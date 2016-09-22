@@ -1,0 +1,68 @@
+/**
+ * The World namespace is where all the VR World functions and variables are
+ * stored.
+ */
+namespace World {
+
+    /**
+     * The CameraChar namespace is where all the functions and variables
+     * related to the camera/main character are stored.
+     */
+    export namespace CameraChar {
+
+        /* A variable to store the camera object. */
+        export var camera;
+
+        /* The height of the character/camera in feet. */
+        export const characterHeight: number = 6;  // 6 feet.
+
+        /**
+         * Set up the camera/character.
+         */
+        export function setup(): void {
+
+            // Get the scene object.
+            let scene = World.scene;
+
+            // The active camera from the babylon file is used (keep it
+            // simple)
+            scene.activeCamera.attachControl(World.canvas);
+            World.CameraChar.camera = scene.activeCamera;
+
+            // Get the camera object for reference.
+            let camera = World.CameraChar.camera;
+
+            // Define an elipsoid raround the camera
+            camera.ellipsoid = new BABYLON.Vector3(
+                1, World.CameraChar.characterHeight / 2, 1
+            );
+
+            // Enable gravity on the camera. The actual strength of the
+            // gravity is set in the babylon file.
+            camera.applyGravity = true;
+
+            // Now enable collisions between the camera and relevant objects.
+            scene.collisionsEnabled = true;
+            camera.checkCollisions = true;
+
+            // Additional control keys.
+            camera.keysUp.push(87);  // W
+            camera.keysLeft.push(65);  // A
+            camera.keysDown.push(83);  // S
+            camera.keysRight.push(68);  // D
+
+            // Set the speed and inertia of camera motions.
+            camera.speed = 0.5;
+            camera.inertia = 0.9;
+        }
+
+        /**
+         * Get the y value (along the up-down axis) of the character's feet.
+         * @return {number} The y value of the feet.
+         */
+        export function feetAltitude(): number {
+            return (World.CameraChar.camera.position.y -
+                    World.CameraChar.characterHeight);
+        }
+    }
+}

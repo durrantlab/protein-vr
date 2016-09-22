@@ -1,0 +1,102 @@
+/**
+ * The World namespace is where all the VR World functions and variables are
+ * stored.
+ */
+namespace World {
+
+    /**
+     * The Ground namespace is where all the functions and variables related
+     * to the ground are stored.
+     */
+    export namespace Ground {
+
+        /** A variable where the ground mesh is stored. */
+        export var groundMesh: any;
+
+        /**
+         * This function checks a mesh to see if it's marked as the ground
+         * mesh. You can mark a mesh as a ground mesh using the VR Blender
+         * plugin.
+         * @param {any} m    The mesh.
+         * @param {any} json The associated json file, which contains the
+         *                   information about whether or not the mesh is
+         *                   marked as the ground.
+         */
+        export function checkInitialMesh(m: any, json: any): void {
+            if (json.g === "1") {
+                // It's the ground
+                m.checkCollisions = false;  // No need to check for collisions
+                                            // with the ground because you
+                                            // test for collisions manually by
+                                            // casting a ray.
+                m.isPickable = true;  // Make the ground pickable. That's how
+                                      // the manual collision checking works.
+                World.Ground.groundMesh = m;  // Set the ground mesh to be
+                                              // this one.
+            } else {
+                m.isPickable = false;  // Everything that isn't the ground
+                                       // isn't pickable.
+            }
+        }
+
+        /**
+         * Make sure the character (really the camera) is always above the
+         * ground.
+         */
+        export function ensureCharAboveGround(): void {
+            // Get a point in 3D space that is three feet above the camera.
+            let pointAboveCamera = World.CameraChar.camera.position.add(
+                new BABYLON.Vector3(0, 3, 0)
+            );
+
+            // Cast a ray straight down from that point, and get the point
+            // where that ray intersects with the ground.
+            let groundPt = World.scene.pickWithRay(
+                new BABYLON.Ray(
+                    pointAboveCamera, new BABYLON.Vector3(0, -0.1, 0)
+                )
+            ).pickedPoint;
+
+            // Get a point in 3D space that is three feet above the camera.
+            let pointBelowCamera = World.CameraChar.camera.position.subtract(
+                new BABYLON.Vector3(0, 3, 0)
+            );
+
+            // If there is no such point, check above the camera. Maybe the
+            // camera has accidentally fallen through the ground.
+            if (groundPt === null) {
+
+                // Cast a ray straight up from that point, and get the point
+                // where that ray intersects with the ground.
+                let groundPt = World.scene.pickWithRay(
+                    new BABYLON.Ray(
+                        pointBelowCamera,
+                        new BABYLON.Vector3(0, 0.1, 0)
+                    )
+                ).pickedPoint;
+            }
+
+            // If the ground point exists, you can check if the character is
+            // above or below that point.
+            if (groundPt !== null) {
+
+                // Get the y value (up-down axis) of the ground.
+                let groundAltitude = groundPt.y;
+
+                // Get the y value (up-down axis) of the character's feet.
+                let feetAltitude = World.CameraChar.feetAltitude();
+
+                // If the ground is aboe the feet, you've got a problem.
+                if (groundAltitude > feetAltitude) {
+                    // Move the camera so it's on top of the ground.
+                    let delta = feetAltitude - groundAltitude;
+                    World.CameraChar.camera.position.y =
+                        World.CameraChar.camera.position.y - delta;
+                }
+            } else {
+                // If that point still doesn't exist, the charamter/camera
+                // must have fallen off the edge of some cliff.
+            }
+        }
+    }
+}
