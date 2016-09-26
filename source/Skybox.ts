@@ -88,7 +88,11 @@ namespace World {
             skyboxMaterial.reflectionTexture.coordinatesMode =
                 BABYLON.Texture.SKYBOX_MODE;
 
-            World.Skybox.skyboxMesh.material = skyboxMaterial;
+            if (World.Skybox.skyboxMesh !== undefined) {
+                World.Skybox.skyboxMesh.material = skyboxMaterial;
+            } else {
+                console.log("ERROR: You tried to apply a skybox, but there is no skybox object imported from blender.");
+            }
         }
     }
 }

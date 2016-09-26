@@ -10,11 +10,13 @@ namespace World {
      */
     export namespace CameraChar {
 
+        export var previousPos = undefined;
+
         /* A variable to store the camera object. */
         export var camera;
 
         /* The height of the character/camera in feet. */
-        export const characterHeight: number = 6;  // 6 feet.
+        export const characterHeight: number = 1.8;  // All units in metric.
 
         /**
          * Set up the camera/character.
@@ -52,8 +54,8 @@ namespace World {
             camera.keysRight.push(68);  // D
 
             // Set the speed and inertia of camera motions.
-            camera.speed = 0.5;
-            camera.inertia = 0.9;
+            camera.inertia = 0; //0.9;
+            camera.angularSensibility = 200;
         }
 
         /**
@@ -63,6 +65,18 @@ namespace World {
         export function feetAltitude(): number {
             return (World.CameraChar.camera.position.y -
                     World.CameraChar.characterHeight);
+        }
+
+        export function repositionPlayerIfCollision() {
+            let intersect: boolean = false;
+            for (let i = 0; i < World.CollisionMeshes.meshesThatCollide.length; i++) {
+                let mesh = World.CollisionMeshes.meshesThatCollide[i];
+                if (mesh.intersectsPoint(World.CameraChar.camera.position)) {
+                    intersect = true;
+                    World.CameraChar.camera.position = World.CameraChar.previousPos;
+                    break;
+                }
+            }
         }
     }
 }

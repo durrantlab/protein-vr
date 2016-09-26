@@ -46,6 +46,9 @@ namespace World {
             // Optimize the scene to keep it running fast.
             optimize();
 
+            // Set up the fog.
+            World.Environment.setFog();
+
             // lensEffect();
             // timers();
 

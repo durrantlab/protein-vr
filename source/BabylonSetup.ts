@@ -6,6 +6,7 @@
 /// <reference path="Billboard.ts" />
 /// <reference path="AutoLOD.ts" />
 /// <reference path="Utils.ts" />
+/// <reference path="Triggers.ts" />
 
 // jQuery is an external library, so declare it here to avoid Typescript
 // errors.
@@ -24,6 +25,8 @@ namespace World {
     export var tmpSpheres = [];
     export var shadowGenerator;
     export var debug: boolean = false;
+    export var meshesByName: any[] = [];
+    export var anyVar: any = undefined;  // Just a place to storev  any variable
 
     /**
      * Set up the BABYLON game engine.
@@ -65,6 +68,9 @@ namespace World {
                             let json = JSON.parse(jsonStr);
                             m.name = json.n;
 
+                            // save for later reference
+                            World.meshesByName[m.name] = m;
+
                             // Given the mesh, check if it shoudl collide with
                             // the camera.
                             World.CollisionMeshes.checkInitialMesh(m, json);
@@ -97,7 +103,7 @@ namespace World {
 
                     // Set up the skybox.
                     World.Skybox.applyBoxImgs(
-                        "3d_resources/sky_boxes/ame_desert/desertsky"
+                        "3d_resources/sky_boxes/sky27/sp9"
                     );
 
                     // Listen for a click. If the user clicks on an object,
@@ -114,14 +120,50 @@ namespace World {
                                    pickResult.pickedMesh.renderingGroupId);
                     });
 
+                    // Add triggers.
+                    World.Triggers.addTrigger(function() {
+                            let mesh = World.meshesByName["surf"];
+                            World.Triggers.PackagedAction.fadeOutMesh(mesh);
+                        }, 
+                        World.Triggers.PackagedConditionals.distance(World.meshesByName["prot_coll"], 6), 
+                        true, 
+                        2000
+                    );
+
+                    World.Triggers.addTrigger(function() {
+                            let mesh = World.meshesByName["surf"];
+                            World.Triggers.PackagedAction.fadeInMesh(mesh);
+                        }, 
+                        World.Triggers.PackagedConditionals.distance(World.meshesByName["prot_coll"], 3), 
+                        true, 
+                        2000
+                    );
+                    
                     // Once the scene is loaded, register a render loop and
                     // start rendering the frames.
                     engine.runRenderLoop(function() {
                         // Make sure the character is aboe the ground.
                         World.Ground.ensureCharAboveGround();
 
+                        // Check for collisions
+                        World.CameraChar.repositionPlayerIfCollision();
+
+                        // Go through each of the triggers and see if any one has been set.
+                        World.Triggers.checkAllTriggers();
+
+                        // Run all timers
+                        World.Timers.tick();
+                        
+                        // Set variables based on current frame rate
+                        let animationRatio = World.scene.getAnimationRatio();
+
+                        World.CameraChar.camera.speed = 1.5 * animationRatio; 
+
                         // Render the scene.
                         newScene.render();
+
+                        // Save location of camera
+                        World.CameraChar.previousPos = World.CameraChar.camera.position.clone();
                     });
                 });
             });

@@ -10,6 +10,8 @@ namespace World {
      */
     export namespace CollisionMeshes {
 
+        export var meshesThatCollide = [];
+
         /**
          * This function checks a mesh to see if it's one that can collide
          * with the camera. You can mark a mesh as collidable mesh using the
@@ -20,12 +22,17 @@ namespace World {
          *                   marked as collidable.
          */
         export function checkInitialMesh(m, json) {
-            if (json.c === "1") {
+            if ((json.c === "1") || (json.h === "1")) {
                 // Enable collisions.
-                m.checkCollisions = true;
+                m.checkCollisions = false; //true;
+                console.log("Collisions on: ", json)
+                World.CollisionMeshes.meshesThatCollide.push(m);
+                // m.material.alpha = 0.0;
+                m.visibility = 0.0;
             } else {
                 // Disable collisions.
                 m.checkCollisions = false;
+                console.log("Collisions off: ", json)
             }
         }
     }

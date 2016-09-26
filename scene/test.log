@@ -1,0 +1,80 @@
+Exporter version: 5.0.5, Blender version: 2.76 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used:
+		selected layers only:  false
+		flat shading entire scene:  false
+		inline textures:  false
+		texture directory:  /Users/jdurrant/Documents/Work/durrant_git/protein-vr/scene/
+	Python World class constructor completed
+	processing begun of mesh:  s:0,g:0,c:0,h:0,n:ribbon,l:0,b:0
+		processing begun of Standard material:  ribbon
+			Diffuse texture found "Texture"
+				Image texture found, type:  diffuseTexture, mapped using: "UVMap"
+		num positions      :  32724
+		num normals        :  32724
+		num uvs            :  65448
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  66777
+	processing begun of mesh:  s:0,g:0,c:0,h:0,n:MG,l:0,b:0
+		processing begun of Standard material:  MG
+			Diffuse texture found "Texture.001"
+				Image texture found, type:  diffuseTexture, mapped using: "UVMap"
+		num positions      :  171
+		num normals        :  171
+		num uvs            :  342
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  384
+	processing begun of mesh:  s:0,g:0,c:0,h:0,n:surf,l:0,b:0
+		processing begun of Standard material:  vmd_mat_cindex_9
+			Diffuse texture found "surface"
+				Image texture found, type:  diffuseTexture, mapped using: "UVMap"
+		num positions      :  32428
+		num normals        :  32428
+		num uvs            :  64856
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  73512
+	processing begun of mesh:  s:0,g:0,c:0,h:1,n:prot_coll,l:0,b:0
+		processing begun of Standard material:  Material.001
+		num positions      :  26
+		num normals        :  26
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  144
+	processing begun of mesh:  s:1,g:0,c:0,h:0,n:sky,l:0,b:0
+		processing begun of Standard material:  Material.003
+		num positions      :  30
+		num normals        :  30
+		num uvs            :  60
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  36
+	processing begun of mesh:  s:0,g:1,c:0,h:0,n:grnd,l:0,b:0
+		processing begun of Standard material:  grount.mat
+			Diffuse texture found "ground"
+				Image texture found, type:  diffuseTexture, mapped using: "UVMap"
+		num positions      :  5056
+		num normals        :  5056
+		num uvs            :  10112
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  24576
+	processing begun of camera (FreeCamera):  s:0,g:0,c:0,h:0,n:cmra,l:0,b:0
+	processing begun of mesh:  s:0,g:0,c:0,h:0,n:lig,l:1,b:0
+		processing begun of Standard material:  Material
+			Diffuse texture found "Texture.002"
+				Image texture found, type:  diffuseTexture, mapped using: "UVMap"
+		num positions      :  5182
+		num normals        :  5182
+		num uvs            :  10364
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  11904
+	processing begun of light (POINT):  Light
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========
+elapsed time:  0 min, 4.0162 secs

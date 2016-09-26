@@ -39,8 +39,8 @@ class OBJECT_OT_update_name(bpy.types.Operator):
 
     bl_label = "Update Object Name"
     bl_idname = "proteinvr.update_name"
-    bl_description = "Update the name of the object to reflect " +
-                     "user-defined parameters."
+    bl_description = ("Update the name of the object to reflect " +
+                     "user-defined parameters.")
 
     def execute(self, context):
         """What to run when the button is clicked.
@@ -48,7 +48,7 @@ class OBJECT_OT_update_name(bpy.types.Operator):
             Args:
                 context: the context.
         """
-        
+
         bpy.context.scene.objects.active.name = data_str
         return {'FINISHED'}
 
@@ -81,50 +81,62 @@ class ProteinVRPanel(bpy.types.Panel):
         # row.label(text="Active object is: " + obj.name)
 
         # The first row in the panel.
-        row = layout.row()
-        # The text input where the user can enter the object name.
-        row.prop(obj, "vr_label", text = "Object label/name")
+        if True:
+            row = layout.row()
+            # The text input where the user can enter the object name.
+            row.prop(obj, "vr_label", text = "Object label/name")
 
         # The second (split) row in the panel.
-        split = layout.split()
-        # The checkbox where the user can specify whether or not the object
-        # can collide with the camera/chracter.
-        col = split.column()
-        col.prop(obj, "is_colidable", text = "Collides with Player?")
-
-        # The checkbox where the user can specify whether or not an object is
-        # the ground.
-        col = split.column()
-        col.prop(obj, "is_ground", text = "Is Ground?")
-
+        if True:
+            split = layout.split()
+            # The checkbox where the user can specify whether or not the object
+            # can collide with the camera/chracter.
+            col = split.column()
+            col.prop(obj, "is_colidable", text = "Collides with Player?")
+    
+            # The checkbox where the user can specify whether or not the object
+            # can collide with the camera/chracter and is hidden (for simplifying
+            # collisions with complex meshes).
+            col = split.column()
+            col.prop(obj, "is_hidden_colidable", text = "Hidden Collider?")
+    
         # The third (split) row in the panel.
-        split = layout.split()
-        # The checkbox where the user can specify whether or not an object
-        # should be rendered as automatic LOD.
-        col = split.column()
-        col.prop(obj, "use_lod", text = "Auto LOD?")
+        if True:
+            split = layout.split()
+            # The checkbox where the user can specify whether or not an object is
+            # the ground.
+            col = split.column()
+            col.prop(obj, "is_ground", text = "Is Ground?")
 
-        col = split.column()
-        # The checkbox where the user can specify whether or not an object
-        # should be a skybox.
-        col.prop(obj, "is_skybox", text = "Is this a Skybox?")
-
+            # The checkbox where the user can specify whether or not an object
+            # should be rendered as automatic LOD.
+            col = split.column()
+            col.prop(obj, "use_lod", text = "Auto LOD?")
+    
         # The fourth (split) row in the panel.
-        split = layout.split()
-        # The checkbox where the user can specify whether or not an object is
-        # a billboard.
-        col = split.column()
-        col.prop(obj, "is_billboard", text = "Is this a Billboard?")
+        if True:
+            split = layout.split()
+            # The checkbox where the user can specify whether or not an object
+            # should be a skybox.
+            col = split.column()
+            col.prop(obj, "is_skybox", text = "Is this a Skybox?")
 
+            # The checkbox where the user can specify whether or not an object is
+            # a billboard.
+            col = split.column()
+            col.prop(obj, "is_billboard", text = "Is this a Billboard?")
+    
         # The fifth row in the panel.
-        row = layout.row()
-        # The text label tht contains the json.
-        row.label(text = self.get_data_str(obj), icon = 'WORLD_DATA')
+        if True:
+            row = layout.row()
+            # The text label tht contains the json.
+            row.label(text = self.get_data_str(obj), icon = 'WORLD_DATA')
 
         # The sixth row in the panel.
-        row = layout.row()
-        # The button to transfer the json to the name of the mesh.
-        row.operator("proteinvr.update_name", text = "Save Data")
+        if True:
+            row = layout.row()
+            # The button to transfer the json to the name of the mesh.
+            row.operator("proteinvr.update_name", text = "Save Data")
 
     def get_data_str(self, obj):
         """Convert the user-specified parameters into a modified json
@@ -143,6 +155,7 @@ class ProteinVRPanel(bpy.types.Panel):
         data_str = json.dumps({
             "n": obj.vr_label,
             "c": int(obj.is_colidable),
+            "h": int(obj.is_hidden_colidable),
             "g": int(obj.is_ground),
             "l": int(obj.use_lod),
             "s": int(obj.is_skybox),
@@ -150,8 +163,9 @@ class ProteinVRPanel(bpy.types.Panel):
         })
 
         # Modify the json string.
-        data_str = str(data_str).replace(" ", "").replace("{", "")
-                                .replace("}", "").replace('"', '')
+        data_str = str(
+            data_str
+        ).replace(" ", "").replace("{", "").replace("}", "").replace('"', '')
 
         return data_str
 
@@ -162,6 +176,14 @@ def register():
         name = "is_colidable",
         description = "Whether or not this object can collide with " + 
                       "the player.",
+        default = False
+    )
+
+    bpy.types.Object.is_hidden_colidable = bpy.props.BoolProperty(
+        name = "is_hidden_colidable",
+        description = "Whether or not this object can collide with " + 
+                      "the player and is invisible. Good for simplifying " +
+                      "collision with more complex meshes.",
         default = False
     )
 
