@@ -16,7 +16,7 @@ Exporter version: 5.0.5, Blender version: 2.76 (sub 0)
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  66777
-	processing begun of mesh:  s:0,g:0,c:0,h:0,n:MG,l:0,b:0
+	processing begun of mesh:  s:0,h:0,b:0,l:0,c:0,n:MG,g:0
 		processing begun of Standard material:  MG
 			Diffuse texture found "Texture.001"
 				Image texture found, type:  diffuseTexture, mapped using: "UVMap"
@@ -26,7 +26,7 @@ Exporter version: 5.0.5, Blender version: 2.76 (sub 0)
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  384
-	processing begun of mesh:  s:0,g:0,c:0,h:0,n:surf,l:0,b:0
+	processing begun of mesh:  s:0,h:0,b:0,l:0,c:0,n:surf,g:0
 		processing begun of Standard material:  vmd_mat_cindex_9
 			Diffuse texture found "surface"
 				Image texture found, type:  diffuseTexture, mapped using: "UVMap"
@@ -36,7 +36,7 @@ Exporter version: 5.0.5, Blender version: 2.76 (sub 0)
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  73512
-	processing begun of mesh:  s:0,g:0,c:0,h:1,n:prot_coll,l:0,b:0
+	processing begun of mesh:  s:0,h:0,b:0,l:0,c:1,n:prot_coll,g:0
 		processing begun of Standard material:  Material.001
 		num positions      :  26
 		num normals        :  26
@@ -44,7 +44,7 @@ Exporter version: 5.0.5, Blender version: 2.76 (sub 0)
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  144
-	processing begun of mesh:  s:1,g:0,c:0,h:0,n:sky,l:0,b:0
+	processing begun of mesh:  s:1,h:0,b:0,l:0,c:0,n:sky,g:0
 		processing begun of Standard material:  Material.003
 		num positions      :  30
 		num normals        :  30
@@ -62,8 +62,8 @@ Exporter version: 5.0.5, Blender version: 2.76 (sub 0)
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  24576
-	processing begun of camera (FreeCamera):  s:0,g:0,c:0,h:0,n:cmra,l:0,b:0
-	processing begun of mesh:  s:0,g:0,c:0,h:0,n:lig,l:1,b:0
+	processing begun of camera (FreeCamera):  s:0,h:0,b:0,l:0,c:0,n:cmra,g:0
+	processing begun of mesh:  s:0,h:0,b:0,l:1,c:0,n:lig,g:0
 		processing begun of Standard material:  Material
 			Diffuse texture found "Texture.002"
 				Image texture found, type:  diffuseTexture, mapped using: "UVMap"
@@ -77,4 +77,4 @@ Exporter version: 5.0.5, Blender version: 2.76 (sub 0)
 ========= Writing of scene file started =========
 ========= Writing of scene file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 4.0162 secs
+elapsed time:  0 min, 4.4735 secs

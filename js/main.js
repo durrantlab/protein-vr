@@ -515,13 +515,15 @@ var World;
 (function (World) {
     var Timers;
     (function (Timers) {
-        Timers.timersList = [];
+        Timers.timers = {};
         Timers.lastTime = new Date().getTime();
         function addTimer(params) {
-            var params2 = params;
-            params2.index = World.Timers.timersList.length;
-            var newTimer = new World.Timers.Timer(params2);
-            World.Timers.timersList.push(newTimer);
+            // Default tickFrameFrequency to 1 (check timer every frame)
+            params.tickFrameFrequency = (params.tickFrameFrequency === undefined) ? 1 : params.tickFrameFrequency;
+            // Make a new timer.
+            var newTimer = new World.Timers.Timer(params);
+            // Add it to the timer list.
+            World.Timers.timers[params.name] = newTimer;
         }
         Timers.addTimer = addTimer;
         function tick() {
@@ -529,9 +531,10 @@ var World;
             var nowTime = new Date().getTime();
             var deltaTime = nowTime - World.Timers.lastTime;
             World.Timers.lastTime = nowTime;
-            for (var i = 0; i < World.Timers.timersList.length; i++) {
-                var timer = World.Timers.timersList[i];
-                timer.tick(deltaTime);
+            for (var key in World.Timers.timers) {
+                if (World.Timers.timers.hasOwnProperty(key)) {
+                    World.Timers.timers[key].tick(deltaTime);
+                }
             }
         }
         Timers.tick = tick;
@@ -542,10 +545,22 @@ var World;
                 this.parameters = params;
                 // Set the current time remaining.
                 this.timeRemaining = params.intervalInMiliseconds;
+                // There's a lot of functions flying around here. Let's add
+                // the current object to this.parameters.extraVars just in
+                // case one of those functions is in another context (so you
+                // don't have to figure out what "this" is).
+                this.parameters.extraVars = (this.parameters.extraVars === undefined) ? {} : this.parameters.extraVars;
+                this.parameters.extraVars.timerObj = this;
+                World.debugMsg("Timer " + this.parameters.name + ": Starting");
             }
             Timer.prototype.tick = function (deltaTime) {
                 // Compute the remaining time on this timer
                 this.timeRemaining = this.timeRemaining - deltaTime;
+                // See if this timer is set to be checked for this frame number.
+                if (World.frameNum % this.parameters.tickFrameFrequency !== 0) {
+                    return;
+                }
+                // World.debugMsg("Timer " + this.parameters.name + ": Tick. " + this.timeRemaining.toString() + " ms remaining.");
                 // Run the tick callback if it exists
                 if (this.parameters.tickCallback !== undefined) {
                     // Interpolate between the start and end values, based on timer value.
@@ -556,20 +571,31 @@ var World;
                     var run = this.parameters.intervalInMiliseconds;
                     var m = rise / run;
                     var interpVal = m * this.timeRemaining + this.parameters.interpValEnd;
-                    this.parameters.tickCallback(interpVal);
+                    // Be sure to also pass the extraVars to any callback.
+                    this.parameters.tickCallback(interpVal, this.parameters.extraVars);
                 }
                 // If timeRemaining is less than 0, trigger doneCallback
                 if (this.timeRemaining < 0) {
                     if (this.parameters.doneCallback !== undefined) {
-                        this.parameters.doneCallback();
+                        World.debugMsg("Timer " + this.parameters.name + ": Calling doneCallBack. Time remaining: " + this.timeRemaining.toString() + " ms");
+                        // Be sure to pass extraVars to any callback.
+                        this.parameters.doneCallback(this.parameters.extraVars);
                     }
+                }
+                if (this.timeRemaining < 0) {
+                    // Don't merge this with the if block above, because
+                    // there's a chance that in some circumstances the
+                    // callback function might modify this.timeRemaining. So
+                    // you need to recheck it.
                     // If it's autorestart, add the interval time to timeRemaining.
                     if (this.parameters.autoRestart === true) {
+                        World.debugMsg("Timer " + this.parameters.name + ": Restarting");
                         this.timeRemaining = this.timeRemaining + this.parameters.intervalInMiliseconds;
                     }
                     else {
+                        World.debugMsg("Timer " + this.parameters.name + ": Removing");
                         // Otherwise, remove the timer from the list so it is no longer called.
-                        World.Timers.timersList.splice(this.parameters.index, 1);
+                        delete World.Timers.timers[this.parameters.name];
                     }
                 }
             };
@@ -584,53 +610,47 @@ var World;
     var Triggers;
     (function (Triggers) {
         Triggers.triggers = [];
-        function addTrigger(action, conditionToSatisfy, fireOnce, intervalInMiliseconds) {
-            if (intervalInMiliseconds === void 0) { intervalInMiliseconds = 2000; }
-            var trig = new World.Triggers.Trigger(action, conditionToSatisfy, fireOnce, intervalInMiliseconds);
-            World.Triggers.triggers.push(trig);
+        function addTrigger(params) {
+            // Create a new trigger object. It will be checked from within a
+            // timer object.
+            var trig = new World.Triggers.Trigger(params);
+            // Create a timer that checks if the trigger should be fired every
+            // so often, and fires it if necessary. Optional parameters on
+            // triggerTimerParams need to be overwritten here to work with
+            // Trigger.
+            params.extraVars = {
+                // The trigger object must be associated with the timer, and visa versa.
+                triggerObj: trig
+            };
+            params.doneCallback = function (extraVars) {
+                // After the timer countdown, check the trigger.
+                if (!(extraVars.triggerObj.check())) {
+                    // So the condition isn't satisfied yet. Regardless of the
+                    // user-specified value of autoRestart, you need to check
+                    // again in a bit to see if the condition is satisfied.
+                    extraVars.timerObj.timeRemaining = extraVars.timerObj.timeRemaining + extraVars.timerObj.parameters.intervalInMiliseconds;
+                }
+            };
+            // Enable the timer.
+            World.Timers.addTimer(params);
         }
         Triggers.addTrigger = addTrigger;
-        function checkAllTriggers() {
-            for (var i = 0; i < World.Triggers.triggers.length; i++) {
-                var trig = World.Triggers.triggers[i];
-                trig.tick();
-            }
-        }
-        Triggers.checkAllTriggers = checkAllTriggers;
         var Trigger = (function () {
-            function Trigger(action, conditionToSatisfy, fireOnce, intervalInMiliseconds) {
-                if (intervalInMiliseconds === void 0) { intervalInMiliseconds = 2000; }
-                this.action = function () { };
-                this.conditionToSatisfy = function () { };
-                this.intervalInMiliseconds = 0;
-                this.fireOnce = true;
-                this.countDown = 0;
-                this.lastTime = 0;
+            //public vars = {};
+            function Trigger(params) {
                 // Set class variables
-                this.action = action;
-                this.conditionToSatisfy = conditionToSatisfy; // This function doesn't accept parameters. Just bind the needed variables.
-                this.fireOnce = fireOnce;
-                this.intervalInMiliseconds = intervalInMiliseconds;
-                // Set countdown.
-                this.countDown = intervalInMiliseconds;
-                this.lastTime = new Date().getTime();
+                this.parameters = params;
+                // Set the extra vars
+                // this.vars = extraVars;
             }
-            Trigger.prototype.tick = function () {
-                if (this.countDown < 0) {
-                    this.countDown = this.intervalInMiliseconds;
-                    if (this.conditionToSatisfy()) {
-                        this.action();
-                        if (this.fireOnce == true) {
-                            this.action = function () { };
-                        }
-                    }
+            Trigger.prototype.check = function () {
+                World.debugMsg("Checking a trigger.");
+                var conditionSatisfied = this.parameters.conditionToSatisfy();
+                if (conditionSatisfied) {
+                    this.parameters.actionIfConditionSatisfied();
+                    World.debugMsg("Trigger firing.");
                 }
-                else {
-                    var curTime = new Date().getTime();
-                    var deltaTime = curTime - this.lastTime;
-                    this.countDown = this.countDown - deltaTime;
-                    this.lastTime = curTime;
-                }
+                return conditionSatisfied;
             };
             return Trigger;
         }());
@@ -642,18 +662,23 @@ var World;
                 var func = function () {
                     // First check if the player is within a certain distance of the target.
                     var dist = BABYLON.Vector3.Distance(this.triggerMesh.position, World.CameraChar.camera.position);
+                    World.debugMsg("Distance from camera to " + this.triggerMesh.name + ": " + dist.toString());
                     if (dist < this.cutoffDistance) {
+                        World.debugMsg("That distance is less than cutoff of " + this.cutoffDistance.toString());
                         // They are close to the target.
                         // Now check if the camera is looking at the target.
                         var frustumPlanes = BABYLON.Frustum.GetPlanes(World.scene.getTransformMatrix());
                         if (triggerMesh.isInFrustum(frustumPlanes)) {
+                            World.debugMsg(this.triggerMesh.name + " is also visible to camera. So condition satisfied.");
                             return true;
                         }
                         else {
+                            World.debugMsg("But " + this.triggerMesh.name + " is not visible to camera.");
                             return false;
                         }
                     }
                     else {
+                        World.debugMsg("That distance is NOT less than cutoff of " + this.cutoffDistance.toString());
                         // They are not, so return false.
                         return false;
                     }
@@ -668,26 +693,44 @@ var World;
         var PackagedAction;
         (function (PackagedAction) {
             function fadeOutMesh(mesh, milliseconds) {
+                // Note: For complex geometries, this will likely cause problems.
+                // See http://www.html5gamedevs.com/topic/25430-transparency-issues/
                 if (milliseconds === void 0) { milliseconds = 2000; }
+                mesh.material.alphaMode = BABYLON.Engine.ALPHA_ADD;
                 World.Timers.addTimer({
+                    name: "FadeOut" + Math.random().toString(),
                     intervalInMiliseconds: milliseconds,
                     interpValStart: 1.0,
                     interpValEnd: 0.0,
                     autoRestart: false,
-                    tickCallback: function (val) { this.visibility = val; }.bind(mesh),
-                    doneCallback: function () { this.visibility = 0; }.bind(mesh)
+                    tickCallback: function (val) {
+                        this.material.alpha = val;
+                    }.bind(mesh),
+                    doneCallback: function () {
+                        this.material.alpha = 0;
+                        mesh.material.alphaMode = BABYLON.Engine.ALPHA_COMBINE;
+                    }.bind(mesh)
                 });
             }
             PackagedAction.fadeOutMesh = fadeOutMesh;
             function fadeInMesh(mesh, milliseconds) {
+                // Note: For complex geometries, this will likely cause problems.
+                // See http://www.html5gamedevs.com/topic/25430-transparency-issues/
                 if (milliseconds === void 0) { milliseconds = 2000; }
+                mesh.material.alphaMode = BABYLON.Engine.ALPHA_ADD;
                 World.Timers.addTimer({
+                    name: "FadeIn" + Math.random().toString(),
                     intervalInMiliseconds: milliseconds,
                     interpValStart: 0.0,
                     interpValEnd: 1.0,
                     autoRestart: false,
-                    tickCallback: function (val) { this.visibility = val; }.bind(mesh),
-                    doneCallback: function () { this.visibility = 1.0; }.bind(mesh)
+                    tickCallback: function (val) {
+                        this.material.alpha = val;
+                    }.bind(mesh),
+                    doneCallback: function () {
+                        this.material.alpha = 1.0;
+                        mesh.material.alphaMode = BABYLON.Engine.ALPHA_COMBINE;
+                    }.bind(mesh)
                 });
             }
             PackagedAction.fadeInMesh = fadeInMesh;
@@ -713,13 +756,20 @@ var World;
     World.debug = false;
     World.meshesByName = [];
     World.anyVar = undefined; // Just a place to storev  any variable
+    World.frameNum = 0;
+    function debugMsg(msg) {
+        if (World.debug === true) {
+            console.log(msg);
+        }
+    }
+    World.debugMsg = debugMsg;
     /**
      * Set up the BABYLON game engine.
      */
     function setup() {
         // Whether or not to run in debug mode (shows certain messages in the
         // console, etc.)
-        World.debug = true;
+        World.debug = false;
         // Only run the below once the whole document has loaded.
         $(document).ready(function () {
             // Get the canvas DOM element.
@@ -780,32 +830,51 @@ var World;
                         console.log(pickResult.pickedMesh, pickResult.pickedMesh.name, pickResult.pickedMesh.renderingGroupId);
                     });
                     // Add triggers.
-                    World.Triggers.addTrigger(function () {
-                        var mesh = World.meshesByName["surf"];
-                        World.Triggers.PackagedAction.fadeOutMesh(mesh);
-                    }, World.Triggers.PackagedConditionals.distance(World.meshesByName["prot_coll"], 6), true, 2000);
-                    World.Triggers.addTrigger(function () {
-                        var mesh = World.meshesByName["surf"];
-                        World.Triggers.PackagedAction.fadeInMesh(mesh);
-                    }, World.Triggers.PackagedConditionals.distance(World.meshesByName["prot_coll"], 3), true, 2000);
+                    World.Triggers.addTrigger({
+                        name: "FadeOutWhenWithinSixMeters",
+                        conditionToSatisfy: World.Triggers.PackagedConditionals.distance(World.meshesByName["prot_coll"], 5),
+                        actionIfConditionSatisfied: function () {
+                            var mesh = World.meshesByName["surf"];
+                            World.Triggers.PackagedAction.fadeOutMesh(mesh);
+                        },
+                        intervalInMiliseconds: 2000,
+                        autoRestart: false,
+                        tickFrameFrequency: 20
+                    });
+                    World.Triggers.addTrigger({
+                        name: "FadeInWhenWithinThreeMeters",
+                        conditionToSatisfy: World.Triggers.PackagedConditionals.distance(World.meshesByName["prot_coll"], 3),
+                        actionIfConditionSatisfied: function () {
+                            var mesh = World.meshesByName["surf"];
+                            World.Triggers.PackagedAction.fadeInMesh(mesh);
+                        },
+                        intervalInMiliseconds: 2000,
+                        autoRestart: false,
+                        tickFrameFrequency: 20
+                    });
                     // Once the scene is loaded, register a render loop and
                     // start rendering the frames.
                     World.engine.runRenderLoop(function () {
-                        // Make sure the character is aboe the ground.
-                        World.Ground.ensureCharAboveGround();
-                        // Check for collisions
-                        World.CameraChar.repositionPlayerIfCollision();
-                        // Go through each of the triggers and see if any one has been set.
-                        World.Triggers.checkAllTriggers();
-                        // Run all timers
+                        World.frameNum++;
+                        // Some things don't need to be checked every frame.
+                        // Let's minimize stuff to improve speed.
+                        if (World.frameNum % 10 === 0) {
+                            // Assuming a fps of 30, this is about every third of a second.
+                            // Save location of camera
+                            World.CameraChar.previousPos = World.CameraChar.camera.position.clone();
+                            // Check for collisions
+                            World.CameraChar.repositionPlayerIfCollision();
+                        }
+                        // These do run every frame
+                        // Run all timers every 10 frames (faster than every frame, probably.)
                         World.Timers.tick();
+                        // Make sure the character is above the ground.
+                        World.Ground.ensureCharAboveGround();
                         // Set variables based on current frame rate
                         var animationRatio = World.scene.getAnimationRatio();
                         World.CameraChar.camera.speed = 1.5 * animationRatio;
                         // Render the scene.
                         newScene.render();
-                        // Save location of camera
-                        World.CameraChar.previousPos = World.CameraChar.camera.position.clone();
                     });
                 });
             });

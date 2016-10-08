@@ -14,6 +14,8 @@ bl_info = {
 import random  # To use random numbers.
 import bpy     # To interface with Blender.
 import json    # To work with json.
+import sys
+import os
 
 # Get properties (basically variable types) for the plugin parameters.
 from bpy.props import (StringProperty,
@@ -50,6 +52,105 @@ class OBJECT_OT_update_name(bpy.types.Operator):
         """
 
         bpy.context.scene.objects.active.name = data_str
+        return {'FINISHED'}
+
+class OBJECT_OT_bake_shadows(bpy.types.Operator):
+    """This class represents the "action" when the button is clicked."""
+
+    bl_label = "Bake a Shadow Map"
+    bl_idname = "proteinvr.bake_shadows"
+    bl_description = ("Bake shadows to an image.")
+
+    def remove_material(self, active_obj):
+        # Save that objects current material, and then remove it.
+        # This assumes one material per object.
+        try:  # Maybe there isn't a material'
+            material_of_active = active_obj.material_slots[0].material
+        except:
+            material_of_active = None
+
+        # Remove that material.
+        active_obj.active_material_index = 0
+        bpy.ops.object.material_slot_remove()
+
+        return material_of_active
+
+
+    def execute(self, context):
+        """What to run when the button is clicked.
+        
+            Args:
+                context: the context.
+        """
+
+        # First, make sure you're in cycles.
+        context.scene.render.engine = 'CYCLES'
+
+        # Make sure you're in object mode
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+        # Get the active object.
+        active_obj = context.object
+
+        # Check to make sure the object is UV unwrapped
+        if len(active_obj.data.uv_layers) == 0:
+            self.report({'ERROR'}, "Error! The object needs to be UV unwrapped!")
+        
+        # Bake the texture.
+        elif len(active_obj.data.uv_textures) > 1:
+            self.report({'ERROR'}, "Error! There must be only 1 uv map! Currently there are " + str(len(active_obj.data.uv_textures)) + ".")
+
+        else:  # No errors, so proceed
+            # Get the original material and remove it
+            orig_material = self.remove_material(active_obj)
+
+            # Create a new image to render the shadows to
+            image_name = "tmptmp" + str(random.random())
+            image = bpy.ops.image.new(
+                name   = image_name,
+                width  = 512,
+                height = 512,
+                color  = (1.0, 1.0, 1.0, 1.0),
+                alpha  = False
+            )
+
+            # Create a new material, pure white diffuse.
+            mat_name = "tmptmp" + str(random.random())
+            mat = bpy.data.materials.new(name=mat_name)
+            mat.use_nodes = True
+            nodes = mat.node_tree.nodes
+            links = mat.node_tree.links
+            output = nodes['Material Output']
+            diffuse = nodes['Diffuse BSDF']
+            diffuse.inputs["Color"].default_value = (1.0, 1.0, 1.0, 1.0)  # pure white
+
+            # You need to add a texture node
+            texture_node = nodes.new(type='ShaderNodeTexImage') 
+            texture_node.select = True
+            texture_node.image = bpy.data.images[image_name]
+            mat.node_tree.nodes.active = texture_node
+
+            # Add this material to the current object
+            active_obj.data.materials.append(mat)
+
+            # Bake the shadow map
+            uv_textures = active_obj.data.uv_textures
+            uv_textures.active = active_obj.data.uv_textures[0]  # Assuming just one uv map
+            bpy.ops.object.bake(type='COMBINED')
+
+            # Save that shadow map
+            img = bpy.data.images[image_name]
+            filepath =  "/var/tmp/shadow.jpg" if bpy.data.filepath == '' else os.path.dirname(bpy.data.filepath) + os.sep + "shadow.jpg"
+            img.filepath_raw = bpy.path.abspath(filepath)
+            img.file_format = 'JPEG'
+            img.save()
+
+            # Remove the temporary material
+            #self.remove_material(active_obj)
+            #active_obj.data.materials.append(orig_material)
+
+            self.report({'ERROR'}, "Shadow map saved to " + filepath + ". Now blur the image in a program like PhotoShop.")
+
         return {'FINISHED'}
 
 class ProteinVRPanel(bpy.types.Panel):
@@ -137,6 +238,12 @@ class ProteinVRPanel(bpy.types.Panel):
             row = layout.row()
             # The button to transfer the json to the name of the mesh.
             row.operator("proteinvr.update_name", text = "Save Data")
+
+        # The seventh row in the panel.
+        if True:
+            row = layout.row()
+            # The button to bake shadows
+            row.operator("proteinvr.bake_shadows", text = "Bake a Shadow Map")
 
     def get_data_str(self, obj):
         """Convert the user-specified parameters into a modified json

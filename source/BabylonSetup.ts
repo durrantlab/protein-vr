@@ -27,6 +27,13 @@ namespace World {
     export var debug: boolean = false;
     export var meshesByName: any[] = [];
     export var anyVar: any = undefined;  // Just a place to storev  any variable
+    export var frameNum: number = 0;
+
+    export function debugMsg(msg: string) {
+        if (World.debug === true) {
+            console.log(msg);
+        }
+    }
 
     /**
      * Set up the BABYLON game engine.
@@ -34,7 +41,7 @@ namespace World {
     export function setup(): void {
         // Whether or not to run in debug mode (shows certain messages in the
         // console, etc.)
-        World.debug = true;
+        World.debug = false;
 
         // Only run the below once the whole document has loaded.
         $(document).ready(function() {
@@ -121,49 +128,62 @@ namespace World {
                     });
 
                     // Add triggers.
-                    World.Triggers.addTrigger(function() {
+                    World.Triggers.addTrigger({
+                        name: "FadeOutWhenWithinSixMeters",
+                        conditionToSatisfy: World.Triggers.PackagedConditionals.distance(World.meshesByName["prot_coll"], 5),
+                        actionIfConditionSatisfied: function() {
                             let mesh = World.meshesByName["surf"];
                             World.Triggers.PackagedAction.fadeOutMesh(mesh);
-                        }, 
-                        World.Triggers.PackagedConditionals.distance(World.meshesByName["prot_coll"], 6), 
-                        true, 
-                        2000
-                    );
+                        },
+                        intervalInMiliseconds: 2000,
+                        autoRestart: false,
+                        tickFrameFrequency: 20
+                    });
 
-                    World.Triggers.addTrigger(function() {
+                    World.Triggers.addTrigger({
+                        name: "FadeInWhenWithinThreeMeters",
+                        conditionToSatisfy: World.Triggers.PackagedConditionals.distance(World.meshesByName["prot_coll"], 3),
+                        actionIfConditionSatisfied: function() {
                             let mesh = World.meshesByName["surf"];
                             World.Triggers.PackagedAction.fadeInMesh(mesh);
-                        }, 
-                        World.Triggers.PackagedConditionals.distance(World.meshesByName["prot_coll"], 3), 
-                        true, 
-                        2000
-                    );
-                    
+                        },
+                        intervalInMiliseconds: 2000,
+                        autoRestart: false,
+                        tickFrameFrequency: 20
+                    });
+
                     // Once the scene is loaded, register a render loop and
                     // start rendering the frames.
                     engine.runRenderLoop(function() {
-                        // Make sure the character is aboe the ground.
+                        World.frameNum++;
+
+                        // Some things don't need to be checked every frame.
+                        // Let's minimize stuff to improve speed.
+                        
+                        if (World.frameNum % 10 === 0) {
+                            // Assuming a fps of 30, this is about every third of a second.
+
+                            // Save location of camera
+                            World.CameraChar.previousPos = World.CameraChar.camera.position.clone();
+
+                            // Check for collisions
+                            World.CameraChar.repositionPlayerIfCollision();
+                        }
+
+                        // These do run every frame
+
+                        // Run all timers every 10 frames (faster than every frame, probably.)
+                        World.Timers.tick();
+
+                        // Make sure the character is above the ground.
                         World.Ground.ensureCharAboveGround();
 
-                        // Check for collisions
-                        World.CameraChar.repositionPlayerIfCollision();
-
-                        // Go through each of the triggers and see if any one has been set.
-                        World.Triggers.checkAllTriggers();
-
-                        // Run all timers
-                        World.Timers.tick();
-                        
                         // Set variables based on current frame rate
                         let animationRatio = World.scene.getAnimationRatio();
-
                         World.CameraChar.camera.speed = 1.5 * animationRatio; 
 
                         // Render the scene.
                         newScene.render();
-
-                        // Save location of camera
-                        World.CameraChar.previousPos = World.CameraChar.camera.position.clone();
                     });
                 });
             });
