@@ -1,82 +1,83 @@
+import Core from "./Core/Core";
+import CollisionMeshes from "./Objects/CollisionMeshes";
+
+declare var BABYLON;
+
 /**
- * The World namespace is where all the VR World functions and variables are
- * stored.
+ * The CameraChar namespace is where all the functions and variables
+ * related to the camera/main character are stored.
  */
-namespace World {
+namespace CameraChar {
+
+    export var previousPos = undefined;
+
+    /* A variable to store the camera object. */
+    export var camera;
+
+    /* The height of the character/camera in feet. */
+    export const characterHeight: number = 1.8;  // All units in metric.
 
     /**
-     * The CameraChar namespace is where all the functions and variables
-     * related to the camera/main character are stored.
+     * Set up the camera/character.
      */
-    export namespace CameraChar {
+    export function setup(): void {
 
-        export var previousPos = undefined;
+        // Get the scene object.
+        let scene = Core.scene;
 
-        /* A variable to store the camera object. */
-        export var camera;
+        // The active camera from the babylon file is used (keep it
+        // simple)
+        scene.activeCamera.attachControl(Core.canvas);
+        CameraChar.camera = scene.activeCamera;
 
-        /* The height of the character/camera in feet. */
-        export const characterHeight: number = 1.8;  // All units in metric.
+        // Get the camera object for reference.
+        let camera = CameraChar.camera;
 
-        /**
-         * Set up the camera/character.
-         */
-        export function setup(): void {
+        // Define an elipsoid raround the camera
+        camera.ellipsoid = new BABYLON.Vector3(
+            1, CameraChar.characterHeight / 2, 1
+        );
 
-            // Get the scene object.
-            let scene = World.scene;
+        // Enable gravity on the camera. The actual strength of the
+        // gravity is set in the babylon file.
+        camera.applyGravity = true;
 
-            // The active camera from the babylon file is used (keep it
-            // simple)
-            scene.activeCamera.attachControl(World.canvas);
-            World.CameraChar.camera = scene.activeCamera;
+        // Now enable collisions between the camera and relevant objects.
+        scene.collisionsEnabled = true;
+        camera.checkCollisions = true;
 
-            // Get the camera object for reference.
-            let camera = World.CameraChar.camera;
+        // Additional control keys.
+        camera.keysUp.push(87);  // W
+        camera.keysLeft.push(65);  // A
+        camera.keysDown.push(83);  // S
+        camera.keysRight.push(68);  // D
 
-            // Define an elipsoid raround the camera
-            camera.ellipsoid = new BABYLON.Vector3(
-                1, World.CameraChar.characterHeight / 2, 1
-            );
+        // Set the speed and inertia of camera motions.
+        camera.inertia = 0; //0.9;
+        camera.angularSensibility = 200;
+    }
 
-            // Enable gravity on the camera. The actual strength of the
-            // gravity is set in the babylon file.
-            camera.applyGravity = true;
+    /**
+     * Get the y value (along the up-down axis) of the character's feet.
+     * @return {number} The y value of the feet.
+     */
+    export function feetAltitude(): number {
+        return (CameraChar.camera.position.y -
+                CameraChar.characterHeight);
+    }
 
-            // Now enable collisions between the camera and relevant objects.
-            scene.collisionsEnabled = true;
-            camera.checkCollisions = true;
-
-            // Additional control keys.
-            camera.keysUp.push(87);  // W
-            camera.keysLeft.push(65);  // A
-            camera.keysDown.push(83);  // S
-            camera.keysRight.push(68);  // D
-
-            // Set the speed and inertia of camera motions.
-            camera.inertia = 0; //0.9;
-            camera.angularSensibility = 200;
-        }
-
-        /**
-         * Get the y value (along the up-down axis) of the character's feet.
-         * @return {number} The y value of the feet.
-         */
-        export function feetAltitude(): number {
-            return (World.CameraChar.camera.position.y -
-                    World.CameraChar.characterHeight);
-        }
-
-        export function repositionPlayerIfCollision() {
-            let intersect: boolean = false;
-            for (let i = 0; i < World.CollisionMeshes.meshesThatCollide.length; i++) {
-                let mesh = World.CollisionMeshes.meshesThatCollide[i];
-                if (mesh.intersectsPoint(World.CameraChar.camera.position)) {
-                    intersect = true;
-                    World.CameraChar.camera.position = World.CameraChar.previousPos;
-                    break;
-                }
+    export function repositionPlayerIfCollision() {
+        let intersect: boolean = false;
+        for (let i = 0; i < CollisionMeshes.meshesThatCollide.length; i++) {
+            let mesh = CollisionMeshes.meshesThatCollide[i];
+            if (mesh.intersectsPoint(CameraChar.camera.position)) {
+                intersect = true;
+                CameraChar.camera.position = CameraChar.previousPos.clone();
+                break;
             }
         }
     }
 }
+
+
+export default CameraChar;

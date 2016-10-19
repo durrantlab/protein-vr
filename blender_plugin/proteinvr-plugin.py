@@ -134,9 +134,12 @@ class OBJECT_OT_bake_shadows(bpy.types.Operator):
             active_obj.data.materials.append(mat)
 
             # Bake the shadow map
+            oldCyclesSamples = context.scene.cycles.samples
+            context.scene.cycles.samples = 200
             uv_textures = active_obj.data.uv_textures
             uv_textures.active = active_obj.data.uv_textures[0]  # Assuming just one uv map
-            bpy.ops.object.bake(type='COMBINED')
+            bpy.ops.object.bake(type='COMBINED', use_selected_to_active=False)
+            context.scene.cycles.samples = oldCyclesSamples
 
             # Save that shadow map
             img = bpy.data.images[image_name]
@@ -146,10 +149,10 @@ class OBJECT_OT_bake_shadows(bpy.types.Operator):
             img.save()
 
             # Remove the temporary material
-            #self.remove_material(active_obj)
-            #active_obj.data.materials.append(orig_material)
+            self.remove_material(active_obj)
+            active_obj.data.materials.append(orig_material)
 
-            self.report({'ERROR'}, "Shadow map saved to " + filepath + ". Now blur the image in a program like PhotoShop.")
+            self.report({'ERROR'}, "Shadow map saved to " + filepath + ".\nNow blur the image and convert to black and white in a program like PhotoShop.")
 
         return {'FINISHED'}
 
@@ -233,6 +236,12 @@ class ProteinVRPanel(bpy.types.Panel):
             # The text label tht contains the json.
             row.label(text = self.get_data_str(obj), icon = 'WORLD_DATA')
 
+        # The first row in the panel.
+        if True:
+            row = layout.row()
+            # The text input where the user can enter the name of a custom shader.
+            row.prop(obj, "custom_shader", text = "Custom Shader")
+
         # The sixth row in the panel.
         if True:
             row = layout.row()
@@ -267,6 +276,7 @@ class ProteinVRPanel(bpy.types.Panel):
             "l": int(obj.use_lod),
             "s": int(obj.is_skybox),
             "b": int(obj.is_billboard),
+            "cs": obj.custom_shader,
         })
 
         # Modify the json string.
@@ -322,6 +332,12 @@ def register():
         name="Enable or Disable",
         description="A short object label.",
         default="d" + str(random.randint(0,100))
+    )
+
+    bpy.types.Object.custom_shader = StringProperty(
+        name="Enable or Disable",
+        description="The same of a custom shader to use. This custom shader is defined in the associated Typescript code, not in here in Blender. If empty, uses the Blender material.",
+        default=""
     )
 
     bpy.utils.register_module(__name__)
