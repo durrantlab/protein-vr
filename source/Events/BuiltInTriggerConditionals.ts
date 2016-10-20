@@ -3,8 +3,12 @@ import CameraChar from "../CameraChar";
 
 declare var BABYLON;
 
+// Useful variables:
+// Location of camera: CameraChar.camera.position
+
+
 namespace BuiltInTriggerConditionals {
-    export function distance(triggerMesh, cutoffDistance: number) {
+    export function distance(triggerMesh, cutoffDistance: number): boolean {
 
         // The distance trigger function.
         let func = function() {

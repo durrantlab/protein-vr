@@ -1,6 +1,14 @@
 import Timers from "./Timers";
+import Core from "../Core/Core";
+import CameraChar from "../CameraChar";
 
 declare var BABYLON;
+
+// Useful variables:
+// Location of camera: CameraChar.camera.position
+// The same is true of a mesh. mesh.position is the location of the mesh.
+// Timers will be useful here. Let's talk about it if it's not clear from the examples below.
+
 
 namespace BuiltInActions {
     export function fadeOutMesh(mesh, milliseconds: number = 2000) {
