@@ -6,6 +6,7 @@ import Core from "./Core/Core";
 import Event from "./Events/Event";
 import DistanceToMesh from "./Events/TriggerConditionals/DistanceToMesh";
 import FadeOutMesh from "./Events/Actions/FadeOutMesh";
+import ScreenWhite from "./Events/Actions/ScreenWhite";
 
 window.Core = Core;
 
@@ -143,7 +144,7 @@ let setEvents = function() {
             triggerMesh: Core.meshesByName["surf_trgt"], 
             cutOffDistance: 9.0
         }),
-        new FadeOutMesh({
+        new ScreenWhite({
             mesh: Core.meshesByName["surf"], 
             milliseconds: 2000
         })

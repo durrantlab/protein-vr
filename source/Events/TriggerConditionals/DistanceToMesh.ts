@@ -10,6 +10,7 @@ interface CheckInterface {
     cutOffDistance: number;
 }
 
+
 class DistanceToMesh extends parent {
 
     constructor(params: CheckInterface) {

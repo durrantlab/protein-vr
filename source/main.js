@@ -1,5 +1,5 @@
 // THIS IS WHERE ANY CUSTOM CODE GOES. DEFINING SHADERS AND TRIGGERS AND SUCH.
-define(["require", "exports", "./Core/Setup", "./Shader/Shader", "./Core/Core", "./Events/Event", "./Events/TriggerConditionals/DistanceToMesh", "./Events/Actions/FadeOutMesh"], function (require, exports, Setup_1, Shader_1, Core_1, Event_1, DistanceToMesh_1, FadeOutMesh_1) {
+define(["require", "exports", "./Core/Setup", "./Shader/Shader", "./Core/Core", "./Events/Event", "./Events/TriggerConditionals/DistanceToMesh", "./Events/Actions/ScreenWhite"], function (require, exports, Setup_1, Shader_1, Core_1, Event_1, DistanceToMesh_1, ScreenWhite_1) {
     "use strict";
     window.Core = Core_1.default;
     // A function to create any custom shaders
@@ -116,7 +116,7 @@ define(["require", "exports", "./Core/Setup", "./Shader/Shader", "./Core/Core", 
         new Event_1.default(new DistanceToMesh_1.default({
             triggerMesh: Core_1.default.meshesByName["surf_trgt"],
             cutOffDistance: 9.0
-        }), new FadeOutMesh_1.default({
+        }), new ScreenWhite_1.default({
             mesh: Core_1.default.meshesByName["surf"],
             milliseconds: 2000
         }));

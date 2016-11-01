@@ -1,3 +1,5 @@
+import Core from "../../Core/Core";
+
 abstract class ActionParent {
     public parameters: any;
 
@@ -6,6 +8,10 @@ abstract class ActionParent {
     }
 
     public abstract do(): any;
+
+    public scene() {
+        return Core.scene;
+    }
 }
 
 export default ActionParent;
