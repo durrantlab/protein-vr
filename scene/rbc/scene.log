@@ -1,0 +1,111 @@
+Exporter version: 5.0.6, Blender version: 2.78 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used:
+		selected layers only:  false
+		flat shading entire scene:  false
+		inline textures:  false
+		texture directory:  /Users/jdurrant/Documents/Work/durrant_git/protein-vr/scene/rbc/
+	Python World class constructor completed
+	processing begun of node:  c:0,s:0,n:surf_trgt,h:0,l:0,cs:,g:0,b:0
+	processing begun of mesh:  c:0,s:0,n:urea1,h:0,l:1,cs:urea1,g:0,b:0
+		processing begun of Standard material:  Material.013
+		num positions      :  35780
+		num normals        :  35780
+		num uvs            :  71560
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  35844
+	processing begun of mesh:  c:0,s:0,n:ribbon,h:0,l:0,cs:ribbon,g:0,b:0
+		processing begun of Standard material:  Material.009
+		num positions      :  40345
+		num normals        :  40345
+		num uvs            :  80690
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  61140
+	processing begun of mesh:  c:0,s:1,n:sky,h:0,l:0,cs:,g:0,b:0
+		processing begun of Standard material:  Material.017
+		num positions      :  28
+		num normals        :  28
+		num uvs            :  56
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  36
+	processing begun of camera (FreeCamera):  c:0,s:0,n:cmra,h:0,l:0,cs:,g:0,b:0
+	processing begun of mesh:  c:0,s:0,n:grnd,h:0,l:0,cs:grnd,g:1,b:0
+		processing begun of Standard material:  Material.003
+		num positions      :  1056
+		num normals        :  1056
+		num uvs            :  2112
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4428
+	processing begun of mesh:  c:0,s:0,n:inner,h:0,l:0,cs:,g:0,b:0
+		processing begun of Standard material:  Material.008
+		num positions      :  48
+		num normals        :  48
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  210
+	processing begun of mesh:  c:0,s:0,n:urea2,h:0,l:1,cs:urea2,g:0,b:0
+		processing begun of Standard material:  Material.014
+		num positions      :  21080
+		num normals        :  21080
+		num uvs            :  42160
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  46533
+	processing begun of mesh:  c:0,s:0,n:urea3,h:0,l:1,cs:urea3,g:0,b:0
+		processing begun of Standard material:  Material.015
+		num positions      :  15960
+		num normals        :  15960
+		num uvs            :  31920
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  37173
+	processing begun of mesh:  c:0,s:0,n:urea4,h:0,l:1,cs:urea4,g:0,b:0
+		processing begun of Standard material:  Material.016
+		num positions      :  14468
+		num normals        :  14468
+		num uvs            :  28936
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  33519
+	processing begun of mesh:  c:0,s:0,n:surf3,h:0,l:1,cs:surface3,g:0,b:0
+		processing begun of Standard material:  Material.012
+		num positions      :  11435
+		num normals        :  11435
+		num uvs            :  22870
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  24774
+	processing begun of mesh:  c:0,s:0,n:surf2,h:0,l:1,cs:surface2,g:0,b:0
+		processing begun of Standard material:  Material.011
+		num positions      :  12482
+		num normals        :  12482
+		num uvs            :  24964
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  24648
+	processing begun of mesh:  c:0,s:0,n:surf,h:0,l:0,cs:surface1,g:0,b:0
+		processing begun of Standard material:  Material
+		num positions      :  65533
+		num normals        :  65533
+		num uvs            :  131066
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  134817
+	WARNING: The following mesh has exceeded the maximum # of vertex elements & will be broken into multiple Babylon meshes: c:0,s:0,n:surf,h:0,l:0,cs:surface1,g:0,b:0
+	processing begun of mesh:  c:0,s:0,n:surf,h:0,l:0,cs:surface1,g:0,b:01
+		registered as also a user of material:  Material
+		num positions      :  4181
+		num normals        :  4181
+		num uvs            :  8362
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  8241
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========
+elapsed time:  0 min, 44.9237 secs

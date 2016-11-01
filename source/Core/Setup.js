@@ -1,4 +1,4 @@
-define(["require", "exports", "../Objects/CollisionMeshes", "../Objects/Ground", "../Objects/Skybox", "../Objects/AutoLOD", "../Objects/Billboard", "../CameraChar", "../Environment", "./Core", "../Events/Event", "../Events/BuiltInTriggerConditionals", "../Events/BuiltInActions", "./RenderLoop", "../Shader/Shader"], function (require, exports, CollisionMeshes_1, Ground_1, Skybox_1, AutoLOD_1, Billboard_1, CameraChar_1, Environment_1, Core_1, Event_1, BuiltInTriggerConditionals_1, BuiltInActions_1, RenderLoop_1, Shader_1) {
+define(["require", "exports", "../Objects/CollisionMeshes", "../Objects/Ground", "../Objects/Skybox", "../Objects/AutoLOD", "../Objects/Billboard", "../Objects/CustomShaderObject", "../CameraChar", "../Environment", "./Core", "./RenderLoop"], function (require, exports, CollisionMeshes_1, Ground_1, Skybox_1, AutoLOD_1, Billboard_1, CustomShaderObject_1, CameraChar_1, Environment_1, Core_1, RenderLoop_1) {
     "use strict";
     /**
      * Core is where all the VR ProteinVR functions and variables are
@@ -17,19 +17,10 @@ define(["require", "exports", "../Objects/CollisionMeshes", "../Objects/Ground",
         export var Triggers = Triggers;
         export var Timers = Timers;
         */
-        Setup.setCustomShaders = function () { };
-        Setup.setEvents = function () { };
         /**
          * Set up the BABYLON game engine.
          */
         function setup(setCustomShaders, setEvents) {
-            // Set callbacks
-            if (setCustomShaders !== undefined) {
-                Setup.setCustomShaders = setCustomShaders;
-            }
-            if (setEvents !== undefined) {
-                Setup.setEvents = setEvents;
-            }
             // Whether or not to run in debug mode (shows certain messages in the
             // console, etc.)
             Core_1.default.debug = false;
@@ -40,7 +31,7 @@ define(["require", "exports", "../Objects/CollisionMeshes", "../Objects/Ground",
                 // Load the 3D engine. true means antialiasing is on.
                 Core_1.default.engine = new BABYLON.Engine(Core_1.default.canvas, true);
                 // Load a scene from a BABYLON file.
-                BABYLON.SceneLoader.Load("scene/", "test.babylon", Core_1.default.engine, function (newScene) {
+                BABYLON.SceneLoader.Load("scene/rbc/", "scene.babylon", Core_1.default.engine, function (newScene) {
                     // Wait for textures and shaders to be ready before
                     // proceeding.
                     newScene.executeWhenReady(function () {
@@ -48,7 +39,7 @@ define(["require", "exports", "../Objects/CollisionMeshes", "../Objects/Ground",
                         // later.
                         Core_1.default.scene = newScene;
                         // Set custom shaders
-                        Setup.setCustomShaders();
+                        setCustomShaders();
                         // Loop through each of the objects in the scene and
                         // modify them according to the name (which is a json).
                         Core_1.default.scene.meshes.forEach(function (m) {
@@ -76,18 +67,8 @@ define(["require", "exports", "../Objects/CollisionMeshes", "../Objects/Ground",
                             // Check if the mesh is marked as a billboard
                             // mesh.
                             new Billboard_1.default().checkMesh(m, json);
-                            if (m.name === "surf") {
-                                var oldMat = m.material;
-                                m.material = null;
-                                oldMat.dispose();
-                                m.material = Shader_1.default.shadersLibrary["surface"].material;
-                            }
-                            if (m.name === "grnd") {
-                                var oldMat = m.material;
-                                m.material = null;
-                                oldMat.dispose();
-                                m.material = Shader_1.default.shadersLibrary["grnd"].material;
-                            }
+                            // Check if the mesh requires a custom shader.
+                            new CustomShaderObject_1.default().checkMesh(m, json);
                             //} catch (err) {
                             //
                             //}
@@ -97,19 +78,29 @@ define(["require", "exports", "../Objects/CollisionMeshes", "../Objects/Ground",
                         // Set up the environment.
                         Environment_1.default.setup();
                         // Set up the skybox.
-                        Skybox_1.default.applyBoxImgs("3d_resources/sky_boxes/sky27/sp9");
+                        Skybox_1.default.applyBoxImgs(
+                        //"3d_resources/sky_boxes/sky27/sp9"
+                        "3d_resources/sky_boxes/my_bloodstream/blood");
+                        // Set up events.
+                        setEvents();
                         // Listen for a click. If the user clicks on an object,
                         // print information about the clicked object in the
                         // console.
-                        window.addEventListener("click", function () {
-                            // We try to pick an object.
-                            var pickResult = Core_1.default.scene.pick(Core_1.default.scene.pointerX, Core_1.default.scene.pointerY);
-                            console.log(pickResult.pickedMesh, pickResult.pickedMesh.name, pickResult.pickedMesh.renderingGroupId);
-                        });
+                        /* window.addEventListener("click", function () {
+                           // We try to pick an object.
+                           var pickResult = Core.scene.pick(
+                               Core.scene.pointerX, Core.scene.pointerY
+                            );
+    
+                           console.log(pickResult.pickedMesh,
+                                       pickResult.pickedMesh.name,
+                                       pickResult.pickedMesh.renderingGroupId);
+                        });*/
                         // Add triggers.
-                        new Event_1.default(BuiltInTriggerConditionals_1.default.distance(Core_1.default.meshesByName["prot_coll"], 3.5), function () {
-                            BuiltInActions_1.default.fadeOutMesh(Core_1.default.meshesByName["surf"], 2000);
-                        });
+                        /*new Event(
+                            BuiltInTriggerConditionals.distance(Core.meshesByName["prot_coll"], 3.5),
+                            BuiltInActions.fadeOutMesh(Core.meshesByName["surf"], 2000)
+                        );*/
                         /*Triggers.addTrigger({
                             name: "FadeOutWhenWithinSixMeters",
                             conditionToSatisfy: Triggers.PackagedConditionals.distance(Core.meshesByName["prot_coll"], 5),

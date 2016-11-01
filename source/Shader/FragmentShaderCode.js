@@ -20,6 +20,7 @@ define(["require", "exports", "./ShaderParent"], function (require, exports, Sha
             this._hasDiffuseEffect = true;
             this._isShadeless = false;
             this._requiresLightAndCameraPos = true;
+            this._hasTransparency = false;
             this.numTextures = 1;
             this.textureBlendingType = TextureBlendingType.ConstantBlend;
             this.useShadowMap = false;
@@ -50,6 +51,13 @@ define(["require", "exports", "./ShaderParent"], function (require, exports, Sha
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(FragmentShaderCode.prototype, "hasTransparency", {
+            set: function (val) {
+                this._hasTransparency = val;
+            },
+            enumerable: true,
+            configurable: true
+        });
         FragmentShaderCode.prototype.getCode = function () {
             // Figure out if you need to include simplex.
             var texBT = this.textureBlendingType;
@@ -63,7 +71,7 @@ define(["require", "exports", "./ShaderParent"], function (require, exports, Sha
                 this.useSimplexNoise = true;
             }
             this.Material.updateDependentVars();
-            return "\n            #ifdef GL_ES\n            precision highp float;\n            #endif\n\n            /********** Variables **********/\n            // Notes:\n\n            // \"uniform\"\" variables are specified by the CPU and don't change over time.\n            // They are defined in the shader config.json file. \"varying\"\" variables are\n            // those that were set by the vertex shader.\n\n            " + this.Texture.getTextureVars() + "\n            " + this.Texture.getHeightBasedBlendingVars() + "\n            " + this.Texture.shadowMapVars() + "\n            " + this.simplexNoiseVars() + "\n\n            // Get a matrix to change 3D positions into world positions. (?)\n            uniform mat4 world;\n\n            " + this.Material.lightAndCameraVars() + "\n            " + this.Material.glossyVars() + "\n            " + this.Material.diffuseVars() + "\n\n            // The 3d position\n            varying vec3 vPosition;\n\n            // The normal\n            varying vec3 vNormal;\n\n            // The uv value\n            varying vec2 vUV;\n\n            // Set some global variables used in various functions\n            vec3 vPositionW;\n            vec3 vNormalW;\n\n            " + this.randomNumber() + "\n            " + this.simplexNoise() + "\n            \n            /********** The main function. **********/\n\n            // In the fragment shader, the main code is executed for each pixel (not\n            // just each vector).\n            void main(void) {\n                // At the very least, this must return gl_FragColor (the color of\n                // the pixel)\n\n                // Get the color\n                " + this.Texture.getTextureCode() + "\n                " + this.Texture.getShadowMapCode() + "\n\n                // Modify that color according to the material.\n                " + this.Material.getMaterialCode() + "\n            }";
+            return "\n            #ifdef GL_ES\n            precision highp float;\n            #endif\n\n            /********** Variables **********/\n            // Notes:\n\n            // \"uniform\"\" variables are specified by the CPU and don't change over time.\n            // They are defined in the shader config.json file. \"varying\"\" variables are\n            // those that were set by the vertex shader.\n\n            " + this.Texture.getTextureVars() + "\n            " + this.Texture.getHeightBasedBlendingVars() + "\n            " + this.Texture.shadowMapVars() + "\n            " + this.simplexNoiseVars() + "\n\n            // Get a matrix to change 3D positions into world positions. (?)\n            uniform mat4 world;\n\n            " + this.Material.lightAndCameraVars() + "\n            " + this.Material.glossyVars() + "\n            " + this.Material.diffuseVars() + "\n            " + this.Material.transparencyVars() + "\n\n            // The 3d position\n            varying vec3 vPosition;\n\n            // The normal\n            varying vec3 vNormal;\n\n            // The uv value\n            varying vec2 vUV;\n\n            // Set some global variables used in various functions\n            vec3 vPositionW;\n            vec3 vNormalW;\n\n            " + this.randomNumber() + "\n            " + this.simplexNoise() + "\n            \n            /********** The main function. **********/\n\n            // In the fragment shader, the main code is executed for each pixel (not\n            // just each vector).\n            void main(void) {\n                // At the very least, this must return gl_FragColor (the color of\n                // the pixel)\n\n                // Get the color\n                " + this.Texture.getTextureCode() + "\n                " + this.Texture.getShadowMapCode() + "\n\n                // Modify that color according to the material.\n                " + this.Material.getMaterialCode() + "\n            }";
         };
         FragmentShaderCode.prototype.simplexNoiseVars = function () {
             if (!this.useSimplexNoise) {
@@ -101,6 +109,13 @@ define(["require", "exports", "./ShaderParent"], function (require, exports, Sha
             this.parent.inputVarsNeeded.push("diffuseVal");
             return "\n            // Mateirals properties\n            uniform float diffuseVal;\n        ";
         };
+        Material.prototype.transparencyVars = function () {
+            if (!this.parent._hasTransparency) {
+                return "";
+            }
+            this.parent.inputVarsNeeded.push("alpha");
+            return "\n            // Transparency properties\n            uniform float alpha;\n        ";
+        };
         Material.prototype.updateDependentVars = function () {
             if (this.parent._isShadeless) {
                 // If shadeless, no glossy, diffuse, light and camera position.
@@ -137,7 +152,12 @@ define(["require", "exports", "./ShaderParent"], function (require, exports, Sha
             if (this.parent._hasGlossyEffect) {
                 code += " + vec3(specularComponent)";
             }
-            code += ", 1.);";
+            if (this.parent._hasTransparency) {
+                code += ", alpha);";
+            }
+            else {
+                code += ", 1.);";
+            }
             return code;
         };
         return Material;

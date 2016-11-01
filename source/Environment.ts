@@ -1,5 +1,6 @@
 import Core from "./Core/Core";
 import CameraChar from "./CameraChar"; 
+import RenderLoop from "./Core/RenderLoop"
 
 declare var BABYLON;
 
@@ -39,6 +40,15 @@ namespace Environment {
             Core.engine.resize();
         });
 
+        // If the window looses focus, pause the game.
+        window.addEventListener('blur', function() {
+            RenderLoop.pause();
+        });
+
+        window.addEventListener('focus', function() {
+            RenderLoop.start();
+        });
+
         // "Capture" the mouse from the browser.
         //PointerLock.pointerLock();
 
@@ -46,7 +56,7 @@ namespace Environment {
         optimize();
 
         // Set up the fog.
-        setFog();
+        setFog(0.0);
 
         // lensEffect();
         // timers();
@@ -54,7 +64,7 @@ namespace Environment {
     }
 
     /**
-     * Setup the fox.
+     * Setup the fog.
      * @param {number = 0.015} density The fog density. Defaults to 0.015.
      */
     export function setFog(density: number = 0.015): void {

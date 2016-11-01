@@ -1,5 +1,7 @@
 define(["require", "exports", "../Core/Core", "../CameraChar"], function (require, exports, Core_1, CameraChar_1) {
     "use strict";
+    // Useful variables:
+    // Location of camera: CameraChar.camera.position
     var BuiltInTriggerConditionals;
     (function (BuiltInTriggerConditionals) {
         function distance(triggerMesh, cutoffDistance) {

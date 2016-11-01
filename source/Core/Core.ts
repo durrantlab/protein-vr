@@ -6,7 +6,7 @@ namespace Core {
     export var tmpSpheres = [];
     export var shadowGenerator;
     export var debug: boolean = false;
-    export var meshesByName: any[] = [];
+    export var meshesByName = {};
     export var anyVar: any = undefined;  // Just a place to storev  any variable
     export var frameNum: number = 0;
 

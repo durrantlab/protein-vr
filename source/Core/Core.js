@@ -4,7 +4,7 @@ define(["require", "exports"], function (require, exports) {
     (function (Core) {
         Core.tmpSpheres = [];
         Core.debug = false;
-        Core.meshesByName = [];
+        Core.meshesByName = {};
         Core.anyVar = undefined; // Just a place to storev  any variable
         Core.frameNum = 0;
         function debugMsg(msg) {

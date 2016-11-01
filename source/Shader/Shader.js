@@ -20,6 +20,7 @@ define(["require", "exports", "./VertexShaderCode", "./FragmentShaderCode", "../
         function create(params) {
             var shdr = new Shader(params);
             Shaders.shadersLibrary[params["name"]] = shdr;
+            window.shadersLibrary = Shaders.shadersLibrary;
         }
         Shaders.create = create;
         var Shader = (function () {
@@ -36,6 +37,7 @@ define(["require", "exports", "./VertexShaderCode", "./FragmentShaderCode", "../
                     "_hasGlossyEffect": true,
                     "_hasDiffuseEffect": true,
                     "_isShadeless": false,
+                    "_hasTransparency": false,
                     "name": "",
                     "time": 0,
                     "animationSpeed": 1,
@@ -58,6 +60,7 @@ define(["require", "exports", "./VertexShaderCode", "./FragmentShaderCode", "../
                     "diffuseVal": 1.0,
                     "cameraPosition": new BABYLON.Vector3(0., 0., 0.),
                     "lightPosition": new BABYLON.Vector3(0., 10., 10.),
+                    "alpha": 1.
                 };
                 // Overwrite default values with any user-specified one.
                 this.addUserSpecifiedParameters(params);
@@ -76,6 +79,7 @@ define(["require", "exports", "./VertexShaderCode", "./FragmentShaderCode", "../
                 this.fragmentShaderCode.hasGlossyEffect = this.parameters["_hasGlossyEffect"];
                 this.fragmentShaderCode.hasDiffuseEffect = this.parameters["_hasDiffuseEffect"];
                 this.fragmentShaderCode.isShadeless = this.parameters["_isShadeless"];
+                this.fragmentShaderCode.hasTransparency = this.parameters["_hasTransparency"];
                 // Before running compile, set parameters on this.VertexShaderCode and this.FragmentShaderCode
                 this.VSCode = this.vertexShaderCode.getCode();
                 this.FSCode = this.fragmentShaderCode.getCode();
@@ -89,6 +93,8 @@ define(["require", "exports", "./VertexShaderCode", "./FragmentShaderCode", "../
                     vertex: "panGUI" + uniq,
                     fragment: "panGUI" + uniq,
                 }, {
+                    needAlphaBlending: this.parameters["_hasTransparency"],
+                    // needAlphaTesting: this.parameters["_hasTransparency"],
                     attributes: ["position", "normal", "uv"],
                     uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"]
                 });
@@ -105,8 +111,10 @@ define(["require", "exports", "./VertexShaderCode", "./FragmentShaderCode", "../
                         }
                     }
                 }
-                // 
-                this.setupChangingVars(inputsVarsNeeded);
+                // The alpha needs to be set through the setter because the
+                // alphaMode might need to switch.
+                this.alpha = this.parameters["alpha"];
+                this.setupVarsConstantlyChanging(inputsVarsNeeded);
             }
             Shader.prototype.addUserSpecifiedParameters = function (params) {
                 for (var key in params) {
@@ -115,7 +123,7 @@ define(["require", "exports", "./VertexShaderCode", "./FragmentShaderCode", "../
                     }
                 }
             };
-            Shader.prototype.setupChangingVars = function (inputsVarsNeeded) {
+            Shader.prototype.setupVarsConstantlyChanging = function (inputsVarsNeeded) {
                 if (inputsVarsNeeded.indexOf("time") !== -1) {
                     RenderLoop_1.default.extraFunctionsToRunInLoop.push(function () {
                         this.updateTime();
@@ -356,6 +364,18 @@ define(["require", "exports", "./VertexShaderCode", "./FragmentShaderCode", "../
             Object.defineProperty(Shader.prototype, "specularVal", {
                 set: function (val) {
                     this.setMaterialFloat("specularVal", val);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Shader.prototype, "alpha", {
+                set: function (val) {
+                    if (val === 1.0) {
+                        this.material.alphaMode = 0;
+                    } /* else {
+                        this.material.alphaMode = 2;
+                    }*/
+                    this.setMaterialFloat("alpha", val);
                 },
                 enumerable: true,
                 configurable: true

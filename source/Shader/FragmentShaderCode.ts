@@ -11,6 +11,7 @@ class FragmentShaderCode extends parent {
     public _hasDiffuseEffect: boolean = true;
     public _isShadeless: boolean = false;
     public _requiresLightAndCameraPos: boolean = true;
+    public _hasTransparency: boolean = false;
     public numTextures: number = 1;
     public textureBlendingType: TextureBlendingType = TextureBlendingType.ConstantBlend;
     public useShadowMap: boolean = false;
@@ -37,6 +38,10 @@ class FragmentShaderCode extends parent {
     set isShadeless(val: boolean) {
         this._isShadeless = val;
         this.Material.updateDependentVars();
+    }
+
+    set hasTransparency(val: boolean) {
+        this._hasTransparency = val;
     }
 
     public getCode(): string {
@@ -75,6 +80,7 @@ class FragmentShaderCode extends parent {
             ${this.Material.lightAndCameraVars()}
             ${this.Material.glossyVars()}
             ${this.Material.diffuseVars()}
+            ${this.Material.transparencyVars()}
 
             // The 3d position
             varying vec3 vPosition;
@@ -174,6 +180,18 @@ class Material {
         `;
     }
 
+    public transparencyVars() {
+        if (!this.parent._hasTransparency) {
+            return "";
+        }
+
+        this.parent.inputVarsNeeded.push("alpha");
+
+        return `
+            // Transparency properties
+            uniform float alpha;
+        `;
+    }
 
     public updateDependentVars() {
         if (this.parent._isShadeless) {
@@ -242,7 +260,11 @@ class Material {
             code += " + vec3(specularComponent)"
         }
 
-        code += ", 1.);";
+        if (this.parent._hasTransparency) {
+            code += ", alpha);";
+        } else {
+            code += ", 1.);";
+        }
 
         return code;
     }

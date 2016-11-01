@@ -36,6 +36,7 @@ namespace Shaders {
         _hasGlossyEffect?: boolean;
         _hasDiffuseEffect?: boolean;
         _isShadeless?: boolean;
+        _hasTransparency?: boolean;
 
         // Variables after compiled
         time?: number;
@@ -59,11 +60,13 @@ namespace Shaders {
         diffuseVal?: number;
         cameraPosition?: any;
         lightPosition?: any;
+        alpha?: number;
     }
 
     export function create(params: ShaderInterface) {
         let shdr = new Shader(params);
         Shaders.shadersLibrary[params["name"]] = shdr;
+        window.shadersLibrary = Shaders.shadersLibrary;
     }
 
     class Shader {
@@ -83,6 +86,7 @@ namespace Shaders {
             "_hasGlossyEffect": true,
             "_hasDiffuseEffect": true,
             "_isShadeless": false,
+            "_hasTransparency": false,
             "name": "",
             "time": 0,
             "animationSpeed": 1,
@@ -105,6 +109,7 @@ namespace Shaders {
             "diffuseVal": 1.0,
             "cameraPosition": new BABYLON.Vector3(0., 0., 0.),
             "lightPosition": new BABYLON.Vector3(0., 10., 10.),
+            "alpha": 1.
         }
 
         constructor(params: ShaderInterface) {
@@ -126,6 +131,7 @@ namespace Shaders {
             this.fragmentShaderCode.hasGlossyEffect = this.parameters["_hasGlossyEffect"];
             this.fragmentShaderCode.hasDiffuseEffect = this.parameters["_hasDiffuseEffect"];
             this.fragmentShaderCode.isShadeless = this.parameters["_isShadeless"];
+            this.fragmentShaderCode.hasTransparency = this.parameters["_hasTransparency"];
 
             // Before running compile, set parameters on this.VertexShaderCode and this.FragmentShaderCode
             this.VSCode = this.vertexShaderCode.getCode();
@@ -144,6 +150,8 @@ namespace Shaders {
                 vertex: "panGUI" + uniq,
                 fragment: "panGUI" + uniq,
             }, {
+                needAlphaBlending: this.parameters["_hasTransparency"],
+                // needAlphaTesting: this.parameters["_hasTransparency"],
                 attributes: ["position", "normal", "uv"],
                 uniforms: ["world", "worldView", "worldViewProjection", "view", "projection"]
             });
@@ -163,8 +171,11 @@ namespace Shaders {
                 }
             }
 
-            // 
-            this.setupChangingVars(inputsVarsNeeded);
+            // The alpha needs to be set through the setter because the
+            // alphaMode might need to switch.
+            this.alpha = this.parameters["alpha"];
+
+            this.setupVarsConstantlyChanging(inputsVarsNeeded);
         }
 
         private addUserSpecifiedParameters(params: ShaderInterface) {
@@ -175,7 +186,7 @@ namespace Shaders {
             }
         }
 
-        private setupChangingVars(inputsVarsNeeded) {
+        private setupVarsConstantlyChanging(inputsVarsNeeded) {
             if (inputsVarsNeeded.indexOf("time") !== -1) {
                 RenderLoop.extraFunctionsToRunInLoop.push(function() {
                     this.updateTime();
@@ -371,6 +382,16 @@ namespace Shaders {
 
         public set specularVal(val: number) {
             this.setMaterialFloat("specularVal", val);
+        }
+
+        public set alpha(val: any) {
+            if (val === 1.0) {
+                this.material.alphaMode = 0;
+            } /* else {
+                this.material.alphaMode = 2;
+            }*/
+
+            this.setMaterialFloat("alpha", val);
         }
 
         public set diffuseVal(val: number) {

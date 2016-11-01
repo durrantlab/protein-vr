@@ -1,4 +1,4 @@
-define(["require", "exports", "./Core/Core", "./CameraChar"], function (require, exports, Core_1, CameraChar_1) {
+define(["require", "exports", "./Core/Core", "./CameraChar", "./Core/RenderLoop"], function (require, exports, Core_1, CameraChar_1, RenderLoop_1) {
     "use strict";
     /**
      * The Environment namespace is where all the functions and variables
@@ -14,18 +14,25 @@ define(["require", "exports", "./Core/Core", "./CameraChar"], function (require,
             window.addEventListener('resize', function () {
                 Core_1.default.engine.resize();
             });
+            // If the window looses focus, pause the game.
+            window.addEventListener('blur', function () {
+                RenderLoop_1.default.pause();
+            });
+            window.addEventListener('focus', function () {
+                RenderLoop_1.default.start();
+            });
             // "Capture" the mouse from the browser.
             //PointerLock.pointerLock();
             // Optimize the scene to keep it running fast.
             optimize();
             // Set up the fog.
-            setFog();
+            setFog(0.0);
             // lensEffect();
             // timers();
         }
         Environment.setup = setup;
         /**
-         * Setup the fox.
+         * Setup the fog.
          * @param {number = 0.015} density The fog density. Defaults to 0.015.
          */
         function setFog(density) {

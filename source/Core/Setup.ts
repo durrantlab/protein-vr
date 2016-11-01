@@ -3,20 +3,15 @@ import Ground from "../Objects/Ground";
 import Skybox from "../Objects/Skybox";
 import AutoLODMeshes from "../Objects/AutoLOD";
 import BillboardMeshes from "../Objects/Billboard";
+import CustomShaderObjects from "../Objects/CustomShaderObject";
 
 import CameraChar from "../CameraChar";
 import Environment from "../Environment";
 
 import Core from "./Core";
 
-import Event from "../Events/Event";
-import BuiltInTriggerConditionals from "../Events/BuiltInTriggerConditionals";
-import BuiltInActions from "../Events/BuiltInActions";
-
-import Timers from "../Events/Timers";
 import RenderLoop from "./RenderLoop";
 
-import Shaders from "../Shader/Shader";
 
 // jQuery is an external library, so declare it here to avoid Typescript
 // errors.
@@ -42,22 +37,10 @@ namespace Setup {
     export var Timers = Timers;
     */
 
-    export var setCustomShaders = function() {};
-    export var setEvents = function() {};
-
     /**
      * Set up the BABYLON game engine.
      */
     export function setup(setCustomShaders?: any, setEvents?: any): void {
-        // Set callbacks
-        if (setCustomShaders !== undefined) {
-            Setup.setCustomShaders = setCustomShaders;
-        }
-
-        if (setEvents !== undefined) {
-            Setup.setEvents = setEvents;
-        }
-
         // Whether or not to run in debug mode (shows certain messages in the
         // console, etc.)
         Core.debug = false;
@@ -71,7 +54,7 @@ namespace Setup {
             Core.engine = new BABYLON.Engine(Core.canvas, true);
 
             // Load a scene from a BABYLON file.
-            BABYLON.SceneLoader.Load("scene/", "test.babylon", Core.engine,
+            BABYLON.SceneLoader.Load("scene/rbc/", "scene.babylon", Core.engine,
                                      function (newScene: any): void {
 
                 // Wait for textures and shaders to be ready before
@@ -83,7 +66,7 @@ namespace Setup {
                     Core.scene = newScene;
 
                     // Set custom shaders
-                    Setup.setCustomShaders();
+                    setCustomShaders();
 
                     // Loop through each of the objects in the scene and
                     // modify them according to the name (which is a json).
@@ -120,27 +103,9 @@ namespace Setup {
                             // mesh.
                             new BillboardMeshes().checkMesh(m, json);
 
+                            // Check if the mesh requires a custom shader.
+                            new CustomShaderObjects().checkMesh(m, json);
 
-                            This should be ready from the babylon File.
-                            Also, the custom shader should optionally support transparency.
-                            And you still need to test three textures, as well as height-based
-
-                            if (m.name === "surf") {
-                                let oldMat = m.material;
-                                m.material = null;
-                                oldMat.dispose();
-
-                                m.material = Shaders.shadersLibrary["surface"].material;
-                            }
-                            
-                            if (m.name === "grnd") {
-                                let oldMat = m.material;
-                                m.material = null;
-                                oldMat.dispose();
-
-                                m.material = Shaders.shadersLibrary["grnd"].material;
-                            }
-                            
                         //} catch (err) {
                             //
                         //}
@@ -154,8 +119,12 @@ namespace Setup {
 
                     // Set up the skybox.
                     Skybox.applyBoxImgs(
-                        "3d_resources/sky_boxes/sky27/sp9"
+                        //"3d_resources/sky_boxes/sky27/sp9"
+                        "3d_resources/sky_boxes/my_bloodstream/blood"
                     );
+
+                    // Set up events.
+                    setEvents();
 
                     // Listen for a click. If the user clicks on an object,
                     // print information about the clicked object in the
@@ -172,10 +141,10 @@ namespace Setup {
                     });*/
 
                     // Add triggers.
-                    new Event(
+                    /*new Event(
                         BuiltInTriggerConditionals.distance(Core.meshesByName["prot_coll"], 3.5),
                         BuiltInActions.fadeOutMesh(Core.meshesByName["surf"], 2000)
-                    );
+                    );*/
 
 
                     /*Triggers.addTrigger({

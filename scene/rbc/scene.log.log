@@ -1,0 +1,22 @@
+Exporter version: 5.0.6, Blender version: 2.78 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used:
+		selected layers only:  false
+		flat shading entire scene:  false
+		inline textures:  false
+		texture directory:  /Users/jdurrant/Documents/Work/durrant_git/protein-vr/scene/rbc/
+	Python World class constructor completed
+	processing begun of mesh:  b:0,g:0,n:ribbon,h:0,cs:,s:0,c:0,l:0
+		processing begun of baked material:  b:0,g:0,n:ribbon,h:0,cs:,s:0,c:0,l:0
+========= An error was encountered =========
+  File "/Users/jdurrant/Library/Application Support/Blender/2.78/scripts/addons/babylon-js/json_exporter.py", line 99, in execute
+    mesh = Mesh(object, scene, nextStartFace, forcedParent, nameID, self)
+  File "/Users/jdurrant/Library/Application Support/Blender/2.78/scripts/addons/babylon-js/mesh.py", line 151, in __init__
+    bakedMat = BakedMaterial(exporter, object, recipe)
+  File "/Users/jdurrant/Library/Application Support/Blender/2.78/scripts/addons/babylon-js/material.py", line 437, in __init__
+    bpy.ops.object.mode_set(mode='EDIT')
+  File "/Applications/blender-2.78-OSX_10.6-x86_64/blender.app/Contents/MacOS/../Resources/2.78/scripts/modules/bpy/ops.py", line 189, in __call__
+    ret = op_call(self.idname_py(), None, kw)
+ERROR:  Operator bpy.ops.object.mode_set.poll() failed, context is incorrect
+========= end of processing =========
+elapsed time:  0 min, 0.0018 secs
