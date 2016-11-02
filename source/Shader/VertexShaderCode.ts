@@ -8,17 +8,26 @@ enum AnimationType {
     WaveBobbing
 }
 
+/**
+ * The class for generating the vertex shader.
+ */
 class VertexShaderCode extends parent {
 
     public Animation: Animation;
-
     public animationType: AnimationType = AnimationType.None;
 
+    /**
+     * The constructor. super() calls the parents constructor to be called.
+     */
     constructor() {
         super();
         this.Animation = new Animation(this);
     }
 
+    /**
+     * Get the vertex code.
+     * @return {string} The code.
+     */
     public getCode(): string {
 
         switch (this.animationType) {
@@ -101,7 +110,11 @@ class VertexShaderCode extends parent {
         }`;
     }
 
-    public simplexNoiseVars() {
+    /**
+     * Generate the code for simplex noise.
+     * @return {string} The code.
+     */
+    public simplexNoiseVars(): string {
         if (!this.useSimplexNoise) {
             return '';
         }
@@ -115,13 +128,25 @@ class VertexShaderCode extends parent {
     }
 }
 
+/**
+ * A class for controlling vertex animations.
+ */
 class Animation {
     public parent: VertexShaderCode;
 
+    /**
+     * The constructor.
+     * @param  {VertexShaderCode}  parent  The associated vertex shader code
+     *                                         class.
+     */
     constructor(parent: VertexShaderCode) {
         this.parent = parent;
     }
 
+    /**
+     * Get the animation shader code.
+     * @return {string} The code.
+     */
     public getAnimation(): string {
         switch (this.parent.animationType) {
             case AnimationType.None:
@@ -137,6 +162,10 @@ class Animation {
         }
     }
 
+    /**
+     * Generate the shader code for the animation variables.
+     * @return {string} The code.
+     */
     public animationVars(): string {
         if (this.parent.animationType === AnimationType.None) {
             return "";
@@ -165,10 +194,18 @@ class Animation {
         return code;
     }
 
+    /**
+     * Code if there is no animation.
+     * @return {string} The code.
+     */
     private noAnimation(): string {
         return `vec3 v = position;`;
     }
 
+    /**
+     * Generate the shader code for the randomly undulating normals animation.
+     * @return {string} The code.
+     */
     private randomlyUndulateAlongNormals(): string {
         return this.animationTemplate(`
             float noiseHere = snoise(vec2(animationNoiseTurbulenceFactor) * position.xy);  // random seed tied to uv value.
@@ -178,6 +215,10 @@ class Animation {
         `);
     }
 
+    /**
+     * Generate the shader code for the worm animation.
+     * @return {string} The code.
+     */
     private wormAnimation(): string {
         return this.animationTemplate(`
             float noiseHere = snoise(vec2(animationNoiseTurbulenceFactor) * position.xy);  // random seed tied to uv value.
@@ -187,6 +228,10 @@ class Animation {
         `);
     }
 
+    /**
+     * Generate the shader code for the wave along vertical animation.
+     * @return {string} The code.
+     */
     private waveAlongVerticalAnimation(): string {
         return this.animationTemplate(`
             // Along vertical only.
@@ -194,6 +239,10 @@ class Animation {
         `);
     }
 
+    /**
+     * Generate the shader code for the wave bobbing animation.
+     * @return {string} The code.
+     */
     private waveBobbingAnimation(): string {
         return this.animationTemplate(`
             // Along vertical only.
@@ -201,6 +250,11 @@ class Animation {
         `);
     }
 
+    /**
+     * Generate the template code for the animation.
+     * @param  {string} equation The animation equation.
+     * @return {string}          The code.
+     */
     private animationTemplate(equation: string): string {
         return `
             // Animate the vertex if you want. The vertex position is now

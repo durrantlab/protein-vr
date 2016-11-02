@@ -1,3 +1,6 @@
+/**
+ * A class that all shaders inherit.
+ */
 abstract class ShaderParent {
     public useSimplexNoise: boolean = false;
     public useRandomNumber: boolean = false;
@@ -6,8 +9,11 @@ abstract class ShaderParent {
     public abstract getCode(): string;
     public abstract simplexNoiseVars(): string;
 
-    /** Random **/
 
+    /**
+     * Generate the code for generating a random number.
+     * @return {string} The code.
+     */
     public randomNumber(): string {
         if (!this.useRandomNumber) {
             return "";
@@ -20,6 +26,10 @@ abstract class ShaderParent {
 
     }
 
+    /**
+     * Generate the shader code for generating simplex noise.
+     * @return {string} The shader code.
+     */
     public simplexNoise(): string {
         // Function to use is snoise(vec2 v)
 

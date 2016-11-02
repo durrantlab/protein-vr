@@ -4,12 +4,9 @@ import Skybox from "../Objects/Skybox";
 import AutoLODMeshes from "../Objects/AutoLOD";
 import BillboardMeshes from "../Objects/Billboard";
 import CustomShaderObjects from "../Objects/CustomShaderObject";
-
 import CameraChar from "../CameraChar";
 import Environment from "../Environment";
-
 import Core from "./Core";
-
 import RenderLoop from "./RenderLoop";
 
 
@@ -20,8 +17,7 @@ declare var $;
 declare var BABYLON;
 
 /**
- * Core is where all the VR ProteinVR functions and variables are
- * stored. This could probably be a namespace rather than a class.
+ * A namespace to store the functions to start the engine.
  */
 namespace Setup {
 
@@ -38,7 +34,11 @@ namespace Setup {
     */
 
     /**
-     * Set up the BABYLON game engine.
+     * Setup the BABYLON game engine.
+     * @param {any} setCustomShaders An externally defined function that sets
+     *                               up any custom shaders.
+     * @param {any} setEvents        An externally defined function that sets
+     *                               up any events.
      */
     export function setup(setCustomShaders?: any, setEvents?: any): void {
         // Whether or not to run in debug mode (shows certain messages in the
@@ -54,7 +54,8 @@ namespace Setup {
             Core.engine = new BABYLON.Engine(Core.canvas, true);
 
             // Load a scene from a BABYLON file.
-            BABYLON.SceneLoader.Load("scene/rbc/", "scene.babylon", Core.engine,
+            BABYLON.SceneLoader.Load("scene/rbc/", "scene.babylon", 
+                                     Core.engine,
                                      function (newScene: any): void {
 
                 // Wait for textures and shaders to be ready before
@@ -84,7 +85,7 @@ namespace Setup {
                             // save for later reference
                             Core.meshesByName[m.name] = m;
 
-                            // Given the mesh, check if it shoudl collide with
+                            // Given the mesh, check if it should collide with
                             // the camera.
                             new CollisionMeshes().checkMesh(m, json);
 

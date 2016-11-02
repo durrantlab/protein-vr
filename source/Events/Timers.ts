@@ -1,26 +1,37 @@
 import Core from "../Core/Core";
 import RenderLoop from "../Core/RenderLoop";
 
+/**
+ * This namespace stores timers.
+ */
 namespace Timers {
     export var timers = {};
     export var lastTime = new Date().getTime();
     export var tickAllTimersAddedToLoop: boolean = false;
 
+    /**
+     * The Timer interface. To make sure the correct variables are passed.
+     */
     export interface TimerInterface {
         name: string,
         durationInMiliseconds: number;  // The duration of the timer
-        repeated?: boolean;  // Whether or not to automatically restart timer once done.
-        extraVars?: any;  // A place to store extra variables that can be accessed within the callbacks.
+        repeated?: boolean;  // Whether or not to automatically restart timer
+                             // once done.
+        extraVars?: any;  // A place to store extra variables that can be 
+                          // accessed within the callbacks.
         tickCallback?: any;  // Call this function at every tick of the timer
         interpValStart?: number;  // These only needed if you use tickCallback
         interpValEnd?: number;
-        doneCallback?: any;  // This function runs when the timer is done. 
+        doneCallback?: any;  // This function runs when the timer is done.
         tickFrameFrequency?: number;  // For timers where exact timing
                                       // isn't critical, you might
                                       // evaluate them every 10 frames or
                                       // something to save on CPU demands.
     }
 
+    /**
+     * The default Timer variables.
+     */
     export var defaults = {
         repeated: false,
         extraVars: {},
@@ -31,6 +42,14 @@ namespace Timers {
         tickFrameFrequency: 1
     }
 
+    /**
+     * Function to add a timer.
+     * @param  {TimerInterface} params  The parameters associated with this
+     *                                      timer.
+     * @return {Timer}                 Aside from adding it the universal
+     *                                     list, this function also returns 
+     *                                     the new timer.
+     */
     export function addTimer(params: TimerInterface): Timer {
         // Set default values
         for (var key in this.defaults) {
@@ -40,9 +59,10 @@ namespace Timers {
                 }
             }
         }
+
         // Default tickFrameFrequency to 1 (check timer every frame)
         params.tickFrameFrequency = (params.tickFrameFrequency === undefined) ? 1 : params.tickFrameFrequency;
-        
+
         // Make a new timer.
         let newTimer = new Timer(params);
 
@@ -61,7 +81,11 @@ namespace Timers {
         return newTimer;
     }
 
-    export function tickAllTimers() {
+    /**
+     * This function updates the current times on all Timers. It causes all
+     * timers to "tick."
+     */
+    export function tickAllTimers(): void {
         // get time that has passed since last tick
         let nowTime: number = new Date().getTime();
         let deltaTime = nowTime - lastTime;
@@ -74,11 +98,19 @@ namespace Timers {
             }
         }
     }
-    
+
+    /**
+     * This is the Timer class.
+     */
     export class Timer {
         public parameters: TimerInterface;
         public timeRemaining: number = undefined;
 
+        /**
+         * The Timer constructor.
+         * @param  {TimerInterface} params  The parameters that govern the
+         *                                  behavior of this timer.
+         */
         constructor(params: TimerInterface) {
             // Set object values.
             this.parameters = params
@@ -96,12 +128,21 @@ namespace Timers {
             Core.debugMsg("Timer " + this.parameters.name + ": Starting");
         }
 
-        public dispose() {
+        /**
+         * Dispose of this timer. It stops ticking.
+         */
+        public dispose(): void {
             // Stop this timer, even if it hasn't yet run it's course.
             delete timers[this.parameters.name];
         }
 
-        public tick(deltaTime: number) {
+        /**
+         * Cause this timer to tick. It updates the time and runs the
+         *     tickCallBack function, passing the timer's current value.
+         * @param {number} deltaTime  How much time has passed since the last
+         *                                tick.
+         */
+        public tick(deltaTime: number): void {
             // Compute the remaining time on this timer
             this.timeRemaining = this.timeRemaining - deltaTime;
 
@@ -110,11 +151,10 @@ namespace Timers {
                 return;
             }
 
-            // Core.debugMsg("Timer " + this.parameters.name + ": Tick. " + this.timeRemaining.toString() + " ms remaining.");
-
             // Run the tick callback if it exists
             if (this.parameters.tickCallback !== undefined) {
-                // Interpolate between the start and end values, based on timer value.
+                // Interpolate between the start and end values, based on
+                // timer value.
                 // pts: (countdowntime, interpval)
                 //   (this.parameters.durationInMiliseconds, this.parameters.interpValStart)
                 //   (0, this.parameters.interpValEnd)
@@ -151,7 +191,8 @@ namespace Timers {
                 } else {
                     Core.debugMsg("Timer " + this.parameters.name + ": Removing");
 
-                    // Otherwise, remove the timer from the list so it is no longer called.
+                    // Otherwise, remove the timer from the list so it is no
+                    // longer called.
                     this.dispose();
                 }
             }

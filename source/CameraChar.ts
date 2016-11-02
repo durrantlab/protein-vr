@@ -66,7 +66,10 @@ namespace CameraChar {
                 CameraChar.characterHeight);
     }
 
-    export function repositionPlayerIfCollision() {
+    /**
+     * Checks if the camera collides with a mesh. If so, resolve clash.
+     */
+    export function repositionPlayerIfCollision(): void {
         let intersect: boolean = false;
         for (let i = 0; i < CollisionMeshes.meshesThatCollide.length; i++) {
             let mesh = CollisionMeshes.meshesThatCollide[i];

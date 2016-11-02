@@ -1,5 +1,4 @@
 import Timers from "../Timers";
-
 import parent from "./ActionParent";
 
 declare var BABYLON;
@@ -10,15 +9,28 @@ declare var jQuery;
 //     milliseconds: number;
 // }
 
+/**
+ * A class to fade the screen to white.
+ */
 class ScreenWhite extends parent {
 
     public canvasJQuery = undefined;
 
+    /**
+     * The constructor.  super(params) passes params to the parent class'
+     *     constructor.
+     * @param  {DoInterface} params The parameters for this class. Use an
+     *                              interface to make sure the correct 
+     *                              parameters are always used.
+     */
     constructor(params) { // : DoInterface) {
         super(params);
     }
 
-    public do() {
+    /**
+     * Perform the action.
+     */
+    public do(): void {
         // Fog suddenly gets thicker.
         //this.scene().FOGMODE_EXP2;
         this.canvasJQuery = jQuery("#renderCanvas");

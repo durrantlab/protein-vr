@@ -1,14 +1,18 @@
 import Core from "./Core";
 import CameraChar from "../CameraChar";
-// import Timers from "../Triggers/Timers";
 import Ground from "../Objects/Ground";
 
+/**
+ * A namespace that stores functions related to the BABYLON render loop.
+ */
 namespace RenderLoop {
     export var extraFunctionsToRunInLoop: any[] = [];
     export var timeOfLastLoop: number = 0;
 
+    /**
+     * Start the render loop.
+     */
     export function start(): void {
-
         // Once the scene is loaded, register a render loop and
         // start rendering the frames.
         Core.engine.runRenderLoop(function() {
@@ -16,11 +20,17 @@ namespace RenderLoop {
         });
     }
 
+    /**
+     * Pause the game.
+     */
     export function pause(): void {
         Core.engine.stopRenderLoop();
     }
 
-    export function inLoop() {
+    /**
+     * The contents of the render loop.
+     */
+    export function inLoop(): void {
         Core.frameNum++;
 
         // Record loop start time.

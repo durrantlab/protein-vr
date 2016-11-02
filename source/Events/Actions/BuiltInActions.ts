@@ -7,8 +7,10 @@ declare var BABYLON;
 // Useful variables:
 // Location of camera: CameraChar.camera.position
 // The same is true of a mesh. mesh.position is the location of the mesh.
-// Timers will be useful here. Let's talk about it if it's not clear from the examples below.
+// Timers will be useful here. Let's talk about it if it's not clear from the
+// examples below.
 
+// DON'T MODIFY THIS FILE!!!
 
 namespace BuiltInActions {
     export function fadeOutMesh(mesh, milliseconds: number = 2000) {
@@ -39,7 +41,7 @@ namespace BuiltInActions {
         // See http://www.html5gamedevs.com/topic/25430-transparency-issues/
 
         mesh.material.alphaMode = BABYLON.Engine.ALPHA_ADD;
-        
+
         Timers.addTimer({
             name: "FadeIn" + Math.random().toString(),
             durationInMiliseconds: milliseconds, //milliseconds,
