@@ -9,12 +9,19 @@ declare var BABYLON;
  */
 namespace CameraChar {
 
+    /**
+     * The camera's last position.
+     */
     export var previousPos = undefined;
 
-    /* A variable to store the camera object. */
+    /**
+     * A variable to store the camera object. 
+     */
     export var camera;
 
-    /* The height of the character/camera in feet. */
+    /** 
+     * The height of the character/camera in feet. 
+     */
     export const characterHeight: number = 1.8;  // All units in metric.
 
     /**

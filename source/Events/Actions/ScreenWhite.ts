@@ -14,6 +14,9 @@ declare var jQuery;
  */
 class ScreenWhite extends parent {
 
+    /**
+     * A jQuery object, where the canvas where the scene is being rendered.
+     */
     public canvasJQuery = undefined;
 
     /**

@@ -1,5 +1,8 @@
 import Core from "../Core/Core";
 
+/**
+ * The class that all objects inherit.
+ */
 abstract class ObjectParent {
 
     /**

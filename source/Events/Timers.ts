@@ -5,8 +5,19 @@ import RenderLoop from "../Core/RenderLoop";
  * This namespace stores timers.
  */
 namespace Timers {
+    /**
+     * A json object where the timers are stored. 
+     */
     export var timers = {};
+
+    /**
+     * The last recorded time the Timers were fired.
+     */
     export var lastTime = new Date().getTime();
+
+    /**
+     * Whether or not the render loop knows about the timers.
+     */
     export var tickAllTimersAddedToLoop: boolean = false;
 
     /**

@@ -6,6 +6,9 @@ import parent from "./ObjectParent";
  */
 class CollisionMeshes extends parent{
 
+    /**
+     * A list of the meshes that can collide with the camera.
+     */
     static meshesThatCollide = [];
 
     /**

@@ -16,7 +16,9 @@ window.Core = Core;
  */
 declare var BABYLON: any;
 
-// A function to create any custom shaders
+/**
+ * A function to create any custom shaders
+ */
 let setCustomShaders = function() {
     // Create any custom shaders.
     let surf_params = {
@@ -137,7 +139,9 @@ let setCustomShaders = function() {
     });
 };
 
-// A function to register any events.
+/**
+ * A function to register any events.
+ */
 let setEvents = function() {
     new Event(
         new DistanceToMesh({

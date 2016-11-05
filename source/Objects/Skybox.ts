@@ -16,7 +16,9 @@ class Skybox extends parent {
     // Note: The normals of the skybox must be facing inward! Do that in
     // Blender.
 
-    /** A variable where the skybox mesh is stored. */
+    /** 
+     * A variable where the skybox mesh is stored. 
+     */
     static skyboxMesh: any;
 
     /**

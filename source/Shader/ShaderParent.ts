@@ -2,13 +2,32 @@
  * A class that all shaders inherit.
  */
 abstract class ShaderParent {
+    /**
+     * Whether or not this shader code uses simplex noise.
+     */
     public useSimplexNoise: boolean = false;
+
+    /**
+     * Whether or not this shader code uses a random number generator.
+     */
     public useRandomNumber: boolean = false;
+
+    /**
+     * The input variables required for this shader.
+     */
     public inputVarsNeeded: string[] = [];
 
+    /**
+     * Return the shader code for this shader.
+     * @return {string} The code.
+     */
     public abstract getCode(): string;
-    public abstract simplexNoiseVars(): string;
 
+    /**
+     * Get the code associated with simplex-noise variables.
+     * @return {string} The code.
+     */
+    public abstract simplexNoiseVars(): string;
 
     /**
      * Generate the code for generating a random number.

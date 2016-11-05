@@ -6,7 +6,14 @@ import Ground from "../Objects/Ground";
  * A namespace that stores functions related to the BABYLON render loop.
  */
 namespace RenderLoop {
+    /**
+     * A list of functions to run in the render loop.
+     */
     export var extraFunctionsToRunInLoop: any[] = [];
+
+    /**
+     * The time the loop was last run.
+     */
     export var timeOfLastLoop: number = 0;
 
     /**

@@ -9,10 +9,21 @@ declare var BABYLON;
  */
 class Event {
     // public parameters: TriggerInterface;
-    //public vars = {};
+
+    /**
+     * The conditional trigger associated with this Event. 
+     */
     public triggerConditionObj: any; // a function that returns true or false.
+    
+    /**
+     * The action associated with this event.
+     */
     public actionOnTriggerObj: any; // the action to run when triggered.
                                     // Overwrite this.
+    
+    /**
+     * The timer that checks whether or not the conditional is satisfied.
+     */
     public timerThatChecksCondition: Timers.Timer;
 
     /**

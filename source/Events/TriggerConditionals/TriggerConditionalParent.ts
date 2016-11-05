@@ -17,7 +17,9 @@ abstract class TriggerConditionalParent {
      */
     public abstract check(params: any): boolean;
 
-    // Class variable to store creation parameters.
+    /**
+     * Class variable to store parameters.
+     */
     public parameters: any;
 
     /**

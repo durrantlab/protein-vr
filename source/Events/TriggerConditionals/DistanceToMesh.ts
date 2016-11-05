@@ -10,7 +10,6 @@ interface CheckInterface {
     cutOffDistance: number;
 }
 
-
 /**
  * A class to see if the camera is within a certain distance of a mesh.
  */

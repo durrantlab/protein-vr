@@ -12,6 +12,9 @@ declare var jQuery;
  */
 namespace Shaders {
 
+    /**
+     * A JSON object that stores the custom shaders.
+     */
     export var shadersLibrary: any = {};
 
     export enum AnimationType {
@@ -369,7 +372,7 @@ namespace Shaders {
          * Set the time on the shader.
          * @param  {number} val The time.
          */
-        public set time(val: number): void {
+        public set time(val: number) {
             this.setMaterialFloat("time", val);
         }
 
@@ -377,7 +380,7 @@ namespace Shaders {
          * Set the animation speed on the shader.
          * @param  {number} val The animation speed.
          */
-        public set animationSpeed(val: number): void {
+        public set animationSpeed(val: number) {
             this.setMaterialFloat("animationSpeed", val);
         }
 

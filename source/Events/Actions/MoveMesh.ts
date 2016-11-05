@@ -1,5 +1,4 @@
 import Timers from "../Timers";
-
 import parent from "./ActionParent";
 
 declare var BABYLON;
@@ -14,6 +13,9 @@ interface DoInterface {
 
 class MoveMesh extends parent {
 
+    /**
+     * A jQuery object, where the canvas where the scene is being rendered.
+     */
     public canvasJQuery = undefined;
 
     constructor(params) { // : DoInterface) {

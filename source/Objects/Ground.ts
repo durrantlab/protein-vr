@@ -10,7 +10,9 @@ declare var BABYLON;
  */
 class Ground extends parent {
 
-    /** A variable where the ground mesh is stored. */
+    /** 
+     * A variable where the ground mesh is stored. 
+     */
     static groundMesh: any;
 
     /**

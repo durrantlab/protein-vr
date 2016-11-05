@@ -10,16 +10,55 @@ enum TextureBlendingType {
  * A class for generating a custom fragment shader.
  */
 class FragmentShaderCode extends parent {
+    /**
+     * Whether or not this shader has a glossy effect. 
+     */
     public _hasGlossyEffect: boolean = true;
+
+    /**
+     * Whether or not this shader has a diffuse effect. 
+     */
     public _hasDiffuseEffect: boolean = true;
+
+    /**
+     * Whether or not this shader is shadeless. 
+     */
     public _isShadeless: boolean = false;
+
+    /**
+     * Whether or not this shader requires info about the light and camera
+     * position.
+     */
     public _requiresLightAndCameraPos: boolean = true;
+
+    /**
+     * Whether or not this shader can be transparent.
+     */
     public _hasTransparency: boolean = false;
+
+    /**
+     * The number of textures associated with this shader.
+     */
     public numTextures: number = 1;
+
+    /**
+     * How to blend the textures of this shader.
+     */
     public textureBlendingType: TextureBlendingType = TextureBlendingType.ConstantBlend;
+
+    /**
+     * Whether or not to use a shadow map.
+     */
     public useShadowMap: boolean = false;
 
+    /**
+     * The associated Material object.
+     */
     public Material: Material;
+
+    /**
+     * The associated Texture object.
+     */
     public Texture: Texture;
 
     /**
@@ -168,6 +207,10 @@ class FragmentShaderCode extends parent {
  * This class represents a material.
  */
 class Material {
+
+    /**
+     * The associated fragment shader.
+     */
     private parent: FragmentShaderCode;
 
     /**
@@ -339,6 +382,10 @@ class Material {
  * A class describing a texture.
  */
 class Texture {
+
+    /**
+     * The associated fragment shader object.
+     */
     public parent: FragmentShaderCode;
 
     /**

@@ -4,6 +4,9 @@ import Core from "../../Core/Core";
  * The class that all other actions inherit.
  */
 abstract class ActionParent {
+    /**
+     * The parameters associated with this action.
+     */
     public parameters: any;
 
     /**

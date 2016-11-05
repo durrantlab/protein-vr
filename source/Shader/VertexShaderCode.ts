@@ -13,7 +13,14 @@ enum AnimationType {
  */
 class VertexShaderCode extends parent {
 
+    /**
+     * The associated Animation object.
+     */
     public Animation: Animation;
+
+    /**
+     * The type of vertex-shader animation.
+     */
     public animationType: AnimationType = AnimationType.None;
 
     /**
@@ -132,6 +139,9 @@ class VertexShaderCode extends parent {
  * A class for controlling vertex animations.
  */
 class Animation {
+    /**
+     * The associated vertex shader object.
+     */
     public parent: VertexShaderCode;
 
     /**
