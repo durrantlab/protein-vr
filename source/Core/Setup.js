@@ -1,8 +1,7 @@
 define(["require", "exports", "../Objects/CollisionMeshes", "../Objects/Ground", "../Objects/Skybox", "../Objects/AutoLOD", "../Objects/Billboard", "../Objects/CustomShaderObject", "../CameraChar", "../Environment", "./Core", "./RenderLoop"], function (require, exports, CollisionMeshes_1, Ground_1, Skybox_1, AutoLOD_1, Billboard_1, CustomShaderObject_1, CameraChar_1, Environment_1, Core_1, RenderLoop_1) {
     "use strict";
     /**
-     * Core is where all the VR ProteinVR functions and variables are
-     * stored. This could probably be a namespace rather than a class.
+     * A namespace to store the functions to start the engine.
      */
     var Setup;
     (function (Setup) {
@@ -18,7 +17,11 @@ define(["require", "exports", "../Objects/CollisionMeshes", "../Objects/Ground",
         export var Timers = Timers;
         */
         /**
-         * Set up the BABYLON game engine.
+         * Setup the BABYLON game engine.
+         * @param {any} setCustomShaders An externally defined function that sets
+         *                               up any custom shaders.
+         * @param {any} setEvents        An externally defined function that sets
+         *                               up any events.
          */
         function setup(setCustomShaders, setEvents) {
             // Whether or not to run in debug mode (shows certain messages in the
@@ -53,7 +56,7 @@ define(["require", "exports", "../Objects/CollisionMeshes", "../Objects/Ground",
                             m.name = json.n;
                             // save for later reference
                             Core_1.default.meshesByName[m.name] = m;
-                            // Given the mesh, check if it shoudl collide with
+                            // Given the mesh, check if it should collide with
                             // the camera.
                             new CollisionMeshes_1.default().checkMesh(m, json);
                             // Check if the mesh is marked as a ground mesh.

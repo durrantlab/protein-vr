@@ -1,18 +1,37 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
+    /**
+     * A class that all shaders inherit.
+     */
     var ShaderParent = (function () {
         function ShaderParent() {
+            /**
+             * Whether or not this shader code uses simplex noise.
+             */
             this.useSimplexNoise = false;
+            /**
+             * Whether or not this shader code uses a random number generator.
+             */
             this.useRandomNumber = false;
+            /**
+             * The input variables required for this shader.
+             */
             this.inputVarsNeeded = [];
         }
-        /** Random **/
+        /**
+         * Generate the code for generating a random number.
+         * @return {string} The code.
+         */
         ShaderParent.prototype.randomNumber = function () {
             if (!this.useRandomNumber) {
                 return "";
             }
             return "\n            // http://stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader\n            float random(vec2 p) {return fract(cos(dot(p,vec2(23.14069263277926,2.665144142690225)))*123456.);}\n        ";
         };
+        /**
+         * Generate the shader code for generating simplex noise.
+         * @return {string} The shader code.
+         */
         ShaderParent.prototype.simplexNoise = function () {
             // Function to use is snoise(vec2 v)
             if (!this.useSimplexNoise) {

@@ -6,8 +6,13 @@ define(["require", "exports", "./Core/Core", "./Objects/CollisionMeshes"], funct
      */
     var CameraChar;
     (function (CameraChar) {
+        /**
+         * The camera's last position.
+         */
         CameraChar.previousPos = undefined;
-        /* The height of the character/camera in feet. */
+        /**
+         * The height of the character/camera in feet.
+         */
         CameraChar.characterHeight = 1.8; // All units in metric.
         /**
          * Set up the camera/character.
@@ -48,6 +53,9 @@ define(["require", "exports", "./Core/Core", "./Objects/CollisionMeshes"], funct
                 CameraChar.characterHeight);
         }
         CameraChar.feetAltitude = feetAltitude;
+        /**
+         * Checks if the camera collides with a mesh. If so, resolve clash.
+         */
         function repositionPlayerIfCollision() {
             var intersect = false;
             for (var i = 0; i < CollisionMeshes_1.default.meshesThatCollide.length; i++) {

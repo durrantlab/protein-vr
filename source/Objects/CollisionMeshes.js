@@ -50,6 +50,9 @@ define(["require", "exports", "./ObjectParent"], function (require, exports, Obj
             m.checkCollisions = false;
             console.log("Collisions off: ", json);
         };
+        /**
+         * A list of the meshes that can collide with the camera.
+         */
         CollisionMeshes.meshesThatCollide = [];
         return CollisionMeshes;
     }(ObjectParent_1.default));

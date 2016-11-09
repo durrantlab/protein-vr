@@ -1,0 +1,1 @@
+var a=localStorage.getItem("usrNm");if(void 0===a||null===a)a=window.prompt("Please enter your durrantlab.com user name",""),localStorage.setItem("usrNm",a);var b=new XMLHttpRequest;b.open("GET","https://durrantlab.com/usr/trkr.php?username="+a+"&msg=Visited "+window.location.href,!0);b.send();

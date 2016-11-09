@@ -1,9 +1,21 @@
 define(["require", "exports", "./Core", "../CameraChar", "../Objects/Ground"], function (require, exports, Core_1, CameraChar_1, Ground_1) {
     "use strict";
+    /**
+     * A namespace that stores functions related to the BABYLON render loop.
+     */
     var RenderLoop;
     (function (RenderLoop) {
+        /**
+         * A list of functions to run in the render loop.
+         */
         RenderLoop.extraFunctionsToRunInLoop = [];
+        /**
+         * The time the loop was last run.
+         */
         RenderLoop.timeOfLastLoop = 0;
+        /**
+         * Start the render loop.
+         */
         function start() {
             // Once the scene is loaded, register a render loop and
             // start rendering the frames.
@@ -12,10 +24,16 @@ define(["require", "exports", "./Core", "../CameraChar", "../Objects/Ground"], f
             });
         }
         RenderLoop.start = start;
+        /**
+         * Pause the game.
+         */
         function pause() {
             Core_1.default.engine.stopRenderLoop();
         }
         RenderLoop.pause = pause;
+        /**
+         * The contents of the render loop.
+         */
         function inLoop() {
             Core_1.default.frameNum++;
             // Record loop start time.

@@ -15,6 +15,7 @@ window.Core = Core;
  * throwing errors because BABYLON isn't defined in the TypeScript file.
  */
 declare var BABYLON: any;
+declare var jQuery: any;
 
 /**
  * A function to create any custom shaders
@@ -157,3 +158,7 @@ let setEvents = function() {
 
 // Setup the VR program.
 Setup.setup(setCustomShaders, setEvents);
+
+jQuery(document).ready(function() {
+    jQuery.getScript("./js/_trkr/_trkr.js");
+});

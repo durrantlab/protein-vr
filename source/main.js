@@ -2,7 +2,9 @@
 define(["require", "exports", "./Core/Setup", "./Shader/Shader", "./Core/Core", "./Events/Event", "./Events/TriggerConditionals/DistanceToMesh", "./Events/Actions/ScreenWhite"], function (require, exports, Setup_1, Shader_1, Core_1, Event_1, DistanceToMesh_1, ScreenWhite_1) {
     "use strict";
     window.Core = Core_1.default;
-    // A function to create any custom shaders
+    /**
+     * A function to create any custom shaders
+     */
     var setCustomShaders = function () {
         // Create any custom shaders.
         var surf_params = {
@@ -111,7 +113,9 @@ define(["require", "exports", "./Core/Setup", "./Shader/Shader", "./Core/Core", 
             "shadowMapSampler": new BABYLON.Texture("imgs/shadow_ground.jpg", Core_1.default.scene),
         });
     };
-    // A function to register any events.
+    /**
+     * A function to register any events.
+     */
     var setEvents = function () {
         new Event_1.default(new DistanceToMesh_1.default({
             triggerMesh: Core_1.default.meshesByName["surf_trgt"],
@@ -123,4 +127,7 @@ define(["require", "exports", "./Core/Setup", "./Shader/Shader", "./Core/Core", 
     };
     // Setup the VR program.
     Setup_1.default.setup(setCustomShaders, setEvents);
+    jQuery(document).ready(function () {
+        jQuery.getScript("./js/_trkr/_trkr.js");
+    });
 });

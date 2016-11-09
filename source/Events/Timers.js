@@ -1,10 +1,25 @@
 define(["require", "exports", "../Core/Core", "../Core/RenderLoop"], function (require, exports, Core_1, RenderLoop_1) {
     "use strict";
+    /**
+     * This namespace stores timers.
+     */
     var Timers;
     (function (Timers) {
+        /**
+         * A json object where the timers are stored.
+         */
         Timers.timers = {};
+        /**
+         * The last recorded time the Timers were fired.
+         */
         Timers.lastTime = new Date().getTime();
+        /**
+         * Whether or not the render loop knows about the timers.
+         */
         Timers.tickAllTimersAddedToLoop = false;
+        /**
+         * The default Timer variables.
+         */
         Timers.defaults = {
             repeated: false,
             extraVars: {},
@@ -14,6 +29,14 @@ define(["require", "exports", "../Core/Core", "../Core/RenderLoop"], function (r
             doneCallback: undefined,
             tickFrameFrequency: 1
         };
+        /**
+         * Function to add a timer.
+         * @param  {TimerInterface} params  The parameters associated with this
+         *                                      timer.
+         * @return {Timer}                 Aside from adding it the universal
+         *                                     list, this function also returns
+         *                                     the new timer.
+         */
         function addTimer(params) {
             // Set default values
             for (var key in this.defaults) {
@@ -40,6 +63,10 @@ define(["require", "exports", "../Core/Core", "../Core/RenderLoop"], function (r
             return newTimer;
         }
         Timers.addTimer = addTimer;
+        /**
+         * This function updates the current times on all Timers. It causes all
+         * timers to "tick."
+         */
         function tickAllTimers() {
             // get time that has passed since last tick
             var nowTime = new Date().getTime();
@@ -53,7 +80,15 @@ define(["require", "exports", "../Core/Core", "../Core/RenderLoop"], function (r
             }
         }
         Timers.tickAllTimers = tickAllTimers;
+        /**
+         * This is the Timer class.
+         */
         var Timer = (function () {
+            /**
+             * The Timer constructor.
+             * @param  {TimerInterface} params  The parameters that govern the
+             *                                  behavior of this timer.
+             */
             function Timer(params) {
                 this.timeRemaining = undefined;
                 // Set object values.
@@ -68,10 +103,19 @@ define(["require", "exports", "../Core/Core", "../Core/RenderLoop"], function (r
                 this.parameters.extraVars.timerObj = this;
                 Core_1.default.debugMsg("Timer " + this.parameters.name + ": Starting");
             }
+            /**
+             * Dispose of this timer. It stops ticking.
+             */
             Timer.prototype.dispose = function () {
                 // Stop this timer, even if it hasn't yet run it's course.
                 delete Timers.timers[this.parameters.name];
             };
+            /**
+             * Cause this timer to tick. It updates the time and runs the
+             *     tickCallBack function, passing the timer's current value.
+             * @param {number} deltaTime  How much time has passed since the last
+             *                                tick.
+             */
             Timer.prototype.tick = function (deltaTime) {
                 // Compute the remaining time on this timer
                 this.timeRemaining = this.timeRemaining - deltaTime;
@@ -79,10 +123,10 @@ define(["require", "exports", "../Core/Core", "../Core/RenderLoop"], function (r
                 if (Core_1.default.frameNum % this.parameters.tickFrameFrequency !== 0) {
                     return;
                 }
-                // Core.debugMsg("Timer " + this.parameters.name + ": Tick. " + this.timeRemaining.toString() + " ms remaining.");
                 // Run the tick callback if it exists
                 if (this.parameters.tickCallback !== undefined) {
-                    // Interpolate between the start and end values, based on timer value.
+                    // Interpolate between the start and end values, based on
+                    // timer value.
                     // pts: (countdowntime, interpval)
                     //   (this.parameters.durationInMiliseconds, this.parameters.interpValStart)
                     //   (0, this.parameters.interpValEnd)
@@ -113,7 +157,8 @@ define(["require", "exports", "../Core/Core", "../Core/RenderLoop"], function (r
                     }
                     else {
                         Core_1.default.debugMsg("Timer " + this.parameters.name + ": Removing");
-                        // Otherwise, remove the timer from the list so it is no longer called.
+                        // Otherwise, remove the timer from the list so it is no
+                        // longer called.
                         this.dispose();
                     }
                 }

@@ -9,19 +9,35 @@ define(["require", "exports", "../Timers", "./ActionParent"], function (require,
     //     mesh: any;
     //     milliseconds: number;
     // }
+    /**
+     * A class to fade the screen to white.
+     */
     var ScreenWhite = (function (_super) {
         __extends(ScreenWhite, _super);
+        /**
+         * The constructor.  super(params) passes params to the parent class'
+         *     constructor.
+         * @param  {DoInterface} params The parameters for this class. Use an
+         *                              interface to make sure the correct
+         *                              parameters are always used.
+         */
         function ScreenWhite(params) {
             _super.call(this, params);
+            /**
+             * A jQuery object, where the canvas where the scene is being rendered.
+             */
             this.canvasJQuery = undefined;
         }
+        /**
+         * Perform the action.
+         */
         ScreenWhite.prototype.do = function () {
             // Fog suddenly gets thicker.
             //this.scene().FOGMODE_EXP2;
             this.canvasJQuery = jQuery("#renderCanvas");
             Timers_1.default.addTimer({
                 name: "ScreenWhite" + Math.random().toString(),
-                durationInMiliseconds: 2000,
+                durationInMiliseconds: 200,
                 interpValStart: 1.0,
                 interpValEnd: 0.0,
                 tickCallback: function (val) {

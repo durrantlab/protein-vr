@@ -1,5 +1,8 @@
 define(["require", "exports", "../Core/Core"], function (require, exports, Core_1) {
     "use strict";
+    /**
+     * The class that all objects inherit.
+     */
     var ObjectParent = (function () {
         function ObjectParent() {
         }
