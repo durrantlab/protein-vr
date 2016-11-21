@@ -8,6 +8,10 @@ import DistanceToMesh from "./Events/TriggerConditionals/DistanceToMesh";
 import FadeOutMesh from "./Events/Actions/FadeOutMesh";
 import ScreenWhite from "./Events/Actions/ScreenWhite";
 
+interface MyWindow extends Window {
+    Core: any;
+}
+declare var window: MyWindow;
 window.Core = Core;
 
 /**

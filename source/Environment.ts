@@ -8,21 +8,12 @@ declare var BABYLON;
  * This interface prevents Typescript from throwing an error when the
  * browser takes control of the mouse.
  */
-interface Document {
+interface MyDocument extends Document{
     mozPointerLockElement: any;
     webkitPointerLockElement: any;
     msPointerLockElement: any;
 }
-
-/**
- * This interface prevents Typescript from throwing an error when the
- * browser takes control of the mouse.
- */
-interface document {
-    mozPointerLockElement: any;
-    webkitPointerLockElement: any;
-    msPointerLockElement: any;
-}
+declare var document: MyDocument;
 
 /**
  * The Environment namespace is where all the functions and variables
@@ -116,7 +107,6 @@ namespace Environment {
      * related to capturing the mouse are stored.
      */
     export namespace PointerLock {
-
         /* Whether or not the mouse has been captured. */
         export var alreadyLocked: boolean = false;
 

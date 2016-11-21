@@ -7,6 +7,12 @@ import CameraChar from "../CameraChar";
 declare var BABYLON;
 declare var jQuery;
 
+interface MyWindow extends Window {
+    shadersLibrary: any;
+}
+declare var window: MyWindow;
+
+
 /**
  * A namespace to store custom shaders.
  */
