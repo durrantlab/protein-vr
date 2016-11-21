@@ -1,11 +1,5 @@
 import parent from "./ShaderParent";
 
-enum TextureBlendingType {
-    ConstantBlend,
-    SimplexBlend,
-    HeightBasedBlend
-}
-
 /**
  * A class for generating a custom fragment shader.
  */
@@ -44,7 +38,7 @@ class FragmentShaderCode extends parent {
     /**
      * How to blend the textures of this shader.
      */
-    public textureBlendingType: TextureBlendingType = TextureBlendingType.ConstantBlend;
+    public textureBlendingType: string = "ConstantBlend";
 
     /**
      * Whether or not to use a shadow map.
@@ -113,12 +107,12 @@ class FragmentShaderCode extends parent {
      */
     public getCode(): string {
         // Figure out if you need to include simplex.
-        let texBT: TextureBlendingType = this.textureBlendingType;
-        if (texBT === TextureBlendingType.ConstantBlend) {
+        let texBT: string = this.textureBlendingType;
+        if (texBT === "ConstantBlend") {
             this.useSimplexNoise = false;
-        } else if (texBT === TextureBlendingType.SimplexBlend) {
+        } else if (texBT === "SimplexBlend") {
             this.useSimplexNoise = true;
-        } else if (texBT === TextureBlendingType.HeightBasedBlend) {
+        } else if (texBT === "HeightBasedBlend") {
             this.useSimplexNoise = true;
         }
 
@@ -403,7 +397,7 @@ class Texture {
      */
     public getTextureVars(): string {
         let numTexs: number = this.parent.numTextures;
-        let useTextureBlendWeights: boolean = (this.parent.textureBlendingType !== TextureBlendingType.HeightBasedBlend);
+        let useTextureBlendWeights: boolean = (this.parent.textureBlendingType !== "HeightBasedBlend");
         if (numTexs <= 1) {
             // Regardless of the texture mixing method, if there's only one
             // texture no weights are needed.
@@ -442,7 +436,7 @@ class Texture {
      * @return {string} The code.
      */
     public getHeightBasedBlendingVars(): string {
-        if (this.parent.textureBlendingType !== TextureBlendingType.HeightBasedBlend) {
+        if (this.parent.textureBlendingType !== "HeightBasedBlend") {
             return "";
         }
 
@@ -488,7 +482,7 @@ class Texture {
      */
     public getTextureCode(): string {
         let numTexs: number = this.parent.numTextures;
-        let texBT: TextureBlendingType = this.parent.textureBlendingType;
+        let texBT: string = this.parent.textureBlendingType;
 
         if (numTexs <= 1) {
             // If there's only 1 texture, this is easy. Regardless of the
@@ -502,11 +496,11 @@ class Texture {
 
         let code: string = "";
 
-        if (texBT === TextureBlendingType.ConstantBlend) {
+        if (texBT === "ConstantBlend") {
             code += this.getConstantBlendWeights();
-        } else if (texBT === TextureBlendingType.SimplexBlend) {
+        } else if (texBT === "SimplexBlend") {
             code += this.getSimplexBlendWeights();
-        } else if (texBT === TextureBlendingType.HeightBasedBlend) {
+        } else if (texBT === "HeightBasedBlend") {
             code += this.getHeightBasedBlendWeights();
         }
 
@@ -635,4 +629,3 @@ class Texture {
 }
 
 export default FragmentShaderCode;
-export { TextureBlendingType }

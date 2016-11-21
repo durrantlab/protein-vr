@@ -8,6 +8,10 @@ import DistanceToMesh from "./Events/TriggerConditionals/DistanceToMesh";
 import FadeOutMesh from "./Events/Actions/FadeOutMesh";
 import ScreenWhite from "./Events/Actions/ScreenWhite";
 
+interface MyWindow extends Window {
+    Core: any;
+}
+declare var window: MyWindow;
 window.Core = Core;
 
 /**
@@ -24,11 +28,11 @@ let setCustomShaders = function() {
     // Create any custom shaders.
     let surf_params = {
         "name": "surface1",
-        "_animationType": Shaders.AnimationType.WaveBobbing,
+        "_animationType": "WaveBobbing",
         "_hasGlossyEffect": false,
         "_hasDiffuseEffect": false,
         "_numTextures": 2,
-        "_textureBlendingType": Shaders.TextureBlendingType.SimplexBlend,
+        "_textureBlendingType": "SimplexBlend",
         "_useShadowMap": true,
         "_hasTransparency": true,
         "textureSampler1": new BABYLON.Texture("imgs/moss.jpg", Core.scene),
@@ -60,11 +64,11 @@ let setCustomShaders = function() {
 
     let urea_params = {
         "name": "urea1",
-        "_animationType": Shaders.AnimationType.WaveBobbing,
+        "_animationType": "WaveBobbing",
         "_hasGlossyEffect": false,
         "_hasDiffuseEffect": false,
         "_numTextures": 2,
-        "_textureBlendingType": Shaders.TextureBlendingType.ConstantBlend,
+        "_textureBlendingType": "ConstantBlend",
         "_useShadowMap": true,
         "textureSampler1": new BABYLON.Texture("imgs/sand.jpg", Core.scene),
         "textureRepeat1": 9.,
@@ -100,11 +104,11 @@ let setCustomShaders = function() {
     // Create any custom shaders.
     Shaders.create({
         "name": "ribbon",
-        "_animationType": Shaders.AnimationType.WaveBobbing,
+        "_animationType": "WaveBobbing",
         "_hasGlossyEffect": false,
         "_hasDiffuseEffect": false,
         "_numTextures": 2,
-        "_textureBlendingType": Shaders.TextureBlendingType.SimplexBlend,
+        "_textureBlendingType": "SimplexBlend",
         "_useShadowMap": true,
         "textureSampler1": new BABYLON.Texture("imgs/moss.jpg", Core.scene),
         "textureRepeat1": 9.,
@@ -121,11 +125,11 @@ let setCustomShaders = function() {
 
     Shaders.create({
         "name": "grnd",
-        "_animationType": Shaders.AnimationType.WaveAlongVertical,
+        "_animationType": "WaveAlongVertical",
         "_hasGlossyEffect": false,
         "_hasDiffuseEffect": false,
         "_numTextures": 2,
-        "_textureBlendingType": Shaders.TextureBlendingType.ConstantBlend,
+        "_textureBlendingType": "ConstantBlend",
         "_useShadowMap": true,
         "textureSampler1": new BABYLON.Texture("imgs/red1.jdd.jpg", Core.scene),
         "textureRepeat1": 21.,

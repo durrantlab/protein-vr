@@ -7,6 +7,11 @@ import CameraChar from "../CameraChar";
 declare var BABYLON;
 declare var jQuery;
 
+interface MyWindow extends Window {
+    shadersLibrary: any;
+}
+declare var window: MyWindow;
+
 /**
  * A namespace to store custom shaders.
  */
@@ -17,26 +22,12 @@ namespace Shaders {
      */
     export var shadersLibrary: any = {};
 
-    export enum AnimationType {
-        None,
-        RandomlyUndulateAlongNormals,
-        Worm,
-        WaveAlongVertical,
-        WaveBobbing
-    }
-
-    export enum TextureBlendingType {
-        ConstantBlend,
-        SimplexBlend,
-        HeightBasedBlend
-    }
-
     export interface ShaderInterface {
         name: string;
 
         // Variables before compiling
-        _animationType?: Shaders.AnimationType;
-        _textureBlendingType?: Shaders.TextureBlendingType;
+        _animationType?: string;
+        _textureBlendingType?: string;
         _numTextures?: number;
         _useShadowMap?: boolean;
         _hasGlossyEffect?: boolean;
@@ -93,8 +84,8 @@ namespace Shaders {
         public FSCode: string;
 
         public parameters: ShaderInterface = {
-            "_animationType": AnimationType.None,
-            "_textureBlendingType": TextureBlendingType.ConstantBlend,
+            "_animationType": "None",
+            "_textureBlendingType": "ConstantBlend",
             "_numTextures": 1,
             "_useShadowMap": false,
             "_hasGlossyEffect": true,
