@@ -1,13 +1,5 @@
 import parent from "./ShaderParent";
 
-enum AnimationType {
-    None,
-    RandomlyUndulateAlongNormals,
-    Worm,
-    WaveAlongVertical,
-    WaveBobbing
-}
-
 /**
  * The class for generating the vertex shader.
  */
@@ -21,7 +13,7 @@ class VertexShaderCode extends parent {
     /**
      * The type of vertex-shader animation.
      */
-    public animationType: AnimationType = AnimationType.None;
+    public animationType: string = "None";
 
     /**
      * The constructor. super() calls the parents constructor to be called.
@@ -38,13 +30,13 @@ class VertexShaderCode extends parent {
     public getCode(): string {
 
         switch (this.animationType) {
-            case AnimationType.None:
+            case "None":
                 this.useSimplexNoise = false;
                 break;
-            case AnimationType.WaveAlongVertical:
+            case "WaveAlongVertical":
                 this.useSimplexNoise = false;
                 break;
-            case AnimationType.WaveBobbing:
+            case "WaveBobbing":
                 this.useSimplexNoise = false;
                 break;
             default:
@@ -159,15 +151,15 @@ class Animation {
      */
     public getAnimation(): string {
         switch (this.parent.animationType) {
-            case AnimationType.None:
+            case "None":
                 return this.noAnimation();
-            case AnimationType.RandomlyUndulateAlongNormals:
+            case "RandomlyUndulateAlongNormals":
                 return this.randomlyUndulateAlongNormals();
-            case AnimationType.Worm:
+            case "Worm":
                 return this.wormAnimation();
-            case AnimationType.WaveAlongVertical:
+            case "WaveAlongVertical":
                 return this.waveAlongVerticalAnimation();
-            case AnimationType.WaveBobbing:
+            case "WaveBobbing":
                 return this.waveBobbingAnimation();
         }
     }
@@ -177,7 +169,7 @@ class Animation {
      * @return {string} The code.
      */
     public animationVars(): string {
-        if (this.parent.animationType === AnimationType.None) {
+        if (this.parent.animationType === "None") {
             return "";
         }
 
@@ -193,7 +185,7 @@ class Animation {
             uniform float animationStrength;
         `;
 
-        if (this.parent.animationType === AnimationType.WaveBobbing) {
+        if (this.parent.animationType === "WaveBobbing") {
             this.parent.inputVarsNeeded.push("animationOrigin");
 
             code += `
@@ -282,4 +274,3 @@ class Animation {
 }
 
 export default VertexShaderCode;
-export { AnimationType };

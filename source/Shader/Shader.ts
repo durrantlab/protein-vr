@@ -12,14 +12,6 @@ interface MyWindow extends Window {
 }
 declare var window: MyWindow;
 
-enum AnimationType {
-    None,
-    RandomlyUndulateAlongNormals,
-    Worm,
-    WaveAlongVertical,
-    WaveBobbing
-}
-
 /**
  * A namespace to store custom shaders.
  */
@@ -30,18 +22,12 @@ namespace Shaders {
      */
     export var shadersLibrary: any = {};
 
-    export enum TextureBlendingType {
-        ConstantBlend,
-        SimplexBlend,
-        HeightBasedBlend
-    }
-
     export interface ShaderInterface {
         name: string;
 
         // Variables before compiling
-        _animationType?: AnimationType;
-        _textureBlendingType?: TextureBlendingType;
+        _animationType?: string;
+        _textureBlendingType?: string;
         _numTextures?: number;
         _useShadowMap?: boolean;
         _hasGlossyEffect?: boolean;
@@ -98,8 +84,8 @@ namespace Shaders {
         public FSCode: string;
 
         public parameters: ShaderInterface = {
-            "_animationType": AnimationType.None,
-            "_textureBlendingType": TextureBlendingType.ConstantBlend,
+            "_animationType": "None",
+            "_textureBlendingType": "ConstantBlend",
             "_numTextures": 1,
             "_useShadowMap": false,
             "_hasGlossyEffect": true,
@@ -487,4 +473,3 @@ namespace Shaders {
 }
 
 export default Shaders;
-export { AnimationType };
