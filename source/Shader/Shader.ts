@@ -41,8 +41,8 @@ namespace Shaders {
         name: string;
 
         // Variables before compiling
-        _animationType?: Shaders.AnimationType;
-        _textureBlendingType?: Shaders.TextureBlendingType;
+        _animationType?: AnimationType;
+        _textureBlendingType?: TextureBlendingType;
         _numTextures?: number;
         _useShadowMap?: boolean;
         _hasGlossyEffect?: boolean;
