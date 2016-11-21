@@ -12,6 +12,13 @@ interface MyWindow extends Window {
 }
 declare var window: MyWindow;
 
+enum AnimationType {
+    None,
+    RandomlyUndulateAlongNormals,
+    Worm,
+    WaveAlongVertical,
+    WaveBobbing
+}
 
 /**
  * A namespace to store custom shaders.
@@ -22,14 +29,6 @@ namespace Shaders {
      * A JSON object that stores the custom shaders.
      */
     export var shadersLibrary: any = {};
-
-    export enum AnimationType {
-        None,
-        RandomlyUndulateAlongNormals,
-        Worm,
-        WaveAlongVertical,
-        WaveBobbing
-    }
 
     export enum TextureBlendingType {
         ConstantBlend,
@@ -488,3 +487,4 @@ namespace Shaders {
 }
 
 export default Shaders;
+export { AnimationType };
