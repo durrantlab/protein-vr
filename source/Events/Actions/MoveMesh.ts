@@ -1,4 +1,5 @@
 import Timers from "../Timers";
+
 import parent from "./ActionParent";
 
 declare var BABYLON;
@@ -13,9 +14,6 @@ interface DoInterface {
 
 class MoveMesh extends parent {
 
-    /**
-     * A jQuery object, where the canvas where the scene is being rendered.
-     */
     public canvasJQuery = undefined;
 
     constructor(params) { // : DoInterface) {
@@ -23,6 +21,9 @@ class MoveMesh extends parent {
     }
 
     public do() {
+
+        //let params = this.parameters;
+  
         Timers.addTimer({
             name: "MoveMesh" + Math.random().toString(),
             durationInMiliseconds: this.parameters["milliseconds"],
@@ -33,10 +34,18 @@ class MoveMesh extends parent {
                 // how far val is between 0.0 and 1.0.
                 // https://doc.babylonjs.com/classes/2.4/Vector3
                 // https://doc.babylonjs.com/tutorials/Position,_Rotation,_Scaling
-
-            }.bind(this),
+                
+                let ep = this.parameters("endPosition");
+                let sp = this.parameters("startPosition");
+                let mesh = this.parameters("mesh");
+                mesh.position.x = sp.x + ((ep.x - sp.x) * val);
+                mesh.position.y = sp.y + ((ep.y - sp.y) * val);
+                mesh.position.z = sp.z + ((ep.z = sp.Z) * val);
+            
+        }.bind(this),
             doneCallback: function() {
                 // Maybe set the mesh to exactly position endpoint
+                this.parameters["mesh"].position = this.parameters["endPosition"];
             }.bind(this)
         });
     }
