@@ -4,12 +4,14 @@ declare var html2canvas;
 declare var jQuery;
 
 function html_texture(planeMesh, url) {
-    // Use jQuery to add a div to the document body, with id "html_rendered". Width and height 350px.
+    // Use jQuery to add a div to the document body, with id "html_rendered".
+    // Width and height = 350px.
 
-    // Use jQuery.ajax or jQuery.get to place the contents of page at url into that div.
-    // url in this test case will be test.html.
+    // Use jQuery.ajax or jQuery.get to place the contents of the webpage at
+    // url into that div. url in this test case will be test.html (see below,
+    // where this function is called).
 
-    // Save the div to an image on a canvas
+    // Save the div to an image on a canvas. This part is already working.
     html2canvas(jQuery("#html_rendered"), {
         onrendered: function(canvas) {
             // The canvas contains the rendered html.
@@ -22,12 +24,12 @@ function html_texture(planeMesh, url) {
 
             // Apply that texture to the plane. Remember the plane is planeMesh.
 
-            // Delete the original div ("#html_rendered")
+            // Delete the original div ("#html_rendered") to clean up.
         }.bind(planeMesh)
     });
 }
 
-// Cara, don't change this function. See below...
+// Cara, don't change this function.
 function createScene() {
     // Where to render the scene?
     var canvas = document.getElementById('renderCanvas');
