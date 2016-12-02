@@ -336,7 +336,7 @@ def register():
 
     bpy.types.Object.custom_shader = StringProperty(
         name="Enable or Disable",
-        description="The same of a custom shader to use. This custom shader is defined in the associated Typescript code, not in here in Blender. If empty, uses the Blender material.",
+        description="The name of a custom shader to use. This custom shader is defined in the associated Typescript code, not in here in Blender. If empty, uses the Blender material.",
         default=""
     )
 
