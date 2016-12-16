@@ -1,9 +1,10 @@
 import parent from "./ShaderParent";
 
-/**
- * A class for generating a custom fragment shader.
- */
 class FragmentShaderCode extends parent {
+    /**
+     * A class for generating a custom fragment shader.
+     */
+
     /**
      * Whether or not this shader has a glossy effect. 
      */
@@ -55,57 +56,63 @@ class FragmentShaderCode extends parent {
      */
     public Texture: Texture;
 
-    /**
-     * The constructor. super() calls the parent constructor.
-     */
     constructor() {
+        /**
+         * The constructor. super() calls the parent constructor.
+         */
+
         super();
         this.Material = new Material(this);
         this.Texture = new Texture(this);
     }
 
-    /**
-     * Whether or not this fragment shader has a glossy effect on the
-     *     material.
-     * @param  {boolean} val  true if it does, false otherwise.
-     */
     set hasGlossyEffect(val: boolean) {
+        /**
+         * Whether or not this fragment shader has a glossy effect on the
+         *     material.
+         * @param  {boolean} val  true if it does, false otherwise.
+         */
+
         this._hasGlossyEffect = val;
         this.Material.updateDependentVars();
     }
 
-    /**
-     * Whether or not this fragment shader has a diffuse effect on the
-     *     material.
-     * @param  {boolean} val  true if it does, false otherwise.
-     */
     set hasDiffuseEffect(val: boolean) {
+        /**
+         * Whether or not this fragment shader has a diffuse effect on the
+         *     material.
+         * @param  {boolean} val  true if it does, false otherwise.
+         */
+
         this._hasDiffuseEffect = val;
         this.Material.updateDependentVars();
     }
 
-    /**
-     * Whether or not this fragment shader produces a shadeless material.
-     * @param  {boolean} val  true if it is shadeless, false otherwise.
-     */
     set isShadeless(val: boolean) {
+        /**
+         * Whether or not this fragment shader produces a shadeless material.
+         * @param  {boolean} val  true if it is shadeless, false otherwise.
+         */
+
         this._isShadeless = val;
         this.Material.updateDependentVars();
     }
 
-    /**
-     * Whether or not this fragment shader has a transparent material.
-     * @param  {boolean} val  true if it does, false otherwise.
-     */
     set hasTransparency(val: boolean) {
+        /**
+         * Whether or not this fragment shader has a transparent material.
+         * @param  {boolean} val  true if it does, false otherwise.
+         */
+
         this._hasTransparency = val;
     }
 
-    /**
-     * Get the code for this fragment shader.
-     * @return {string} The code.
-     */
     public getCode(): string {
+        /**
+         * Get the code for this fragment shader.
+         * @return {string} The code.
+         */
+
         // Figure out if you need to include simplex.
         let texBT: string = this.textureBlendingType;
         if (texBT === "ConstantBlend") {
@@ -177,11 +184,12 @@ class FragmentShaderCode extends parent {
 
     }
 
-    /**
-     * Get the shader code required for the simplex-noise variables.
-     * @return {string} The code.
-     */
     public simplexNoiseVars(): string {
+        /**
+         * Get the shader code required for the simplex-noise variables.
+         * @return {string} The code.
+         */
+
         if (!this.useSimplexNoise) {
             return '';
         }
@@ -197,31 +205,33 @@ class FragmentShaderCode extends parent {
     }
 }
 
-/**
- * This class represents a material.
- */
 class Material {
+    /**
+     * This class represents a material.
+     */
 
     /**
      * The associated fragment shader.
      */
     private parent: FragmentShaderCode;
 
-    /**
-     * The constructor.
-     * @param  {FragmentShaderCode} parent  Save the associated
-     *                                          FragmentShaderCode object.
-     */
     constructor(parent: FragmentShaderCode) {
+        /**
+         * The constructor.
+         * @param  {FragmentShaderCode} parent  Save the associated
+         *                                          FragmentShaderCode object.
+         */
+
         this.parent = parent;
     }
 
-    /**
-     * Return the code for variables associated with light and camera
-     *     locations.
-     * @return {string} The code.
-     */
     public lightAndCameraVars(): string {
+        /**
+         * Return the code for variables associated with light and camera
+         *     locations.
+         * @return {string} The code.
+         */
+
         if (!this.parent._requiresLightAndCameraPos) {
             return "";
         }
@@ -236,11 +246,12 @@ class Material {
         `;
     }
 
-    /**
-     * Return the code for variables associated with glossy materials.
-     * @return {string} The code.
-     */
     public glossyVars(): string {
+        /**
+         * Return the code for variables associated with glossy materials.
+         * @return {string} The code.
+         */
+
         if (!this.parent._hasGlossyEffect) {
             return "";
         }
@@ -253,11 +264,12 @@ class Material {
         `;
     }
 
-    /**
-     * Return the code for variables associated with diffuse materials.
-     * @return {string} The code.
-     */
     public diffuseVars(): string {
+        /**
+         * Return the code for variables associated with diffuse materials.
+         * @return {string} The code.
+         */
+
         if (!this.parent._hasDiffuseEffect) {
             return "";
         }
@@ -270,11 +282,12 @@ class Material {
         `;
     }
 
-    /**
-     * Return the code for variables associated with transparent materials.
-     * @return {string} The code.
-     */
     public transparencyVars() {
+        /**
+         * Return the code for variables associated with transparent materials.
+         * @return {string} The code.
+         */
+
         if (!this.parent._hasTransparency) {
             return "";
         }
@@ -287,11 +300,12 @@ class Material {
         `;
     }
 
-    /**
-     * A function to make sure different class variables are mutually
-     * compatible.
-     */
     public updateDependentVars(): void {
+        /**
+         * A function to make sure different class variables are mutually
+         * compatible.
+         */
+
         if (this.parent._isShadeless) {
             // If shadeless, no glossy, diffuse, light and camera position.
             this.parent._hasGlossyEffect = false;
@@ -308,11 +322,12 @@ class Material {
         }
     }
 
-    /**
-     * Get the code for the material.
-     * @return {string} The code.
-     */
     public getMaterialCode(): string {
+        /**
+         * Get the code for the material.
+         * @return {string} The code.
+         */
+
         let code: string = '';
 
         if ((this.parent._hasGlossyEffect) || (this.parent._hasDiffuseEffect)) {
@@ -372,30 +387,32 @@ class Material {
     }
 }
 
-/**
- * A class describing a texture.
- */
 class Texture {
+    /**
+     * A class describing a texture.
+     */
 
     /**
      * The associated fragment shader object.
      */
     public parent: FragmentShaderCode;
 
-    /**
-     * The constructor.
-     * @param  {FragmentShaderCode} parent  Save the associated
-     *                                          FragmentShaderCode object.
-     */
     constructor(parent: FragmentShaderCode) {
+        /**
+         * The constructor.
+         * @param  {FragmentShaderCode} parent  Save the associated
+         *                                          FragmentShaderCode object.
+         */
+
         this.parent = parent;
     }
 
-    /**
-     * Get the code for the texture variables.
-     * @return {string} The code.
-     */
     public getTextureVars(): string {
+        /**
+         * Get the code for the texture variables.
+         * @return {string} The code.
+         */
+
         let numTexs: number = this.parent.numTextures;
         let useTextureBlendWeights: boolean = (this.parent.textureBlendingType !== "HeightBasedBlend");
         if (numTexs <= 1) {
@@ -430,12 +447,13 @@ class Texture {
         return code;
     }
 
-    /**
-     * Get the code required if the texture changes according to height. Not
-     *     yet implemented.
-     * @return {string} The code.
-     */
     public getHeightBasedBlendingVars(): string {
+        /**
+         * Get the code required if the texture changes according to height. Not
+         *     yet implemented.
+         * @return {string} The code.
+         */
+
         if (this.parent.textureBlendingType !== "HeightBasedBlend") {
             return "";
         }
@@ -460,11 +478,12 @@ class Texture {
         return code;
     }
 
-    /**
-     * Get the code to deal with shadow maps.
-     * @return {string} The code.
-     */
     public shadowMapVars(): string {
+        /**
+         * Get the code to deal with shadow maps.
+         * @return {string} The code.
+         */
+
         if (!this.parent.useShadowMap) {
             return "";
         }
@@ -476,11 +495,12 @@ class Texture {
         `;
     }
 
-    /**
-     * Get the overall code associated with the texture.
-     * @return {string} The code.
-     */
     public getTextureCode(): string {
+        /**
+         * Get the overall code associated with the texture.
+         * @return {string} The code.
+         */
+
         let numTexs: number = this.parent.numTextures;
         let texBT: string = this.parent.textureBlendingType;
 
@@ -516,11 +536,12 @@ class Texture {
         return code;
     }
 
-    /**
-     * Get code required for the shadow map.
-     * @return {string} The code.
-     */
     public getShadowMapCode(): string {
+        /**
+         * Get code required for the shadow map.
+         * @return {string} The code.
+         */
+
         if (!this.parent.useShadowMap) {
             return "";
         }
@@ -530,11 +551,12 @@ class Texture {
         `;
     }
 
-    /**
-     * Get the code required if you're going to blend the textures evenly.
-     * @return {string} The code.
-     */
     private getConstantBlendWeights(): string {
+        /**
+         * Get the code required if you're going to blend the textures evenly.
+         * @return {string} The code.
+         */
+
         let numTexs: number = this.parent.numTextures;
         let N: string = numTexs.toString();
 
@@ -555,11 +577,12 @@ class Texture {
         return code;
     }
 
-    /**
-     * Get the code for blending textures according to simplex-noise weights.
-     * @return {string} The code.
-     */
     private getSimplexBlendWeights(): string {
+        /**
+         * Get the code for blending textures according to simplex-noise weights.
+         * @return {string} The code.
+         */
+
         let numTexs: number = this.parent.numTextures;
 
         let code = `
@@ -585,11 +608,12 @@ class Texture {
         }
     }
 
-    /**
-     * Get the code to blend textures by height.
-     * @return {string} The code.
-     */
     private getHeightBasedBlendWeights(): string {
+        /**
+         * Get the code to blend textures by height.
+         * @return {string} The code.
+         */
+
         let numTexs: number = this.parent.numTextures;
         let N: string = numTexs.toString();
 

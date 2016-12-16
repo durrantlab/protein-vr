@@ -9,31 +9,33 @@ declare var jQuery;
 //     milliseconds: number;
 // }
 
-/**
- * A class to fade the screen to white.
- */
 class ScreenWhite extends parent {
+    /**
+     * A class to fade the screen to white.
+     */
 
     /**
      * A jQuery object, where the canvas where the scene is being rendered.
      */
     public canvasJQuery = undefined;
 
-    /**
-     * The constructor.  super(params) passes params to the parent class'
-     *     constructor.
-     * @param  {DoInterface} params The parameters for this class. Use an
-     *                              interface to make sure the correct 
-     *                              parameters are always used.
-     */
     constructor(params) { // : DoInterface) {
+        /**
+         * The constructor.  super(params) passes params to the parent class'
+         *     constructor.
+         * @param  {DoInterface} params The parameters for this class. Use an
+         *                              interface to make sure the correct 
+         *                              parameters are always used.
+         */
+
         super(params);
     }
 
-    /**
-     * Perform the action.
-     */
     public do(): void {
+        /**
+         * Perform the action.
+         */
+
         // Fog suddenly gets thicker.
         //this.scene().FOGMODE_EXP2;
         this.canvasJQuery = jQuery("#renderCanvas");

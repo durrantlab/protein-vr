@@ -15,26 +15,28 @@ interface DoInterface {
     milliseconds: number;
 }
 
-/**
- * A class for fading out a given mesh.
- */
 class FadeOutMesh extends parent {
-
     /**
-     * The constructor.  super(params) passes params to the parent class'
-     *     constructor.
-     * @param  {DoInterface} params The parameters for this class. Use an
-     *                              interface to make sure the correct 
-     *                              parameters are always used.
+     * A class for fading out a given mesh.
      */
+
     constructor(params: DoInterface) {
+        /**
+         * The constructor.  super(params) passes params to the parent class'
+         *     constructor.
+         * @param  {DoInterface} params The parameters for this class. Use an
+         *                              interface to make sure the correct 
+         *                              parameters are always used.
+         */
+        
         super(params);
     }
 
-    /**
-     * Perform the action.
-     */
     public do(): void {
+        /**
+         * Perform the action.
+         */
+
         // Note: For complex geometries, this will likely cause problems.
         // See http://www.html5gamedevs.com/topic/25430-transparency-issues/
 

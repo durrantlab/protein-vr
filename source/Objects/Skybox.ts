@@ -7,12 +7,12 @@ import Core from "../Core/Core";
  */
 declare var BABYLON: any;
 
-
-/**
- * The Skybox namespace is where all the functions related to the skybox
- * are stored.
- */
 class Skybox extends parent {
+    /**
+     * The Skybox namespace is where all the functions related to the skybox
+     * are stored.
+     */
+
     // Note: The normals of the skybox must be facing inward! Do that in
     // Blender.
 
@@ -21,18 +21,19 @@ class Skybox extends parent {
      */
     static skyboxMesh: any;
 
-    /**
-     * This function checks a mesh to see if it is marked as this type of
-     * mesh. You can mark a mesh as this type of mesh using the VR Blender
-     * plugin.
-     * @param {any} m     The mesh.
-     * @param {any} json  The associated json file, which contains the
-     *                    information about whether or not the mesh is
-     *                    marked as this type of mesh.
-     * @returns {boolean} Whether or not the provided mesh matches the object
-     *     described in the json.
-     */
     public objectMatch(m: any, json: any): boolean {
+        /**
+         * This function checks a mesh to see if it is marked as this type of
+         * mesh. You can mark a mesh as this type of mesh using the VR Blender
+         * plugin.
+         * @param {any} m     The mesh.
+         * @param {any} json  The associated json file, which contains the
+         *                    information about whether or not the mesh is
+         *                    marked as this type of mesh.
+         * @returns {boolean} Whether or not the provided mesh matches the object
+         *     described in the json.
+         */
+
         if (json.s === "1") {
             // It's a skybox.
             m.checkCollisions = false;  // No need to check collisions on
@@ -65,29 +66,31 @@ class Skybox extends parent {
         return false;
     }
 
-    /**
-     * This function checks a mesh to see if it is NOT marked as this type of
-     * mesh.
-     * @param {any} m    The mesh.
-     * @param {any} json The associated json file, which contains the
-     *                   information about whether or not the mesh is
-     *                   marked as this type of mesh.
-     */
     public objectNoMatch(m: any, json: any): void {
+        /**
+         * This function checks a mesh to see if it is NOT marked as this type of
+         * mesh.
+         * @param {any} m    The mesh.
+         * @param {any} json The associated json file, which contains the
+         *                   information about whether or not the mesh is
+         *                   marked as this type of mesh.
+         */
+
         // If it's not the skybox, set the rendering group id to 1. So
         // it will be displayed in front of the skybox.
         this.setRenderingGroupId(m, 1);
     }
 
-    /**
-     * Applies images to the skybox. Sometimes it's much easier to just
-     * get the skybox from image files directly, rather than making them
-     * in Blender.
-     * @param {string} dir The directory where the skybox images are
-     *                     stored, including the beginning of the jpg file
-     *                     that is common to all files.
-     */
     static applyBoxImgs(dir: string): void {
+        /**
+         * Applies images to the skybox. Sometimes it's much easier to just
+         * get the skybox from image files directly, rather than making them
+         * in Blender.
+         * @param {string} dir The directory where the skybox images are
+         *                     stored, including the beginning of the jpg file
+         *                     that is common to all files.
+         */
+
         // See https://doc.babylonjs.com/tutorials/Environment#skybox for
         // filename convention.
 

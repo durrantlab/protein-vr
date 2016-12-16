@@ -12,10 +12,10 @@ interface MyWindow extends Window {
 }
 declare var window: MyWindow;
 
-/**
- * A namespace to store custom shaders.
- */
 namespace Shaders {
+    /**
+     * A namespace to store custom shaders.
+     */
 
     /**
      * A JSON object that stores the custom shaders.
@@ -60,21 +60,23 @@ namespace Shaders {
         alpha?: number;
     }
 
-    /**
-     * Create the custom shader.
-     * @param  {ShaderInterface} params  The parameters required for the new
-     *                                   shader.
-     */
     export function create(params: ShaderInterface): void {
+        /**
+         * Create the custom shader.
+         * @param  {ShaderInterface} params  The parameters required for the new
+         *                                   shader.
+         */
+
         let shdr = new Shader(params);
         Shaders.shadersLibrary[params["name"]] = shdr;
         window.shadersLibrary = Shaders.shadersLibrary;
     }
 
-    /**
-     * A class describing the new shader.
-     */
     class Shader {
+        /**
+         * A class describing the new shader.
+         */
+
         public vertexShaderCode: VertexShaderCode = new VertexShaderCode();
         public fragmentShaderCode: FragmentShaderCode = new FragmentShaderCode();
         public material;

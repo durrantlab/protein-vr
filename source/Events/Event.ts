@@ -4,10 +4,11 @@ import CameraChar from "../CameraChar";
 
 declare var BABYLON;
 
-/**
- * A class that defines an event (conditional trigger + action)
- */
 class Event {
+    /**
+     * A class that defines an event (conditional trigger + action)
+     */
+
     // public parameters: TriggerInterface;
 
     /**
@@ -26,12 +27,13 @@ class Event {
      */
     public timerThatChecksCondition: Timers.Timer;
 
-    /**
-     * The constructor.
-     * @param  {any}    triggerConditionObj The trigger conditional object.
-     * @param  {any}    actionOnTriggerObj  The action object.
-     */
     public constructor(triggerConditionObj: any, actionOnTriggerObj: any) {
+        /**
+         * The constructor.
+         * @param  {any}    triggerConditionObj The trigger conditional object.
+         * @param  {any}    actionOnTriggerObj  The action object.
+         */
+
         // Set class variables (the function that define a trigger and say
         // what to do if found.)
         this.triggerConditionObj = triggerConditionObj;
@@ -51,11 +53,12 @@ class Event {
         });
     }
 
-    /**
-     * Determines whether or not the associated condition has been satisfied.
-     * @return {boolean} true if satisfied, false otherwise.
-     */
     public triggerIfSatisfied(): boolean {
+        /**
+         * Determines whether or not the associated condition has been satisfied.
+         * @return {boolean} true if satisfied, false otherwise.
+         */
+
         Core.debugMsg("Checking a trigger.");
         let conditionSatisfied: boolean = this.triggerConditionObj.check();
         if (conditionSatisfied) {

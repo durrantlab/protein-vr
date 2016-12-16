@@ -4,29 +4,30 @@ import CameraChar from "../CameraChar";
 
 declare var BABYLON;
 
-/**
- * The Ground namespace is where all the functions and variables related
- * to the ground are stored.
- */
 class Ground extends parent {
+    /**
+     * The Ground namespace is where all the functions and variables related
+     * to the ground are stored.
+     */
 
     /** 
      * A variable where the ground mesh is stored. 
      */
     static groundMesh: any;
 
-    /**
-     * This function checks a mesh to see if it is marked as this type of
-     * mesh. You can mark a mesh as this type of mesh using the VR Blender
-     * plugin.
-     * @param {any} m     The mesh.
-     * @param {any} json  The associated json file, which contains the
-     *                    information about whether or not the mesh is
-     *                    marked as this type of mesh.
-     * @returns {boolean} Whether or not the provided mesh matches the object
-     *     described in the json.
-     */
     public objectMatch(m: any, json: any): boolean {
+        /**
+         * This function checks a mesh to see if it is marked as this type of
+         * mesh. You can mark a mesh as this type of mesh using the VR Blender
+         * plugin.
+         * @param {any} m     The mesh.
+         * @param {any} json  The associated json file, which contains the
+         *                    information about whether or not the mesh is
+         *                    marked as this type of mesh.
+         * @returns {boolean} Whether or not the provided mesh matches the object
+         *     described in the json.
+         */
+
         if (json.g === "1") {
             // It's the ground
             m.checkCollisions = false;  // No need to check for collisions
@@ -43,24 +44,26 @@ class Ground extends parent {
         return false;
     }
 
-    /**
-     * This function checks a mesh to see if it is NOT marked as this type of
-     * mesh.
-     * @param {any} m    The mesh.
-     * @param {any} json The associated json file, which contains the
-     *                   information about whether or not the mesh is
-     *                   marked as this type of mesh.
-     */
     public objectNoMatch(m: any, json: any): void {
+        /**
+         * This function checks a mesh to see if it is NOT marked as this type of
+         * mesh.
+         * @param {any} m    The mesh.
+         * @param {any} json The associated json file, which contains the
+         *                   information about whether or not the mesh is
+         *                   marked as this type of mesh.
+         */
+
         m.isPickable = false;  // Everything that isn't the ground
                                 // isn't pickable.
     }
 
-    /**
-     * Make sure the character (really the camera) is always above the
-     * ground.
-     */
     public static ensureCharAboveGround(): void {
+        /**
+         * Make sure the character (really the camera) is always above the
+         * ground.
+         */
+
         // Get a point in 3D space that is three feet above the camera.
         let pointAboveCamera = CameraChar.camera.position.add(
             new BABYLON.Vector3(0, 3, 0)

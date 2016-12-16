@@ -3,10 +3,11 @@ import Core from "../../Core/Core";
 
 declare var BABYLON;
 
-/**
- * All TriggerConditional class inherit this one.
- */
 abstract class TriggerConditionalParent {
+    /**
+     * All TriggerConditional class inherit this one.
+     */
+
     // Check if the condition is satisfied.
 
     /**
@@ -22,41 +23,45 @@ abstract class TriggerConditionalParent {
      */
     public parameters: any;
 
-    /**
-     * The class constructor
-     * @param  {any}    params  Parameters that govern the behavior of this
-     *                          conditional trigger.
-     */
     constructor(params: any) {
+        /**
+         * The class constructor
+         * @param  {any}    params  Parameters that govern the behavior of this
+         *                          conditional trigger.
+         */
+
         // Constructor sets the creation parameters.
         this.parameters = params;
     }
 
     // Helpful functions and variables.
 
-    /**
-     * Get the current location of the scene camera. A convenience function.
-     * @return {BABYLON.Vector3}   The location of the camera.
-     */
     public get cameraPos(): any {
+        /**
+         * Get the current location of the scene camera. A convenience function.
+         * @return {BABYLON.Vector3}   The location of the camera.
+         */
+
         return CameraChar.camera.position;
     }
 
-    /**
-     * The distance from a 3D point to the camera.
-     * @param  {BABYLON.Vector3} vec3 The 3D point
-     * @return {number}               The distance.
-     */
     public distanceToCamera(vec3: any): number {
+        /**
+         * The distance from a 3D point to the camera.
+         * @param  {BABYLON.Vector3} vec3 The 3D point
+         * @return {number}               The distance.
+         */
+
         return BABYLON.Vector3.Distance(vec3, this.cameraPos);
     }
 
-    /**
-     * Determine whether or not a mesh is visible to the camera.
-     * @param  {any}     mesh The mesh ini question.
-     * @return {boolean}      true if it is visible, false otherwise.
-     */
     public meshVisibleToCamera(mesh: any): boolean {
+        /**
+         * Determine whether or not a mesh is visible to the camera.
+         * @param  {any}     mesh The mesh ini question.
+         * @return {boolean}      true if it is visible, false otherwise.
+         */
+
         // Now check if the camera is looking at the target.
         let frustumPlanes = BABYLON.Frustum.GetPlanes(Core.scene.getTransformMatrix());
         if (mesh.isInFrustum(frustumPlanes)) {

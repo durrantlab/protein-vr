@@ -47,11 +47,12 @@ namespace Core {
      */
     export var frameNum: number = 0;
 
-    /**
-     * Write a message to the console for debugging.
-     * @param {string} msg The message.
-     */
     export function debugMsg(msg: string): void {
+        /**
+         * Write a message to the console for debugging.
+         * @param {string} msg The message.
+         */
+
         if (Core.debug === true) {
             console.log(msg);
         }

@@ -1,19 +1,21 @@
 import Core from "../../Core/Core";
 
-/**
- * The class that all other actions inherit.
- */
 abstract class ActionParent {
+    /**
+     * The class that all other actions inherit.
+     */
+
     /**
      * The parameters associated with this action.
      */
     public parameters: any;
 
-    /**
-     * The class constructor.
-     * @param  {any}    params Any required parameters.
-     */
     constructor(params: any) {
+        /**
+         * The class constructor.
+         * @param  {any}    params Any required parameters.
+         */
+
         this.parameters = params;
     }
 
@@ -22,12 +24,13 @@ abstract class ActionParent {
      */
     public abstract do(): void;
 
-    /**
-     * A function that returns the current BABYLON scene. Here for
-     *     convenience.
-     * @return {any} The BABYLON scene.
-     */
     public scene(): any {
+        /**
+         * A function that returns the current BABYLON scene. Here for
+         *     convenience.
+         * @return {any} The BABYLON scene.
+         */
+
         return Core.scene;
     }
 }

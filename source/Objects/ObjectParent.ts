@@ -1,9 +1,9 @@
 import Core from "../Core/Core";
 
-/**
- * The class that all objects inherit.
- */
 abstract class ObjectParent {
+    /**
+     * The class that all objects inherit.
+     */
 
     /**
      * This function checks a mesh to see if it is marked as this type of
@@ -26,30 +26,32 @@ abstract class ObjectParent {
      *                   information about whether or not the mesh is
      *                   marked as this type of mesh.
      */
-    public abstract objectNoMatch(m: any, json: any): void
+    public abstract objectNoMatch(m: any, json: any): void;
 
-    /**
-     * This function checks whether or not a mesh is marked as this type of
-     * mesh.
-     * @param {any} m    The mesh.
-     * @param {any} json The associated json file, which contains the
-     *                   information about whether or not the mesh is
-     *                   marked as this type of mesh.
-     */
     public checkMesh(m: any, json: any) {
+        /**
+         * This function checks whether or not a mesh is marked as this type of
+         * mesh.
+         * @param {any} m    The mesh.
+         * @param {any} json The associated json file, which contains the
+         *                   information about whether or not the mesh is
+         *                   marked as this type of mesh.
+         */
+
         if (!this.objectMatch(m, json)) {
             this.objectNoMatch(m, json);
         }
     }
 
-    /**
-     * Set the rendering group id for a given mesh. Meshes with lower
-     * rendering group ids (e.g., the skybox) are drawn behind other
-     * objects.
-     * @param {any}    mesh The mesh.
-     * @param {number} val  The rendering group id.
-     */
     public setRenderingGroupId(mesh: any, val: number): void {
+        /**
+         * Set the rendering group id for a given mesh. Meshes with lower
+         * rendering group ids (e.g., the skybox) are drawn behind other
+         * objects.
+         * @param {any}    mesh The mesh.
+         * @param {number} val  The rendering group id.
+         */
+
         // Set the rendering group on this mesh.
         mesh.renderingGroupId = val;
 

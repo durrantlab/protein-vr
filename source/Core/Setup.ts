@@ -16,10 +16,10 @@ declare var jQuery;
 declare var $;
 declare var BABYLON;
 
-/**
- * A namespace to store the functions to start the engine.
- */
 namespace Setup {
+    /**
+     * A namespace to store the functions to start the engine.
+     */
 
     /* export var Ground = Ground;
     export var CameraChar = CameraChar;
@@ -33,14 +33,15 @@ namespace Setup {
     export var Timers = Timers;
     */
 
-    /**
-     * Setup the BABYLON game engine.
-     * @param {any} setCustomShaders An externally defined function that sets
-     *                               up any custom shaders.
-     * @param {any} setEvents        An externally defined function that sets
-     *                               up any events.
-     */
     export function setup(setCustomShaders?: any, setEvents?: any): void {
+        /**
+         * Setup the BABYLON game engine.
+         * @param {any} setCustomShaders An externally defined function that sets
+         *                               up any custom shaders.
+         * @param {any} setEvents        An externally defined function that sets
+         *                               up any events.
+         */
+
         // Whether or not to run in debug mode (shows certain messages in the
         // console, etc.)
         Core.debug = false;

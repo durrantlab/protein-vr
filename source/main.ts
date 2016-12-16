@@ -21,10 +21,11 @@ window.Core = Core;
 declare var BABYLON: any;
 declare var jQuery: any;
 
-/**
- * A function to create any custom shaders
- */
 let setCustomShaders = function() {
+    /**
+     * A function to create any custom shaders
+     */
+
     // Create any custom shaders.
     let surf_params = {
         "name": "surface1",
@@ -144,10 +145,11 @@ let setCustomShaders = function() {
     });
 };
 
-/**
- * A function to register any events.
- */
 let setEvents = function() {
+    /**
+     * A function to register any events.
+     */
+    
     new Event(
         new DistanceToMesh({
             triggerMesh: Core.meshesByName["surf_trgt"], 

@@ -4,27 +4,28 @@ import RenderLoop from "./Core/RenderLoop"
 
 declare var BABYLON;
 
-/**
- * This interface prevents Typescript from throwing an error when the
- * browser takes control of the mouse.
- */
 interface MyDocument extends Document{
+    /**
+     * This interface prevents Typescript from throwing an error when the
+     * browser takes control of the mouse.
+     */
+
     mozPointerLockElement: any;
     webkitPointerLockElement: any;
     msPointerLockElement: any;
 }
 declare var document: MyDocument;
 
-/**
- * The Environment namespace is where all the functions and variables
- * related to the environment are stored.
- */
 namespace Environment {
-
     /**
-     * Set up the environment.
+     * The Environment namespace is where all the functions and variables
+     * related to the environment are stored.
      */
+
     export function setup(): void {
+        /**
+         * Set up the environment.
+         */
 
         // If the window is resized, then also resize the game engine.
         window.addEventListener('resize', function() {
@@ -54,20 +55,22 @@ namespace Environment {
 
     }
 
-    /**
-     * Setup the fog.
-     * @param {number = 0.015} density The fog density. Defaults to 0.015.
-     */
     export function setFog(density: number = 0.015): void {
+        /**
+         * Setup the fog.
+         * @param {number = 0.015} density The fog density. Defaults to 0.015.
+         */
+
         Core.scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
         Core.scene.fogColor = new BABYLON.Color3(1.0, 1.0, 1.0);
         Core.scene.fogDensity = density;
     }
 
-    /**
-     * Perform various optimizations to keep the engine running fast.
-     */
     function optimize(): void {
+        /**
+         * Perform various optimizations to keep the engine running fast.
+         */
+
         // Octrees make selections and things go faster.
         if (Core.scene._activeMeshes.length > 100) {
             Core.scene.createOrUpdateSelectionOctree();
@@ -82,10 +85,11 @@ namespace Environment {
         Core.scene.workerCollisions = true
     }
 
-    /**
-     * Create a lens effect. Not currently implemented.
-     */
     function lensEffect(): void {
+        /**
+         * Create a lens effect. Not currently implemented.
+         */
+
         // See http://doc.babylonjs.com/tutorials/Using_depth-of-field_and
         // _other_lens_effects
         var lensEffect = new BABYLON.LensRenderingPipeline('lens', {
@@ -102,18 +106,20 @@ namespace Environment {
             }, Core.scene, 1.0, CameraChar.camera);
     }
 
-    /**
-     * The PointerLock namespace is where all the functions and variables
-     * related to capturing the mouse are stored.
-     */
     export namespace PointerLock {
+        /**
+         * The PointerLock namespace is where all the functions and variables
+         * related to capturing the mouse are stored.
+         */
+
         /* Whether or not the mouse has been captured. */
         export var alreadyLocked: boolean = false;
 
-        /**
-         * Set up the pointerlock (to capture the mouse).
-         */
         export function pointerLock(): void {
+            /**
+             * Set up the pointerlock (to capture the mouse).
+             */
+
             // Adapted from
             // http://www.pixelcodr.com/tutos/shooter/shooter.html
 
@@ -156,12 +162,13 @@ namespace Environment {
             console.log('Tell user to click...');
         }
 
-        /**
-         * Request the mouse lock.
-         * @param {any} canvas The canvas where the 3D scene is being
-         *                     rendered.
-         */
         export function actuallyRequestLock(canvas: any): void {
+            /**
+             * Request the mouse lock.
+             * @param {any} canvas The canvas where the 3D scene is being
+             *                     rendered.
+             */
+
             canvas.requestPointerLock = canvas.requestPointerLock || 
                                         canvas.msRequestPointerLock || 
                                         canvas.mozRequestPointerLock || 
