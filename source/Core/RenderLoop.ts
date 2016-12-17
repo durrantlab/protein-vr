@@ -4,23 +4,23 @@ import Ground from "../Objects/Ground";
 
 namespace RenderLoop {
     /**
-     * A namespace that stores functions related to the BABYLON render loop.
-     */
+    A namespace that stores functions related to the BABYLON render loop.
+    */
 
     /**
-     * A list of functions to run in the render loop.
-     */
+    A list of functions to run in the render loop.
+    */
     export var extraFunctionsToRunInLoop: any[] = [];
 
     /**
-     * The time the loop was last run.
-     */
+    The time the loop was last run.
+    */
     export var timeOfLastLoop: number = 0;
 
     export function start(): void {
         /**
-         * Start the render loop.
-         */
+        Start the render loop.
+        */
 
         // Once the scene is loaded, register a render loop and
         // start rendering the frames.
@@ -31,16 +31,16 @@ namespace RenderLoop {
 
     export function pause(): void {
         /**
-         * Pause the game.
-         */
+        Pause the game.
+        */
 
         Core.engine.stopRenderLoop();
     }
 
     export function inLoop(): void {
         /**
-         * The contents of the render loop.
-         */
+        The contents of the render loop.
+        */
 
         Core.frameNum++;
 

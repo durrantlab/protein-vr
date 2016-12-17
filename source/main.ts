@@ -15,16 +15,16 @@ declare var window: MyWindow;
 window.Core = Core;
 
 /**
- * BABYLON is an external JavaScript library. This prevents Typescript from
- * throwing errors because BABYLON isn't defined in the TypeScript file.
- */
+BABYLON is an external JavaScript library. This prevents Typescript from
+throwing errors because BABYLON isn't defined in the TypeScript file.
+*/
 declare var BABYLON: any;
 declare var jQuery: any;
 
 let setCustomShaders = function() {
     /**
-     * A function to create any custom shaders
-     */
+    A function to create any custom shaders
+    */
 
     // Create any custom shaders.
     let surf_params = {
@@ -147,8 +147,8 @@ let setCustomShaders = function() {
 
 let setEvents = function() {
     /**
-     * A function to register any events.
-     */
+    A function to register any events.
+    */
     
     new Event(
         new DistanceToMesh({

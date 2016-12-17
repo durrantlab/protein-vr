@@ -1,40 +1,49 @@
 abstract class ShaderParent {
     /**
-     * A class that all shaders inherit.
-     */
+    A class that all shaders inherit.
+    */
 
     /**
-     * Whether or not this shader code uses simplex noise.
-     */
+    Whether or not this shader code uses simplex noise.
+    */
     public useSimplexNoise: boolean = false;
 
     /**
-     * Whether or not this shader code uses a random number generator.
-     */
+    Whether or not this shader code uses a random number generator.
+    */
     public useRandomNumber: boolean = false;
 
     /**
-     * The input variables required for this shader.
-     */
+    The input variables required for this shader.
+    */
     public inputVarsNeeded: string[] = [];
 
     /**
-     * Return the shader code for this shader.
-     * @return {string} The code.
-     */
+    Return the shader code for this shader.
+
+    :returns: The code.
+
+    :rtype: :any:`str`
+    */
     public abstract getCode(): string;
 
     /**
-     * Get the code associated with simplex-noise variables.
-     * @return {string} The code.
-     */
+    Get the code associated with simplex-noise variables.
+
+    :returns: The code.
+
+    :rtype: :any:`str`
+    */
     public abstract simplexNoiseVars(): string;
 
     public randomNumber(): string {
         /**
-         * Generate the code for generating a random number.
-         * @return {string} The code.
-         */
+        Generate the code for generating a random number.
+        
+        :returns: The code.
+
+        :rtype: :any:`str`
+        */
 
         if (!this.useRandomNumber) {
             return "";
@@ -49,9 +58,12 @@ abstract class ShaderParent {
 
     public simplexNoise(): string {
         /**
-         * Generate the shader code for generating simplex noise.
-         * @return {string} The shader code.
-         */
+        Generate the shader code for generating simplex noise.
+
+        :returns: The shader code.
+        
+        :rtype: :any:`str`
+        */
 
         // Function to use is snoise(vec2 v)
 

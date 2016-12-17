@@ -3,28 +3,28 @@ import RenderLoop from "../Core/RenderLoop";
 
 namespace Timers {
     /**
-     * This namespace stores timers.
-     */
+    This namespace stores timers.
+    */
 
     /**
-     * A json object where the timers are stored. 
-     */
+    A json object where the timers are stored. 
+    */
     export var timers = {};
 
     /**
-     * The last recorded time the Timers were fired.
-     */
+    The last recorded time the Timers were fired.
+    */
     export var lastTime = new Date().getTime();
 
     /**
-     * Whether or not the render loop knows about the timers.
-     */
+    Whether or not the render loop knows about the timers.
+    */
     export var tickAllTimersAddedToLoop: boolean = false;
 
     export interface TimerInterface {
         /**
-         * The Timer interface. To make sure the correct variables are passed.
-         */
+        The Timer interface. To make sure the correct variables are passed.
+        */
 
         name: string,
         durationInMiliseconds: number;  // The duration of the timer
@@ -43,8 +43,8 @@ namespace Timers {
     }
 
     /**
-     * The default Timer variables.
-     */
+    The default Timer variables.
+    */
     export var defaults = {
         repeated: false,
         extraVars: {},
@@ -57,13 +57,15 @@ namespace Timers {
 
     export function addTimer(params: TimerInterface): Timer {
         /**
-         * Function to add a timer.
-         * @param  {TimerInterface} params  The parameters associated with this
-         *                                      timer.
-         * @return {Timer}                 Aside from adding it the universal
-         *                                     list, this function also returns 
-         *                                     the new timer.
-         */
+        Function to add a timer.
+
+        :param TimerInterface params: The parameters associated with this
+                              timer.
+
+        :returns: Aside from adding it the universal list, this function also
+                  returns the new timer.
+        :type Timer:
+        */
 
         // Set default values
         for (var key in this.defaults) {
@@ -97,9 +99,9 @@ namespace Timers {
 
     export function tickAllTimers(): void {
         /**
-         * This function updates the current times on all Timers. It causes all
-         * timers to "tick."
-         */
+        This function updates the current times on all Timers. It causes all
+        timers to "tick."
+        */
 
         // get time that has passed since last tick
         let nowTime: number = new Date().getTime();
@@ -116,18 +118,19 @@ namespace Timers {
 
     export class Timer {
         /**
-         * This is the Timer class.
-         */
+        This is the Timer class.
+        */
 
         public parameters: TimerInterface;
         public timeRemaining: number = undefined;
 
         constructor(params: TimerInterface) {
             /**
-             * The Timer constructor.
-             * @param  {TimerInterface} params  The parameters that govern the
-             *                                  behavior of this timer.
-             */
+            The Timer constructor.
+
+            :param TimerInterface params: The parameters that govern the
+                                  behavior of this timer.
+            */
 
             // Set object values.
             this.parameters = params
@@ -147,8 +150,8 @@ namespace Timers {
 
         public dispose(): void {
             /**
-             * Dispose of this timer. It stops ticking.
-             */
+            Dispose of this timer. It stops ticking.
+            */
 
             // Stop this timer, even if it hasn't yet run it's course.
             delete timers[this.parameters.name];
@@ -156,11 +159,12 @@ namespace Timers {
 
         public tick(deltaTime: number): void {
             /**
-             * Cause this timer to tick. It updates the time and runs the
-             *     tickCallBack function, passing the timer's current value.
-             * @param {number} deltaTime  How much time has passed since the last
-             *                                tick.
-             */
+            Cause this timer to tick. It updates the time and runs the
+            tickCallBack function, passing the timer's current value.
+
+            :param float deltaTime:  How much time has passed since the last
+                         tick.
+            */
 
             // Compute the remaining time on this timer
             this.timeRemaining = this.timeRemaining - deltaTime;

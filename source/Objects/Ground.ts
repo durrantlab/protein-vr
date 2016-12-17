@@ -6,27 +6,31 @@ declare var BABYLON;
 
 class Ground extends parent {
     /**
-     * The Ground namespace is where all the functions and variables related
-     * to the ground are stored.
-     */
+    The Ground namespace is where all the functions and variables related
+    to the ground are stored.
+    */
 
     /** 
-     * A variable where the ground mesh is stored. 
-     */
+    A variable where the ground mesh is stored. 
+    */
     static groundMesh: any;
 
     public objectMatch(m: any, json: any): boolean {
         /**
-         * This function checks a mesh to see if it is marked as this type of
-         * mesh. You can mark a mesh as this type of mesh using the VR Blender
-         * plugin.
-         * @param {any} m     The mesh.
-         * @param {any} json  The associated json file, which contains the
-         *                    information about whether or not the mesh is
-         *                    marked as this type of mesh.
-         * @returns {boolean} Whether or not the provided mesh matches the object
-         *     described in the json.
-         */
+        This function checks a mesh to see if it is marked as this type of
+        mesh. You can mark a mesh as this type of mesh using the VR Blender
+        plugin.
+
+        :param any m: The mesh.
+        :param any json:  The associated json file, which contains the
+                   information about whether or not the mesh is
+                   marked as this type of mesh.
+
+        :returns: Whether or not the provided mesh matches the object
+                  described in the json.
+                  
+        :rtype: :any:`bool`
+        */
 
         if (json.g === "1") {
             // It's the ground
@@ -46,13 +50,14 @@ class Ground extends parent {
 
     public objectNoMatch(m: any, json: any): void {
         /**
-         * This function checks a mesh to see if it is NOT marked as this type of
-         * mesh.
-         * @param {any} m    The mesh.
-         * @param {any} json The associated json file, which contains the
-         *                   information about whether or not the mesh is
-         *                   marked as this type of mesh.
-         */
+        This function checks a mesh to see if it is NOT marked as this type of
+        mesh.
+
+        :param any m: The mesh.
+        :param any json: The associated json file, which contains the
+                   information about whether or not the mesh is
+                   marked as this type of mesh.
+        */
 
         m.isPickable = false;  // Everything that isn't the ground
                                 // isn't pickable.
@@ -60,9 +65,9 @@ class Ground extends parent {
 
     public static ensureCharAboveGround(): void {
         /**
-         * Make sure the character (really the camera) is always above the
-         * ground.
-         */
+        Make sure the character (really the camera) is always above the
+        ground.
+        */
 
         // Get a point in 3D space that is three feet above the camera.
         let pointAboveCamera = CameraChar.camera.position.add(

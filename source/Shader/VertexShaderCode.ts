@@ -2,23 +2,23 @@ import parent from "./ShaderParent";
 
 class VertexShaderCode extends parent {
     /**
-     * The class for generating the vertex shader.
-     */
+    The class for generating the vertex shader.
+    */
 
     /**
-     * The associated Animation object.
-     */
+    The associated Animation object.
+    */
     public Animation: Animation;
 
     /**
-     * The type of vertex-shader animation.
-     */
+    The type of vertex-shader animation.
+    */
     public animationType: string = "None";
 
     constructor() {
         /**
-         * The constructor. super() calls the parents constructor to be called.
-         */
+        The constructor. super() calls the parents constructor to be called.
+        */
 
         super();
         this.Animation = new Animation(this);
@@ -26,9 +26,12 @@ class VertexShaderCode extends parent {
 
     public getCode(): string {
         /**
-         * Get the vertex code.
-         * @return {string} The code.
-         */
+        Get the vertex code.
+
+        :returns: The code.
+
+        :rtype: :any:`str`
+        */
 
         switch (this.animationType) {
             case "None":
@@ -112,9 +115,12 @@ class VertexShaderCode extends parent {
 
     public simplexNoiseVars(): string {
         /**
-         * Generate the code for simplex noise.
-         * @return {string} The code.
-         */
+        Generate the code for simplex noise.
+
+        :returns: The code.
+
+        :rtype: :any:`str`
+        */
 
         if (!this.useSimplexNoise) {
             return '';
@@ -131,29 +137,33 @@ class VertexShaderCode extends parent {
 
 class Animation {
     /**
-     * A class for controlling vertex animations.
-     */
+    A class for controlling vertex animations.
+    */
 
     /**
-     * The associated vertex shader object.
-     */
+    The associated vertex shader object.
+    */
     public parent: VertexShaderCode;
 
     constructor(parent: VertexShaderCode) {
         /**
-         * The constructor.
-         * @param  {VertexShaderCode}  parent  The associated vertex shader code
-         *                                         class.
-         */
+        The constructor.
+
+        :param VertexShaderCode parent:  The associated vertex shader code
+                                class.
+        */
 
         this.parent = parent;
     }
 
     public getAnimation(): string {
         /**
-         * Get the animation shader code.
-         * @return {string} The code.
-         */
+        Get the animation shader code.
+
+        :returns: The code.
+
+        :rtype: :any:`str`
+        */
 
         switch (this.parent.animationType) {
             case "None":
@@ -171,9 +181,12 @@ class Animation {
 
     public animationVars(): string {
         /**
-         * Generate the shader code for the animation variables.
-         * @return {string} The code.
-         */
+        Generate the shader code for the animation variables.
+
+        :returns: The code.
+
+        :rtype: :any:`str`
+        */
 
         if (this.parent.animationType === "None") {
             return "";
@@ -204,18 +217,24 @@ class Animation {
 
     private noAnimation(): string {
         /**
-         * Code if there is no animation.
-         * @return {string} The code.
-         */
+        Code if there is no animation.
+
+        :returns: The code.
+
+        :rtype: :any:`str`
+        */
 
         return `vec3 v = position;`;
     }
 
     private randomlyUndulateAlongNormals(): string {
         /**
-         * Generate the shader code for the randomly undulating normals animation.
-         * @return {string} The code.
-         */
+        Generate the shader code for the randomly undulating normals animation.
+
+        :returns: The code.
+
+        :rtype: :any:`str`
+        */
 
         return this.animationTemplate(`
             float noiseHere = snoise(vec2(animationNoiseTurbulenceFactor) * position.xy);  // random seed tied to uv value.
@@ -227,9 +246,12 @@ class Animation {
 
     private wormAnimation(): string {
         /**
-         * Generate the shader code for the worm animation.
-         * @return {string} The code.
-         */
+        Generate the shader code for the worm animation.
+
+        :returns: The code.
+
+        :rtype: :any:`str`
+        */
 
         return this.animationTemplate(`
             float noiseHere = snoise(vec2(animationNoiseTurbulenceFactor) * position.xy);  // random seed tied to uv value.
@@ -241,9 +263,12 @@ class Animation {
 
     private waveAlongVerticalAnimation(): string {
         /**
-         * Generate the shader code for the wave along vertical animation.
-         * @return {string} The code.
-         */
+        Generate the shader code for the wave along vertical animation.
+
+        :returns: The code.
+
+        :rtype: :any:`str`
+        */
 
         return this.animationTemplate(`
             // Along vertical only.
@@ -253,9 +278,12 @@ class Animation {
 
     private waveBobbingAnimation(): string {
         /**
-         * Generate the shader code for the wave bobbing animation.
-         * @return {string} The code.
-         */
+        Generate the shader code for the wave bobbing animation.
+
+        :returns: The code.
+
+        :rtype: :any:`str`
+        */
 
         return this.animationTemplate(`
             // Along vertical only.
@@ -265,10 +293,14 @@ class Animation {
 
     private animationTemplate(equation: string): string {
         /**
-         * Generate the template code for the animation.
-         * @param  {string} equation The animation equation.
-         * @return {string}          The code.
-         */
+        Generate the template code for the animation.
+
+        :param str equation: The animation equation.
+
+        :returns: The code.
+        
+        :rtype: :any:`str`
+        */
         
         return `
             // Animate the vertex if you want. The vertex position is now

@@ -2,37 +2,41 @@ import parent from "./ObjectParent";
 import Core from "../Core/Core";
 
 /**
- * BABYLON is an external JavaScript library. This prevents Typescript from
- * throwing errors because BABYLON isn't defined in the TypeScript file.
- */
+BABYLON is an external JavaScript library. This prevents Typescript from
+throwing errors because BABYLON isn't defined in the TypeScript file.
+*/
 declare var BABYLON: any;
 
 class Skybox extends parent {
     /**
-     * The Skybox namespace is where all the functions related to the skybox
-     * are stored.
-     */
+    The Skybox namespace is where all the functions related to the skybox
+    are stored.
+    */
 
     // Note: The normals of the skybox must be facing inward! Do that in
     // Blender.
 
     /** 
-     * A variable where the skybox mesh is stored. 
-     */
+    A variable where the skybox mesh is stored. 
+    */
     static skyboxMesh: any;
 
     public objectMatch(m: any, json: any): boolean {
         /**
-         * This function checks a mesh to see if it is marked as this type of
-         * mesh. You can mark a mesh as this type of mesh using the VR Blender
-         * plugin.
-         * @param {any} m     The mesh.
-         * @param {any} json  The associated json file, which contains the
-         *                    information about whether or not the mesh is
-         *                    marked as this type of mesh.
-         * @returns {boolean} Whether or not the provided mesh matches the object
-         *     described in the json.
-         */
+        This function checks a mesh to see if it is marked as this type of
+        mesh. You can mark a mesh as this type of mesh using the VR Blender
+        plugin.
+
+        :param any m: The mesh.
+        :param any json: The associated json file, which contains the
+                   information about whether or not the mesh is
+                   marked as this type of mesh.
+
+        :returns: Whether or not the provided mesh matches the object
+                  described in the json.
+                  
+        :rtype: :any:`bool`
+        */
 
         if (json.s === "1") {
             // It's a skybox.
@@ -68,13 +72,14 @@ class Skybox extends parent {
 
     public objectNoMatch(m: any, json: any): void {
         /**
-         * This function checks a mesh to see if it is NOT marked as this type of
-         * mesh.
-         * @param {any} m    The mesh.
-         * @param {any} json The associated json file, which contains the
-         *                   information about whether or not the mesh is
-         *                   marked as this type of mesh.
-         */
+        This function checks a mesh to see if it is NOT marked as this type of
+        mesh.
+
+        :param any m: The mesh.
+        :param any json: The associated json file, which contains the
+                   information about whether or not the mesh is
+                   marked as this type of mesh.
+        */
 
         // If it's not the skybox, set the rendering group id to 1. So
         // it will be displayed in front of the skybox.
@@ -83,13 +88,14 @@ class Skybox extends parent {
 
     static applyBoxImgs(dir: string): void {
         /**
-         * Applies images to the skybox. Sometimes it's much easier to just
-         * get the skybox from image files directly, rather than making them
-         * in Blender.
-         * @param {string} dir The directory where the skybox images are
-         *                     stored, including the beginning of the jpg file
-         *                     that is common to all files.
-         */
+        Applies images to the skybox. Sometimes it's much easier to just
+        get the skybox from image files directly, rather than making them
+        in Blender.
+
+        :param str dir: The directory where the skybox images are
+               stored, including the beginning of the jpg file
+               that is common to all files.
+        */
 
         // See https://doc.babylonjs.com/tutorials/Environment#skybox for
         // filename convention.

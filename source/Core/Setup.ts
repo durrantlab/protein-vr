@@ -18,8 +18,8 @@ declare var BABYLON;
 
 namespace Setup {
     /**
-     * A namespace to store the functions to start the engine.
-     */
+    A namespace to store the functions to start the engine.
+    */
 
     /* export var Ground = Ground;
     export var CameraChar = CameraChar;
@@ -35,12 +35,13 @@ namespace Setup {
 
     export function setup(setCustomShaders?: any, setEvents?: any): void {
         /**
-         * Setup the BABYLON game engine.
-         * @param {any} setCustomShaders An externally defined function that sets
-         *                               up any custom shaders.
-         * @param {any} setEvents        An externally defined function that sets
-         *                               up any events.
-         */
+        Setup the BABYLON game engine.
+
+        :param any setCustomShaders: An externally defined function that sets
+                   up any custom shaders.
+        :param any setEvents: An externally defined function that sets
+                   up any events.
+        */
 
         // Whether or not to run in debug mode (shows certain messages in the
         // console, etc.)
@@ -238,7 +239,7 @@ namespace Setup {
             //var b = BABYLON.Mesh.CreateBox( "box" , 15.0, ProteinVR.Babylon.scene);
             //b.position = new BABYLON.Vector3(0,0,0);
             //var sphere = new ProteinVR.Mesh( BABYLON.Mesh.CreateSphere( "sphere" , 10.0, 1.0, ProteinVR.Babylon.scene) );
-    */
+   */
 
             /*var step = 5;
             for (var x=-35; x<36; x=x+step) {

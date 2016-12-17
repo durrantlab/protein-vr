@@ -12,26 +12,30 @@ interface CheckInterface {
 
 class DistanceToMesh extends parent {
     /**
-     * A class to see if the camera is within a certain distance of a mesh.
-     */
+    A class to see if the camera is within a certain distance of a mesh.
+    */
 
     constructor(params: CheckInterface) {
         /**
-         * The class constructor. super() calls the parent class' constructor.
-         * @param  {any}    params  Any required parameters. To make sure the
-         *                          correct ones are supplied, use an interface.
-         */
+        The class constructor. super() calls the parent class' constructor.
+
+        :param any params:  Any required parameters. To make sure the
+                   correct ones are supplied, use an interface.
+        */
 
         super(params);
     }
 
     public check(): boolean {
         /**
-         * Check if the conditions of this trigger are satisfied.
-         * @param  {any}     params  General function parameters.
-         * @return {boolean}         true if the conditions are satisfied, false
-         *                           otherwise.
-         */
+        Check if the conditions of this trigger are satisfied.
+
+        :param any params: General function parameters.
+
+        :returns: true if the conditions are satisfied, false otherwise.
+        
+        :rtype: :any:`bool`
+        */
 
         // First check if the player is within a certain distance of the
         // target.

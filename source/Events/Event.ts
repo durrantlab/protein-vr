@@ -6,33 +6,34 @@ declare var BABYLON;
 
 class Event {
     /**
-     * A class that defines an event (conditional trigger + action)
-     */
+    A class that defines an event (conditional trigger + action)
+    */
 
     // public parameters: TriggerInterface;
 
     /**
-     * The conditional trigger associated with this Event. 
-     */
+    The conditional trigger associated with this Event. 
+    */
     public triggerConditionObj: any; // a function that returns true or false.
     
     /**
-     * The action associated with this event.
-     */
+    The action associated with this event.
+    */
     public actionOnTriggerObj: any; // the action to run when triggered.
                                     // Overwrite this.
     
     /**
-     * The timer that checks whether or not the conditional is satisfied.
-     */
+    The timer that checks whether or not the conditional is satisfied.
+    */
     public timerThatChecksCondition: Timers.Timer;
 
     public constructor(triggerConditionObj: any, actionOnTriggerObj: any) {
         /**
-         * The constructor.
-         * @param  {any}    triggerConditionObj The trigger conditional object.
-         * @param  {any}    actionOnTriggerObj  The action object.
-         */
+        The constructor.
+
+        :param any triggerConditionObj: The trigger conditional object.
+        :param any actionOnTriggerObj:  The action object.
+        */
 
         // Set class variables (the function that define a trigger and say
         // what to do if found.)
@@ -55,9 +56,12 @@ class Event {
 
     public triggerIfSatisfied(): boolean {
         /**
-         * Determines whether or not the associated condition has been satisfied.
-         * @return {boolean} true if satisfied, false otherwise.
-         */
+        Determines whether or not the associated condition has been satisfied.
+
+        :returns: true if satisfied, false otherwise.
+        
+        :rtype: :any:`bool`
+        */
 
         Core.debugMsg("Checking a trigger.");
         let conditionSatisfied: boolean = this.triggerConditionObj.check();
