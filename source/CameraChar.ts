@@ -34,11 +34,11 @@ namespace CameraChar {
 
         // The active camera from the babylon file is used (keep it
         // simple)
-        // scene.activeCamera.attachControl(Core.canvas);
+        scene.activeCamera.attachControl(Core.canvas);
 
         // Add VR camera here (Oculus Rift, HTC Vive, etc.)
-        let camera = new BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", scene.activeCamera.position, scene);
-        this.switchCamera(camera);
+        // let camera = new BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", scene.activeCamera.position, scene);
+        // this.switchCamera(camera);
 
         CameraChar.camera = scene.activeCamera;
 
@@ -67,6 +67,7 @@ namespace CameraChar {
         // Set the speed and inertia of camera motions.
         camera.inertia = 0; //0.9;
         camera.angularSensibility = 200;
+        camera.speed = 3.0;
     }
 
     export function switchCamera(camera) {

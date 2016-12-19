@@ -159,6 +159,10 @@ let setEvents = function() {
             mesh: Core.meshesByName["surf"], 
             milliseconds: 2000
         })
+        /*new FadeOutMesh({
+            mesh: Core.meshesByName["surf_trgt"],
+            milliseconds: 5000
+        })*/
     );
 };
 
