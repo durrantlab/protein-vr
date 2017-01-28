@@ -21,18 +21,6 @@ namespace Setup {
     A namespace to store the functions to start the engine.
     */
 
-    /* export var Ground = Ground;
-    export var CameraChar = CameraChar;
-    export var CollisionMeshes = CollisionMeshes;
-    export var Environment = Environment;
-    export var Skybox = Skybox;
-    export var BillboardMeshes = Billboard;
-    export var AutoLODMeshes = AutoLOD;
-    export var Utils = Utils;
-    export var Triggers = Triggers;
-    export var Timers = Timers;
-    */
-
     export function setup(setCustomShaders?: any, setEvents?: any): void {
         /**
         Setup the BABYLON game engine.
@@ -177,95 +165,6 @@ namespace Setup {
                     RenderLoop.start();
                 });
             });
-
-            // optional debugging
-            //ProteinVR.Babylon.scene.debugLayer.show();
-
-            // the camera
-            //ProteinVR.Babylon.camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 25, -10), ProteinVR.Babylon.scene); // create a FreeCamera, and set its position to (x:0, y:5, z:-10)
-            //ProteinVR.Babylon.camera.setTarget(new BABYLON.Vector3(0, 5, 50)); // target the camera to scene origin
-            //ProteinVR.Babylon.camera.attachControl(canvas, false); // attach the camera to the canvas
-            //ProteinVR.Babylon.camera.keysUp.push(87); // W
-            //ProteinVR.Babylon.camera.keysLeft.push(65); // A
-            //ProteinVR.Babylon.camera.keysDown.push(83); // S
-            //ProteinVR.Babylon.camera.keysRight.push(68); // D
-            //ProteinVR.Babylon.camera.speed = 0.5;
-            //ProteinVR.Babylon.camera.inertia = 0.9;
-
-            // setup gravity and camera collisions
-            //ProteinVR.Babylon.camera.applyGravity = true;
-            //ProteinVR.Babylon.camera.ellipsoid = new BABYLON.Vector3(1, ProteinVR.Parameters.cameraHeight, 1); //Set the ellipsoid around the camera (e.g. your player's size)
-            //ProteinVR.Babylon.camera.checkCollisions = true;
-
-            // any lights
-            /*var light1 = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), ProteinVR.Babylon.scene);
-            light1.diffuse = new BABYLON.Color3(1, 1, 1);
-            light1.specular = new BABYLON.Color3(1, 1, 1);
-            light1.groundColor = new BABYLON.Color3(0, 0, 0);
-            light1.intensity = 0.1;
-
-            //ProteinVR.Babylon.scene.ambientColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-            var light_noshadow = new BABYLON.DirectionalLight("spot", new BABYLON.Vector3(10, -2, 1), ProteinVR.Babylon.scene);
-            light_noshadow.diffuse = new BABYLON.Color3(1.0, 1.0, 1.0);
-            light_noshadow.position = new BABYLON.Vector3(0, 20, 0);
-            light_noshadow.intensity = 1.0;
-
-            var light2 = new BABYLON.DirectionalLight("spot", new BABYLON.Vector3(-1, -2, -2), ProteinVR.Babylon.scene);
-            light2.position = new BABYLON.Vector3(0, 20, 0);
-
-            light2.diffuse = new BABYLON.Color3(1.0, 1.0, 1.0);
-            //light2.specular = new BABYLON.Color3(1.0, 1.0, 1.0);
-            light2.intensity = 1.0;
-
-            ProteinVR.Babylon.shadowGenerator = new BABYLON.ShadowGenerator(1024, light2);
-            //ProteinVR.Babylon.shadowGenerator.bias = 0.01;
-
-            //ProteinVR.Babylon.shadowGenerator.useVarianceShadowMap = true; // set to false to improve computation time
-            ProteinVR.Babylon.shadowGenerator.usePoissonSampling = true; // false is faster
-
-
-            // fog
-            ProteinVR.Babylon.scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
-            ProteinVR.Babylon.scene.fogColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-            ProteinVR.Babylon.scene.fogDensity = 0.015;
-
-            // here make the ground
-            //ProteinVR.ticks.push(ProteinVR.Ground.refresh);
-
-            //var sphere = new ProteinVR.Mesh( BABYLON.Mesh.CreateSphere( "sphere" , 10.0, 1.0, ProteinVR.Babylon.scene) );
-            //sphere.mesh.position = new BABYLON.Vector3(0,0,0);
-
-            // make a cube to test
-            //var b = BABYLON.Mesh.CreateBox( "box" , 15.0, ProteinVR.Babylon.scene);
-            //b.position = new BABYLON.Vector3(0,0,0);
-            //var sphere = new ProteinVR.Mesh( BABYLON.Mesh.CreateSphere( "sphere" , 10.0, 1.0, ProteinVR.Babylon.scene) );
-   */
-
-            /*var step = 5;
-            for (var x=-35; x<36; x=x+step) {
-                for (var y=-35; y<36; y=y+step) {
-                var part = new ProteinVR.Patch.Patch(new BABYLON.Vector2(x,y), new BABYLON.Vector2(x+step, y+step));
-                part.ground.addToSene();
-                }
-            }*/
-            //ProteinVR.Region.generatePatches(new BABYLON.Vector2(-35, -35), new BABYLON.Vector2(35, 35));
-
-            // optimize the scene
-            //BABYLON.SceneOptimizer.OptimizeAsync(ProteinVR.Babylon.scene);
-
-            //if (ProteinVR.Babylon.scene._activeMeshes.length > 100) { ProteinVR.Babylon.scene.createOrUpdateSelectionOctree(); }
-
-            // setup the scene
-            //Core.sceneSetup();
-
-            //ProteinVR.Babylon.pointerLock();
-
-            // run the render loop
-            /*ProteinVR.Babylon.engine.runRenderLoop(function() {
-                ProteinVR.Babylon.scene.render();
-            }.bind(this));*/
-
-
         });
     }
 }

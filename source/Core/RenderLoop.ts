@@ -81,5 +81,4 @@ namespace RenderLoop {
     }
 }
 
-
 export default RenderLoop;

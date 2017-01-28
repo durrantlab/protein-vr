@@ -13,7 +13,16 @@ declare var BABYLON;
 // DON'T MODIFY THIS FILE!!!
 
 namespace BuiltInActions {
-    export function fadeOutMesh(mesh, milliseconds: number = 2000) {
+    export function fadeOutMesh(mesh: any, milliseconds: number = 2000) {
+        /**
+        Fade a mesh in the scene to transparent.
+
+        :param any mesh: The mesh to fade.
+
+        :param number milliseconds: The number of milliseconds (fade
+                      duration).
+        */
+
         // Note: For complex geometries, this will likely cause problems.
         // See http://www.html5gamedevs.com/topic/25430-transparency-issues/
 
@@ -37,6 +46,15 @@ namespace BuiltInActions {
     }
 
     export function fadeInMesh(mesh, milliseconds: number = 2000) {
+        /**
+        Fade a mesh in the scene from transparent to visible.
+
+        :param any mesh: The mesh to fade in.
+
+        :param number milliseconds: The number of milliseconds (fade
+                      duration).
+        */
+
         // Note: For complex geometries, this will likely cause problems.
         // See http://www.html5gamedevs.com/topic/25430-transparency-issues/
 

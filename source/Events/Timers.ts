@@ -64,7 +64,7 @@ namespace Timers {
 
         :returns: Aside from adding it the universal list, this function also
                   returns the new timer.
-        :type Timer:
+        :rtype: :any:`Timer`
         */
 
         // Set default values
@@ -162,7 +162,7 @@ namespace Timers {
             Cause this timer to tick. It updates the time and runs the
             tickCallBack function, passing the timer's current value.
 
-            :param float deltaTime:  How much time has passed since the last
+            :param float deltaTime: How much time has passed since the last
                          tick.
             */
 

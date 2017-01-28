@@ -22,7 +22,7 @@ class FadeOutMesh extends parent {
 
     constructor(params: DoInterface) {
         /**
-        The constructor.  super(params) passes params to the parent class'
+        The constructor. super(params) passes params to the parent class'
             constructor.
 
         :param DoInterface params: The parameters for this class. Use an
@@ -35,7 +35,7 @@ class FadeOutMesh extends parent {
 
     public do(): void {
         /**
-        Perform the action.
+        Perform the action: Fade out.
         */
 
         // Note: For complex geometries, this will likely cause problems.

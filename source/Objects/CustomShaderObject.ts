@@ -13,13 +13,13 @@ class CustomShaderObject extends parent{
         shader. These shaders are defined in main.ts.
 
         :param str m: The mesh.
+
         :param any json: The associated json, which contains the information
                    about whether or not the mesh is marked as this type of
                    mesh.
 
         :returns: A boolean, whether or not the provided mesh matches the object
                   described in the json.
-                  
         :rtype: :any:`bool`
         */
 
@@ -55,6 +55,7 @@ class CustomShaderObject extends parent{
         of mesh.
 
         :param any m: The mesh.
+        
         :param any json: The associated json file, which contains the
                    information about whether or not the mesh is marked as
                    this type of mesh.

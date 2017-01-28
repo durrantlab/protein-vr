@@ -18,13 +18,13 @@ class CollisionMeshes extends parent{
         plugin.
 
         :param any m: The mesh.
+
         :param any json: The associated json file, which contains the
                    information about whether or not the mesh is
                    marked as this type of mesh.
 
         :returns: Whether or not the provided mesh matches the object
                   described in the json.
-                  
         :rtype: :any:`bool`
         */
 
@@ -47,6 +47,7 @@ class CollisionMeshes extends parent{
         mesh.
 
         :param any m: The mesh.
+        
         :param any json: The associated json file, which contains the
                    information about whether or not the mesh is
                    marked as this type of mesh.
