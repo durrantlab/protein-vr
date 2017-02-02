@@ -3,23 +3,22 @@ import parent from "./TriggerConditionalParent";
 declare var BABYLON;
 declare var jQuery;
 
-class KeyPress extends parent {
+class GameStart extends parent {
     public canvasJQuery = undefined;
-
+    
     constructor(params: any){
         super(params);
     }
 
     public check() :boolean{
-        let keyPressed = false;
+        let gameBegun = false;
         this.canvasJQuery = jQuery("#renderCanvas");
-        
-        keyPressed = this.canvasJQuery.keypress(function(){
-            return true;
-        });
 
-        return keyPressed;
+        gameBegun = this.canvasJQuery.ready(function(){
+            return true;
+        })
+        return gameBegun;
     }
 }
 
-export default KeyPress;
+export default GameStart;
