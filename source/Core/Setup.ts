@@ -179,7 +179,7 @@ namespace Setup {
             });
 
             // optional debugging
-            //ProteinVR.Babylon.scene.debugLayer.show();
+          //  ProteinVR.Babylon.scene.debugLayer.show();
 
             // the camera
             //ProteinVR.Babylon.camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 25, -10), ProteinVR.Babylon.scene); // create a FreeCamera, and set its position to (x:0, y:5, z:-10)

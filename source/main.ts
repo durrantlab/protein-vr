@@ -7,6 +7,8 @@ import Event from "./Events/Event";
 import DistanceToMesh from "./Events/TriggerConditionals/DistanceToMesh";
 import FadeOutMesh from "./Events/Actions/FadeOutMesh";
 import ScreenWhite from "./Events/Actions/ScreenWhite";
+import MoveCamera from "./Events/Actions/MoveCamera";
+import KeyPress from "./Events/TriggerConditionals/KeyPress";
 
 interface MyWindow extends Window {
     Core: any;
@@ -155,14 +157,17 @@ let setEvents = function() {
             triggerMesh: Core.meshesByName["surf_trgt"], 
             cutOffDistance: 9.0
         }),
-        new ScreenWhite({
+       new ScreenWhite({
             mesh: Core.meshesByName["surf"], 
             milliseconds: 2000
         })
+       /* new MoveCamera({
+            milliseconds: 1000
+        }) */
         /*new FadeOutMesh({
             mesh: Core.meshesByName["surf_trgt"],
             milliseconds: 5000
-        })*/
+        })*/      
     );
 };
 

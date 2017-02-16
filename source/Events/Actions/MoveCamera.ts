@@ -6,16 +6,16 @@ declare var BABYLON;
 declare var jQuery;
 
 interface DoInterface{
-    camera: any; //camera object
+   // camera: any; //camera object
     milliseconds: number;
-    direction: any;  // vector object
-    startPoint: any; // vector object
-    endPoint: any;   // vector object
+   // direction: any;  // vector object
+   // startPoint: any; // vector object
+   // endPoint: any;   // vector object
 }
 
 class MoveCamera extends parent {
 
-    constructor(params){
+    constructor(params: DoInterface){
         super(params);
     }
     /**
