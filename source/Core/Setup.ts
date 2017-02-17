@@ -8,12 +8,13 @@ import CameraChar from "../CameraChar";
 import Environment from "../Environment";
 import Core from "./Core";
 import RenderLoop from "./RenderLoop";
-
+// import $ = require("jquery");
 
 // jQuery is an external library, so declare it here to avoid Typescript
 // errors.
-declare var jQuery;
-declare var $;
+
+// declare var jQuery;
+// declare var $;
 declare var BABYLON;
 
 namespace Setup {
@@ -33,7 +34,7 @@ namespace Setup {
     export var Timers = Timers;
     */
 
-    export function setup(setCustomShaders?: any, setEvents?: any): void {
+    export function setup(setCustomShaders?: any, setEvents?: any, $?: any): void {
         /**
         Setup the BABYLON game engine.
 
