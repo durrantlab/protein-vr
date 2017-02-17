@@ -34,6 +34,7 @@ namespace Setup {
     export var Timers = Timers;
     */
 
+    // pass $ as an arg to utilize the jquery module from the config.ts path
     export function setup(setCustomShaders?: any, setEvents?: any, $?: any): void {
         /**
         Setup the BABYLON game engine.

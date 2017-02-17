@@ -23,6 +23,8 @@ throwing errors because BABYLON isn't defined in the TypeScript file.
 declare var BABYLON: any;
 // declare var jQuery: any;
 
+// this function was added in so the app could be run from the config.ts file with requirejs
+// jQuery is passed as an arg so this function and any module it utilizes can use jquery from the config.ts path object
 export function start(jQuery) {
 
     let setCustomShaders = function() {
