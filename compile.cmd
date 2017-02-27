@@ -1,0 +1,1 @@
+tsc --target ES5 --module amd source/main.ts

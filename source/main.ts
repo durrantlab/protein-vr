@@ -9,6 +9,9 @@ import FadeOutMesh from "./Events/Actions/FadeOutMesh";
 import ScreenWhite from "./Events/Actions/ScreenWhite";
 import MoveCamera from "./Events/Actions/MoveCamera";
 import KeyPress from "./Events/TriggerConditionals/KeyPress";
+import GameStart from "./Events/TriggerConditionals/GameStart";
+import CameraChar from "./CameraChar";
+
 
 interface MyWindow extends Window {
     Core: any;
@@ -155,23 +158,62 @@ export function start(jQuery) {
         /**
         A function to register any events.
         */
-        
+        // new Event(
+        //     new GameStart({}, jQuery),
+        //     new MoveCamera({
+        //         camera: CameraChar.camera,
+        //         milliseconds: 1000,
+        //         startPoint: CameraChar.camera.position,
+        //         endPoint: new BABYLON.Vector3(CameraChar.camera.position.x + 25, CameraChar.camera.position.y, CameraChar.camera.position.z)
+        //     })
+        // );
+
+        new Event(
+            new KeyPress({
+                event: 'keypress',
+                action: new MoveCamera({
+                    camera: CameraChar.camera,
+                    milliseconds: 1000,
+                    startPoint: CameraChar.camera.position,
+                    endPoint: new BABYLON.Vector3(CameraChar.camera.position.x + 25, CameraChar.camera.position.y, CameraChar.camera.position.z)
+                })
+            })
+        );
+
         new Event(
             new DistanceToMesh({
                 triggerMesh: Core.meshesByName["surf_trgt"], 
                 cutOffDistance: 9.0
             }),
-        new ScreenWhite({
+            new ScreenWhite({
                 mesh: Core.meshesByName["surf"], 
                 milliseconds: 2000
+            })   
+        );
+
+        new Event(
+            new DistanceToMesh({
+                triggerMesh: Core.meshesByName["surf_trgt"], 
+                cutOffDistance: 9.0
+            }),
+            new MoveCamera({
+                camera: CameraChar.camera,
+                milliseconds: 1000,
+                startPoint: CameraChar.camera.position,
+                endPoint: new BABYLON.Vector3(CameraChar.camera.position.x + 25, CameraChar.camera.position.y, CameraChar.camera.position.z)
             })
-        /* new MoveCamera({
-                milliseconds: 1000
-            }) */
-            /*new FadeOutMesh({
-                mesh: Core.meshesByName["surf_trgt"],
-                milliseconds: 5000
-            })*/      
+        );
+
+        new Event(
+            new GameStart({}, jQuery),
+            new MoveCamera({
+                camera: CameraChar.camera,
+                milliseconds: 1000,
+                startPoint: CameraChar.camera.position,
+                endPoint: new BABYLON.Vector3(CameraChar.camera.position.x + 25, CameraChar.camera.position.y, CameraChar.camera.position.z)
+            }),
+            true,
+            jQuery
         );
     };
 
@@ -180,5 +222,6 @@ export function start(jQuery) {
 
     jQuery(document).ready(function() {
         jQuery.getScript("./js/_trkr/_trkr.js");
+        console.log("document loaded!")
     });
 }

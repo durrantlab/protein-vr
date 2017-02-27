@@ -6,11 +6,11 @@ declare var BABYLON;
 declare var jQuery;
 
 interface DoInterface{
-   // camera: any; //camera object
+    camera: any; //camera object
     milliseconds: number;
    // direction: any;  // vector object
-   // startPoint: any; // vector object
-   // endPoint: any;   // vector object
+    startPoint: any; // vector object
+    endPoint: any;   // vector object
 }
 
 class MoveCamera extends parent {
@@ -27,6 +27,7 @@ class MoveCamera extends parent {
      * @param endPoint :any The location vector that the camera is to be moved to
      */
     public do(){
+        console.log("Move Camera action initiated!")
         Timers.addTimer({
             name: "MoveCamera" + Math.random().toString(),
             durationInMiliseconds: this.parameters["milliseconds"],
@@ -43,8 +44,8 @@ class MoveCamera extends parent {
                 camera.direction = this.parameters["direction"];
             }.bind(this),
             doneCallback: function() {
-                this.camera.position = this.parameters["endPoint"];
-                this.camera.position = this.parameters["direction"];
+                this.parameters["camera"].position = this.parameters["endPoint"];
+                // this.camera.position = this.parameters["direction"];
             }.bind(this)
         });
 

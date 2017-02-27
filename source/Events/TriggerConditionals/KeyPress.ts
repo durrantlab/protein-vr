@@ -3,22 +3,31 @@ import parent from "./TriggerConditionalParent";
 declare var BABYLON;
 declare var jQuery;
 
+interface CheckInterface{
+    event: string;
+    action: any;
+}
+
 class KeyPress extends parent {
     public canvasJQuery = undefined;
 
-    constructor(params: any){
+    constructor(params: CheckInterface){
         super(params);
+
+        //listen for keypress event
+        let action = this.parameters["action"];
+        document.addEventListener(this.parameters['event'], function listener(event :KeyboardEvent){
+            // call action event
+            action.do();
+        });
     }
 
+    /*
+        This method is effectively useless, only kept here because it is required to extend TriggerConditionalParent
+    */
     public check() :boolean{
-        let keyPressed = false;
-        this.canvasJQuery = jQuery("#renderCanvas");
-        
-        keyPressed = this.canvasJQuery.keypress(function(){
-            return true;
-        });
-
-        return keyPressed;
+        console.log("Entered check function");
+        return true;
     }
 }
 

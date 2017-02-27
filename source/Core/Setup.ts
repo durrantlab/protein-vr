@@ -43,6 +43,7 @@ namespace Setup {
                    up any custom shaders.
         :param any setEvents: An externally defined function that sets
                    up any events.
+        :param any $: the jquery module imported via cdn in config.ts
         */
 
         // Whether or not to run in debug mode (shows certain messages in the

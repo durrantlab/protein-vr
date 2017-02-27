@@ -1,4 +1,5 @@
-// THIS IS WHERE ANY CUSTOM CODE GOES. DEFINING SHADERS AND TRIGGERS AND SUCH.
+// Temporary workaround for requirejs issue
+// could be a decent template for future projects --> putting config and requirejs method in one main file
  requirejs.config({
         paths: {
             jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min'
