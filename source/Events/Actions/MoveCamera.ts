@@ -1,6 +1,8 @@
 import Timers from "../Timers";
 
 import parent from "./ActionParent";
+import CameraChar from "../../CameraChar";
+
 
 declare var BABYLON;
 declare var jQuery;
@@ -35,8 +37,8 @@ class MoveCamera extends parent {
             interpValEnd: 1.0,
             tickCallback: function(val){
                 let camera = this.parameters["camera"];
-                let sp = this.parameters["startPoint"];
-                let ep = this.parameters["endPoint"];
+                let sp = CameraChar.camera.position;
+                let ep = this.parameters['endPoint'];
 
                 camera.position.x = sp.x + ((ep.x-sp.x) * val);
                 camera.position.y = sp.y + ((ep.y-sp.y) * val);
