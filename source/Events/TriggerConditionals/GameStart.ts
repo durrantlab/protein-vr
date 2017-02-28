@@ -8,17 +8,23 @@ class GameStart extends parent {
     public $ = undefined;
     constructor(params: any, jQuery?: any){
         super(params);
-        this.$ = jQuery;
     }
 
+    
+    public check() :boolean{
     /**
      * useless method, required to extend parent class
      */
-    public check() :boolean{
         return true;
     }
 
     public asyncSetup() :any{
+    /**
+     * This method sets up the asycnronous function to be called in event.ts
+     * 
+     * :returns: An object containing the 'listener' target and the event to be listened for.
+     * :rtype: :any: `object`
+     */
         return {
             "target": "document", 
             "event": "ready"

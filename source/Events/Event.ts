@@ -83,8 +83,13 @@ class Event {
         return conditionSatisfied;
     }
 
-    //execute async functions here
+    
     public execAsync(eventMetaData: any) :void{
+    /**
+     * Executes async functions for trigger conditionals.
+     * 
+     * :param any eventMetaData: An object containing metadata about the event listener to be created. 
+     * */
         let action = this.actionOnTriggerObj;
         let target = eventMetaData["target"];
         let eventTrigger = eventMetaData["event"];

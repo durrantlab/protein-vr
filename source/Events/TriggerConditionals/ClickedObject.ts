@@ -13,6 +13,11 @@ class ClickedObject extends parent {
     public canvasJQuery = undefined;
 
     constructor(params: CheckInterface, Core :any){
+        /**
+         * This is the constructor.
+         * 
+         * :param CheckInterface params: The expected parameters for this module
+         */
         super(params);
 
         //assign parameters to variables because 'this' refers to the render canvas inside ananymous function
