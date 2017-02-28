@@ -10,6 +10,7 @@ import ScreenWhite from "./Events/Actions/ScreenWhite";
 import MoveCamera from "./Events/Actions/MoveCamera";
 import KeyPress from "./Events/TriggerConditionals/KeyPress";
 import GameStart from "./Events/TriggerConditionals/GameStart";
+import ClickedObject from "./Events/TriggerConditionals/ClickedObject";
 import CameraChar from "./CameraChar";
 
 
@@ -214,6 +215,24 @@ export function start(jQuery) {
             }),
             true,
             jQuery
+        );
+
+        new Event(
+            new ClickedObject({
+                triggerMesh: Core.meshesByName["grnd"],
+                action: new MoveCamera({
+                    camera: CameraChar.camera,
+                    milliseconds: 1000,
+                    startPoint: CameraChar.camera.position,
+                    endPoint: new BABYLON.Vector3(CameraChar.camera.position.x + 25, CameraChar.camera.position.y, CameraChar.camera.position.z)
+            })
+            }, Core)
+            // new MoveCamera({
+            //     camera: CameraChar.camera,
+            //     milliseconds: 1000,
+            //     startPoint: CameraChar.camera.position,
+            //     endPoint: new BABYLON.Vector3(CameraChar.camera.position.x + 25, CameraChar.camera.position.y, CameraChar.camera.position.z)
+            // })
         );
     };
 

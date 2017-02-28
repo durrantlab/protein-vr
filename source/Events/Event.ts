@@ -89,7 +89,7 @@ class Event {
         let target = eventMetaData["target"];
         let eventTrigger = eventMetaData["event"];
         jQuery(target).ready( function(event){
-            console.log("action triggered");
+            console.log("action triggered");         
             setTimeout(function(){
                 console.log("delay complete");
                 action.do();

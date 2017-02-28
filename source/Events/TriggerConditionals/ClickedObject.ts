@@ -3,24 +3,44 @@ import parent from "./TriggerConditionalParent";
 declare var BABYLON;
 declare var jQuery;
 
+
+interface CheckInterface{
+    triggerMesh: any;
+    action: any;
+}
+
 class ClickedObject extends parent {
     public canvasJQuery = undefined;
 
-    constructor(params){
+    constructor(params: CheckInterface, Core :any){
         super(params);
+
+        //assign parameters to variables because 'this' refers to the render canvas inside ananymous function
+        let target = this.parameters['triggerMesh'];
+        let action = this.parameters['action'];
+        jQuery('#renderCanvas').click(function(){
+            let pickResult = Core.scene.pick(Core.scene.pointerX, Core.scene.pointerY);
+            console.log('Something was clicked!');
+            console.log(Core.meshesByName);
+            if(pickResult.hit) {
+                console.log(pickResult.pickedMesh);
+                console.log(pickResult.pickedPoint);
+            }
+            if (pickResult.pickedMesh == target) {
+                console.log('mesh clicked!');
+                action.do();
+            }
+        });
     }
 
+    /**
+     * this method is not used because of the asynchronous nature of the triggerMesh
+     * 
+     * In place of a boolean method, the action is triggered from an event listener within the constructor
+     */
     public check() :boolean {
-        let picked = false;
-        this.canvasJQuery = jQuery("#renderCanvas");
-
-        let pickResult = this.canvasJQuery.click(function(){
-            this.canvasJQuery.pick(this.canvasJQuery.pointerX, this.canvasJQuery.pointerY);
-        });
-
-        if (pickResult.pickedMesh) {
-            picked = true;
-        }
-        return picked;
+        return true;
     }
 }
+
+export default ClickedObject;
