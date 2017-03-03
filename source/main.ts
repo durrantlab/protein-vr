@@ -205,17 +205,17 @@ export function start(jQuery) {
             })
         );
 
-        new Event(
-            new GameStart({}, jQuery),
-            new MoveCamera({
-                camera: CameraChar.camera,
-                milliseconds: 1000,
-                startPoint: CameraChar.camera.position,
-                endPoint: new BABYLON.Vector3(CameraChar.camera.position.x + 25, CameraChar.camera.position.y, CameraChar.camera.position.z)
-            }),
-            true,
-            jQuery
-        );
+        // new Event(
+            // new GameStart({}, jQuery),
+            // new MoveCamera({
+                // camera: CameraChar.camera,
+                // milliseconds: 1000,
+                // startPoint: CameraChar.camera.position,
+                // endPoint: new BABYLON.Vector3(CameraChar.camera.position.x + 25, CameraChar.camera.position.y, CameraChar.camera.position.z)
+            // }),
+            // true,
+            // jQuery
+        // );
 
         new Event(
             new ClickedObject({
