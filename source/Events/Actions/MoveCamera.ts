@@ -29,7 +29,7 @@ class MoveCamera extends parent {
      * @param endPoint :any The location vector that the camera is to be moved to
      */
     public do(){
-        console.log("Move Camera action initiated!")
+        console.log("Move Camera action initiated!");
         Timers.addTimer({
             name: "MoveCamera" + Math.random().toString(),
             durationInMiliseconds: this.parameters["milliseconds"],
