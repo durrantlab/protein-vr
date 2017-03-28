@@ -150,9 +150,9 @@ namespace CameraChar {
 
         if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
             requestFullScreen.call(docEl);
+            alert("yo2");
         } else {
             cancelFullScreen.call(doc);
-            alert("yo");
         }
     }
 }
