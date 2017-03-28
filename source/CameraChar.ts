@@ -142,6 +142,7 @@ namespace CameraChar {
     }
 
     export function toggleFullScreen() {
+        alert("hi");
         var doc = window.document;
         var docEl = doc.documentElement;
 
