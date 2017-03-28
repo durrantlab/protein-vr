@@ -3,6 +3,7 @@ import Core from "../Core/Core";
 import CameraChar from "../CameraChar";
 
 declare var BABYLON;
+declare var jQuery;
 
 class Event {
     /**
@@ -25,7 +26,7 @@ class Event {
     */
     public timerThatChecksCondition: Timers.Timer;
 
-    public constructor(triggerConditionObj: any, actionOnTriggerObj: any) {
+    public constructor(triggerConditionObj: any, actionOnTriggerObj?: any, async?: boolean, $?: any) {
         /**
         The constructor.
 
@@ -37,20 +38,29 @@ class Event {
         // Set class variables (the function that define a trigger and say
         // what to do if found.)
         this.triggerConditionObj = triggerConditionObj;
-        this.actionOnTriggerObj = actionOnTriggerObj;
-
-        // Now you need to register a timer to check for the trigger.
-        this.timerThatChecksCondition = Timers.addTimer({
-            name: "trigger" + Math.floor(Math.random() * 100000).toString(),
-            durationInMiliseconds: 500,  // Check every half a second to see
-                                         // if trigger satisfied.
-            repeated: true,  // Keep checking until satisfied.
-            tickCallback: function() {
-                if (this.triggerIfSatisfied()) {
-                    this.timerThatChecksCondition.dispose();
-                }
-            }.bind(this)
-        });
+        if(actionOnTriggerObj) {
+            this.actionOnTriggerObj = actionOnTriggerObj;
+        
+            if(async){
+                let eventType :any = this.triggerConditionObj.asyncSetup();
+                this.execAsync(eventType);
+            }
+            
+            else{
+                // Now you need to register a timer to check for the trigger.
+                this.timerThatChecksCondition = Timers.addTimer({
+                    name: "trigger" + Math.floor(Math.random() * 100000).toString(),
+                    durationInMiliseconds: 500,  // Check every half a second to see
+                                                // if trigger satisfied.
+                    repeated: true,  // Keep checking until satisfied.
+                    tickCallback: function() {
+                        if (this.triggerIfSatisfied()) {
+                            this.timerThatChecksCondition.dispose();
+                        }
+                    }.bind(this)
+                });
+            }
+        }
     }
 
     public triggerIfSatisfied(): boolean {
@@ -69,6 +79,25 @@ class Event {
         }
 
         return conditionSatisfied;
+    }
+
+    
+    public execAsync(eventMetaData: any) :void{
+    /**
+     * Executes async functions for trigger conditionals.
+     * 
+     * :param any eventMetaData: An object containing metadata about the event listener to be created. 
+     * */
+        let action = this.actionOnTriggerObj;
+        let target = eventMetaData["target"];
+        let eventTrigger = eventMetaData["event"];
+        jQuery(target).ready( function(event){
+            console.log("action triggered");         
+            setTimeout(function(){
+                console.log("delay complete");
+                action.do();
+            }, 3000);          
+        });
     }
 }
 
