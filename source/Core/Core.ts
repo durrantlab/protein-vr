@@ -1,7 +1,8 @@
-/**
-A namespace to store key variables related to the BABYLON game engine.
-*/
 namespace Core {
+    /**
+    A namespace to store key variables related to the BABYLON game engine.
+    */
+
     /**
     The BABYLON engine.
     */

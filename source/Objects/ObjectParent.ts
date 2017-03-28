@@ -11,13 +11,13 @@ abstract class ObjectParent {
     plugin.
 
     :param any m: The mesh.
+
     :param any json: The associated json file, which contains the
                information about whether or not the mesh is
                marked as this type of mesh.
 
     :returns: Whether or not the provided mesh matches the object described in
               the json. 
-              
     :rtype: :any:`bool`
     */
     public abstract objectMatch(m: any, json: any): boolean;
@@ -27,6 +27,7 @@ abstract class ObjectParent {
     mesh.
 
     :param any m: The mesh.
+
     :param any json: The associated json file, which contains the
                information about whether or not the mesh is
                marked as this type of mesh.
@@ -39,6 +40,7 @@ abstract class ObjectParent {
         mesh.
 
         :param any m: The mesh.
+
         :param any json: The associated json file, which contains the
                    information about whether or not the mesh is
                    marked as this type of mesh.
@@ -56,6 +58,7 @@ abstract class ObjectParent {
         objects.
 
         :param any mesh: The mesh.
+        
         :param float val: The rendering group id.
         */
 

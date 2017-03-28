@@ -2,6 +2,7 @@ import Core from "./Core/Core";
 import CollisionMeshes from "./Objects/CollisionMeshes";
 
 declare var BABYLON;
+declare var screenfull;
 
 namespace CameraChar {
     /**
@@ -34,11 +35,26 @@ namespace CameraChar {
 
         // The active camera from the babylon file is used (keep it
         // simple)
-        scene.activeCamera.attachControl(Core.canvas);
+        let VRCamera: boolean = true;
 
-        // Add VR camera here (Oculus Rift, HTC Vive, etc.)
-        // let camera = new BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", scene.activeCamera.position, scene);
-        // this.switchCamera(camera);
+        if (VRCamera) {
+            // Add VR camera here (Oculus Rift, HTC Vive, etc.)
+            let camera = new BABYLON.VRDeviceOrientationFreeCamera(
+                "deviceOrientationCamera", 
+                scene.activeCamera.position, 
+                scene
+            );
+
+            this.switchCamera(camera);
+
+            if (screenfull.enabled) {
+                screenfull.request();
+            }
+
+        } else {
+            // Just a regular camera
+            scene.activeCamera.attachControl(Core.canvas);
+        }
 
         CameraChar.camera = scene.activeCamera;
 
@@ -129,6 +145,5 @@ namespace CameraChar {
         }
     }
 }
-
 
 export default CameraChar;

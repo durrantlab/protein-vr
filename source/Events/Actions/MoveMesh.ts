@@ -16,11 +16,23 @@ class MoveMesh extends parent {
 
     public canvasJQuery = undefined;
 
-    constructor(params) { // : DoInterface) {
+    constructor(params) {  // : DoInterface
+        /**
+        The constructor. super(params) passes params to the parent class'
+            constructor.
+
+        :param DoInterface params: The parameters for this class. Use an
+                           interface to make sure the correct 
+                           parameters are always used.
+        */
+        
         super(params);
     }
 
     public do() {
+        /**
+        Perform the action: Move the mesh.
+        */
 
         //let params = this.parameters;
   

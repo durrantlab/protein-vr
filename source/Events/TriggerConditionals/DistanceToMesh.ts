@@ -33,7 +33,6 @@ class DistanceToMesh extends parent {
         :param any params: General function parameters.
 
         :returns: true if the conditions are satisfied, false otherwise.
-        
         :rtype: :any:`bool`
         */
 

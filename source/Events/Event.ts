@@ -10,8 +10,6 @@ class Event {
     A class that defines an event (conditional trigger + action)
     */
 
-    // public parameters: TriggerInterface;
-
     /**
     The conditional trigger associated with this Event. 
     */
@@ -33,6 +31,7 @@ class Event {
         The constructor.
 
         :param any triggerConditionObj: The trigger conditional object.
+
         :param any actionOnTriggerObj:  The action object.
         */
 
@@ -69,7 +68,6 @@ class Event {
         Determines whether or not the associated condition has been satisfied.
 
         :returns: true if satisfied, false otherwise.
-        
         :rtype: :any:`bool`
         */
 

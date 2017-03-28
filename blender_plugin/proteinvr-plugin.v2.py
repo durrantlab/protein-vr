@@ -1,6 +1,8 @@
 import bpy
 from bpy.props import *
 
+##### Note: This is based on a template that is now more up-to-date that this version... #####
+
 ##### Plugin information #####
 bl_info = {
     "name" : "Tetrahedron Maker",

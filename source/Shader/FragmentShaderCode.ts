@@ -9,7 +9,7 @@ class FragmentShaderCode extends parent {
     Whether or not this shader has a glossy effect. 
     */
     public _hasGlossyEffect: boolean = true;
-
+ 
     /**
     Whether or not this shader has a diffuse effect. 
     */

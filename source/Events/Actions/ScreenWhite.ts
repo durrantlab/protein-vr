@@ -21,7 +21,7 @@ class ScreenWhite extends parent {
 
     constructor(params) { // : DoInterface) {
         /**
-        The constructor.  super(params) passes params to the parent class'
+        The constructor. super(params) passes params to the parent class'
             constructor.
 
         :param DoInterface params: The parameters for this class. Use an
@@ -34,7 +34,7 @@ class ScreenWhite extends parent {
 
     public do(): void {
         /**
-        Perform the action.
+        Perform the action: Flash the screen white.
         */
 
         // Fog suddenly gets thicker.
