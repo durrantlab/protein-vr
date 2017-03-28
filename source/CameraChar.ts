@@ -2,6 +2,7 @@ import Core from "./Core/Core";
 import CollisionMeshes from "./Objects/CollisionMeshes";
 
 declare var BABYLON;
+declare var screenfull;
 
 namespace CameraChar {
     /**
@@ -46,7 +47,10 @@ namespace CameraChar {
 
             this.switchCamera(camera);
 
-            this.toggleFullScreen();
+            if (screenfull.enabled) {
+                screenfull.request();
+            }
+
         } else {
             // Just a regular camera
             scene.activeCamera.attachControl(Core.canvas);
@@ -140,22 +144,6 @@ namespace CameraChar {
             }
         }
     }
-
-    export function toggleFullScreen() {
-        var doc = window.document;
-        var docEl = doc.documentElement;
-
-        var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-        var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
-
-        if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
-            requestFullScreen.call(docEl);
-            alert("yo2");
-        } else {
-            cancelFullScreen.call(doc);
-        }
-    }
 }
-
 
 export default CameraChar;
