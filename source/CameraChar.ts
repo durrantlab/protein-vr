@@ -45,6 +45,8 @@ namespace CameraChar {
             );
 
             this.switchCamera(camera);
+
+            document.body.requestFullscreen();
         } else {
             // Just a regular camera
             scene.activeCamera.attachControl(Core.canvas);
