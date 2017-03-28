@@ -142,7 +142,6 @@ namespace CameraChar {
     }
 
     export function toggleFullScreen() {
-        alert("hi");
         var doc = window.document;
         var docEl = doc.documentElement;
 
@@ -153,6 +152,7 @@ namespace CameraChar {
             requestFullScreen.call(docEl);
         } else {
             cancelFullScreen.call(doc);
+            alert("yo");
         }
     }
 }
