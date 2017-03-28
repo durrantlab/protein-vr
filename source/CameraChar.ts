@@ -46,7 +46,7 @@ namespace CameraChar {
 
             this.switchCamera(camera);
 
-            document.body.requestFullscreen();
+            this.toggleFullScreen();
         } else {
             // Just a regular camera
             scene.activeCamera.attachControl(Core.canvas);
@@ -138,6 +138,20 @@ namespace CameraChar {
                 CameraChar.camera.position = CameraChar.previousPos.clone();
                 break;
             }
+        }
+    }
+
+    export function toggleFullScreen() {
+        var doc = window.document;
+        var docEl = doc.documentElement;
+
+        var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+        var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+        if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+            requestFullScreen.call(docEl);
+        } else {
+            cancelFullScreen.call(doc);
         }
     }
 }
