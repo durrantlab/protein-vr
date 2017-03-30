@@ -41,7 +41,7 @@ export function start(jQuery) {
         // Create any custom shaders.
         let surf_params = {
             "name": "surface1",
-            "_animationType": "WaveBobbing",
+            "_animationType": "None", // "WaveBobbing",
             "_hasGlossyEffect": false,
             "_hasDiffuseEffect": false,
             "_numTextures": 2,
@@ -77,7 +77,7 @@ export function start(jQuery) {
 
         let urea_params = {
             "name": "urea1",
-            "_animationType": "WaveBobbing",
+            "_animationType": "None", // "WaveBobbing",
             "_hasGlossyEffect": false,
             "_hasDiffuseEffect": false,
             "_numTextures": 2,
@@ -117,7 +117,7 @@ export function start(jQuery) {
         // Create any custom shaders.
         Shaders.create({
             "name": "ribbon",
-            "_animationType": "WaveBobbing",
+            "_animationType": "None", // "WaveBobbing",
             "_hasGlossyEffect": false,
             "_hasDiffuseEffect": false,
             "_numTextures": 2,
@@ -138,7 +138,7 @@ export function start(jQuery) {
 
         Shaders.create({
             "name": "grnd",
-            "_animationType": "WaveAlongVertical",
+            "_animationType": "None", // "WaveAlongVertical",
             "_hasGlossyEffect": false,
             "_hasDiffuseEffect": false,
             "_numTextures": 2,
@@ -262,9 +262,4 @@ export function start(jQuery) {
 
     // Setup the VR program.
     Setup.setup(setCustomShaders, setEvents, jQuery);
-
-    jQuery(document).ready(function() {
-        jQuery.getScript("./js/_trkr/_trkr.js");
-        console.log("document loaded!");
-    });
 }

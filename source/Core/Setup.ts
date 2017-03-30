@@ -118,7 +118,7 @@ namespace Setup {
                     });
 
                     // Set up the game character/camera.
-                    CameraChar.setup();
+                    CameraChar.setup($);
 
                     // Set up the environment.
                     Environment.setup();

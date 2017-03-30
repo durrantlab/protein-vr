@@ -48,6 +48,9 @@ namespace Core {
     */
     export var frameNum: number = 0;
 
+    // higher means more simple.
+    export var textureSimplificationLevel: number = 0;
+
     export function debugMsg(msg: string): void {
         /**
         Write a message to the console for debugging.

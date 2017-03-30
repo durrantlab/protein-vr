@@ -25,7 +25,7 @@ namespace CameraChar {
     */
     export const characterHeight: number = 1.8;  // All units in metric.
 
-    export function setup(): void {
+    export function setup($?: any): void {
         /**
         Set up the camera/character.
         */
@@ -45,11 +45,15 @@ namespace CameraChar {
                 scene
             );
 
-            this.switchCamera(camera);
+            $.getScript( "js/screenfull.min.js" ).done(function( script, textStatus ) {
+                $(window).click(function() {
+                    if (screenfull.enabled) {
+                        screenfull.request();
+                    }
+                });
+            });
 
-            if (screenfull.enabled) {
-                screenfull.request();
-            }
+            this.switchCamera(camera);
 
         } else {
             // Just a regular camera

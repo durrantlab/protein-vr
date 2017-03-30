@@ -67,6 +67,65 @@ namespace Environment {
         Core.scene.fogDensity = density;
     }
 
+    function mySceneOptimizationUpdateOctTree(priority) {
+        if (typeof priority === "undefined") {
+            priority = 0;
+        }
+
+        this.priority = priority;
+        this.apply = function (scene) {
+            scene.createOrUpdateSelectionOctree();
+        };
+    }
+
+    function optimizationOptions() {
+        var optim = new BABYLON.SceneOptimizerOptions(30, 2000);
+
+        // Merge meshes that have same material.
+        // In browser simplification.
+
+        var priority = 0;
+        optim.optimizations.push(new BABYLON.ShadowsOptimization(priority));
+        optim.optimizations.push(new BABYLON.LensFlaresOptimization(priority));
+        optim.optimizations.push(new mySceneOptimizationUpdateOctTree(priority));
+
+        priority++;
+        optim.optimizations.push(new BABYLON.PostProcessesOptimization(priority));
+        optim.optimizations.push(new BABYLON.ParticlesOptimization(priority));
+
+        // Next priority
+        priority++;
+        optim.optimizations.push(new BABYLON.TextureOptimization(priority, 256));
+
+        // Next priority
+        priority++;
+        optim.optimizations.push(new BABYLON.RenderTargetsOptimization(priority));
+
+        // Next priority
+        priority++;
+        optim.optimizations.push(new BABYLON.HardwareScalingOptimization(priority, 4));
+
+        return optim;
+    }
+
+    function babylonOptimization() {
+        // This optimization is great, except it merges different
+        // LOD-level meshes into one visible mesh. I think this is a
+        // BABYLON bug.
+        console.log(Core.engine.getFps());
+        BABYLON.SceneOptimizer.OptimizeAsync(
+            Core.scene,
+            optimizationOptions(),
+            function() {
+                // On success
+                //alert("Success!");
+            }, function() {
+                // FPS target not reached
+                //alert("FPS target not reached!");
+            }
+        );
+    }
+
     function optimize(): void {
         /**
         Perform various optimizations to keep the engine running fast.
@@ -77,13 +136,12 @@ namespace Environment {
             Core.scene.createOrUpdateSelectionOctree();
         }
 
-        // This optimization is great, except it merges different
-        // LOD-level meshes into one visible mesh. I think this is a
-        // BABYLON bug.
+        // Every five seconds optimize the scene as necessary.
+        setInterval(function() {
+            babylonOptimization();
+        }, 5000);
 
-        // BABYLON.SceneOptimizer.OptimizeAsync(Core.scene);
-
-        Core.scene.workerCollisions = true
+        Core.scene.workerCollisions = true;
     }
 
     function lensEffect(): void {
