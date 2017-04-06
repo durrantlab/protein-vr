@@ -18,31 +18,7 @@ class LabelOnMesh extends parent{
 
 // use abstract mesh in billboard_mode along with dynamic texture
     public do(jQuery?: any, pickResult?: any){
-    //     let labelPlane = BABYLON.Mesh.CreatePlane("labelPlane", 5, super.scene(), false);
-    //     labelPlane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
-    //     labelPlane.material = new BABYLON.StandardMaterial("labelPlane", super.scene());
-
-    //     labelPlane.position = new BABYLON.Vector3(camera.camera.position.x+3, camera.camera.position.y, camera.camera.position.z+5);
-    //     // labelPlane.position = this.parameters["mesh"].position;
-    //     labelPlane.scaling.y = 0.4; 
-    //     // something's not working here
-        
-
-    //     // create dynamic texture to hold text
-    //     let labelPlaneTexture = new BABYLON.DynamicTexture("dynamic texture", 200, super.scene(), true);
-    //     labelPlane.material.diffuseTexture = labelPlaneTexture;
-    //     labelPlane.material.specularColor = new BABYLON.Color3(1,1,1);
-    //     labelPlane.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
-    //     labelPlane.material.backFaceCulling = false;
-    //     labelPlaneTexture.drawText(this.parameters["label"], null, 120, "40px verdana", "white", null);
-
-    //     setTimeout(function(){
-    //         labelPlane.dispose();
-    //     }, 1000);
-    // }
-
-    // Trying something else: 2DCanvas
-
+   
     console.log(pickResult.pickedPoint);
 
     //let point = BABYLON.Vector3.Project(pickResult.pickedPoint, BABYLON.Matrix.Identity(), super.scene().getTransformMatrix(), camera.camera.viewport.toGlobal(Core.engine));
@@ -54,7 +30,8 @@ class LabelOnMesh extends parent{
     let canvas = new BABYLON.ScreenSpaceCanvas2D(super.scene(), {
         id: id.toString(),
         // position: BABYLON.Vector3.Project(pickResult.pickedPoint, BABYLON.Matrix.Identity(), super.scene().getTransformMatrix(), camera.camera.viewport.toGlobal(Core.engine)),
-        position: new BABYLON.Vector2(500, 250),
+        // position: new BABYLON.Vector2(500, 250),
+        position: new BABYLON.Vector2(pickResult.pickedPoint.x, pickResult.pickedPoint.y),
         size: new BABYLON.Size(300, 100),
         backgroundFill: "#4040408F",
         backgroundRoundRadius: 50,

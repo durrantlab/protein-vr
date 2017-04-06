@@ -33,7 +33,7 @@ class ClickedObject extends parent {
             }
             if (pickResult.pickedMesh == target) {
                 console.log('mesh clicked!');
-                action.do();
+                action.do(jQuery, pickResult);
             }
         });
     }
