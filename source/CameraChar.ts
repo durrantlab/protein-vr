@@ -35,7 +35,7 @@ namespace CameraChar {
 
         // The active camera from the babylon file is used (keep it
         // simple)
-        let VRCamera: boolean = true;
+        let VRCamera: boolean = false;
 
         if (VRCamera) {
             // Add VR camera here (Oculus Rift, HTC Vive, etc.)

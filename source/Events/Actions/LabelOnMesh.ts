@@ -21,17 +21,43 @@ class LabelOnMesh extends parent{
    
     console.log(pickResult.pickedPoint);
 
-    //let point = BABYLON.Vector3.Project(pickResult.pickedPoint, BABYLON.Matrix.Identity(), super.scene().getTransformMatrix(), camera.camera.viewport.toGlobal(Core.engine));
+    let point = BABYLON.Vector3.Project(pickResult.pickedPoint, 
+        BABYLON.Matrix.Identity(), 
+        super.scene().getTransformMatrix(), 
+        camera.camera.viewport.toGlobal(
+            Core.engine.getRenderWidth(), 
+            Core.engine.getRenderHeight()
+        )
+    );
 
+// debugging code
+
+    // console.log("Vector2 point?");
     // console.log(point);
-    // console.log(point.x);
-    // console.log(point.y);
+
+    console.log("v2 point");
+    console.log(point.x + ", " + (Core.engine.getRenderHeight() -  point.y));
+    // console.log("camera part working?");
+    // console.log(camera.camera.viewport);
+    // console.log("Camera info");
+    // console.log(camera.camera);
+
+    // console.log("engine?");
+    // console.log(Core.engine);
+
+
+    // console.log("transform matrix working?");
+    // console.log(super.scene().getTransformMatrix());
+
+    // console.log("Identity working?");
+    // console.log(BABYLON.Matrix.Identity());
+// end debugging code
     let id = Math.random();
     let canvas = new BABYLON.ScreenSpaceCanvas2D(super.scene(), {
         id: id.toString(),
         // position: BABYLON.Vector3.Project(pickResult.pickedPoint, BABYLON.Matrix.Identity(), super.scene().getTransformMatrix(), camera.camera.viewport.toGlobal(Core.engine)),
         // position: new BABYLON.Vector2(500, 250),
-        position: new BABYLON.Vector2(pickResult.pickedPoint.x, pickResult.pickedPoint.y),
+        position: new BABYLON.Vector2(point.x, Core.engine.getRenderHeight() - point.y),
         size: new BABYLON.Size(300, 100),
         backgroundFill: "#4040408F",
         backgroundRoundRadius: 50,
@@ -45,12 +71,12 @@ class LabelOnMesh extends parent{
             })
         ]
     });
-    console.log("did it work?");
-    console.log(canvas);
+    // console.log("did it work?");
+    // console.log(canvas);
 
-    console.log(canvas._id)
-    console.log("Is it visible?");
-    console.log(canvas.levelVisible);
+    // console.log(canvas._id)
+    // console.log("Is it visible?");
+    // console.log(canvas.levelVisible);
     
     super.scene().render();
 
