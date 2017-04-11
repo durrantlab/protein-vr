@@ -9,6 +9,9 @@ interface CheckInterface{
     action: any;
 }
 
+/* THIS CLASS WILL BE DEPRECIATED!!!! CLICKING HAS BECOME SO FUNDAMENTAL TO
+THE UI THAT IT WILL BE BUILT IN RATHER THAN A PLUGIN. */
+
 class ClickedObject extends parent {
     public canvasJQuery = undefined;
 

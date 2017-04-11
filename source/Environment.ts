@@ -1,8 +1,9 @@
+///<reference path="../js/Babylonjs/dist/babylon.2.4.d.ts" />
+
 import Core from "./Core/Core";
 import CameraChar from "./CameraChar"; 
 import RenderLoop from "./Core/RenderLoop"
-
-declare var BABYLON;
+import { startOptimizing } from "./Optimization/Optimization";
 
 interface MyDocument extends Document{
     /**
@@ -45,7 +46,7 @@ namespace Environment {
         //PointerLock.pointerLock();
 
         // Optimize the scene to keep it running fast.
-        optimize();
+        startOptimizing();
 
         // Set up the fog.
         setFog(0.0);
@@ -62,86 +63,52 @@ namespace Environment {
         :param float density: The fog density. Defaults to 0.015.
         */
 
-        Core.scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
-        Core.scene.fogColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+        if (density !== 0) {
+            // Make the fog
+            Core.scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
+            // Core.scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
+            let color = new BABYLON.Color3(0.9, 0.9, 0.85);
+            Core.scene.fogColor = color;
+            Core.scene.clearColor = color;
+
+            // If there's fog, there's no skybox, and everything is on the
+            // same renderid. renderid doesn't matter... it was that your
+            // custom shaders didn't accept fog.
+
+            // No need to keep the skybox visible.
+            for (let i = 0; i < Core.scene.meshes.length; i++) {
+                let m = Core.scene.meshes[i];
+                // Everything on same renderingroup
+                // m.renderingGroupId = 1;
+                if (m.name === "sky") {
+                    m.isVisible = false;
+                }
+            }
+        } else {
+            // Skybox visible.
+            for (let i = 0; i < Core.scene.meshes.length; i++) {
+                let m = Core.scene.meshes[i];
+                if (m.name === "sky") {
+                    m.isVisible = true;
+                    // m.renderingGroupId = 0;
+                } 
+                // else if (m.name === "crosshair") {
+                //     // m.renderingGroupId = 2;
+                // } else {
+                //     // m.renderingGroupId = 1;
+                // }
+            }
+            
+        }
+
         Core.scene.fogDensity = density;
     }
 
-    function mySceneOptimizationUpdateOctTree(priority) {
-        if (typeof priority === "undefined") {
-            priority = 0;
-        }
-
-        this.priority = priority;
-        this.apply = function (scene) {
+    export class mySceneOptimizationUpdateOctTree extends BABYLON.SceneOptimization {
+        public apply = (scene): boolean => {
             scene.createOrUpdateSelectionOctree();
+            return true;
         };
-    }
-
-    function optimizationOptions() {
-        var optim = new BABYLON.SceneOptimizerOptions(30, 2000);
-
-        // Merge meshes that have same material.
-        // In browser simplification.
-
-        var priority = 0;
-        optim.optimizations.push(new BABYLON.ShadowsOptimization(priority));
-        optim.optimizations.push(new BABYLON.LensFlaresOptimization(priority));
-        optim.optimizations.push(new mySceneOptimizationUpdateOctTree(priority));
-
-        priority++;
-        optim.optimizations.push(new BABYLON.PostProcessesOptimization(priority));
-        optim.optimizations.push(new BABYLON.ParticlesOptimization(priority));
-
-        // Next priority
-        priority++;
-        optim.optimizations.push(new BABYLON.TextureOptimization(priority, 256));
-
-        // Next priority
-        priority++;
-        optim.optimizations.push(new BABYLON.RenderTargetsOptimization(priority));
-
-        // Next priority
-        priority++;
-        optim.optimizations.push(new BABYLON.HardwareScalingOptimization(priority, 4));
-
-        return optim;
-    }
-
-    function babylonOptimization() {
-        // This optimization is great, except it merges different
-        // LOD-level meshes into one visible mesh. I think this is a
-        // BABYLON bug.
-        console.log(Core.engine.getFps());
-        BABYLON.SceneOptimizer.OptimizeAsync(
-            Core.scene,
-            optimizationOptions(),
-            function() {
-                // On success
-                //alert("Success!");
-            }, function() {
-                // FPS target not reached
-                //alert("FPS target not reached!");
-            }
-        );
-    }
-
-    function optimize(): void {
-        /**
-        Perform various optimizations to keep the engine running fast.
-        */
-
-        // Octrees make selections and things go faster.
-        if (Core.scene._activeMeshes.length > 100) {
-            Core.scene.createOrUpdateSelectionOctree();
-        }
-
-        // Every five seconds optimize the scene as necessary.
-        setInterval(function() {
-            babylonOptimization();
-        }, 5000);
-
-        Core.scene.workerCollisions = true;
     }
 
     function lensEffect(): void {

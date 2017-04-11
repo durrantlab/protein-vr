@@ -88,7 +88,7 @@ namespace Timers {
         // Add a timer ticker to the loop if it hasn't already been added.
         if (Timers.tickAllTimersAddedToLoop === false) {
             Timers.tickAllTimersAddedToLoop = true;
-            RenderLoop.extraFunctionsToRunInLoop.push(function() {
+            RenderLoop.extraFunctionsToRunInLoop_BeforeCameraLocFinalized.push(function() {
                 Timers.tickAllTimers();
             })
         }

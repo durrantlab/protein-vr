@@ -10,7 +10,13 @@ namespace RenderLoop {
     /**
     A list of functions to run in the render loop.
     */
-    export var extraFunctionsToRunInLoop: any[] = [];
+    export var extraFunctionsToRunInLoop_BeforeCameraLocFinalized: any[] = [];
+
+    /**
+    A list of functions to run in the render loop, after camera placed above
+    ground and everything (finalized)
+    */
+    export var extraFunctionsToRunInLoop_AfterCameraLocFinalized: any[] = [];
 
     /**
     The time the loop was last run.
@@ -64,15 +70,20 @@ namespace RenderLoop {
         // These do run every frame
         // Timers.tick();
 
-        // Make sure the character is above the ground.
-        Ground.ensureCharAboveGround();
-
         // Set variables based on current frame rate
         // let animationRatio = Core.scene.getAnimationRatio();
         // CameraChar.camera.speed = 1.5 * animationRatio;
 
-        for (let t = 0; t < RenderLoop.extraFunctionsToRunInLoop.length; t++) {
-            let func = RenderLoop.extraFunctionsToRunInLoop[t];
+        for (let t = 0; t < RenderLoop.extraFunctionsToRunInLoop_BeforeCameraLocFinalized.length; t++) {
+            let func = RenderLoop.extraFunctionsToRunInLoop_BeforeCameraLocFinalized[t];
+            func();
+        }
+
+        // Make sure the character is above the ground.
+        //Ground.ensureCharAboveGround();
+
+        for (let t = 0; t < RenderLoop.extraFunctionsToRunInLoop_AfterCameraLocFinalized.length; t++) {
+            let func = RenderLoop.extraFunctionsToRunInLoop_AfterCameraLocFinalized[t];
             func();
         }
 

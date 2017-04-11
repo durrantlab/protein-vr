@@ -1,6 +1,6 @@
-import Timers from "./Timers";
-import Core from "../Core/Core";
-import CameraChar from "../CameraChar";
+import Timers from "../Timers";
+import Core from "../../Core/Core";
+import CameraChar from "../../CameraChar";
 
 declare var BABYLON;
 
@@ -27,7 +27,6 @@ namespace BuiltInActions {
         // See http://www.html5gamedevs.com/topic/25430-transparency-issues/
 
         mesh.material.alphaMode = BABYLON.Engine.ALPHA_ADD;
-        console.log("YOYOYO");
 
         Timers.addTimer({
             name: "FadeOut" + Math.random().toString(),
@@ -36,7 +35,6 @@ namespace BuiltInActions {
             interpValEnd: 0.0,
             tickCallback: function(val) {
                 this.material.alpha = val;
-                console.log(val);
             }.bind(mesh),
             doneCallback: function() {
                 this.material.alpha = 0;
@@ -65,7 +63,6 @@ namespace BuiltInActions {
             durationInMiliseconds: milliseconds, //milliseconds,
             tickCallback: function(val) {
                 this.material.alpha = val;
-                console.log(val);
             }.bind(mesh),
             doneCallback: function() {
                 this.material.alpha = 1.0;

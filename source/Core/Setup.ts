@@ -1,13 +1,15 @@
 import CollisionMeshes from "../Objects/CollisionMeshes";
 import Ground from "../Objects/Ground";
 import Skybox from "../Objects/Skybox";
-import AutoLODMeshes from "../Objects/AutoLOD";
+//import AutoLODMeshes from "../Objects/AutoLOD";
 import BillboardMeshes from "../Objects/Billboard";
 import CustomShaderObjects from "../Objects/CustomShaderObject";
 import CameraChar from "../CameraChar";
 import Environment from "../Environment";
 import Core from "./Core";
 import RenderLoop from "./RenderLoop";
+import MouseState from "./MouseState";
+
 // import $ = require("jquery");
 
 // jQuery is an external library, so declare it here to avoid Typescript
@@ -48,7 +50,7 @@ namespace Setup {
 
         // Whether or not to run in debug mode (shows certain messages in the
         // console, etc.)
-        Core.debug = false;
+        Core.debug = true;
 
         // Only run the below once the whole document has loaded.
         $(document).ready(function() {
@@ -59,7 +61,7 @@ namespace Setup {
             Core.engine = new BABYLON.Engine(Core.canvas, true);
 
             // Load a scene from a BABYLON file.
-            BABYLON.SceneLoader.Load("scene/rbc/", "scene.babylon", 
+            BABYLON.SceneLoader.Load(Core.sceneDirectory, "scene.babylon", 
                                      Core.engine,
                                      function (newScene: any): void {
 
@@ -71,113 +73,206 @@ namespace Setup {
                     // later.
                     Core.scene = newScene;
 
-                    // Set custom shaders
-                    setCustomShaders();
+                    // Setup mouse events
+                    MouseState.setup();
 
-                    // Loop through each of the objects in the scene and
-                    // modify them according to the name (which is a json).
+                    // if (Core.debug === true) {
+                    //     Core.scene.debugLayer.show(true, Core.scene.activeCamera);
+                    // }
 
-                    Core.scene.meshes.forEach(function(m) {
-                        //try {
+                    // Load in informtion re. the materials
+                    $.ajax({
+                        url: Core.sceneDirectory + "materials.json",
+                        dataType: "json"
+                    }).done(function(materials_info) {
+                        // Set custom shaders
+                        // setCustomShaders();
+
+                        // Loop through each of the objects in the scene and
+                        // modify them according to the name (which is a json).
+
+                        Core.scene.meshes.forEach(function(m) {
+                            //try {
                             // Convert the mesh name to a json object with
                             // information about the mesh.
-                            let jsonStr = '{"' + m.name + '"}';
-                            jsonStr = jsonStr.replace(/:/g, '":"')
-                                             .replace(/,/g, '","');
-                            let json = JSON.parse(jsonStr);
-                            m.name = json.n;
+                            // let jsonStr = '{"' + m.name + '"}';
+                            // jsonStr = jsonStr.replace(/:/g, '":"')
+                            //                  .replace(/,/g, '","');
+                            // let json = JSON.parse(jsonStr);
+                            // m.name = json.n;
 
                             // save for later reference
                             Core.meshesByName[m.name] = m;
 
                             // Given the mesh, check if it should collide with
                             // the camera.
-                            new CollisionMeshes().checkMesh(m, json);
+                            // new CollisionMeshes().checkMesh(m, json);
 
                             // Check if the mesh is marked as a ground mesh.
-                            new Ground().checkMesh(m, json);
+                            new Ground().checkMesh(m); //, json);
 
                             // Check if the mesh is marked as a skybox.
-                            new Skybox().checkMesh(m, json);
+                            new Skybox().checkMesh(m); //, json);
 
                             // Check if the object is marked to be
                             // level-of-detail (fewer vertices when farther
                             // away).
-                            new AutoLODMeshes().checkMesh(m, json);
+                            //new AutoLODMeshes().checkMesh(m, json);
 
                             // Check if the mesh is marked as a billboard
                             // mesh.
-                            new BillboardMeshes().checkMesh(m, json);
+                            // new BillboardMeshes().checkMesh(m, json);
 
                             // Check if the mesh requires a custom shader.
-                            new CustomShaderObjects().checkMesh(m, json);
+                            // new CustomShaderObjects().checkMesh(m, json);
 
-                        //} catch (err) {
+                            // Create a material if the info is available.
+                            if (this.materials_info[m.name] !== undefined) {
+                                let mat_inf = this.materials_info[m.name];
+                                // Generate a key for this material. Doing it
+                                // this way so you can reuse materials.
+                                let mat_key = "";
+                                let colorType: string = "color";
+                                if (typeof mat_inf.color === "string") {
+                                    // it's a filename
+                                    mat_key += mat_inf.color;
+                                    colorType = "image";
+                                } else {
+                                    // it's a color (RGB)
+                                    mat_inf.color[0] = roundToHundredth(mat_inf.color[0]);
+                                    mat_inf.color[1] = roundToHundredth(mat_inf.color[1]);
+                                    mat_inf.color[2] = roundToHundredth(mat_inf.color[2]);
+                                    mat_key += JSON.stringify(mat_inf.color);
+                                }
+
+                                mat_inf.glossiness = roundToHundredth(mat_inf.glossiness);
+                                mat_key += " " + mat_inf.glossiness.toString();
+
+                                // HERE DO THE SHADER LIBRARY THING TO NOT DUPLICATE EFFORTS!!!
+
+                                var mat = new BABYLON.StandardMaterial(mat_key, Core.scene);
+                                mat.diffuseColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
+                                mat.specularColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
+
+                                if (colorType === "color") {
+                                    // set the diffuse colors
+                                    mat.emissiveColor = new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
+                                } else {  // so it's an image
+                                    mat.emissiveColor = new BABYLON.Color3(0,0,0);
+                                    mat.emissiveTexture = new BABYLON.Texture(Core.sceneDirectory + mat_inf.color, Core.scene);
+                                }
+
+                                // Now do glossiness
+                                mat.specularColor = new BABYLON.Color3(mat_inf.glossiness, mat_inf.glossiness, mat_inf.glossiness);
+
+                                // Add shadows
+                                if (m.name !== "sky") { // sky has no shadow
+                                    let nameToUse = m.name.replace(/Decimated/g, "");
+                                    mat.ambientTexture = new BABYLON.Texture(Core.sceneDirectory + nameToUse + "shadow.jpg", Core.scene);
+                                }
+
+                                // Now add this material to the object.
+                                m.material = mat;
+                            }
+
+                            //} catch (err) {
                             //
-                        //}
-                    });
+                            //}
+                        }.bind({
+                            materials_info: materials_info
+                        }));
 
-                    // Set up the game character/camera.
-                    CameraChar.setup($);
-
-                    // Set up the environment.
-                    Environment.setup();
-
-                    // Set up the skybox.
-                    Skybox.applyBoxImgs(
-                        //"3d_resources/sky_boxes/sky27/sp9"
-                        "3d_resources/sky_boxes/my_bloodstream/blood"
-                    );
-
-                    // Set up events.
-                    setEvents();
-
-                    // Listen for a click. If the user clicks on an object,
-                    // print information about the clicked object in the
-                    // console.
-                    /* window.addEventListener("click", function () {
-                       // We try to pick an object.
-                       var pickResult = Core.scene.pick(
-                           Core.scene.pointerX, Core.scene.pointerY
-                        );
-
-                       console.log(pickResult.pickedMesh,
-                                   pickResult.pickedMesh.name,
-                                   pickResult.pickedMesh.renderingGroupId);
-                    });*/
-
-                    // Add triggers.
-                    /*new Event(
-                        BuiltInTriggerConditionals.distance(Core.meshesByName["prot_coll"], 3.5),
-                        BuiltInActions.fadeOutMesh(Core.meshesByName["surf"], 2000)
-                    );*/
+                        // Add LODs
+                        Core.scene.meshes.forEach(function(m) {
+                            // If the name has the word "Decimated" in it,
+                            // make LOD.
+                            if (m.name.indexOf("Decimated") !== -1) {
+                                let nameToUse = m.name.replace(/Decimated/g, "");
+                                let parentMesh = Core.meshesByName[nameToUse];
+                                m.material = parentMesh.material;
+                                parentMesh.addLODLevel(15, m);
+                                parentMesh.addLODLevel(25, null);
+                            }
+                        });
 
 
-                    /*Triggers.addTrigger({
-                        name: "FadeOutWhenWithinSixMeters",
-                        conditionToSatisfy: Triggers.PackagedConditionals.distance(Core.meshesByName["prot_coll"], 5),
-                        actionIfConditionSatisfied: function() {
-                            let mesh = Core.meshesByName["surf"];
-                            Triggers.PackagedAction.fadeOutMesh(mesh);
-                        },
-                        intervalInMiliseconds: 2000,
-                        autoRestart: false,
-                        tickFrameFrequency: 20
-                    });
 
-                    Triggers.addTrigger({
-                        name: "FadeInWhenWithinThreeMeters",
-                        conditionToSatisfy: Triggers.PackagedConditionals.distance(Core.meshesByName["prot_coll"], 3),
-                        actionIfConditionSatisfied: function() {
-                            let mesh = Core.meshesByName["surf"];
-                            Triggers.PackagedAction.fadeInMesh(mesh);
-                        },
-                        intervalInMiliseconds: 2000,
-                        autoRestart: false,
-                        tickFrameFrequency: 20
-                    });*/
+                        // Parent all objects to the grnd object. That way it will
+                        // be easy to scale the scene.
+                        // let grnd = Core.meshesByName["grnd"];
+                        // for (let i = 0; i < Core.scene.meshes.length; i++) {
+                        //     let m = Core.scene.meshes[i];
+                        //     if (m.name !== "grnd") {
+                        //         m.parent = grnd;
+                        //     }
+                        // };
 
-                    RenderLoop.start();
+                        //grnd.scaling = new BABYLON.Vector3(8, 8, 8);
+
+                        // Set up the game character/camera.
+                        CameraChar.setup($);
+
+                        // Set up the environment.
+                        Environment.setup();
+
+                        // Set up the skybox.
+                        // Skybox.applyBoxImgs(
+                        //     //"3d_resources/sky_boxes/sky27/sp9"
+                        //     "3d_resources/sky_boxes/my_bloodstream/blood"
+                        // );
+
+                        // Set up events.
+                        setEvents();
+
+                        // Listen for a click. If the user clicks on an object,
+                        // print information about the clicked object in the
+                        // console.
+                        /* window.addEventListener("click", function () {
+                        // We try to pick an object.
+                        var pickResult = Core.scene.pick(
+                            Core.scene.pointerX, Core.scene.pointerY
+                            );
+
+                        console.log(pickResult.pickedMesh,
+                                    pickResult.pickedMesh.name,
+                                    pickResult.pickedMesh.renderingGroupId);
+                        });*/
+
+                        // Add triggers.
+                        /*new Event(
+                            BuiltInTriggerConditionals.distance(Core.meshesByName["prot_coll"], 3.5),
+                            BuiltInActions.fadeOutMesh(Core.meshesByName["surf"], 2000)
+                        );*/
+
+
+                        /*Triggers.addTrigger({
+                            name: "FadeOutWhenWithinSixMeters",
+                            conditionToSatisfy: Triggers.PackagedConditionals.distance(Core.meshesByName["prot_coll"], 5),
+                            actionIfConditionSatisfied: function() {
+                                let mesh = Core.meshesByName["surf"];
+                                Triggers.PackagedAction.fadeOutMesh(mesh);
+                            },
+                            intervalInMiliseconds: 2000,
+                            autoRestart: false,
+                            tickFrameFrequency: 20
+                        });
+
+                        Triggers.addTrigger({
+                            name: "FadeInWhenWithinThreeMeters",
+                            conditionToSatisfy: Triggers.PackagedConditionals.distance(Core.meshesByName["prot_coll"], 3),
+                            actionIfConditionSatisfied: function() {
+                                let mesh = Core.meshesByName["surf"];
+                                Triggers.PackagedAction.fadeInMesh(mesh);
+                            },
+                            intervalInMiliseconds: 2000,
+                            autoRestart: false,
+                            tickFrameFrequency: 20
+                        });*/
+
+                        RenderLoop.start();
+                    })
+
+
                 });
             });
 
@@ -271,6 +366,10 @@ namespace Setup {
 
         });
     }
+}
+
+export function roundToHundredth(num: number) {
+    return Math.round(num * 100) / 100;
 }
 
 export default Setup;

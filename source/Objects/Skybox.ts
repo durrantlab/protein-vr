@@ -21,7 +21,7 @@ class Skybox extends parent {
     */
     static skyboxMesh: any;
 
-    public objectMatch(m: any, json: any): boolean {
+    public objectMatch(m: any): boolean { //, json: any): boolean {
         /**
         This function checks a mesh to see if it is marked as this type of
         mesh. You can mark a mesh as this type of mesh using the VR Blender
@@ -38,7 +38,9 @@ class Skybox extends parent {
         :rtype: :any:`bool`
         */
 
-        if (json.s === "1") {
+        // if (json.s === "1") {
+        if (m.name === "sky") {
+            console.log(m);
             // It's a skybox.
             m.checkCollisions = false;  // No need to check collisions on
                                         // a skybox.
@@ -55,6 +57,8 @@ class Skybox extends parent {
             m.material.disableLighting = true;  // The skybox doesn't
                                                 // interact with lights.
 
+            
+
             // Remove reflections, because the skybox is an image texture,
             // and the sun doens't reflect off the sky.
             m.material.specularColor = new BABYLON.Color3(0,0,0);
@@ -70,7 +74,7 @@ class Skybox extends parent {
         return false;
     }
 
-    public objectNoMatch(m: any, json: any): void {
+    public objectNoMatch(m: any): void { //, json: any): void {
         /**
         This function checks a mesh to see if it is NOT marked as this type of
         mesh.

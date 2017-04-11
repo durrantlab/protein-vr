@@ -1,17 +1,13 @@
 // Temporary workaround for requirejs issue
 // could be a decent template for future projects --> putting config and requirejs method in one main file
- requirejs.config({
-        paths: {
-            jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min'
-            // Babylon: '../js/Babylonjs/dist/babylon.2.4.max',
-            // webVRCamera: '../js/Babylonjs/src/Cameras/VR/babylon.webVRCamera'
-        }
-    });
-
-requirejs(["jquery", "./Core/Setup", "./Shader/Shader", "./Core/Core", "./Events/Event", 
-            "./Events/TriggerConditionals/DistanceToMesh", 
-                "./Events/Actions/ScreenWhite"], 
-                function ($, Setup_1, Shader_1, Core_1, Event_1, DistanceToMesh_1, ScreenWhite_1) {
+requirejs.config({
+    paths: {
+        jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min'
+    }
+});
+requirejs(["jquery", "./Core/Setup", "./Shader/Shader", "./Core/Core", "./Events/Event",
+    "./Events/TriggerConditionals/DistanceToMesh",
+    "./Events/Actions/ScreenWhite"], function ($, Setup_1, Shader_1, Core_1, Event_1, DistanceToMesh_1, ScreenWhite_1) {
     "use strict";
     console.log($);
     console.log(BABYLON);

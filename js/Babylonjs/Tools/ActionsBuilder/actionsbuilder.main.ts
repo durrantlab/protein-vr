@@ -13,7 +13,7 @@ this.createJSON = () => {
     var structure = viewer.utils.createJSON(viewer.root);
     var asText = JSON.stringify(structure);
     actionsBuilderJsonInput.value = asText;
-    console.log(asText);
+    //console.log(asText);
 };
 
 this.loadFromJSON = () => {

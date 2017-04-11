@@ -48,6 +48,11 @@ namespace Core {
     */
     export var frameNum: number = 0;
 
+    /**
+    File location of the sene resources
+    */
+    export var sceneDirectory: string = "";
+
     // higher means more simple.
     export var textureSimplificationLevel: number = 0;
 

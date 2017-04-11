@@ -14,7 +14,7 @@ class AutoLODMeshes extends parent {
     mesh is shown from a distance, to keep things running fast.
     */
 
-    public objectMatch(m: any, json: any): boolean {
+    public objectMatch(m: any): boolean { //, json: any): boolean {
         /**
         This function checks a mesh to see if it is marked as this type of
         mesh. You can mark a mesh as this type of mesh using the VR Blender
@@ -30,7 +30,8 @@ class AutoLODMeshes extends parent {
         :rtype: :any:`bool`
         */
 
-        if (json.l === "1") {
+        // if (json.l === "1") {
+        if (false) {
             // Enable auto LOD.
             let settings = [
                 { quality: 0.8, distance: 25, optimizeMesh: true },
@@ -47,7 +48,7 @@ class AutoLODMeshes extends parent {
         return false;
     }
 
-    public objectNoMatch(m: any, json: any): void {
+    public objectNoMatch(m: any): void { //, json: any): void {
         /**
         This function checks a mesh to see if it is NOT marked as this type of
         mesh.
