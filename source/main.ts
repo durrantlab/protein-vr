@@ -253,7 +253,6 @@ export function start(jQuery) {
             new ClickedObject({
              triggerMesh: Core.meshesByName["grnd"],
                 action: new LabelOnMesh({
-                    mesh: Core.meshesByName["surf_trgt"],
                     label: "Hi :)",
                 })
             }, Core),

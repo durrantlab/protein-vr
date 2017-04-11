@@ -5,7 +5,6 @@ declare var BABYLON;
 //provide a label for the mesh when triggered
 
 interface LabelInterface{
-    mesh :any;
     label :String;
 }
 
@@ -55,8 +54,6 @@ class LabelOnMesh extends parent{
     let id = Math.random();
     let canvas = new BABYLON.ScreenSpaceCanvas2D(super.scene(), {
         id: id.toString(),
-        // position: BABYLON.Vector3.Project(pickResult.pickedPoint, BABYLON.Matrix.Identity(), super.scene().getTransformMatrix(), camera.camera.viewport.toGlobal(Core.engine)),
-        // position: new BABYLON.Vector2(500, 250),
         position: new BABYLON.Vector2(point.x, Core.engine.getRenderHeight() - point.y),
         size: new BABYLON.Size(300, 100),
         backgroundFill: "#4040408F",
@@ -64,28 +61,21 @@ class LabelOnMesh extends parent{
         cachingStrategy: BABYLON.Canvas2D.CACHESTRATEGY_CANVAS,
         levelVisible: true,
         children: [
-            new BABYLON.Text2D("Hello World!", {
+            new BABYLON.Text2D(this.parameters['label'], {
                 id: "text",
                 marginAlignment: "h: center, v:center",
                 fontName: "20pt Arial"
             })
         ]
     });
-    // console.log("did it work?");
-    // console.log(canvas);
 
-    // console.log(canvas._id)
-    // console.log("Is it visible?");
-    // console.log(canvas.levelVisible);
-    
     super.scene().render();
 
 
-    // this.remove();
+   
     console.log("Canvas created, another click should remove the canvas");
     jQuery('#renderCanvas').click(function(){
         canvas.levelVisible = false;
-        // canvas.dispose(); 
         return;     
     });
     
@@ -109,12 +99,6 @@ class LabelOnMesh extends parent{
     //     ]
     // });
 
-    // super.scene().render(worldCanvas, true);
-
-    }
-    public erase(canvas: any) {
-        console.log("entered remove")
-        canvas.levelVisible = false;
     }
 }
 
