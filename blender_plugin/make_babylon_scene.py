@@ -10,6 +10,8 @@ import Shadows
 import os
 import json
 import random
+import bmesh
+import Sounds
 
 # Objects with fewer than this will never be decimated
 min_verts_to_decimate = 100
@@ -33,15 +35,23 @@ if not os.path.exists(Utils.pwd()):
 # Make sure you're in object mode
 Utils.object_mode()
 
+# Pick random id
+manifest_id = random.randrange(0, 10000000)
+scene_data = {
+    "file_id": manifest_id,
+}
+
 # Do some preliminary checks (exists if fails...)
-Checks.preliminary_checks()
+scene_data = Checks.preliminary_checks(scene_data)
 
 print("Applying basic changes to meshes...")
 for obj in bpy.data.objects:
     # Make sure all rotations, locations, scales are applied.
     Utils.select(obj)
-    if obj.location[0] != 0 or obj.location[1] != 0 or obj.location[2] != 0 or obj.rotation_euler[0] != 0 or obj.rotation_euler[1] != 0 or obj.rotation_euler[2] != 0 or obj.scale[0] != 1 or obj.scale[1] != 1 or obj.scale[2] != 1:
-        print("\tApplying " + obj.name + " location/rotation/scaling")
+    # if obj.location[0] != 0 or obj.location[1] != 0 or obj.location[2] != 0 or obj.rotation_euler[0] != 0 or obj.rotation_euler[1] != 0 or obj.rotation_euler[2] != 0 or obj.scale[0] != 1 or obj.scale[1] != 1 or obj.scale[2] != 1:
+    print("\tApplying " + obj.name + " location/rotation/scaling")
+    if obj.name[-4:] not in [".mp3"]:
+        # Don't apply transforms to useful empties (ones that include sounds)
         bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
     
     # Make sure smooth rendering turned on
@@ -64,10 +74,27 @@ for obj in bpy.data.objects:
     if obj.name == "sky":
         Utils.select(obj)
         Utils.editing_mode(obj)
+
+        mesh = bmesh.from_edit_mesh(bpy.context.object.data)
+
+        for v in mesh.verts:
+            v.select = True
+        
+        for f in mesh.faces:
+            f.select = True
+
+        for e in mesh.edges:
+            e.select = True
+
+        bpy.context.scene.objects.active = bpy.context.scene.objects.active
+
         bpy.ops.mesh.normals_make_consistent()
         bpy.ops.mesh.flip_normals()
         Utils.object_mode()
         break
+
+# Save any specified sounds
+scene_data = Sounds.save_sounds(scene_data)
 
 # Save to a new blender file
 pwd = Utils.pwd()
@@ -76,8 +103,15 @@ bpy.ops.wm.save_as_mainfile(filepath=pwd + 'fixed.blend', check_existing=False)
 # save the babylon file
 bpy.ops.bjs.main(filepath=pwd + "scene.babylon")
 
+# Save scene info
+json.dump(scene_data, open(pwd + "proteinvr.json", 'w'))
+
 # Save a manifest
 json.dump(
-    {"version" : random.randrange(0, 10000000), "enableSceneOffline" : True, "enableTexturesOffline" : True}, 
+    {
+        "version" : manifest_id, 
+        "enableSceneOffline" : True, # In the future, reenable this for faster load.
+        "enableTexturesOffline" : True
+    }, 
     open(pwd + "scene.babylon.manifest", 'w')
 )

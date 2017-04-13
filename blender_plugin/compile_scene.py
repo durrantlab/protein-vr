@@ -13,9 +13,9 @@ os.system(
 )
 
 # Now blur shadows and save as black and white
-resp = raw_input("Blur shadows and save as black and white jpg? (Y/n) ")
-if resp.upper() == "Y" or resp == "":
-    for filename in glob.glob("proteinvr_scene_prepped/*shadow.jpg"):
+resp = raw_input("Blur shadows and save as black and white png? (y/N) ")
+if resp.upper() == "Y":
+    for filename in glob.glob("proteinvr_scene_prepped/*shadow.png"):
         img = Image.open(filename)
         blurred_img = img.filter(ImageFilter.GaussianBlur(radius=5))
         gray_img = blurred_img.convert('L')

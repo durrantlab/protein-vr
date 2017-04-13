@@ -2,7 +2,7 @@
 
 import Core from "../Core/Core";
 import Environment from "../Environment";
-import { mySceneOptimizationLOD, autoLODMeshes, autoLODDone } from "./LOD";
+import { mySceneOptimizationLOD } from "./LOD";
 import { mySceneOptimizationCustomShaders } from "./Shaders";
 import { mySceneOptimizationFog } from "./Fog";
 
@@ -47,7 +47,6 @@ export function oneTimeOptimization(doneCallBack: any) {
     // and leads the optimizer to think drastic things need to be done to
     // maintain FPS. The default distances are so large that, for all
     // practical purposes, it is disabled.
-    // autoLODMeshes();
 
     // Only continue once autoLOD done.
     // intervalWaitingForLODToFinishID = setInterval(function() {
@@ -144,43 +143,44 @@ function optimizationOptions() {
     // Minor impact on appearance. Introducing LOD.
     optim.optimizations.push(new BABYLON.PostProcessesOptimization(priority));
     optim.optimizations.push(new BABYLON.ParticlesOptimization(priority));
-    // optim.optimizations.push(new mySceneOptimizationLOD(priority));  // LOD #1
+    optim.optimizations.push(new mySceneOptimizationLOD(priority));  // LOD #1
 
 
     // Next priority
     priority++; // 2  
     // Modest impact on appearance. Textures at 512, more aggressive LOD.
     optim.optimizations.push(new BABYLON.TextureOptimization(priority, 512));
-    // optim.optimizations.push(new mySceneOptimizationLOD(priority));  // LOD #2
+    optim.optimizations.push(new mySceneOptimizationLOD(priority));  // LOD #2
 
 
     // Next priority
     priority++;  // 3
     // Major impact on apperance. Only 1 color texture on your custom
     // shader. Even more aggressive LOD.
-    optim.optimizations.push(new mySceneOptimizationCustomShaders(priority));  // CustomShaderOpt #1
-    // optim.optimizations.push(new mySceneOptimizationLOD(priority));  // LOD #3
+    // optim.optimizations.push(new mySceneOptimizationCustomShaders(priority));  // CustomShaderOpt #1
+    optim.optimizations.push(new mySceneOptimizationLOD(priority));  // LOD #3
 
     // Next priority
-    priority++;  // 4
+    // priority++;  // 4
     // Severe impact on apperance. Stop vertex animations (custom shaders).
-    optim.optimizations.push(new mySceneOptimizationCustomShaders(priority));  // CustomShaderOpt #2
+    //optim.optimizations.push(new mySceneOptimizationCustomShaders(priority));  // CustomShaderOpt #2
 
-    priority++;  // 5
+    priority++;  // 4
     // Very severe impact on appearance. Bring in fog and get rid of baked
     // shadows on custom shaders.
     optim.optimizations.push(new BABYLON.RenderTargetsOptimization(priority));
-    optim.optimizations.push(new mySceneOptimizationCustomShaders(priority));  // CustomShaderOpt #3
+    // optim.optimizations.push(new mySceneOptimizationCustomShaders(priority));  // CustomShaderOpt #3
     optim.optimizations.push(new mySceneOptimizationFog(priority));  // Fog #1
 
-    priority++;  // 6
+    priority++;  // 5
     // Fog thicker to avoid rendering things in the distance.
     optim.optimizations.push(new mySceneOptimizationFog(priority));  // Fog #2
 
-    priority++;  // 7
+    priority++;  // 6
     // Fog ridiculously thick, and textures down to 256.
     optim.optimizations.push(new BABYLON.TextureOptimization(priority, 256));
     optim.optimizations.push(new BABYLON.HardwareScalingOptimization(priority, 4));
-    
+    optim.optimizations.push(new mySceneOptimizationFog(priority));  // Fog #3
+
     return optim;
 }

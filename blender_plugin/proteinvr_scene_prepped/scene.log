@@ -22,6 +22,7 @@ Exporter version: 5.0.6, Blender version: 2.78 (sub 0)
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  2823
+	processing begun of node:  Water-Lisa_Redfern-1888623835-public-domain.mp3
 	processing begun of mesh:  Suzanne
 		processing begun of baked material:  Suzanne
 		num positions      :  4662
@@ -67,4 +68,4 @@ Exporter version: 5.0.6, Blender version: 2.78 (sub 0)
 ========= Writing of scene file started =========
 ========= Writing of scene file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 0.7324 secs
+elapsed time:  0 min, 0.7091 secs

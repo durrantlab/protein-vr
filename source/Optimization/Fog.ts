@@ -7,7 +7,7 @@ export class mySceneOptimizationFog extends BABYLON.SceneOptimization {
     public apply = (scene): boolean => {
         
         switch (this.priority) {
-            case 5:
+            case 4:
                 // Fog far away
                 Environment.setFog(0.05);
 
@@ -15,14 +15,20 @@ export class mySceneOptimizationFog extends BABYLON.SceneOptimization {
                 Core.scene.activeCamera.maxZ = 30;  // nothing visible beyond 30 anyway.
 
                 break;
-            case 6:
+            case 5:
                 // Not so far away.
-                Environment.setFog(0.5);
+                Environment.setFog(0.1);
 
                 Core.scene.activeCamera.maxZ = 15;
                 break;
+            case 6:
+                // Not so far away.
+                Environment.setFog(0.15);
+
+                Core.scene.activeCamera.maxZ = 10;
+                break;
             default:
-                alert("Error with fog priority value!");
+                alert("Error with fog priority value! It's " + this.priority.toString());
         }
 
         return true;

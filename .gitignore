@@ -4,4 +4,10 @@
 3d_resources
 /source/**/*.js
 /source/notes.txt
-
+*.blend
+*.tar.gz
+*.png
+*.jpg
+*.mp3
+*.pyc
+*.blend1

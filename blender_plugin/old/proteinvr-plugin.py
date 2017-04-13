@@ -143,9 +143,9 @@ class OBJECT_OT_bake_shadows(bpy.types.Operator):
 
             # Save that shadow map
             img = bpy.data.images[image_name]
-            filepath =  "/var/tmp/shadow.jpg" if bpy.data.filepath == '' else os.path.dirname(bpy.data.filepath) + os.sep + "shadow.jpg"
+            filepath =  "/var/tmp/shadow.png" if bpy.data.filepath == '' else os.path.dirname(bpy.data.filepath) + os.sep + "shadow.png"
             img.filepath_raw = bpy.path.abspath(filepath)
-            img.file_format = 'JPEG'
+            img.file_format = 'PNG'
             img.save()
 
             # Remove the temporary material

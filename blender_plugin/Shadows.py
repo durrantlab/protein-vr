@@ -26,6 +26,7 @@ def bake_maps():
     for obj in bpy.data.objects:
         if "Decimate" in obj.name:
             continue
+
         if obj.name == "sky":
             # The sky has no shadows.
             continue
@@ -36,11 +37,11 @@ def bake_maps():
             # Cameras and things don't count
             continue
 
-        filepath =  Utils.pwd() + obj.name + "shadow.jpg"
+        filepath =  Utils.pwd() + obj.name + "shadow.png"
 
         if os.path.exists(filepath):
-            resp = input(filepath + " already exists. Overwrite? (Y/n) ")
-            if resp == "n":
+            resp = input(filepath + " already exists. Overwrite? (y/N) ")
+            if resp.upper() != "Y":
                 continue
         
         objs.append(obj)
@@ -92,7 +93,7 @@ def bake_maps():
     for i, obj in enumerate(objs):
         print("\tBaking shadows for " + obj.name)
 
-        filepath =  Utils.pwd() + obj.name + "shadow.jpg"
+        filepath =  Utils.pwd() + obj.name + "shadow.png"
         Utils.select(obj)
 
         # Bake the shadow map
@@ -108,13 +109,13 @@ def bake_maps():
         # Save that shadow map
         img = bpy.data.images[img_filenames[i]]
         img.filepath_raw = bpy.path.abspath(filepath)
-        img.file_format = 'JPEG'
+        img.file_format = 'PNG'
         img.save()
 
-        print("\t\tShadow map saved to " + filepath + ".\n\t\tNow blur the image and convert to black and white in a program like PhotoShop.")
+        print("\t\tShadow map saved to " + filepath) # + ".\n\t\tNow blur the image and convert to black and white in a program like PhotoShop.")
 
     # Restore materials No more... material information is now stored to
-    # materials.json. Leaving these materials off will prevent babylon
+    # proteinvr.json. Leaving these materials off will prevent babylon
     # exporter from doing bakes. 
     # for i, obj in enumerate(objs):
     #     Utils.select(obj)

@@ -40,7 +40,6 @@ class Skybox extends parent {
 
         // if (json.s === "1") {
         if (m.name === "sky") {
-            console.log(m);
             // It's a skybox.
             m.checkCollisions = false;  // No need to check collisions on
                                         // a skybox.
@@ -50,7 +49,7 @@ class Skybox extends parent {
                                         // 0, so other objects are always
                                         // rendered in front.
 
-            m.material.backFaceCulling = false;  // No need to render the
+            m.material.backFaceCulling = true;  // No need to render the
                                                     // outside of the skybox,
                                                     // since the camera will
                                                     // always be inside it.
@@ -98,7 +97,7 @@ class Skybox extends parent {
         in Blender.
 
         :param str dir: The directory where the skybox images are
-               stored, including the beginning of the jpg file
+               stored, including the beginning of the png file
                that is common to all files.
         */
 

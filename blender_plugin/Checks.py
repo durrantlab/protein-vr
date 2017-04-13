@@ -3,7 +3,7 @@ import Utils
 import sys
 import json
 
-def preliminary_checks():
+def preliminary_checks(scene_data):
     # There always needs to be a few objects.
     obj_names = bpy.data.objects.keys()
     print("Checking if key objects exist in the scene...")
@@ -26,7 +26,7 @@ def preliminary_checks():
         sys.exit(0)
 
     # All objects with verticies must have UV maps. Required for shadows.
-    material_data = {}
+    scene_data["materials"] = {}
     textureNameMappings = {}
     for obj in bpy.data.objects:
         Utils.select(obj)
@@ -63,14 +63,14 @@ def preliminary_checks():
         nodes = mat.node_tree.nodes
         for node in nodes:
             if hasattr(node, 'node_tree') and node.node_tree.name == "ProteinVR":
-                material_data[obj.name] = {}
+                scene_data["materials"][obj.name] = {}
 
                 # So ProteinVR does exist... Get the color and glossiness
                 protein_vr = nodes.get(node.name)
                 color_input = protein_vr.inputs[0]
                 color = color_input.default_value[:]
                 glossiness = protein_vr.inputs[1].default_value
-                material_data[obj.name]["glossiness"] = glossiness
+                scene_data["materials"][obj.name]["glossiness"] = glossiness
 
                 # Now check if it's attached to a image node. If so, use that.
                 # See http://blender.stackexchange.com/questions/77365/getting-the-image-of-a-texture-node-that-feeds-into-a-node-group?noredirect=1#comment135993_77365
@@ -84,23 +84,23 @@ def preliminary_checks():
                         image_name = image.name
 
                         if not image_name in textureNameMappings.keys():
-                            textureNameMappings[image_name] = "Image" + str(len(textureNameMappings.keys()) + 1) + ".jpg"
+                            textureNameMappings[image_name] = "Image" + str(len(textureNameMappings.keys()) + 1) + ".png"
 
                         # Save the texture
                         scene = bpy.context.scene
-                        scene.render.image_settings.file_format='JPEG'
-                        image.file_format = "JPEG"
-                        base_filename = textureNameMappings[image_name] # obj.name + "_tex.jpg"
+                        scene.render.image_settings.file_format='PNG'
+                        image.file_format = "PNG"
+                        base_filename = textureNameMappings[image_name] # obj.name + "_tex.png"
                         filename = Utils.pwd() + base_filename
                         image.save_render(filename, scene)
 
-                        material_data[obj.name]["color"] = base_filename
+                        scene_data["materials"][obj.name]["color"] = base_filename
                         #print( "result", image.name, image.filepath )
                     else:
-                        material_data[obj.name]["color"] = color[:3]
+                        scene_data["materials"][obj.name]["color"] = color[:3]
                 except:
-                    material_data[obj.name]["color"] = color[:3]
+                    scene_data["materials"][obj.name]["color"] = color[:3]
 
                 break
         
-    json.dump(material_data, open(Utils.pwd() + "materials.json", 'w'))
+    return scene_data

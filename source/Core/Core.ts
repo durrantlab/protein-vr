@@ -53,8 +53,33 @@ namespace Core {
     */
     export var sceneDirectory: string = "";
 
-    // higher means more simple.
+    // higher means simpler.
     export var textureSimplificationLevel: number = 0;
+
+    // Whether or not currently fullscreen.
+    export var fullScreen: boolean = false;
+
+    // Variables that can be toggled. Some of these will be set via UI
+    // eventually.
+    export enum cameraTypes {
+        Standard,
+        VR
+    }
+
+    export enum audioTypes {
+        Speakers,
+        Headphones
+    }
+
+    interface userVarsInterface {
+        cameraType: cameraTypes,
+        audioType: audioTypes
+    }
+
+    export var userVars: userVarsInterface = {
+        cameraType: cameraTypes.VR,
+        audioType: audioTypes.Headphones
+    }
 
     export function debugMsg(msg: string): void {
         /**

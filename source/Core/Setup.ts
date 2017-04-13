@@ -1,7 +1,6 @@
 import CollisionMeshes from "../Objects/CollisionMeshes";
 import Ground from "../Objects/Ground";
 import Skybox from "../Objects/Skybox";
-//import AutoLODMeshes from "../Objects/AutoLOD";
 import BillboardMeshes from "../Objects/Billboard";
 import CustomShaderObjects from "../Objects/CustomShaderObject";
 import CameraChar from "../CameraChar";
@@ -9,6 +8,7 @@ import Environment from "../Environment";
 import Core from "./Core";
 import RenderLoop from "./RenderLoop";
 import MouseState from "./MouseState";
+import addSound from "./Sound";
 
 // import $ = require("jquery");
 
@@ -30,7 +30,6 @@ namespace Setup {
     export var Environment = Environment;
     export var Skybox = Skybox;
     export var BillboardMeshes = Billboard;
-    export var AutoLODMeshes = AutoLOD;
     export var Utils = Utils;
     export var Triggers = Triggers;
     export var Timers = Timers;
@@ -60,38 +59,48 @@ namespace Setup {
             // Load the 3D engine. true means antialiasing is on.
             Core.engine = new BABYLON.Engine(Core.canvas, true);
 
-            // Load a scene from a BABYLON file.
-            BABYLON.SceneLoader.Load(Core.sceneDirectory, "scene.babylon", 
-                                     Core.engine,
-                                     function (newScene: any): void {
+            // Load in informtion re. the scene
+            $.ajax({
+                url: Core.sceneDirectory + "proteinvr.json",
+                dataType: "json"
+            }).done(function(proteinvr_info) {
+                // I would expect that updating the version in the .manifest
+                // file would prevent this, but in testing I'm not 100% it's
+                // true.
+                let disableCaching: boolean = true;
+                let urlCacheBreakTxt: string = (disableCaching ? "?" + proteinvr_info["file_id"] : "")
 
-                // Wait for textures and shaders to be ready before
-                // proceeding.
-                newScene.executeWhenReady(function () {
+                // Load a scene from a BABYLON file.
+                BABYLON.SceneLoader.Load(Core.sceneDirectory, "scene.babylon" + urlCacheBreakTxt, 
+                                        Core.engine,
+                                        function (newScene: any): void {
 
-                    // Store the scene in a variable so you can reference it
-                    // later.
-                    Core.scene = newScene;
 
-                    // Setup mouse events
-                    MouseState.setup();
+                    // Wait for textures and shaders to be ready before
+                    // proceeding.
+                    newScene.executeWhenReady(function () {
 
-                    // if (Core.debug === true) {
-                    //     Core.scene.debugLayer.show(true, Core.scene.activeCamera);
-                    // }
+                        // Store the scene in a variable so you can reference it
+                        // later.
+                        Core.scene = newScene;
 
-                    // Load in informtion re. the materials
-                    $.ajax({
-                        url: Core.sceneDirectory + "materials.json",
-                        dataType: "json"
-                    }).done(function(materials_info) {
+                        // Setup mouse events
+                        MouseState.setup();
+
+                        // if (Core.debug === true) {
+                        //     Core.scene.debugLayer.show(true, Core.scene.activeCamera);
+                        // }
+
                         // Set custom shaders
                         // setCustomShaders();
 
                         // Loop through each of the objects in the scene and
                         // modify them according to the name (which is a json).
 
-                        Core.scene.meshes.forEach(function(m) {
+                        // Core.scene.meshes.forEach(function(m) { // Avoid this because requires binding...
+                        for (let meshIdx = 0; meshIdx < Core.scene.meshes.length; meshIdx++) {
+                            let m = Core.scene.meshes[meshIdx];
+
                             //try {
                             // Convert the mesh name to a json object with
                             // information about the mesh.
@@ -114,11 +123,6 @@ namespace Setup {
                             // Check if the mesh is marked as a skybox.
                             new Skybox().checkMesh(m); //, json);
 
-                            // Check if the object is marked to be
-                            // level-of-detail (fewer vertices when farther
-                            // away).
-                            //new AutoLODMeshes().checkMesh(m, json);
-
                             // Check if the mesh is marked as a billboard
                             // mesh.
                             // new BillboardMeshes().checkMesh(m, json);
@@ -127,8 +131,8 @@ namespace Setup {
                             // new CustomShaderObjects().checkMesh(m, json);
 
                             // Create a material if the info is available.
-                            if (this.materials_info[m.name] !== undefined) {
-                                let mat_inf = this.materials_info[m.name];
+                            if (this.proteinvr_info["materials"][m.name] !== undefined) {
+                                let mat_inf = this.proteinvr_info["materials"][m.name];
                                 // Generate a key for this material. Doing it
                                 // this way so you can reuse materials.
                                 let mat_key = "";
@@ -159,7 +163,8 @@ namespace Setup {
                                     mat.emissiveColor = new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
                                 } else {  // so it's an image
                                     mat.emissiveColor = new BABYLON.Color3(0,0,0);
-                                    mat.emissiveTexture = new BABYLON.Texture(Core.sceneDirectory + mat_inf.color, Core.scene);
+                                    let img_path = Core.sceneDirectory + mat_inf.color + this.urlCacheBreakTxt;
+                                    mat.emissiveTexture = new BABYLON.Texture(img_path, Core.scene);
                                 }
 
                                 // Now do glossiness
@@ -168,21 +173,16 @@ namespace Setup {
                                 // Add shadows
                                 if (m.name !== "sky") { // sky has no shadow
                                     let nameToUse = m.name.replace(/Decimated/g, "");
-                                    mat.ambientTexture = new BABYLON.Texture(Core.sceneDirectory + nameToUse + "shadow.jpg", Core.scene);
+                                    mat.ambientTexture = new BABYLON.Texture(Core.sceneDirectory + nameToUse + "shadow.png" + this.urlCacheBreakTxt, Core.scene);
                                 }
 
                                 // Now add this material to the object.
                                 m.material = mat;
                             }
-
-                            //} catch (err) {
-                            //
-                            //}
-                        }.bind({
-                            materials_info: materials_info
-                        }));
+                        };
 
                         // Add LODs
+                        // No binding needed here, so forEach ok.
                         Core.scene.meshes.forEach(function(m) {
                             // If the name has the word "Decimated" in it,
                             // make LOD.
@@ -195,31 +195,19 @@ namespace Setup {
                             }
                         });
 
-
-
-                        // Parent all objects to the grnd object. That way it will
-                        // be easy to scale the scene.
-                        // let grnd = Core.meshesByName["grnd"];
-                        // for (let i = 0; i < Core.scene.meshes.length; i++) {
-                        //     let m = Core.scene.meshes[i];
-                        //     if (m.name !== "grnd") {
-                        //         m.parent = grnd;
-                        //     }
-                        // };
-
-                        //grnd.scaling = new BABYLON.Vector3(8, 8, 8);
+                        // Set up sounds
+                        for (let soundIdx = 0; soundIdx < proteinvr_info["sounds"].length; soundIdx++) {
+                            let sound = proteinvr_info["sounds"][soundIdx];
+                            let filename = sound[0];
+                            let loc = new BABYLON.Vector3(sound[1][0], sound[1][2], sound[1][1]);
+                            addSound(filename, loc);
+                        }
 
                         // Set up the game character/camera.
                         CameraChar.setup($);
 
                         // Set up the environment.
                         Environment.setup();
-
-                        // Set up the skybox.
-                        // Skybox.applyBoxImgs(
-                        //     //"3d_resources/sky_boxes/sky27/sp9"
-                        //     "3d_resources/sky_boxes/my_bloodstream/blood"
-                        // );
 
                         // Set up events.
                         setEvents();
@@ -270,10 +258,14 @@ namespace Setup {
                         });*/
 
                         RenderLoop.start();
-                    })
-
-
-                });
+                    }.bind({
+                        urlCacheBreakTxt: this.urlCacheBreakTxt,
+                        proteinvr_info: this.proteinvr_info
+                    }));
+                }.bind({
+                    urlCacheBreakTxt: urlCacheBreakTxt,
+                    proteinvr_info: proteinvr_info
+                }));
             });
 
             // optional debugging
