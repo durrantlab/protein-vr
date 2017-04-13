@@ -8,6 +8,7 @@ import CameraChar from "../CameraChar";
 import Environment from "../Environment";
 import Core from "./Core";
 import RenderLoop from "./RenderLoop";
+import SystemVars from "../SystemVars";
 // import $ = require("jquery");
 
 // jQuery is an external library, so declare it here to avoid Typescript
@@ -116,6 +117,8 @@ namespace Setup {
                             //
                         //}
                     });
+                    // Set up the system variables
+                    SystemVars.setup();
 
                     // Set up the game character/camera.
                     CameraChar.setup($);

@@ -23,7 +23,6 @@ class BuildSysVars extends parent {
         systemVars['fog'] = confirm("You down with F.O.G?");
 
         systemVars['visibility'] = parseInt(prompt("Enter your desired visibility level on a scale of 1-5") ,10); 
-        
     }
 }
 
