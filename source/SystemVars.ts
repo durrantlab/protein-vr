@@ -12,14 +12,12 @@ namespace SystemVars{
         "visibility": undefined
     };
 
+    /**
+     * This function will assign values to the system variables based on user input.
+     */
     export function setup() :void {
-        // let systemVars :object = {
-        //     "device": null,
-        //     "animations": null
-        // };
-        let device = prompt("What device are you using?\nDesktop\nLaptop\nVRHeadset", "all lowercase please");
 
-        SystemVars.systemVars['device'] = device;
+        SystemVars.systemVars['device'] = prompt("What device are you using?\nDesktop\nLaptop\nVRHeadset", "all lowercase please");
         
         SystemVars.systemVars['animations'] = confirm("Would you like animations in your experince?");
 
