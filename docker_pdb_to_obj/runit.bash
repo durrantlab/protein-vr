@@ -2,6 +2,11 @@
 
 cd /image_tmp/
 
+# If the first parameter exists in the mounted directory, use that.
+if [ -f /mounted/${1} ]; then
+    cp /mounted/${1} ./
+fi
+
 # First, get the obj files
 vmd ${*} -e save_objs.tcl
 
