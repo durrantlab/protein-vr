@@ -44,6 +44,13 @@ foreach chain $uniq_chains {
   mol addrep top
   render Wavefront "/image_tmp/ligand_${chain}.obj"
 
+  # Protein residues near ligand
+  mol delrep 0 top
+  mol selection "(not name N O C) and (same residue as (protein within 8 of ((chain A) and (not protein and not water) and not ((not element N C O P S Se Cl Br F) and mass > 16) and (not resname MSE))))"
+  mol representation Licorice 0.300000 20.000000 20.000000
+  mol addrep top
+  render Wavefront "/image_tmp/amino_acids_near_ligand_${chain}.obj"
+  
   # Deal with heavy atoms
   mol delrep 0 top
   mol selection "(not element N C O P S Se Cl Br F) and (mass > 16) and (not resname MSE)"
@@ -64,6 +71,20 @@ foreach chain $uniq_chains {
   mol representation MSMS 1.500000 1.500000 0.000000 0.000000
   mol addrep top
   render Wavefront "/image_tmp/protein_msms_${chain}.obj"
+
+  # # Deal with protein (surface)
+  # mol delrep 0 top
+  # mol selection "chain $chain and (protein or resname MSE)"
+  # mol representation Surf 1.400000 0.000000
+  # mol addrep top
+  # render Wavefront "/image_tmp/protein_surf_${chain}.obj"
+
+  # # Deal with protein (surface)
+  # mol delrep 0 top
+  # mol selection "chain $chain and (protein or resname MSE)"
+  # mol representation QuickSurf 0.700000 0.500000 0.500000 1.000000
+  # mol addrep top
+  # render Wavefront "/image_tmp/protein_quicksurf_${chain}.obj"
 }
 
 quit

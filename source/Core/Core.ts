@@ -77,8 +77,8 @@ namespace Core {
     }
 
     export var userVars: userVarsInterface = {
-        cameraType: cameraTypes.VR,
-        audioType: audioTypes.Headphones
+        cameraType: cameraTypes.Standard,
+        audioType: audioTypes.Speakers
     }
 
     export function debugMsg(msg: string): void {

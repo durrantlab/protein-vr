@@ -31,6 +31,11 @@ def preliminary_checks(scene_data):
     for obj in bpy.data.objects:
         Utils.select(obj)
 
+        # If object isn't visible, remove it.
+        if obj.hide == True or obj.hide_render == True:
+            print('"' + obj.name + '" isn\'t visible, so deleteing.')
+            bpy.ops.object.delete()
+
         # Check if has uv
         try:
             has_uv_layers = bpy.context.object.data.uv_layers

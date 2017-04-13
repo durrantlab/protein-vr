@@ -15,3 +15,6 @@ vmd ${*} -e save_objs.tcl
 
 # move blend file to mounted directory
 mv /image_tmp/molecules.blend /mounted/
+mv /image_tmp/*-tex.png /mounted/
+
+# bash

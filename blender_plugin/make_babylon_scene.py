@@ -8,20 +8,20 @@ import LOD
 import Checks
 import Shadows
 import os
-import json
 import random
 import bmesh
 import Sounds
+import Save
 
 # Objects with fewer than this will never be decimated
 min_verts_to_decimate = 100
 
 # Any mesh with more than this will be decimated to match it.
-max_obj_verts_allowed = 6000
+max_obj_verts_allowed = 15000
 
 # Large meshes will be decimated until the scene has no more than this many
 # verts.
-max_scene_verts_allowed = 5000
+max_scene_verts_allowed = 25000
 
 # How much to decimate for LOD version
 LOD_decimation_ratio = 0.2
@@ -93,25 +93,7 @@ for obj in bpy.data.objects:
         Utils.object_mode()
         break
 
-# Save any specified sounds
+# SavSete any specified sounds
 scene_data = Sounds.save_sounds(scene_data)
 
-# Save to a new blender file
-pwd = Utils.pwd()
-bpy.ops.wm.save_as_mainfile(filepath=pwd + 'fixed.blend', check_existing=False)
-
-# save the babylon file
-bpy.ops.bjs.main(filepath=pwd + "scene.babylon")
-
-# Save scene info
-json.dump(scene_data, open(pwd + "proteinvr.json", 'w'))
-
-# Save a manifest
-json.dump(
-    {
-        "version" : manifest_id, 
-        "enableSceneOffline" : True, # In the future, reenable this for faster load.
-        "enableTexturesOffline" : True
-    }, 
-    open(pwd + "scene.babylon.manifest", 'w')
-)
+Save.save_it(scene_data, manifest_id)

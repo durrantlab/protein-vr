@@ -11,3 +11,4 @@
 *.mp3
 *.pyc
 *.blend1
+**/__pycache__/**

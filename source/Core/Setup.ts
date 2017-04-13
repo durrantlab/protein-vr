@@ -117,19 +117,6 @@ namespace Setup {
                             // the camera.
                             // new CollisionMeshes().checkMesh(m, json);
 
-                            // Check if the mesh is marked as a ground mesh.
-                            new Ground().checkMesh(m); //, json);
-
-                            // Check if the mesh is marked as a skybox.
-                            new Skybox().checkMesh(m); //, json);
-
-                            // Check if the mesh is marked as a billboard
-                            // mesh.
-                            // new BillboardMeshes().checkMesh(m, json);
-
-                            // Check if the mesh requires a custom shader.
-                            // new CustomShaderObjects().checkMesh(m, json);
-
                             // Create a material if the info is available.
                             if (this.proteinvr_info["materials"][m.name] !== undefined) {
                                 let mat_inf = this.proteinvr_info["materials"][m.name];
@@ -179,6 +166,20 @@ namespace Setup {
                                 // Now add this material to the object.
                                 m.material = mat;
                             }
+                            
+                            // Check if the mesh is marked as a ground mesh.
+                            new Ground().checkMesh(m); //, json);
+
+                            // Check if the mesh is marked as a skybox.
+                            new Skybox().checkMesh(m); //, json);
+
+                            // Check if the mesh is marked as a billboard
+                            // mesh.
+                            // new BillboardMeshes().checkMesh(m, json);
+
+                            // Check if the mesh requires a custom shader.
+                            // new CustomShaderObjects().checkMesh(m, json);
+
                         };
 
                         // Add LODs

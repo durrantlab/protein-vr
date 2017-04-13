@@ -17,7 +17,6 @@ export namespace MouseState {
         worldLoc: BABYLON.Vector3;
         distance: number;
         mesh: BABYLON.Mesh;
-
     }
 
     export function setup() {
