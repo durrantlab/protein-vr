@@ -1,6 +1,7 @@
 import parent from "./ActionParent";
 import Core from "../../Core/Core";
 import camera from "../../CameraChar";
+import SystemVars from "../../SystemVars";
 declare var BABYLON;
 
 interface LabelInterface{
@@ -91,6 +92,8 @@ class LabelOnMesh extends parent{
 
         super.scene().render();
 
+        console.log("Retrieving device in use from sys vars");
+        console.log(SystemVars.getDevice());
 
     
         console.log("Canvas created, another click should remove the canvas");

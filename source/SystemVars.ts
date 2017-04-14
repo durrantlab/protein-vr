@@ -30,6 +30,54 @@ namespace SystemVars{
         SystemVars.systemVars['visibility'] = parseInt(prompt("Enter your desired visibility level on a scale of 1-5") ,10); 
    
     } 
+
+    export function getDevice() :string{
+        return SystemVars.systemVars['device'];
+    }
+
+    export function setDevice(d :string) :void {
+        SystemVars.systemVars['device'] = d;
+    }
+
+    export function getAnimations() :boolean {
+        return SystemVars.systemVars['animations'];
+    }
+
+    export function setAnimations(b :boolean) :void {
+        SystemVars.systemVars['animations'] = b;
+    }
+
+    export function getTextureDetail() :number {
+        return SystemVars.systemVars['textureDetail'];
+    }
+
+    export function setTextureDetail(level :number) :void {
+        SystemVars.systemVars['textureDetail'] = level;
+    }
+
+    export function getAudio() :boolean {
+        return SystemVars.systemVars['audio'];
+    }
+
+    export function setAudio(b :boolean) :void {
+        SystemVars.systemVars['audio'] = b;
+    }
+
+    export function getFog() :boolean {
+        return SystemVars.systemVars['fog'];
+    }
+
+    export function setFog(b :boolean) :void {
+        SystemVars.systemVars['fog'] = b;
+    }
+
+    export function getVisibility() :number {
+        return SystemVars.systemVars['visibility'];
+    }
+
+    export function setVisibility(level :number) :void {
+        SystemVars.systemVars['visibility'] = level;
+    }
 }
 
 export default SystemVars;
