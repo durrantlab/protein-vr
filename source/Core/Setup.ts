@@ -2,7 +2,6 @@ import CollisionMeshes from "../Objects/CollisionMeshes";
 import Ground from "../Objects/Ground";
 import Skybox from "../Objects/Skybox";
 import BillboardMeshes from "../Objects/Billboard";
-import CustomShaderObjects from "../Objects/CustomShaderObject";
 import CameraChar from "../CameraChar";
 import Environment from "../Environment";
 import Core from "./Core";
@@ -37,12 +36,10 @@ namespace Setup {
     */
 
     // pass $ as an arg to utilize the jquery module from the config.ts path
-    export function setup(setCustomShaders?: any, setEvents?: any, $?: any): void {
+    export function setup(setEvents?: any, $?: any): void {
         /**
         Setup the BABYLON game engine.
 
-        :param any setCustomShaders: An externally defined function that sets
-                   up any custom shaders.
         :param any setEvents: An externally defined function that sets
                    up any events.
         :param any $: the jquery module imported via cdn in config.ts
@@ -91,9 +88,6 @@ namespace Setup {
                         // if (Core.debug === true) {
                         //     Core.scene.debugLayer.show(true, Core.scene.activeCamera);
                         // }
-
-                        // Set custom shaders
-                        // setCustomShaders();
 
                         // Loop through each of the objects in the scene and
                         // modify them according to the name (which is a json).
@@ -177,10 +171,6 @@ namespace Setup {
                             // Check if the mesh is marked as a billboard
                             // mesh.
                             // new BillboardMeshes().checkMesh(m, json);
-
-                            // Check if the mesh requires a custom shader.
-                            // new CustomShaderObjects().checkMesh(m, json);
-
                         };
 
                         // Add LODs
@@ -206,63 +196,63 @@ namespace Setup {
                         }
 
                         // Set up the system variables
-                        UserVars.setup();
+                        UserVars.setup(function() {
+                            // Set up the game character/camera.
+                            CameraChar.setup($);
 
-                        // Set up the game character/camera.
-                        CameraChar.setup($);
+                            // Set up the environment.
+                            Environment.setup();
 
-                        // Set up the environment.
-                        Environment.setup();
+                            // Set up events.
+                            setEvents();
 
-                        // Set up events.
-                        setEvents();
+                            // Listen for a click. If the user clicks on an object,
+                            // print information about the clicked object in the
+                            // console.
+                            /* window.addEventListener("click", function () {
+                            // We try to pick an object.
+                            var pickResult = Core.scene.pick(
+                                Core.scene.pointerX, Core.scene.pointerY
+                                );
 
-                        // Listen for a click. If the user clicks on an object,
-                        // print information about the clicked object in the
-                        // console.
-                        /* window.addEventListener("click", function () {
-                        // We try to pick an object.
-                        var pickResult = Core.scene.pick(
-                            Core.scene.pointerX, Core.scene.pointerY
-                            );
+                            console.log(pickResult.pickedMesh,
+                                        pickResult.pickedMesh.name,
+                                        pickResult.pickedMesh.renderingGroupId);
+                            });*/
 
-                        console.log(pickResult.pickedMesh,
-                                    pickResult.pickedMesh.name,
-                                    pickResult.pickedMesh.renderingGroupId);
-                        });*/
-
-                        // Add triggers.
-                        /*new Event(
-                            BuiltInTriggerConditionals.distance(Core.meshesByName["prot_coll"], 3.5),
-                            BuiltInActions.fadeOutMesh(Core.meshesByName["surf"], 2000)
-                        );*/
+                            // Add triggers.
+                            /*new Event(
+                                BuiltInTriggerConditionals.distance(Core.meshesByName["prot_coll"], 3.5),
+                                BuiltInActions.fadeOutMesh(Core.meshesByName["surf"], 2000)
+                            );*/
 
 
-                        /*Triggers.addTrigger({
-                            name: "FadeOutWhenWithinSixMeters",
-                            conditionToSatisfy: Triggers.PackagedConditionals.distance(Core.meshesByName["prot_coll"], 5),
-                            actionIfConditionSatisfied: function() {
-                                let mesh = Core.meshesByName["surf"];
-                                Triggers.PackagedAction.fadeOutMesh(mesh);
-                            },
-                            intervalInMiliseconds: 2000,
-                            autoRestart: false,
-                            tickFrameFrequency: 20
+                            /*Triggers.addTrigger({
+                                name: "FadeOutWhenWithinSixMeters",
+                                conditionToSatisfy: Triggers.PackagedConditionals.distance(Core.meshesByName["prot_coll"], 5),
+                                actionIfConditionSatisfied: function() {
+                                    let mesh = Core.meshesByName["surf"];
+                                    Triggers.PackagedAction.fadeOutMesh(mesh);
+                                },
+                                intervalInMiliseconds: 2000,
+                                autoRestart: false,
+                                tickFrameFrequency: 20
+                            });
+
+                            Triggers.addTrigger({
+                                name: "FadeInWhenWithinThreeMeters",
+                                conditionToSatisfy: Triggers.PackagedConditionals.distance(Core.meshesByName["prot_coll"], 3),
+                                actionIfConditionSatisfied: function() {
+                                    let mesh = Core.meshesByName["surf"];
+                                    Triggers.PackagedAction.fadeInMesh(mesh);
+                                },
+                                intervalInMiliseconds: 2000,
+                                autoRestart: false,
+                                tickFrameFrequency: 20
+                            });*/
+
+                            RenderLoop.start();
                         });
-
-                        Triggers.addTrigger({
-                            name: "FadeInWhenWithinThreeMeters",
-                            conditionToSatisfy: Triggers.PackagedConditionals.distance(Core.meshesByName["prot_coll"], 3),
-                            actionIfConditionSatisfied: function() {
-                                let mesh = Core.meshesByName["surf"];
-                                Triggers.PackagedAction.fadeInMesh(mesh);
-                            },
-                            intervalInMiliseconds: 2000,
-                            autoRestart: false,
-                            tickFrameFrequency: 20
-                        });*/
-
-                        RenderLoop.start();
                     }.bind({
                         urlCacheBreakTxt: this.urlCacheBreakTxt,
                         proteinvr_info: this.proteinvr_info

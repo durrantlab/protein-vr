@@ -3,7 +3,6 @@
 import Core from "../Core/Core";
 import Environment from "../Environment";
 import { mySceneOptimizationLOD } from "./LOD";
-import { mySceneOptimizationCustomShaders } from "./Shaders";
 import { mySceneOptimizationFog } from "./Fog";
 
 var optimizationWaitDuration = 10000;  // how to long wait after successfull
@@ -157,19 +156,12 @@ function optimizationOptions() {
     priority++;  // 3
     // Major impact on apperance. Only 1 color texture on your custom
     // shader. Even more aggressive LOD.
-    // optim.optimizations.push(new mySceneOptimizationCustomShaders(priority));  // CustomShaderOpt #1
     optim.optimizations.push(new mySceneOptimizationLOD(priority));  // LOD #3
-
-    // Next priority
-    // priority++;  // 4
-    // Severe impact on apperance. Stop vertex animations (custom shaders).
-    //optim.optimizations.push(new mySceneOptimizationCustomShaders(priority));  // CustomShaderOpt #2
 
     priority++;  // 4
     // Very severe impact on appearance. Bring in fog and get rid of baked
     // shadows on custom shaders.
     optim.optimizations.push(new BABYLON.RenderTargetsOptimization(priority));
-    // optim.optimizations.push(new mySceneOptimizationCustomShaders(priority));  // CustomShaderOpt #3
     optim.optimizations.push(new mySceneOptimizationFog(priority));  // Fog #1
 
     priority++;  // 5

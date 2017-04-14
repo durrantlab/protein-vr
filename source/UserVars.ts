@@ -42,7 +42,7 @@ export namespace UserVars{
     /**
      * This function will assign values to the system variables based on user input.
      */
-    export function setup() :void {
+    export function setup(callBackFunc: any) :void {
         // This will eventually be a UI, not prompts.
 
         // Add in any values from UserVars.json (overwrites defaults here)
@@ -61,19 +61,21 @@ export namespace UserVars{
             // Now prompt user. This will be a GUI with the defaults displayed
             // in the future. So user will always have option of changing
             // defaults. Ignore this for now (debugging);
-            return;
-            
-            userVars['device'] = stringToEnumVal(prompt("What device are you using?\nDesktop\nLaptop\nVRHeadset", "all lowercase please"));
-            userVars['animations'] = confirm("Would you like animations in your experince?");
-            userVars['textureDetail'] = parseInt(prompt("On a scale of 1-5 how detailed would you like the textures to be?"), 10);
-            userVars['audio'] = stringToEnumVal(prompt("What audio are you using?\nSpeakers\nHeadsets\nNone"));
-            userVars['fog'] = confirm("You down with F.O.G?");
-            userVars['visibility'] = parseInt(prompt("Enter your desired visibility level on a scale of 1-5") ,10); 
-        });
+            // userVars['device'] = stringToEnumVal(prompt("What device are you using?\nDesktop\nLaptop\nVRHeadset", "all lowercase please"));
+            // userVars['animations'] = stringToEnumVal(confirm("Would you like animations in your experince?"));
+            // userVars['textureDetail'] = stringToEnumVal(parseInt(prompt("On a scale of 1-5 how detailed would you like the textures to be?"), 10));
+            // userVars['audio'] = stringToEnumVal(prompt("What audio are you using?\nSpeakers\nHeadsets\nNone"));
+            // userVars['fog'] = stringToEnumVal(confirm("You down with F.O.G?"));
+            // userVars['visibility'] = stringToEnumVal(parseInt(prompt("Enter your desired visibility level on a scale of 1-5") ,10)); 
+
+            this.callBackFunc();
+        }.bind({
+            callBackFunc: callBackFunc
+        }));
     }
 
     // Convert strings to enums. A helper function.
-    export function stringToEnumVal(s: string): any {
+    export function stringToEnumVal(s: any): any {
         s = s.toLowerCase();
 
         switch(s) {
@@ -90,7 +92,7 @@ export namespace UserVars{
             case "none":
                 return audios.None;
             default:
-                return undefined;
+                return s;
         }
     }
 

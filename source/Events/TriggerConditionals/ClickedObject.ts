@@ -1,4 +1,5 @@
 import parent from "./TriggerConditionalParent";
+import MouseState from "../../Core/MouseState";
 
 declare var BABYLON;
 declare var jQuery;
@@ -8,9 +9,6 @@ interface CheckInterface{
     triggerMesh: any;
     action: any;
 }
-
-/* THIS CLASS WILL BE DEPRECIATED!!!! CLICKING HAS BECOME SO FUNDAMENTAL TO
-THE UI THAT IT WILL BE BUILT IN RATHER THAN A PLUGIN. */
 
 class ClickedObject extends parent {
     public canvasJQuery = undefined;
@@ -26,17 +24,12 @@ class ClickedObject extends parent {
         //assign parameters to variables because 'this' refers to the render canvas inside ananymous function
         let target = this.parameters['triggerMesh'];
         let action = this.parameters['action'];
-        jQuery('#renderCanvas').click(function(){
-            let pickResult = Core.scene.pick(Core.scene.pointerX, Core.scene.pointerY);
-            console.log('Something was clicked!');
-            console.log(Core.meshesByName);
-            if(pickResult.hit) {
-                console.log(pickResult.pickedMesh);
-                console.log(pickResult.pickedPoint);
-            }
-            if (pickResult.pickedMesh == target) {
+
+        // There's a new click detection system. Use that here...
+        MouseState.mouseClickDownFunctions.push(function(results) {
+            if (results.mesh == target) {
                 console.log('mesh clicked!');
-                action.do();
+                action.do(results.worldLoc);
             }
         });
     }
