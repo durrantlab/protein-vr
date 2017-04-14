@@ -1,6 +1,8 @@
 namespace Core {
     /**
     A namespace to store key variables related to the BABYLON game engine.
+    Note that these are set internally. For externally set variables, see
+    UserVars.ts.
     */
 
     /**
@@ -58,28 +60,6 @@ namespace Core {
 
     // Whether or not currently fullscreen.
     export var fullScreen: boolean = false;
-
-    // Variables that can be toggled. Some of these will be set via UI
-    // eventually.
-    export enum cameraTypes {
-        Standard,
-        VR
-    }
-
-    export enum audioTypes {
-        Speakers,
-        Headphones
-    }
-
-    interface userVarsInterface {
-        cameraType: cameraTypes,
-        audioType: audioTypes
-    }
-
-    export var userVars: userVarsInterface = {
-        cameraType: cameraTypes.Standard,
-        audioType: audioTypes.Speakers
-    }
 
     export function debugMsg(msg: string): void {
         /**

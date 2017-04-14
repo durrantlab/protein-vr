@@ -2,6 +2,7 @@ import Core from "./Core/Core";
 import CollisionMeshes from "./Objects/CollisionMeshes";
 import RenderLoop from "./Core/RenderLoop";
 import MouseState from "./Core/MouseState";
+import UserVars from "./UserVars";
 
 declare var BABYLON;
 declare var screenfull;
@@ -37,7 +38,7 @@ namespace CameraChar {
 
         // The active camera from the babylon file is used (keep it
         // simple)
-        if (Core.userVars.cameraType === Core.cameraTypes.VR) {
+        if (UserVars.userVars.device === UserVars.devices.VRHeadset) {
             // VR camera
             setUpVRCameraControls($);
         } else {

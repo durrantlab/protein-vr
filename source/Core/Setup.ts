@@ -9,6 +9,7 @@ import Core from "./Core";
 import RenderLoop from "./RenderLoop";
 import MouseState from "./MouseState";
 import addSound from "./Sound";
+import UserVars from "../UserVars";
 
 // import $ = require("jquery");
 
@@ -203,6 +204,9 @@ namespace Setup {
                             let loc = new BABYLON.Vector3(sound[1][0], sound[1][2], sound[1][1]);
                             addSound(filename, loc);
                         }
+
+                        // Set up the system variables
+                        UserVars.setup();
 
                         // Set up the game character/camera.
                         CameraChar.setup($);

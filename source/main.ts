@@ -14,7 +14,7 @@ import GameStart from "./Events/TriggerConditionals/GameStart";
 import ClickedObject from "./Events/TriggerConditionals/ClickedObject";
 import LabelOnMesh from "./Events/Actions/LabelOnMesh";
 import CameraChar from "./CameraChar";
-
+import UserVars from "./UserVars";
 
 interface MyWindow extends Window {
     Core: any;
@@ -264,4 +264,7 @@ export function start(jQuery) {
 
     // Setup the VR program.
     Setup.setup(setCustomShaders, setEvents, jQuery);
+
+    console.log("Sys vars should be setup!");
+    console.log(UserVars);
 }
