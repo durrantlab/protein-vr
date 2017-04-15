@@ -9,7 +9,7 @@ class BillboardMeshes extends parent {
     the camera (could be just a plane).
     */
 
-    public objectMatch(m: any, json: any): boolean {
+    public objectMatch(m: any): boolean { //, json: any): boolean {
         /**
         This function checks a mesh to see if it is marked as this type of
         mesh. You can mark a mesh as this type of mesh using the VR Blender
@@ -26,16 +26,16 @@ class BillboardMeshes extends parent {
         :rtype: :any:`bool`
         */
 
-        if (json.b === "1") {
-            // Enable billboard.
-            m.billboardMode = BABYLON.Mesh.BILLBOARDMODE_Y;
-            return true;
-        }
+        // if (json.b === "1") {
+        //     // Enable billboard.
+        //     m.billboardMode = BABYLON.Mesh.BILLBOARDMODE_Y;
+        //     return true;
+        // }
 
         return false;
     }
 
-    public objectNoMatch(m: any, json: any): void {
+    public objectNoMatch(m: any): void { // , json: any): void {
         /**
         This function checks a mesh to see if it is NOT marked as this type of
         mesh.

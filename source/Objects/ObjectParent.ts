@@ -20,7 +20,7 @@ abstract class ObjectParent {
               the json. 
     :rtype: :any:`bool`
     */
-    public abstract objectMatch(m: any, json: any): boolean;
+    public abstract objectMatch(m: any): boolean; //, json: any): boolean;
 
     /**
     This function checks a mesh to see if it is NOT marked as this type of
@@ -32,9 +32,9 @@ abstract class ObjectParent {
                information about whether or not the mesh is
                marked as this type of mesh.
     */
-    public abstract objectNoMatch(m: any, json: any): void;
+    public abstract objectNoMatch(m: any): void; //, json: any): void;
 
-    public checkMesh(m: any, json: any) {
+    public checkMesh(m: any) { //, json: any) {
         /**
         This function checks whether or not a mesh is marked as this type of
         mesh.
@@ -46,8 +46,8 @@ abstract class ObjectParent {
                    marked as this type of mesh.
         */
 
-        if (!this.objectMatch(m, json)) {
-            this.objectNoMatch(m, json);
+        if (!this.objectMatch(m)) { //, json)) {
+            this.objectNoMatch(m); //, json);
         }
     }
 

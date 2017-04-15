@@ -15,7 +15,7 @@ class Ground extends parent {
     */
     static groundMesh: any;
 
-    public objectMatch(m: any, json: any): boolean {
+    public objectMatch(m: any): boolean { //, json: any): boolean {
         /**
         This function checks a mesh to see if it is marked as this type of
         mesh. You can mark a mesh as this type of mesh using the VR Blender
@@ -32,7 +32,8 @@ class Ground extends parent {
         :rtype: :any:`bool`
         */
 
-        if (json.g === "1") {
+        // if (json.g === "1") {
+        if (m.name === "grnd") {
             // It's the ground
             m.checkCollisions = false;  // No need to check for collisions
                                         // with the ground because you
@@ -48,7 +49,7 @@ class Ground extends parent {
         return false;
     }
 
-    public objectNoMatch(m: any, json: any): void {
+    public objectNoMatch(m: any): void { //, json: any): void {
         /**
         This function checks a mesh to see if it is NOT marked as this type of
         mesh.

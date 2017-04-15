@@ -11,7 +11,7 @@ class CollisionMeshes extends parent{
     */
     static meshesThatCollide = [];
 
-    public objectMatch(m: any, json: any): boolean {
+    public objectMatch(m: any): boolean { //, json: any): boolean {
         /**
         This function checks a mesh to see if it is marked as this type of
         mesh. You can mark a mesh as this type of mesh using the VR Blender
@@ -28,10 +28,11 @@ class CollisionMeshes extends parent{
         :rtype: :any:`bool`
         */
 
-        if ((json.c === "1") || (json.h === "1")) {
+        // if ((json.c === "1") || (json.h === "1")) {
+        if (false) {
             // Enable collisions.
             m.checkCollisions = false; //true;
-            console.log("Collisions on: ", json)
+            // console.log("Collisions on: ", json)
             CollisionMeshes.meshesThatCollide.push(m);
             // m.material.alpha = 0.0;
             m.visibility = 0.0;
@@ -41,7 +42,7 @@ class CollisionMeshes extends parent{
         return false;
     }
 
-    public objectNoMatch(m: any, json: any): void {
+    public objectNoMatch(m: any): void { //, json: any): void {
         /**
         This function checks a mesh to see if it is NOT marked as this type of
         mesh.
@@ -55,7 +56,7 @@ class CollisionMeshes extends parent{
 
         // Disable collisions.
         m.checkCollisions = false;
-        console.log("Collisions off: ", json)
+        // console.log("Collisions off: ", json)
     }
 
 
