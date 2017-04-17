@@ -10,6 +10,6 @@ require.config({
 });
 
 // This require function starts the app
-require(['main', 'jquery'], (main, jQuery) => {
+require(['../main', 'jquery'], (main, jQuery) => {
     main.start(jQuery);
 });

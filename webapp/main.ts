@@ -1,19 +1,19 @@
 // THIS IS WHERE ANY CUSTOM CODE GOES. DEFINING SHADERS AND TRIGGERS AND SUCH.
 
-import Setup from "./Core/Setup";
-import Core from "./Core/Core";
-import Event from "./Events/Event";
-import DistanceToMesh from "./Events/TriggerConditionals/DistanceToMesh";
-import FadeOutMesh from "./Events/Actions/FadeOutMesh";
-import ScreenWhite from "./Events/Actions/ScreenWhite";
-import MoveCamera from "./Events/Actions/MoveCamera";
-import AdministerQuiz from "./Events/Actions/AdministerQuiz";
-import KeyPress from "./Events/TriggerConditionals/KeyPress";
-import GameStart from "./Events/TriggerConditionals/GameStart";
-import ClickedObject from "./Events/TriggerConditionals/ClickedObject";
-import LabelOnMesh from "./Events/Actions/LabelOnMesh";
-import CameraChar from "./CameraChar";
-import UserVars from "./UserVars";
+import Setup from "./proteinvr/Core/Setup";
+import Core from "./proteinvr/Core/Core";
+import Event from "./proteinvr/Events/Event";
+import DistanceToMesh from "./proteinvr/Events/TriggerConditionals/DistanceToMesh";
+import FadeOutMesh from "./proteinvr/Events/Actions/FadeOutMesh";
+import ScreenWhite from "./proteinvr/Events/Actions/ScreenWhite";
+import MoveCamera from "./proteinvr/Events/Actions/MoveCamera";
+import AdministerQuiz from "./proteinvr/Events/Actions/AdministerQuiz";
+import KeyPress from "./proteinvr/Events/TriggerConditionals/KeyPress";
+import GameStart from "./proteinvr/Events/TriggerConditionals/GameStart";
+import ClickedObject from "./proteinvr/Events/TriggerConditionals/ClickedObject";
+import LabelOnMesh from "./proteinvr/Events/Actions/LabelOnMesh";
+import CameraChar from "./proteinvr/CameraChar";
+import UserVars from "./proteinvr/UserVars";
 
 interface MyWindow extends Window {
     Core: any;
