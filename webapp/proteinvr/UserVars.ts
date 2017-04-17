@@ -47,7 +47,7 @@ export namespace UserVars{
 
         // Add in any values from UserVars.json (overwrites defaults here)
         jQuery.ajax({
-            url: "./proteinvr/UserVars.json",
+            url: "../params.json",
             dataType: "json",
             cache: false
         }).done(function(user_vars) {
