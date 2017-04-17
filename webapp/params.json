@@ -1,0 +1,9 @@
+{
+    "audio": "headphones",
+    "device": "desktop",
+    "animations": false,
+    "textureDetail": 1,
+    "fog": true,
+    "visibility": 2,
+    "scenePath": "./scenes/test/"
+}

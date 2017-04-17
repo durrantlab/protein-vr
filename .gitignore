@@ -12,3 +12,6 @@
 *.pyc
 *.blend1
 **/__pycache__/**
+**/webapp/proteinvr/**/*.js
+**/webapp/proteinvr/*.js
+docs

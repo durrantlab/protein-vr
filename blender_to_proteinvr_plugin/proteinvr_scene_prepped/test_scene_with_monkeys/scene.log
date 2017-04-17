@@ -1,0 +1,71 @@
+Exporter version: 5.0.6, Blender version: 2.78 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used:
+		selected layers only:  false
+		flat shading entire scene:  false
+		inline textures:  false
+		texture directory:  /Users/jdurrant/Documents/Work/durrant_git/protein-vr/blender_plugin/proteinvr_scene_prepped/
+	Python World class constructor completed
+	processing begun of mesh:  Suzanne2Decimated
+		processing begun of baked material:  Suzanne2Decimated
+		num positions      :  1372
+		num normals        :  1372
+		num uvs            :  2744
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  2823
+	processing begun of mesh:  SuzanneDecimated
+		processing begun of baked material:  SuzanneDecimated
+		num positions      :  1372
+		num normals        :  1372
+		num uvs            :  2744
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  2823
+	processing begun of node:  Water-Lisa_Redfern-1888623835-public-domain.mp3
+	processing begun of mesh:  Suzanne
+		processing begun of baked material:  Suzanne
+		num positions      :  4662
+		num normals        :  4662
+		num uvs            :  9324
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  14115
+	processing begun of mesh:  grnd
+		processing begun of baked material:  grnd
+		num positions      :  4
+		num normals        :  4
+		num uvs            :  8
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  6
+	processing begun of mesh:  sky
+		processing begun of baked material:  sky
+		num positions      :  110
+		num normals        :  110
+		num uvs            :  220
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  240
+	processing begun of mesh:  Cube
+		processing begun of baked material:  Cube
+		num positions      :  31
+		num normals        :  31
+		num uvs            :  62
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  36
+	processing begun of camera (FreeCamera):  cmra
+	processing begun of mesh:  Suzanne2
+		processing begun of baked material:  Suzanne2
+		num positions      :  4662
+		num normals        :  4662
+		num uvs            :  9324
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  14115
+	processing begun of light (POINT):  Lamp
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========
+elapsed time:  0 min, 0.7091 secs

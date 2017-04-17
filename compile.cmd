@@ -1,1 +1,0 @@
-tsc --target ES5 --module amd source/main.ts config.ts source/Environment.ts source/CameraChar.ts --allowUnreachableCode
