@@ -32,7 +32,7 @@ declare var BABYLON: any;
 // jQuery is passed as an arg so this function and any module it utilizes can use jquery from the config.ts path object
 export function start(jQuery) {
 
-    Core.sceneDirectory = "blender_plugin/proteinvr_scene_prepped/"; // "scene/rbc/";  // Here to load the scene files.
+    Core.sceneDirectory = "scenes/test/"; // Here to load the scene files.
 
     let setEvents = function() {
         /**
