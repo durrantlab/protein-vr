@@ -1,4 +1,4 @@
-///<reference path="source/Definitions/require.d.ts" />
+///<reference path="proteinvr/Definitions/require.d.ts" />
 
 // requirejs configuration file
 
@@ -10,6 +10,6 @@ require.config({
 });
 
 // This require function starts the app
-require(['source/main', 'jquery'], (main, jQuery) => {
+require(['proteinvr/main', 'jquery'], (main, jQuery) => {
     main.start(jQuery);
 });
