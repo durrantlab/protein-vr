@@ -15,9 +15,9 @@ import UserVars from "../UserVars";
 // jQuery is an external library, so declare it here to avoid Typescript
 // errors.
 
-// declare var jQuery;
 // declare var $;
 declare var BABYLON;
+declare var jQuery;  // attached to window in RequireConfig.ts
 
 namespace Setup {
     /**
@@ -36,7 +36,7 @@ namespace Setup {
     */
 
     // pass $ as an arg to utilize the jquery module from the config.ts path
-    export function setup(setEvents?: any, $?: any): void {
+    export function setup(setEvents?: any): void {
         /**
         Setup the BABYLON game engine.
 
@@ -58,7 +58,7 @@ namespace Setup {
         }
 
         // Only run the below once the whole document has loaded.
-        $(document).ready(function() {
+        jQuery(document).ready(function() {
             // Get the canvas DOM element.
             Core.canvas = document.getElementById('renderCanvas');
 
@@ -69,7 +69,7 @@ namespace Setup {
             UserVars.setup(function() {
 
                 // Load in information re. the scene
-                $.ajax({
+                jQuery.ajax({
                     url: UserVars.userVars["scenePath"] + "proteinvr.json",
                     dataType: "json"
                 }).done(function(proteinvr_info) {
@@ -209,7 +209,7 @@ namespace Setup {
                             // Set up the system variables
                         
                             // Set up the game character/camera.
-                            CameraChar.setup($);
+                            CameraChar.setup();
 
                             // Set up the environment.
                             Environment.setup();

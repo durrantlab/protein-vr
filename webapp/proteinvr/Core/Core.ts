@@ -50,14 +50,6 @@ namespace Core {
     */
     export var frameNum: number = 0;
 
-    /**
-    File location of the sene resources
-    */
-    export var sceneDirectory: string = "";
-
-    // higher means simpler.
-    export var textureSimplificationLevel: number = 0;
-
     // Whether or not currently fullscreen.
     export var fullScreen: boolean = false;
 

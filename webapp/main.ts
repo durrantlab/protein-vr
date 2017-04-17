@@ -1,7 +1,5 @@
 // THIS IS WHERE ANY CUSTOM CODE GOES. DEFINING SHADERS AND TRIGGERS AND SUCH.
 
-import Setup from "./proteinvr/Core/Setup";
-import Core from "./proteinvr/Core/Core";
 import Event from "./proteinvr/Events/Event";
 import DistanceToMesh from "./proteinvr/Events/TriggerConditionals/DistanceToMesh";
 import FadeOutMesh from "./proteinvr/Events/Actions/FadeOutMesh";
@@ -12,25 +10,18 @@ import KeyPress from "./proteinvr/Events/TriggerConditionals/KeyPress";
 import GameStart from "./proteinvr/Events/TriggerConditionals/GameStart";
 import ClickedObject from "./proteinvr/Events/TriggerConditionals/ClickedObject";
 import LabelOnMesh from "./proteinvr/Events/Actions/LabelOnMesh";
-import CameraChar from "./proteinvr/CameraChar";
-import UserVars from "./proteinvr/UserVars";
-
-interface MyWindow extends Window {
-    Core: any;
-}
-declare var window: MyWindow;
-window.Core = Core;
 
 /**
 BABYLON is an external JavaScript library. This prevents Typescript from
 throwing errors because BABYLON isn't defined in the TypeScript file.
 */
 declare var BABYLON: any;
-// declare var jQuery: any;
+declare var jQuery: any;  // attached to window in RequireConfig.ts
+declare var Core: any;  // attached to window in RequireConfig.ts
 
 // this function was added in so the app could be run from the config.ts file with requirejs
 // jQuery is passed as an arg so this function and any module it utilizes can use jquery from the config.ts path object
-export function start(jQuery) {
+export function start() {
     let setEvents = function() {
         /**
         A function to register any events.
@@ -132,9 +123,5 @@ export function start(jQuery) {
         );
     }
 
-    // Setup the VR program.
-    Setup.setup(setEvents, jQuery);
-
-    console.log("Sys vars should be setup!");
-    console.log(UserVars);
+    return setEvents;
 }

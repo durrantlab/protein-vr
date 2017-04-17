@@ -6,6 +6,7 @@ import UserVars from "./UserVars";
 
 declare var BABYLON;
 declare var screenfull;
+declare var jQuery;  // attached to window in RequireConfig.ts
 
 namespace CameraChar {
     /**
@@ -28,7 +29,7 @@ namespace CameraChar {
     */
     export const characterHeight: number = 1.8;  // All units in metric.
 
-    export function setup($?: any): void {
+    export function setup(): void {
         /**
         Set up the camera/character.
         */
@@ -40,7 +41,7 @@ namespace CameraChar {
         // simple)
         if (UserVars.userVars["device"] === UserVars.devices.VRHeadset) {
             // VR camera
-            setUpVRCameraControls($);
+            setUpVRCameraControls();
         } else {
             // Just a regular camera
             scene.activeCamera.attachControl(Core.canvas);
@@ -145,7 +146,7 @@ namespace CameraChar {
         }
     }
 
-    export function setUpVRCameraControls($) {
+    export function setUpVRCameraControls() {
         // I feel like I should have to do the below... Why don't the defaults work?
         var metrics = BABYLON.VRCameraMetrics.GetDefault();
         //metrics.interpupillaryDistance = 0.5;
@@ -159,15 +160,15 @@ namespace CameraChar {
             metrics
         );
 
-        $.getScript( "js/screenfull.min.js" ).done(function( script, textStatus ) {
+        jQuery.getScript( "js/screenfull.min.js" ).done(function( script, textStatus ) {
             // This does need to be registered on the window. If you do it
             // through a click in babylonjs, browsers will reject the
             // full-screen request.
-            $(window).click(function() {
+            jQuery(window).click(function() {
                 if (screenfull.enabled) {
                     screenfull.request();
                 }
-                $(window).unbind("click");
+                jQuery(window).unbind("click");
             });
         });
 
