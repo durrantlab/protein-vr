@@ -26,7 +26,8 @@ export namespace UserVars{
         animations: boolean,
         textureDetail: number,
         fog: boolean,  // maybe a number in the future?
-        visibility: number
+        visibility: number,
+        scenePath: string
     }
 
     // Default values
@@ -36,7 +37,8 @@ export namespace UserVars{
         "animations": true,
         "textureDetail": 5,
         "fog": false,
-        "visibility": 5
+        "visibility": 5,
+        "scenePath": "./scenes/test/"
     }
 
     /**

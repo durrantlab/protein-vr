@@ -24,7 +24,7 @@ export function addSound(mp3FileName, location) {
         soundParams["panningModel"] = panningModel;
     }
 
-    var sound = new BABYLON.Sound(mp3FileName, Core.sceneDirectory + mp3FileName,
+    var sound = new BABYLON.Sound(mp3FileName, UserVars.userVars["scenePath"] + mp3FileName,
         Core.scene, null, soundParams
     );
 

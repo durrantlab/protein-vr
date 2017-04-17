@@ -31,9 +31,6 @@ declare var BABYLON: any;
 // this function was added in so the app could be run from the config.ts file with requirejs
 // jQuery is passed as an arg so this function and any module it utilizes can use jquery from the config.ts path object
 export function start(jQuery) {
-
-    Core.sceneDirectory = "scenes/test/"; // Here to load the scene files.
-
     let setEvents = function() {
         /**
         A function to register any events.

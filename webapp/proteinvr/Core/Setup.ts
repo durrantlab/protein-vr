@@ -65,146 +65,149 @@ namespace Setup {
             // Load the 3D engine. true means antialiasing is on.
             Core.engine = new BABYLON.Engine(Core.canvas, true);
 
-            // Load in informtion re. the scene
-            $.ajax({
-                url: Core.sceneDirectory + "proteinvr.json",
-                dataType: "json"
-            }).done(function(proteinvr_info) {
-                // I would expect that updating the version in the .manifest
-                // file would prevent this, but in testing I'm not 100% it's
-                // true.
-                let disableCaching: boolean = true;
-                let urlCacheBreakTxt: string = (disableCaching ? "?" + proteinvr_info["file_id"] : "")
+            // Load the user parameters
+            UserVars.setup(function() {
 
-                // Load a scene from a BABYLON file.
-                BABYLON.SceneLoader.Load(Core.sceneDirectory, "scene.babylon" + urlCacheBreakTxt, 
-                                        Core.engine,
-                                        function (newScene: any): void {
+                // Load in information re. the scene
+                $.ajax({
+                    url: UserVars.userVars["scenePath"] + "proteinvr.json",
+                    dataType: "json"
+                }).done(function(proteinvr_info) {
+                    // I would expect that updating the version in the .manifest
+                    // file would prevent this, but in testing I'm not 100% it's
+                    // true.
+                    let disableCaching: boolean = true;
+                    let urlCacheBreakTxt: string = (disableCaching ? "?" + proteinvr_info["file_id"] : "")
+
+                    // Load a scene from a BABYLON file.
+                    BABYLON.SceneLoader.Load(UserVars.userVars["scenePath"], "scene.babylon" + urlCacheBreakTxt, 
+                                            Core.engine,
+                                            function (newScene: any): void {
 
 
-                    // Wait for textures and shaders to be ready before
-                    // proceeding.
-                    newScene.executeWhenReady(function () {
+                        // Wait for textures and shaders to be ready before
+                        // proceeding.
+                        newScene.executeWhenReady(function () {
 
-                        // Store the scene in a variable so you can reference it
-                        // later.
-                        Core.scene = newScene;
+                            // Store the scene in a variable so you can reference it
+                            // later.
+                            Core.scene = newScene;
 
-                        // Setup mouse events
-                        MouseState.setup();
+                            // Setup mouse events
+                            MouseState.setup();
 
-                        // if (Core.debug === true) {
-                        //     Core.scene.debugLayer.show(true, Core.scene.activeCamera);
-                        // }
+                            // if (Core.debug === true) {
+                            //     Core.scene.debugLayer.show(true, Core.scene.activeCamera);
+                            // }
 
-                        // Loop through each of the objects in the scene and
-                        // modify them according to the name (which is a json).
+                            // Loop through each of the objects in the scene and
+                            // modify them according to the name (which is a json).
 
-                        // Core.scene.meshes.forEach(function(m) { // Avoid this because requires binding...
-                        for (let meshIdx = 0; meshIdx < Core.scene.meshes.length; meshIdx++) {
-                            let m = Core.scene.meshes[meshIdx];
+                            // Core.scene.meshes.forEach(function(m) { // Avoid this because requires binding...
+                            for (let meshIdx = 0; meshIdx < Core.scene.meshes.length; meshIdx++) {
+                                let m = Core.scene.meshes[meshIdx];
 
-                            //try {
-                            // Convert the mesh name to a json object with
-                            // information about the mesh.
-                            // let jsonStr = '{"' + m.name + '"}';
-                            // jsonStr = jsonStr.replace(/:/g, '":"')
-                            //                  .replace(/,/g, '","');
-                            // let json = JSON.parse(jsonStr);
-                            // m.name = json.n;
+                                //try {
+                                // Convert the mesh name to a json object with
+                                // information about the mesh.
+                                // let jsonStr = '{"' + m.name + '"}';
+                                // jsonStr = jsonStr.replace(/:/g, '":"')
+                                //                  .replace(/,/g, '","');
+                                // let json = JSON.parse(jsonStr);
+                                // m.name = json.n;
 
-                            // save for later reference
-                            Core.meshesByName[m.name] = m;
+                                // save for later reference
+                                Core.meshesByName[m.name] = m;
 
-                            // Given the mesh, check if it should collide with
-                            // the camera.
-                            // new CollisionMeshes().checkMesh(m, json);
+                                // Given the mesh, check if it should collide with
+                                // the camera.
+                                // new CollisionMeshes().checkMesh(m, json);
 
-                            // Create a material if the info is available.
-                            if (this.proteinvr_info["materials"][m.name] !== undefined) {
-                                let mat_inf = this.proteinvr_info["materials"][m.name];
-                                // Generate a key for this material. Doing it
-                                // this way so you can reuse materials.
-                                let mat_key = "";
-                                let colorType: string = "color";
-                                if (typeof mat_inf.color === "string") {
-                                    // it's a filename
-                                    mat_key += mat_inf.color;
-                                    colorType = "image";
-                                } else {
-                                    // it's a color (RGB)
-                                    mat_inf.color[0] = roundToHundredth(mat_inf.color[0]);
-                                    mat_inf.color[1] = roundToHundredth(mat_inf.color[1]);
-                                    mat_inf.color[2] = roundToHundredth(mat_inf.color[2]);
-                                    mat_key += JSON.stringify(mat_inf.color);
+                                // Create a material if the info is available.
+                                if (this.proteinvr_info["materials"][m.name] !== undefined) {
+                                    let mat_inf = this.proteinvr_info["materials"][m.name];
+                                    // Generate a key for this material. Doing it
+                                    // this way so you can reuse materials.
+                                    let mat_key = "";
+                                    let colorType: string = "color";
+                                    if (typeof mat_inf.color === "string") {
+                                        // it's a filename
+                                        mat_key += mat_inf.color;
+                                        colorType = "image";
+                                    } else {
+                                        // it's a color (RGB)
+                                        mat_inf.color[0] = roundToHundredth(mat_inf.color[0]);
+                                        mat_inf.color[1] = roundToHundredth(mat_inf.color[1]);
+                                        mat_inf.color[2] = roundToHundredth(mat_inf.color[2]);
+                                        mat_key += JSON.stringify(mat_inf.color);
+                                    }
+
+                                    mat_inf.glossiness = roundToHundredth(mat_inf.glossiness);
+                                    mat_key += " " + mat_inf.glossiness.toString();
+
+                                    // HERE DO THE SHADER LIBRARY THING TO NOT DUPLICATE EFFORTS!!!
+
+                                    var mat = new BABYLON.StandardMaterial(mat_key, Core.scene);
+                                    mat.diffuseColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
+                                    mat.specularColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
+
+                                    if (colorType === "color") {
+                                        // set the diffuse colors
+                                        mat.emissiveColor = new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
+                                    } else {  // so it's an image
+                                        mat.emissiveColor = new BABYLON.Color3(0,0,0);
+                                        let img_path = UserVars.userVars["scenePath"] + mat_inf.color + this.urlCacheBreakTxt;
+                                        mat.emissiveTexture = new BABYLON.Texture(img_path, Core.scene);
+                                    }
+
+                                    // Now do glossiness
+                                    mat.specularColor = new BABYLON.Color3(mat_inf.glossiness, mat_inf.glossiness, mat_inf.glossiness);
+
+                                    // Add shadows
+                                    if (m.name !== "sky") { // sky has no shadow
+                                        let nameToUse = m.name.replace(/Decimated/g, "");
+                                        mat.ambientTexture = new BABYLON.Texture(UserVars.userVars["scenePath"] + nameToUse + "shadow.png" + this.urlCacheBreakTxt, Core.scene);
+                                    }
+
+                                    // Now add this material to the object.
+                                    m.material = mat;
                                 }
+                                
+                                // Check if the mesh is marked as a ground mesh.
+                                new Ground().checkMesh(m); //, json);
 
-                                mat_inf.glossiness = roundToHundredth(mat_inf.glossiness);
-                                mat_key += " " + mat_inf.glossiness.toString();
+                                // Check if the mesh is marked as a skybox.
+                                new Skybox().checkMesh(m); //, json);
 
-                                // HERE DO THE SHADER LIBRARY THING TO NOT DUPLICATE EFFORTS!!!
+                                // Check if the mesh is marked as a billboard
+                                // mesh.
+                                // new BillboardMeshes().checkMesh(m, json);
+                            };
 
-                                var mat = new BABYLON.StandardMaterial(mat_key, Core.scene);
-                                mat.diffuseColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
-                                mat.specularColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
-
-                                if (colorType === "color") {
-                                    // set the diffuse colors
-                                    mat.emissiveColor = new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
-                                } else {  // so it's an image
-                                    mat.emissiveColor = new BABYLON.Color3(0,0,0);
-                                    let img_path = Core.sceneDirectory + mat_inf.color + this.urlCacheBreakTxt;
-                                    mat.emissiveTexture = new BABYLON.Texture(img_path, Core.scene);
-                                }
-
-                                // Now do glossiness
-                                mat.specularColor = new BABYLON.Color3(mat_inf.glossiness, mat_inf.glossiness, mat_inf.glossiness);
-
-                                // Add shadows
-                                if (m.name !== "sky") { // sky has no shadow
+                            // Add LODs
+                            // No binding needed here, so forEach ok.
+                            Core.scene.meshes.forEach(function(m) {
+                                // If the name has the word "Decimated" in it,
+                                // make LOD.
+                                if (m.name.indexOf("Decimated") !== -1) {
                                     let nameToUse = m.name.replace(/Decimated/g, "");
-                                    mat.ambientTexture = new BABYLON.Texture(Core.sceneDirectory + nameToUse + "shadow.png" + this.urlCacheBreakTxt, Core.scene);
+                                    let parentMesh = Core.meshesByName[nameToUse];
+                                    m.material = parentMesh.material;
+                                    parentMesh.addLODLevel(15, m);
+                                    parentMesh.addLODLevel(25, null);
                                 }
+                            });
 
-                                // Now add this material to the object.
-                                m.material = mat;
+                            // Set up sounds
+                            for (let soundIdx = 0; soundIdx < proteinvr_info["sounds"].length; soundIdx++) {
+                                let sound = proteinvr_info["sounds"][soundIdx];
+                                let filename = sound[0];
+                                let loc = new BABYLON.Vector3(sound[1][0], sound[1][2], sound[1][1]);
+                                addSound(filename, loc);
                             }
-                            
-                            // Check if the mesh is marked as a ground mesh.
-                            new Ground().checkMesh(m); //, json);
 
-                            // Check if the mesh is marked as a skybox.
-                            new Skybox().checkMesh(m); //, json);
-
-                            // Check if the mesh is marked as a billboard
-                            // mesh.
-                            // new BillboardMeshes().checkMesh(m, json);
-                        };
-
-                        // Add LODs
-                        // No binding needed here, so forEach ok.
-                        Core.scene.meshes.forEach(function(m) {
-                            // If the name has the word "Decimated" in it,
-                            // make LOD.
-                            if (m.name.indexOf("Decimated") !== -1) {
-                                let nameToUse = m.name.replace(/Decimated/g, "");
-                                let parentMesh = Core.meshesByName[nameToUse];
-                                m.material = parentMesh.material;
-                                parentMesh.addLODLevel(15, m);
-                                parentMesh.addLODLevel(25, null);
-                            }
-                        });
-
-                        // Set up sounds
-                        for (let soundIdx = 0; soundIdx < proteinvr_info["sounds"].length; soundIdx++) {
-                            let sound = proteinvr_info["sounds"][soundIdx];
-                            let filename = sound[0];
-                            let loc = new BABYLON.Vector3(sound[1][0], sound[1][2], sound[1][1]);
-                            addSound(filename, loc);
-                        }
-
-                        // Set up the system variables
-                        UserVars.setup(function() {
+                            // Set up the system variables
+                        
                             // Set up the game character/camera.
                             CameraChar.setup($);
 
@@ -260,15 +263,15 @@ namespace Setup {
                             });*/
 
                             RenderLoop.start();
-                        });
+                        }.bind({
+                            urlCacheBreakTxt: this.urlCacheBreakTxt,
+                            proteinvr_info: this.proteinvr_info
+                        }));
                     }.bind({
-                        urlCacheBreakTxt: this.urlCacheBreakTxt,
-                        proteinvr_info: this.proteinvr_info
+                        urlCacheBreakTxt: urlCacheBreakTxt,
+                        proteinvr_info: proteinvr_info
                     }));
-                }.bind({
-                    urlCacheBreakTxt: urlCacheBreakTxt,
-                    proteinvr_info: proteinvr_info
-                }));
+                });
             });
 
             // optional debugging
