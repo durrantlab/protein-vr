@@ -2,9 +2,9 @@
 #cd ../
 
 
-tsc --target ES5 --module amd source/main.ts config.ts source/Environment.ts source/CameraChar.ts
+tsc --target ES5 --module amd proteinvr/main.ts config.ts proteinvr/Environment.ts proteinvr/CameraChar.ts
 
-#find source -name "*.js" -exec rm '{}' \;
-#find source -name "*.ts" | awk '{print "tsc --target ES5 --module amd " $1}' | parallel -j6
+find proteinvr -name "*.js" -exec rm '{}' \;
+find proteinvr -name "*.ts" | awk '{print "tsc --target ES5 --module amd " $1}' | parallel -j6
 
 echo Done
