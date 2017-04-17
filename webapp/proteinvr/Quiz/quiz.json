@@ -1,0 +1,14 @@
+{
+    "quiz.name": "sampleName",
+
+    "questions" : {
+        "question1": {
+            "question": "Sample question?",
+            "option1": "exampleAnswer",
+            "option2": "exampleAnswer",
+            "option3": "exampleAnswer",
+            "Option4": "exampleAnswer",
+            "answer": "Option4"
+        }
+    }  
+}
