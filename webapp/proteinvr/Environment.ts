@@ -23,6 +23,8 @@ namespace Environment {
     related to the environment are stored.
     */
 
+    let lens :any = null;
+
     export function setup(): void {
         /**
         Set up the environment.
@@ -51,7 +53,8 @@ namespace Environment {
         // Set up the fog.
         setFog(0.0);
 
-        // lensEffect();
+        console.log("should be utilizing barrel distortion now");
+        lens = lensEffect();
         // timers();
 
     }
@@ -111,7 +114,7 @@ namespace Environment {
         };
     }
 
-    function lensEffect(): void {
+    function lensEffect(): any {
         /**
         Create a lens effect. Not currently implemented.
         */
@@ -122,16 +125,26 @@ namespace Environment {
                 edge_blur: 1.0,
                 chromatic_aberration: 1.0,
                 distortion: 1.0,
-                dof_focus_distance: 50,
+                dof_focus_distance: 5.0,
                 dof_aperture: 2.0,	// Set very high for tilt-shift effect.
                 grain_amount: 1.0,
                 dof_pentagon: true,
-                dof_gain: 1.0,
+                dof_gain: 0.0,
                 dof_threshold: 1.0,
                 dof_darken: 0.25
             }, Core.scene, 1.0, CameraChar.camera);
+            return lensEffect;
     }
+        // if limiting fps, remove dof_gain and dof_aperature first
 
+    /**
+     * Limit GPU demanding operations in the lens effects (barrel distortion).
+     * Here we eliminate highlighting objects out of focus and limit blur effects.
+     */
+    export function limitLensEffect(): void {
+        lens.setHighlightsGain(0.0);
+        lens.setAperture(0.1);
+    }
     export namespace PointerLock {
         /**
         The PointerLock namespace is where all the functions and variables

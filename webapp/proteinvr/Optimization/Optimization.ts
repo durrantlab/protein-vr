@@ -87,6 +87,7 @@ export function babylonOptimization() {
     // BABYLON bug.
     //console.log(Core.engine.getFps());
     console.log("optimizing... "); //FPS: ", Core.engine.getFps());
+    console.log("current frame rate: " + Core.engine.getFps());
     BABYLON.SceneOptimizer.OptimizeAsync(
         Core.scene,
         //BABYLON.SceneOptimizerOptions.HighDegradationAllowed(), //optimizationOptions(), // this.optimizationOptions() doesn't work 
@@ -136,7 +137,10 @@ function optimizationOptions() {
     optim.optimizations.push(new BABYLON.LensFlaresOptimization(priority));
     optim.optimizations.push(new Environment.mySceneOptimizationUpdateOctTree(priority));
     optim.optimizations.push(new BABYLON.TextureOptimization(priority, 1024));
-    
+
+    // limit post processing enhancements
+    console.log("limiting lens effects");
+    Environment.limitLensEffect();
 
     priority++;  // 1  
     // Minor impact on appearance. Introducing LOD.
