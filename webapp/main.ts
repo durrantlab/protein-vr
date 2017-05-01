@@ -79,18 +79,18 @@ export function start() {
         //     })   
         // );
 
-        new Event(
-            new DistanceToMesh({
-                triggerMesh: Core.meshesByName["surf_trgt"], 
-                cutOffDistance: 9.0
-            }),
-            new MoveCamera({
-                camera: CameraChar.camera,
-                milliseconds: 1000,
-                startPoint: CameraChar.camera.position,
-                endPoint: new BABYLON.Vector3(CameraChar.camera.position.x + 25, CameraChar.camera.position.y, CameraChar.camera.position.z)
-            })
-        );
+        // new Event(
+        //     new DistanceToMesh({
+        //         triggerMesh: Core.meshesByName["surf_trgt"], 
+        //         cutOffDistance: 9.0
+        //     }),
+        //     new MoveCamera({
+        //         camera: CameraChar.camera,
+        //         milliseconds: 1000,
+        //         startPoint: CameraChar.camera.position,
+        //         endPoint: new BABYLON.Vector3(CameraChar.camera.position.x + 25, CameraChar.camera.position.y, CameraChar.camera.position.z)
+        //     })
+        // );
 
         // new Event(
             // new GameStart({}, jQuery),

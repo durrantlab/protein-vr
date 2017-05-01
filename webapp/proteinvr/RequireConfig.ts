@@ -4,10 +4,12 @@
 // them to the window.
 interface MyWindow extends Window {
     Core: any;
-    jQuery: any;
+    jQuery: any;	
 }
 declare var window: MyWindow;
 
+console.log('window loaded?');
+console.log(window);
 // requirejs configuration file
 require.config({
     paths: {
@@ -18,6 +20,9 @@ require.config({
 
 // This require function starts the app
 require(['../main', 'jquery', "./Core/Core", "./Core/Setup"], (main, jQuery, Core, Setup) => {
+
+    
+
     window.Core = Core.default;  // not sure why the default is needed here.
     window.jQuery = jQuery;
     let setEvents = main.start();

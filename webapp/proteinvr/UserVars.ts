@@ -19,6 +19,12 @@ export namespace UserVars{
         VRHeadset
     }
 
+    export enum navMethods {
+        InstantaneousForward,
+        GradualForward,
+        IntantaneousDirect
+    }
+
     // The interface
     interface userVarsInterface {
         audio: audios,
@@ -27,8 +33,9 @@ export namespace UserVars{
         textureDetail: number,
         fog: boolean,  // maybe a number in the future?
         visibility: number,
-        scenePath: string
-    }
+        scenePath: string,
+        navigation: navMethods
+        }
 
     // Default values
     export var userVars: userVarsInterface = {
@@ -38,7 +45,8 @@ export namespace UserVars{
         "textureDetail": 5,
         "fog": false,
         "visibility": 5,
-        "scenePath": "./scenes/test/"
+        "scenePath": "./scenes/test/",
+        "navigation": navMethods.InstantaneousForward
     }
 
     /**
@@ -96,6 +104,12 @@ export namespace UserVars{
                 return audios.Headphones;
             case "none":
                 return audios.None;
+            case "instantaneous":
+                return navMethods.InstantaneousForward;
+            case "gradual":
+                return navMethods.GradualForward;
+            case "maintain direction":
+                return navMethods.IntantaneousDirect;
             default:
                 return s;
         }
@@ -126,6 +140,10 @@ export namespace UserVars{
         return userVars['visibility'];
     }
 
+    export function getNavigation(): navMethods {
+        return userVars['navigation'];
+    }
+
     // Setters
     export function setDevice(d: devices): void {
         userVars['device'] = d;
@@ -149,6 +167,10 @@ export namespace UserVars{
 
     export function setVisibility(level: number) :void {
         userVars['visibility'] = level;
+    }
+
+    export function setNavigation(n: navMethods) :void{
+        userVars['navigation'] = n;
     }
 }
 
