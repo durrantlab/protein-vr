@@ -1,5 +1,6 @@
 // THIS IS WHERE ANY CUSTOM CODE GOES. DEFINING SHADERS AND TRIGGERS AND SUCH.
 
+
 import Event from "./proteinvr/Events/Event";
 import DistanceToMesh from "./proteinvr/Events/TriggerConditionals/DistanceToMesh";
 import FadeOutMesh from "./proteinvr/Events/Actions/FadeOutMesh";
@@ -10,6 +11,7 @@ import KeyPress from "./proteinvr/Events/TriggerConditionals/KeyPress";
 import GameStart from "./proteinvr/Events/TriggerConditionals/GameStart";
 import ClickedObject from "./proteinvr/Events/TriggerConditionals/ClickedObject";
 import LabelOnMesh from "./proteinvr/Events/Actions/LabelOnMesh";
+import CameraChar from "./proteinvr/CameraChar";
 
 /**
 BABYLON is an external JavaScript library. This prevents Typescript from
@@ -127,6 +129,7 @@ export function start(Core) {
         //     }, Core),
         // );
     }
+
 
     return setEvents;
 }

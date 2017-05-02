@@ -47,6 +47,12 @@ export enum displays {
     Windowed
 }
 
+export enum navMethods {
+    InstantaneousForward,
+    GradualForward,
+    IntantaneousDirect
+}
+
 // The interface
 interface userVarsInterface {
     audio: audios,
@@ -58,7 +64,8 @@ interface userVarsInterface {
     display: displays
     animations: boolean,
     visibility: number,
-    scenePath: string
+    scenePath: string,
+    navigation: navMethods
 }
 
 /**
@@ -86,7 +93,8 @@ export function setup(callBackFunc: any) :void {
             "objects": objects.Detailed,
             "display": displays.FullScreen,
             "visibility": 5,
-            "scenePath": "./scenes/test/"
+            "scenePath": "./scenes/test/",
+            "navigation": navMethods.InstantaneousForward 
         }
 
         // Here you overwrite with values from params.json
@@ -214,6 +222,12 @@ export function stringToEnumVal(s: any): any {
             return displays.FullScreen;
         case "windowed":
             return displays.Windowed;
+        case "instantaneous":
+            return navMethods.InstantaneousForward;
+        case "gradual":
+            return navMethods.GradualForward;
+        case "maintain direction":
+            return navMethods.IntantaneousDirect; 
         default:
             return s;
     }

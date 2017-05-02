@@ -1,0 +1,8 @@
+{
+    "device": "desktop", // string, expecting 'desktop', 'laptop', or 'vrHeadset'
+    "animations": false, //boolean
+    "textureDetail": 1, //int in range 1-5 with 5 being most detailed
+    "audio": false, //boolean
+    "fog": true, //boolean
+    "visibility": 2 //1-5 scale, same as "textureDetail"
+}

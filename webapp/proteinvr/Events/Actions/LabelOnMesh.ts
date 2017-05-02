@@ -4,6 +4,8 @@ import * as CameraChar from "../../CameraChar";
 import * as UserVars from "../../Settings/UserVars";
 
 declare var BABYLON;
+declare var PVRGlobals;
+
 var jQuery = PVRGlobals.jQuery;
 
 interface LabelInterface{

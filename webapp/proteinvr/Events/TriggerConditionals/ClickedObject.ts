@@ -29,7 +29,9 @@ class ClickedObject extends parent {
         MouseState.mouseClickDownFunctions.push(function(results) {
             if (results.mesh == target) {
                 console.log('mesh clicked!');
+
                 action.do(results.worldLoc);
+
             }
         });
     }

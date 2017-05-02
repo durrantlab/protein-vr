@@ -7,6 +7,8 @@ import * as UserVars from "../Settings/UserVars";
 import { mySceneOptimizationLOD } from "./LOD";
 import { mySceneOptimizationFog } from "./Fog";
 
+declare var PVRGlobals;
+
 var optimizationWaitDuration = 10000;  // how to long wait after successfull
                                         // optimization to check and see if
                                         // further optimization needed.
@@ -89,8 +91,11 @@ export function babylonOptimization() {
     // This optimization is great, except it merges different
     // LOD-level meshes into one visible mesh. I think this is a
     // BABYLON bug.
-    //console.log(PVRGlobals.engine.getFps());
-    console.log("optimizing... "); //FPS: ", PVRGlobals.engine.getFps());
+
+    //console.log(Core.engine.getFps());
+    console.log("optimizing... "); //FPS: ", Core.engine.getFps());
+    console.log("current frame rate: " + PVRGlobals.engine.getFps());
+
     BABYLON.SceneOptimizer.OptimizeAsync(
         PVRGlobals.scene,
         //BABYLON.SceneOptimizerOptions.HighDegradationAllowed(), //optimizationOptions(), // this.optimizationOptions() doesn't work 
@@ -140,7 +145,10 @@ function optimizationOptions() {
     optim.optimizations.push(new BABYLON.LensFlaresOptimization(priority));
     optim.optimizations.push(new Environment.mySceneOptimizationUpdateOctTree(priority));
     optim.optimizations.push(new BABYLON.TextureOptimization(priority, 1024));
-    
+
+    // limit post processing enhancements
+    console.log("limiting lens effects");
+    Environment.limitLensEffect();
 
     priority++;  // 1  
     // Minor impact on appearance. Introducing LOD.

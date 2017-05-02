@@ -18,6 +18,9 @@ interface MyDocument extends Document{
     msPointerLockElement: any;
 }
 declare var document: MyDocument;
+declare var PVRGlobals;
+
+let lens: any = null;
 
 // namespace Environment {
 /**
@@ -85,6 +88,11 @@ export function setFog(density: number = 0.015): void {
         density = 0.6;
     }
 
+    console.log("should be utilizing barrel distortion now");
+    lens = lensEffect();
+    // timers();
+
+
     if (density !== 0) {
         // Make the fog
         PVRGlobals.scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
@@ -135,7 +143,7 @@ export class mySceneOptimizationUpdateOctTree extends BABYLON.SceneOptimization 
     };
 }
 
-function lensEffect(): void {
+function lensEffect(): any {
     /**
     Create a lens effect. Not currently implemented.
     */
@@ -146,14 +154,24 @@ function lensEffect(): void {
             edge_blur: 1.0,
             chromatic_aberration: 1.0,
             distortion: 1.0,
-            dof_focus_distance: 50,
+            dof_focus_distance: 5.0,
             dof_aperture: 2.0,	// Set very high for tilt-shift effect.
             grain_amount: 1.0,
             dof_pentagon: true,
-            dof_gain: 1.0,
+            dof_gain: 0.0,
             dof_threshold: 1.0,
             dof_darken: 0.25
         }, PVRGlobals.scene, 1.0, PVRGlobals.camera);
+        return lensEffect;
+}
+
+/**
+ * Limit GPU demanding operations in the lens effects (barrel distortion).
+ * Here we eliminate highlighting objects out of focus and limit blur effects.
+ */
+export function limitLensEffect(): void {
+    lens.setHighlightsGain(0.0);
+    lens.setAperture(0.1);
 }
 
 export namespace PointerLock {
@@ -211,6 +229,7 @@ export namespace PointerLock {
         // Tell user to click somehow.
         console.log('Tell user to click...');
     }
+        // if limiting fps, remove dof_gain and dof_aperature first
 
     export function actuallyRequestLock(canvas: any): void {
         /**

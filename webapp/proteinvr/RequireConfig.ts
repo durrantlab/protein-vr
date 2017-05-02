@@ -40,6 +40,8 @@ var PVRGlobals = {
     extraFunctionsToRunInLoop_AfterCameraLocFinalized: []
 };
 
+console.log('window loaded?');
+console.log(window);
 // requirejs configuration file
 require.config({
     paths: {
