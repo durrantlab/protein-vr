@@ -147,8 +147,8 @@ function optimizationOptions() {
     optim.optimizations.push(new BABYLON.TextureOptimization(priority, 1024));
 
     // limit post processing enhancements
-    console.log("limiting lens effects");
-    Environment.limitLensEffect();
+    // Need to create optimization class for this for it to work...
+    // Environment.limitLensEffect();
 
     priority++;  // 1  
     // Minor impact on appearance. Introducing LOD.

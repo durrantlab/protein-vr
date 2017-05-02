@@ -11,7 +11,7 @@ import KeyPress from "./proteinvr/Events/TriggerConditionals/KeyPress";
 import GameStart from "./proteinvr/Events/TriggerConditionals/GameStart";
 import ClickedObject from "./proteinvr/Events/TriggerConditionals/ClickedObject";
 import LabelOnMesh from "./proteinvr/Events/Actions/LabelOnMesh";
-import CameraChar from "./proteinvr/CameraChar";
+import * as CameraChar from "./proteinvr/CameraChar";
 
 /**
 BABYLON is an external JavaScript library. This prevents Typescript from

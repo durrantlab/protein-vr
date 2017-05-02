@@ -69,7 +69,10 @@ export function setup(): void {
             LOD.adjustLODDistances(LOD.LODLevelOptions[0]);
     }
 
-    // lensEffect();
+    // console.log("should be utilizing barrel distortion now");
+    lens = lensEffect();
+    Environment.limitLensEffect();
+
     // timers();
 
 }
@@ -88,8 +91,6 @@ export function setFog(density: number = 0.015): void {
         density = 0.6;
     }
 
-    console.log("should be utilizing barrel distortion now");
-    lens = lensEffect();
     // timers();
 
 
