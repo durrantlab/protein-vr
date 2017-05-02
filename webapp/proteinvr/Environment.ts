@@ -69,9 +69,9 @@ export function setup(): void {
             LOD.adjustLODDistances(LOD.LODLevelOptions[0]);
     }
 
-    // console.log("should be utilizing barrel distortion now");
-    lens = lensEffect();
-    Environment.limitLensEffect();
+    // Let's effects are just too intensive, on both phone and camera. Deactivating.
+    // lens = lensEffect();
+    // limitLensEffect();
 
     // timers();
 
