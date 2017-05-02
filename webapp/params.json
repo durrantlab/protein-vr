@@ -8,5 +8,5 @@
     "display": "fullscreen",
     "visibility": 2,
     "scenePath": "./scenes/influenza/",
-    "navigation": "instantaneous forward"
+    "navigation": "InstantaneousForward"
 }
