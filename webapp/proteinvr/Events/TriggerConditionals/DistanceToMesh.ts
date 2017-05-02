@@ -3,7 +3,7 @@ import parent from "./TriggerConditionalParent";
 declare var BABYLON;
 
 // Useful variables:
-// Location of camera: CameraChar.camera.position
+// Location of camera: PVRGlobals.camera.position
 
 interface CheckInterface {
     triggerMesh: any;
@@ -38,7 +38,7 @@ class DistanceToMesh extends parent {
 
         // First check if the player is within a certain distance of the
         // target.
-        let dist: number = this.distanceToCamera(this.parameters.triggerMesh.position);
+        let dist = this.distanceToCamera(this.parameters.triggerMesh.position);
 
         if (dist < this.parameters.cutOffDistance) {
             // They are close to the target.

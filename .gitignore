@@ -2,7 +2,8 @@
 /.DS_Store
 /**/.DS_Store
 3d_resources
-/source/**/*.js
+/webapp/source/**/*.js
+/webapp/*.js
 /source/notes.txt
 *.blend
 *.tar.gz
@@ -15,3 +16,7 @@
 **/webapp/proteinvr/**/*.js
 **/webapp/proteinvr/*.js
 docs
+Babylonjs.old
+tmp
+old
+influenza.good

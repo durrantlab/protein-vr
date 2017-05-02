@@ -18,7 +18,7 @@
 
         constructor(public name: string, emitter: any, scene: Scene) {
 
-            this._scene = scene;
+            this._scene = scene || Engine.LastCreatedScene;
             this._emitter = emitter;
             this.id = name;
             scene.lensFlareSystems.push(this);
@@ -117,11 +117,11 @@
             }
 
             var emitterPosition = this.getEmitterPosition();
-            var direction = emitterPosition.subtract(this._scene.activeCamera.position);
+            var direction = emitterPosition.subtract(this._scene.activeCamera.globalPosition);
             var distance = direction.length();
             direction.normalize();
 
-            var ray = new Ray(this._scene.activeCamera.position, direction);
+            var ray = new Ray(this._scene.activeCamera.globalPosition, direction);
             var pickInfo = this._scene.pickWithRay(ray, this.meshesSelectionPredicate, true);
 
             return !pickInfo.hit || pickInfo.distance > distance;

@@ -15,7 +15,7 @@ def remove_all_materials():
             print("\tCould not remove materials for object \"" + obj.name + '"')
             pass
 
-def save_it(scene_data, manifest_id):
+def save_it(scene_data, manifest_id, params):
     # Show the sky now that you're done rendering shadows. Just in case failed
     # earlier.
     bpy.data.objects["sky"].hide = False
@@ -26,7 +26,7 @@ def save_it(scene_data, manifest_id):
     remove_all_materials()
 
     # Save to a new blender file
-    pwd = Utils.pwd()
+    pwd = Utils.pwd(params)
     bpy.ops.wm.save_as_mainfile(filepath=pwd + 'fixed.blend', check_existing=False)
 
     # save the babylon file

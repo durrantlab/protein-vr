@@ -1,0 +1,58 @@
+<div class="panel panel-primary">
+    <div class="panel-heading"><h3 class="panel-title">ProteinVR 1.0</h3></div>
+    <div class="panel-body">
+
+        <div class="panel panel-primary">
+            <div class="panel-heading"><h3 class="panel-title">Hardware</h3></div>
+            <div class="panel-body">
+
+                <div class="row">
+                    <div class="col-md-6 col-xs-12">
+                        <div class="panel panel-default"><div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-xs-2">Viewer:</label>
+                                <div class="col-xs-10">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="viewer" id="viewer1" value="Screen"> Screen
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="viewer" id="viewer2" value="VRHeadset"> VR Headset
+                                    </label>
+                                </div>
+                            </div>
+                        </div></div>
+                    </div>
+
+                    <div class="col-md-6 col-xs-12">
+                        <div class="panel panel-default"><div class="panel-body">
+                            <div class="form-group">
+                                <label class="col-xs-2">Audio:</label>
+                                <div class="col-xs-10">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="audio" id="audio1" value="Speakers"> Speakers
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="audio" id="audio2" value="Headphones"> Headphones
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="audio" id="audio3" value="None"> None
+                                    </label>
+                                </div>
+                            </div>
+                        </div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="panel panel-primary">
+            <div class="panel-heading"><h3 class="panel-title">Performance</h3></div>
+            <div class="panel-body">
+                Moose.
+            </div>
+        </div>
+
+
+    </div>
+</div>

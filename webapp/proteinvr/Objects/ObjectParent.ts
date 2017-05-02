@@ -1,4 +1,4 @@
-import Core from "../Core/Core";
+import * as Core from "../Core/Core";
 
 abstract class ObjectParent {
     /**
@@ -75,7 +75,7 @@ abstract class ObjectParent {
         }
 
         // Anything with "Decimated" in it needs to be renderingGroupID 1.
-        Core.scene.meshes.forEach(function(m) {
+        PVRGlobals.scene.meshes.forEach(function(m) {
             if (m.name.indexOf("Decimated") !== -1) {
                 m.renderingGroupId = 1;
             }

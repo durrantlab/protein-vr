@@ -1,7 +1,7 @@
-///<reference path="../../js/Babylonjs/dist/babylon.2.4.d.ts" />
+///<reference path="../../js/Babylonjs/dist/babylon.2.5.d.ts" />
 
-import Core from "../Core/Core";
-import Environment from "../Environment";
+import * as Core from "../Core/Core";
+import * as Environment from "../Environment";
 
 export class mySceneOptimizationFog extends BABYLON.SceneOptimization {
     public apply = (scene): boolean => {
@@ -12,20 +12,20 @@ export class mySceneOptimizationFog extends BABYLON.SceneOptimization {
                 Environment.setFog(0.05);
 
                 // No need to render things beyond the fog.
-                Core.scene.activeCamera.maxZ = 30;  // nothing visible beyond 30 anyway.
+                PVRGlobals.scene.activeCamera.maxZ = 30;  // nothing visible beyond 30 anyway.
 
                 break;
             case 5:
                 // Not so far away.
                 Environment.setFog(0.1);
 
-                Core.scene.activeCamera.maxZ = 15;
+                PVRGlobals.scene.activeCamera.maxZ = 15;
                 break;
             case 6:
                 // Not so far away.
                 Environment.setFog(0.15);
 
-                Core.scene.activeCamera.maxZ = 10;
+                PVRGlobals.scene.activeCamera.maxZ = 10;
                 break;
             default:
                 alert("Error with fog priority value! It's " + this.priority.toString());

@@ -43,8 +43,10 @@ RUN cd /image_bins/vmd-1.9.3/ && \
     make install
 
 # Copy over script for making OBJ files
-ADD save_objs.tcl /image_tmp/
+ADD save_pdb_objs.tcl /image_tmp/
 ADD save_objs.py /image_tmp/
+ADD save_vmd_objs.tcl /image_tmp/
+ADD common.tcl /image_tmp/
 
 # Copy over MSMS
 ADD msms_i86_64Linux2_2.6.1.tar.gz /image_bins/
@@ -53,8 +55,8 @@ RUN cd /image_bins/ && \
 ENV MSMSSERVER /image_bins/msms
 
 # Add the bash file to run things
-ADD runit.bash /image_tmp/
-RUN chmod +x /image_tmp/runit.bash
+ADD workflow.bash /image_tmp/
+RUN chmod +x /image_tmp/workflow.bash
 
 # # Install dependencies
 # RUN dpkg --add-architecture i386 && \
@@ -95,7 +97,7 @@ RUN chmod +x /image_tmp/runit.bash
 # CMD export MSMSSERVER=/obj_maker/msms && \
 #     vmd
 
-ENTRYPOINT ["/bin/bash", "-c", "/image_tmp/runit.bash ${*}", "--"]
+ENTRYPOINT ["/bin/bash", "-c", "/image_tmp/workflow.bash ${*}", "--"]
 
 # Define working directory.
 WORKDIR /image_tmp/ 

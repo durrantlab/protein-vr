@@ -28,6 +28,9 @@
             this._meshRank = rank;
             this._mesh = mesh;
 
+            if (rank < this._currentRank) {
+                this._currentRank = rank;
+            }
             if (rank > this._maxRank) {
                 this._maxRank = rank;
             }
@@ -38,23 +41,45 @@
         }
 
         public reduce(currentDefines: string): string {
-
-            var currentFallbacks = this._defines[this._currentRank];
-
-            for (var index = 0; index < currentFallbacks.length; index++) {
-                currentDefines = currentDefines.replace("#define " + currentFallbacks[index], "");
-            }
-
-            if (this._mesh && this._currentRank === this._meshRank) {
+            // First we try to switch to CPU skinning
+            if (this._mesh && this._mesh.computeBonesUsingShaders && this._mesh.numBoneInfluencers > 0) {
                 this._mesh.computeBonesUsingShaders = false;
                 currentDefines = currentDefines.replace("#define NUM_BONE_INFLUENCERS " + this._mesh.numBoneInfluencers, "#define NUM_BONE_INFLUENCERS 0");
                 Tools.Log("Falling back to CPU skinning for " + this._mesh.name);
-            }
 
-            this._currentRank++;
+                var scene = this._mesh.getScene();
+                for (var index = 0; index < scene.meshes.length; index++) {
+                    var otherMesh = scene.meshes[index];
+
+                    if (otherMesh.material === this._mesh.material && otherMesh.computeBonesUsingShaders && otherMesh.numBoneInfluencers > 0) {
+                        otherMesh.computeBonesUsingShaders = false;
+                    }
+                }
+            }
+            else {
+                var currentFallbacks = this._defines[this._currentRank];
+                if (currentFallbacks) {
+                    for (var index = 0; index < currentFallbacks.length; index++) {
+                        currentDefines = currentDefines.replace("#define " + currentFallbacks[index], "");
+                    }
+                }
+
+                this._currentRank++;
+            }
 
             return currentDefines;
         }
+    }
+
+    export class EffectCreationOptions {
+        public attributes: string[];
+        public uniformsNames: string[];
+        public samplers: string[];
+        public defines: string;
+        public fallbacks: EffectFallbacks;
+        public onCompiled: (effect: Effect) => void;
+        public onError: (effect: Effect, errors: string) => void;
+        public indexParameters: any;
     }
 
     export class Effect {
@@ -63,7 +88,9 @@
         public onCompiled: (effect: Effect) => void;
         public onError: (effect: Effect, errors: string) => void;
         public onBind: (effect: Effect) => void;
+        public uniqueId = 0;
 
+        private static _uniqueIdSeed = 0;
         private _engine: Engine;
         private _uniformsNames: string[];
         private _samplers: string[];
@@ -74,22 +101,41 @@
         private _uniforms: WebGLUniformLocation[];
         public _key: string;
         private _indexParameters: any;
+        private _fallbacks: EffectFallbacks;
 
         private _program: WebGLProgram;
         private _valueCache: { [key: string]: any } = {};
 
-        constructor(baseName: any, attributesNames: string[], uniformsNames: string[], samplers: string[], engine, defines?: string, fallbacks?: EffectFallbacks, onCompiled?: (effect: Effect) => void, onError?: (effect: Effect, errors: string) => void, indexParameters?: any) {
-            this._engine = engine;
+        constructor(baseName: any, attributesNamesOrOptions: string[] | EffectCreationOptions, uniformsNamesOrEngine: string[] | Engine, samplers?: string[], engine?: Engine, defines?: string, fallbacks?: EffectFallbacks, onCompiled?: (effect: Effect) => void, onError?: (effect: Effect, errors: string) => void, indexParameters?: any) {
             this.name = baseName;
-            this.defines = defines;
-            this._uniformsNames = uniformsNames.concat(samplers);
-            this._samplers = samplers;
-            this._attributesNames = attributesNames;
 
-            this.onError = onError;
-            this.onCompiled = onCompiled;
+            if ((<EffectCreationOptions>attributesNamesOrOptions).attributes) {
+                var options = <EffectCreationOptions>attributesNamesOrOptions;
+                this._engine = <Engine>uniformsNamesOrEngine;
 
-            this._indexParameters = indexParameters;
+                this._attributesNames = options.attributes;
+                this._uniformsNames = options.uniformsNames.concat(options.samplers);
+                this._samplers = options.samplers;
+                this.defines = options.defines;
+                this.onError = options.onError;
+                this.onCompiled = options.onCompiled;
+                this._fallbacks = options.fallbacks;
+                this._indexParameters = options.indexParameters;                
+            } else {
+                this._engine = engine;
+                this.defines = defines;
+                this._uniformsNames = (<string[]>uniformsNamesOrEngine).concat(samplers);
+                this._samplers = samplers;
+                this._attributesNames = (<string[]>attributesNamesOrOptions);
+
+                this.onError = onError;
+                this.onCompiled = onCompiled;
+
+                this._indexParameters = indexParameters;
+                this._fallbacks = fallbacks;
+            }
+        
+            this.uniqueId = Effect._uniqueIdSeed++;
 
             var vertexSource;
             var fragmentSource;
@@ -116,13 +162,21 @@
 
             this._loadVertexShader(vertexSource, vertexCode => {
                 this._processIncludes(vertexCode, vertexCodeWithIncludes => {
-                    this._loadFragmentShader(fragmentSource, (fragmentCode) => {
-                        this._processIncludes(fragmentCode, fragmentCodeWithIncludes => {
-                            this._prepareEffect(vertexCodeWithIncludes, fragmentCodeWithIncludes, attributesNames, defines, fallbacks);
+                    this._processShaderConversion(vertexCodeWithIncludes, false, migratedVertexCode => {
+                        this._loadFragmentShader(fragmentSource, (fragmentCode) => {
+                            this._processIncludes(fragmentCode, fragmentCodeWithIncludes => {
+                                this._processShaderConversion(fragmentCodeWithIncludes, true, migratedFragmentCode => {
+                                    this._prepareEffect(migratedVertexCode, migratedFragmentCode, this._attributesNames, this.defines, this._fallbacks);
+                                });
+                            });
                         });
                     });
                 });
             });
+        }
+
+        public get key(): string {
+            return this._key;
         }
 
         // Properties
@@ -168,6 +222,14 @@
             return this._compilationError;
         }
 
+        public getVertexShaderSource(): string {
+            return this._evaluateDefinesOnString(this._engine.getVertexShaderSource(this._program));
+        }
+
+        public getFragmentShaderSource(): string {
+            return this._evaluateDefinesOnString(this._engine.getFragmentShaderSource(this._program));
+        }
+
         // Methods
         public _loadVertexShader(vertex: any, callback: (data: any) => void): void {
             // DOM element ?
@@ -175,6 +237,13 @@
                 var vertexCode = Tools.GetDOMTextContent(vertex);
                 callback(vertexCode);
                 return;
+            }
+
+            // Base64 encoded ?
+            if (vertex.substr(0, 7) === "base64:") {
+            	var vertexBinary = window.atob(vertex.substr(7));
+            	callback(vertexBinary);
+            	return;
             }
 
             // Is in local store ?
@@ -201,6 +270,13 @@
                 var fragmentCode = Tools.GetDOMTextContent(fragment);
                 callback(fragmentCode);
                 return;
+            }
+
+            // Base64 encoded ?
+            if (fragment.substr(0, 7) === "base64:") {
+            	var fragmentBinary = window.atob(fragment.substr(7));
+            	callback(fragmentBinary);
+            	return;
             }
 
             // Is in local store ?
@@ -237,6 +313,45 @@
                 Tools.Error("Vertex shader:" + this.name);
                 Tools.Error("Fragment shader:" + this.name);
             }
+        }
+        private _processShaderConversion(sourceCode: string, isFragment: boolean, callback: (data: any) => void): void {
+
+            var preparedSourceCode = this._processPrecision(sourceCode);
+
+            if (this._engine.webGLVersion == 1) {
+                callback(preparedSourceCode);
+                return;
+            }
+
+            // Already converted
+            if (preparedSourceCode.indexOf("#version 3") !== -1) {
+                callback(preparedSourceCode);
+                return;
+            }
+            
+            // Remove extensions 
+            // #extension GL_OES_standard_derivatives : enable
+            // #extension GL_EXT_shader_texture_lod : enable
+            // #extension GL_EXT_frag_depth : enable
+            var regex = /#extension.+(GL_OES_standard_derivatives|GL_EXT_shader_texture_lod|GL_EXT_frag_depth).+enable/g;
+            var result = preparedSourceCode.replace(regex, "");
+
+            // Migrate to GLSL v300
+            result = result.replace(/varying\s/g, isFragment ? "in " : "out ");
+            result = result.replace(/attribute[ \t]/g, "in ");
+            result = result.replace(/[ \t]attribute/g, " in");
+            
+            if (isFragment) {
+                result = result.replace(/texture2DLodEXT\(/g, "textureLod(");
+                result = result.replace(/textureCubeLodEXT\(/g, "textureLod(");
+                result = result.replace(/texture2D\(/g, "texture(");
+                result = result.replace(/textureCube\(/g, "texture(");
+                result = result.replace(/gl_FragDepthEXT/g, "gl_FragDepth");
+                result = result.replace(/gl_FragColor/g, "glFragColor");
+                result = result.replace(/void\s+?main\(/g, "out vec4 glFragColor;\nvoid main(");
+            }
+            
+            callback(result);
         }
 
         private _processIncludes(sourceCode: string, callback: (data: any) => void): void {
@@ -276,7 +391,7 @@
                                 maxIndex = this._indexParameters[indexSplits[1]];
                             }
 
-                            for (var i = minIndex; i <= maxIndex; i++) {
+                            for (var i = minIndex; i < maxIndex; i++) {
                                 includeContent += sourceIncludeContent.replace(/\{X\}/g, i) + "\n";
                             }
                         } else {
@@ -322,10 +437,6 @@
             try {
                 var engine = this._engine;
 
-                // Precision
-                vertexSourceCode = this._processPrecision(vertexSourceCode);
-                fragmentSourceCode = this._processPrecision(fragmentSourceCode);
-
                 this._program = engine.createShaderProgram(vertexSourceCode, fragmentSourceCode, defines);
 
                 this._uniforms = engine.getUniforms(this._program, this._uniformsNames);
@@ -343,23 +454,25 @@
 
                 engine.bindSamplers(this);
 
+                this._compilationError = "";
                 this._isReady = true;
                 if (this.onCompiled) {
                     this.onCompiled(this);
                 }
             } catch (e) {
+                this._compilationError = e.message;
+
                 // Let's go through fallbacks then
+                Tools.Error("Unable to compile effect: ");
+                Tools.Error("Defines: " + defines);
+                Tools.Error("Error: " + this._compilationError);
+                this._dumpShadersName();
+
                 if (fallbacks && fallbacks.isMoreFallbacks) {
-                    Tools.Error("Unable to compile effect with current defines. Trying next fallback.");
-                    this._dumpShadersName();
+                    Tools.Error("Trying next fallback.");
                     defines = fallbacks.reduce(defines);
                     this._prepareEffect(vertexSourceCode, fragmentSourceCode, attributesNames, defines, fallbacks);
                 } else { // Sorry we did everything we can
-                    Tools.Error("Unable to compile effect: ");
-                    this._dumpShadersName();
-                    Tools.Error("Defines: " + defines);
-                    Tools.Error("Error: " + e.message);
-                    this._compilationError = e.message;
 
                     if (this.onError) {
                         this.onError(this, this._compilationError);
@@ -396,24 +509,15 @@
         }
 
         public _cacheMatrix(uniformName: string, matrix: Matrix): boolean {
-            var changed = false;
-            var cache: Matrix = this._valueCache[uniformName];
-            if (!cache || !(cache instanceof Matrix)) {
-                changed = true;
-                cache = new Matrix();
+            var cache = this._valueCache[uniformName];
+            var flag = matrix.updateFlag;
+            if (cache !== undefined && cache === flag) {
+                return false;
             }
 
-            var tm = cache.m;
-            var om = matrix.m;
-            for (var index = 0; index < 16; index++) {
-                if (tm[index] !== om[index]) {
-                    tm[index] = om[index];
-                    changed = true;
-                }
-            }
+            this._valueCache[uniformName] = flag;
 
-            this._valueCache[uniformName] = cache;
-            return changed;
+            return true;
         }
 
         public _cacheFloat2(uniformName: string, x: number, y: number): boolean {
@@ -681,6 +785,132 @@
                 this._engine.setColor4(this.getUniform(uniformName), color3, alpha);
             }
             return this;
+        }
+
+        private _recombineShader(node: any): string {
+            if (node.define) {
+                if (node.condition) {
+                    var defineIndex = this.defines.indexOf("#define " + node.define);
+                    if (defineIndex === -1) {
+                        return null;
+                    }
+
+                    var nextComma = this.defines.indexOf("\n", defineIndex);
+                    var defineValue = this.defines.substr(defineIndex + 7, nextComma - defineIndex - 7).replace(node.define, "").trim();
+                    var condition = defineValue + node.condition;
+                    if (!eval(condition)) {
+                        return null;
+                    }
+                }
+                else if (node.ndef) {
+                    if (this.defines.indexOf("#define " + node.define) !== -1) {
+                        return null;
+                    }
+                }
+                else if (this.defines.indexOf("#define " + node.define) === -1) {
+                    return null;
+                }
+            }
+
+            var result = "";
+            for (var index = 0; index < node.children.length; index++) {
+                var line = node.children[index];
+
+                if (line.children) {
+                    var combined = this._recombineShader(line);
+                    if (combined !== null) {
+                        result += combined + "\r\n";
+                    }
+
+                    continue;
+                }
+
+                if (line.length > 0) {
+                    result += line + "\r\n";
+                }
+            }
+
+            return result;
+        }
+
+        private _evaluateDefinesOnString(shaderString: string): string {
+            var root = <any>{
+                children: []
+            };
+            var currentNode = root;
+
+            var lines = shaderString.split("\n");
+
+            for (var index = 0; index < lines.length; index++) {
+                var line = lines[index].trim();
+
+                // #ifdef
+                var pos = line.indexOf("#ifdef ");
+                if (pos !== -1) {
+                    var define = line.substr(pos + 7);
+
+                    var newNode = {
+                        condition: null,
+                        ndef: false,
+                        define: define,
+                        children: [],
+                        parent: currentNode
+                    }
+                    
+                    currentNode.children.push(newNode);
+                    currentNode = newNode;
+                    continue;
+                }
+
+                // #ifndef
+                var pos = line.indexOf("#ifndef ");
+                if (pos !== -1) {
+                    var define = line.substr(pos + 8);
+
+                    newNode = {
+                        condition: null,
+                        define: define,
+                        ndef: true,
+                        children: [],
+                        parent: currentNode
+                    }
+                    
+                    currentNode.children.push(newNode);
+                    currentNode = newNode;
+                    continue;
+                }
+
+                // #if
+                var pos = line.indexOf("#if ");
+                if (pos !== -1) {
+                    var define = line.substr(pos + 4).trim();
+                    var conditionPos = define.indexOf(" ");
+
+                    newNode = {
+                        condition: define.substr(conditionPos + 1),
+                        define: define.substr(0, conditionPos),
+                        ndef: false,
+                        children: [],
+                        parent: currentNode
+                    }
+                    
+                    currentNode.children.push(newNode);
+                    currentNode = newNode;
+                    continue;
+                }
+
+                // #endif
+                pos = line.indexOf("#endif");
+                if (pos !== -1) {
+                    currentNode = currentNode.parent;
+                    continue;
+                }
+
+                currentNode.children.push(line);
+            }
+
+            // Recombine
+            return this._recombineShader(root);
         }
 
         // Statics

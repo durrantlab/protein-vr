@@ -1,6 +1,6 @@
 import parent from "./ObjectParent";
-import Core from "../Core/Core";
-import CameraChar from "../CameraChar"; 
+import * as Core from "../Core/Core";
+import * as CameraChar from "../CameraChar"; 
 
 declare var BABYLON;
 
@@ -72,20 +72,20 @@ class Ground extends parent {
         */
 
         // Get a point in 3D space that is three feet above the camera.
-        let pointAboveCamera = CameraChar.camera.position.add(
+        let pointAboveCamera = PVRGlobals.camera.position.add(
             new BABYLON.Vector3(0, 3, 0)
         );
 
         // Cast a ray straight down from that point, and get the point
         // where that ray intersects with the ground.
-        let groundPt = Core.scene.pickWithRay(
+        let groundPt = PVRGlobals.scene.pickWithRay(
             new BABYLON.Ray(
                 pointAboveCamera, new BABYLON.Vector3(0, -0.1, 0)
             )
         ).pickedPoint;
 
         // Get a point in 3D space that is three feet above the camera.
-        let pointBelowCamera = CameraChar.camera.position.subtract(
+        let pointBelowCamera = PVRGlobals.camera.position.subtract(
             new BABYLON.Vector3(0, 3, 0)
         );
 
@@ -95,7 +95,7 @@ class Ground extends parent {
 
             // Cast a ray straight up from that point, and get the point
             // where that ray intersects with the ground.
-            let groundPt = Core.scene.pickWithRay(
+            let groundPt = PVRGlobals.scene.pickWithRay(
                 new BABYLON.Ray(
                     pointBelowCamera,
                     new BABYLON.Vector3(0, 0.1, 0)
@@ -117,8 +117,8 @@ class Ground extends parent {
             if (groundAltitude > feetAltitude) {
                 // Move the camera so it's on top of the ground.
                 let delta = feetAltitude - groundAltitude;
-                CameraChar.camera.position.y =
-                    CameraChar.camera.position.y - delta;
+                PVRGlobals.camera.position.y =
+                    PVRGlobals.camera.position.y - delta;
             }
         } else {
             // If that point still doesn't exist, the charamter/camera

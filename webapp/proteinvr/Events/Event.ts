@@ -1,9 +1,9 @@
-import Timers from "./Timers";
-import Core from "../Core/Core";
-import CameraChar from "../CameraChar";
+import * as Timers from "./Timers";
+import * as Core from "../Core/Core";
+import * as CameraChar from "../CameraChar";
 
 declare var BABYLON;
-declare var jQuery;
+var jQuery = PVRGlobals.jQuery;
 
 class Event {
     /**
@@ -44,9 +44,7 @@ class Event {
             if(async){
                 let eventType :any = this.triggerConditionObj.asyncSetup();
                 this.execAsync(eventType);
-            }
-            
-            else{
+            } else{
                 // Now you need to register a timer to check for the trigger.
                 this.timerThatChecksCondition = Timers.addTimer({
                     name: "trigger" + Math.floor(Math.random() * 100000).toString(),

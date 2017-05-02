@@ -1,9 +1,11 @@
 {
     "audio": "headphones",
-    "device": "desktop",
+    "viewer": "screen",
     "animations": false,
-    "textureDetail": 1,
-    "fog": true,
+    "textures": "highdef",
+    "fog": "clear",
+    "objects": "detailed",
+    "display": "fullscreen",
     "visibility": 2,
-    "scenePath": "./scenes/test/"
+    "scenePath": "./scenes/influenza/"
 }

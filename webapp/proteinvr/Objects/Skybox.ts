@@ -1,5 +1,5 @@
 import parent from "./ObjectParent";
-import Core from "../Core/Core";
+import * as Core from "../Core/Core";
 
 /**
 BABYLON is an external JavaScript library. This prevents Typescript from
@@ -106,13 +106,13 @@ class Skybox extends parent {
 
         // Create a new material for the skybox.
         let skyboxMaterial =
-            new BABYLON.StandardMaterial("skyBox", Core.scene);
+            new BABYLON.StandardMaterial("skyBox", PVRGlobals.scene);
 
-        skyboxMaterial.backFaceCulling = false;
+        skyboxMaterial.backFaceCulling = true;
         skyboxMaterial.disableLighting = true;
 
         skyboxMaterial.reflectionTexture =
-            new BABYLON.CubeTexture(dir, Core.scene);
+            new BABYLON.CubeTexture(dir, PVRGlobals.scene);
 
         skyboxMaterial.reflectionTexture.coordinatesMode =
             BABYLON.Texture.SKYBOX_MODE;

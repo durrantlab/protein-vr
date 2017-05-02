@@ -10,7 +10,7 @@ def save_sounds(scene_data):
                 print("Error! MP3 file " + obj.name + " does not exist!")
             else:
                 # Copy to working directory.
-                os.system("cp " + obj.name + " " + Utils.pwd() + os.path.basename(obj.name))
+                os.system("cp " + obj.name + " " + Utils.pwd(params) + os.path.basename(obj.name))
                 scene_data["sounds"].append((os.path.basename(obj.name), obj.location[:]))
     
     return scene_data

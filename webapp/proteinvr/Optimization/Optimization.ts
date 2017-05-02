@@ -1,7 +1,9 @@
-///<reference path="../../js/Babylonjs/dist/babylon.2.4.d.ts" />
+///<reference path="../../js/Babylonjs/dist/babylon.2.5.d.ts" />
 
-import Core from "../Core/Core";
-import Environment from "../Environment";
+import * as Core from "../Core/Core";
+import * as Environment from "../Environment";
+import * as UserVars from "../Settings/UserVars";
+
 import { mySceneOptimizationLOD } from "./LOD";
 import { mySceneOptimizationFog } from "./Fog";
 
@@ -15,13 +17,11 @@ var optimizationWaitDuration = 10000;  // how to long wait after successfull
 // start checking for optimization again.
 var lastTimeOptimizationChecked: number = 0;
 
-var intervalWaitingForLODToFinishID = undefined;
-
 export function startOptimizing() {
     oneTimeOptimization(function() {
-        // So one time optimization is done (including setting up LOD)
-        // Wait just a bit before starting the regular optimization. Let the scene
-        // stabalize before that first big hit.
+        // So one time optimization is done. Wait just a bit before starting
+        // the regular optimization. Let the scene stabalize before that first
+        // big hit.
         setTimeout(function() {
             // Do the first on-the-fly optimization
             babylonOptimization();
@@ -36,44 +36,48 @@ export function oneTimeOptimization(doneCallBack: any) {
     */
 
     // Octrees make selections and things go faster.
-    if (Core.scene._activeMeshes.length > 100) {
-        Core.scene.createOrUpdateSelectionOctree();
+    if (PVRGlobals.scene._activeMeshes.length > 100) {
+        PVRGlobals.scene.createOrUpdateSelectionOctree();
     }
 
-    // AutoLOD all the relevant objects. You do this now, but then change the
-    // distances later as you more agressively apply the LOD. Doing it here is
-    // better, because trying to decimate while maintaining FPS is a no go,
-    // and leads the optimizer to think drastic things need to be done to
-    // maintain FPS. The default distances are so large that, for all
-    // practical purposes, it is disabled.
-
-    // Only continue once autoLOD done.
-    // intervalWaitingForLODToFinishID = setInterval(function() {
-    //     if (autoLODDone() === true) {
-            clearInterval(intervalWaitingForLODToFinishID);
-
-            // Every 30 seconds see if you need to restart the on-the-fly
-            // optimization.
-            let periodicChecksDuration = 30000;
-            setInterval(function() {
-                let curTime = new Date().getTime();
-                if (curTime - lastTimeOptimizationChecked > periodicChecksDuration) {
-                    // It's been 10 seconds since callback should have fired.
-                    // Assume it's not going to happen.
-                    console.log("Appears that babylon optimization never fired callback. Restarting optimization checks...");
-                    babylonOptimization();
-                }
-            }, periodicChecksDuration + optimizationWaitDuration);
-
-            Core.scene.workerCollisions = true;
+    // If the user specified lower-resolution textures, do that now...
+    // setTimeout(function() {
+    //     let textureDetail = UserVars.getParam("texturedetail");
+    //     if (textureDetail !== UserVars.textureDetail.High) {
+    //         let reso = (textureDetail === UserVars.textureDetail.Medium) ? 512 : 256;
             
-            /*this.*/doneCallBack()
+    //         var optim = new BABYLON.SceneOptimizerOptions(100, 2000); // 100 is impossible fps to attain. 10 ms isn't enough to get accurate count, but doesn't matter.
+    //         optim.optimizations.push(new BABYLON.TextureOptimization(0, reso));
 
-        // } 
-    // }.bind({
-    //     doneCallBack: doneCallBack
-    // }), 500);
+    //         BABYLON.SceneOptimizer.OptimizeAsync(
+    //             PVRGlobals.scene,
+    //             optim,
+    //             function () {
+    //                 alert("Success!");
+    //             },
+    //             function () {
+    //                 alert("Did not attain FPS!");
+    //             }
+    //         );
+    //     }
+    // }, 3000);
 
+    // Every 30 seconds see if you need to restart the on-the-fly
+    // optimization.
+    let periodicChecksDuration = 30000;
+    setInterval(function() {
+        let curTime = new Date().getTime();
+        if (curTime - lastTimeOptimizationChecked > periodicChecksDuration) {
+            // It's been 10 seconds since callback should have fired.
+            // Assume it's not going to happen.
+            console.log("Appears that babylon optimization never fired callback. Restarting optimization checks...");
+            babylonOptimization();
+        }
+    }, periodicChecksDuration + optimizationWaitDuration);
+
+    PVRGlobals.scene.workerCollisions = true;
+    
+    doneCallBack()
 }
 
 export function babylonOptimization() {
@@ -85,10 +89,10 @@ export function babylonOptimization() {
     // This optimization is great, except it merges different
     // LOD-level meshes into one visible mesh. I think this is a
     // BABYLON bug.
-    //console.log(Core.engine.getFps());
-    console.log("optimizing... "); //FPS: ", Core.engine.getFps());
+    //console.log(PVRGlobals.engine.getFps());
+    console.log("optimizing... "); //FPS: ", PVRGlobals.engine.getFps());
     BABYLON.SceneOptimizer.OptimizeAsync(
-        Core.scene,
+        PVRGlobals.scene,
         //BABYLON.SceneOptimizerOptions.HighDegradationAllowed(), //optimizationOptions(), // this.optimizationOptions() doesn't work 
         optimizationOptions(),
         function() {

@@ -1,4 +1,7 @@
-﻿module BABYLON {
+﻿/// <reference path="babylon.targetCamera.ts" />
+/// <reference path="..\Tools\babylon.tools.ts" />
+
+module BABYLON {
     export class ArcRotateCamera extends TargetCamera {
         @serialize()
         public alpha: number;
@@ -184,7 +187,7 @@
         public onCollide: (collidedMesh: AbstractMesh) => void;
         public checkCollisions = false;
         public collisionRadius = new Vector3(0.5, 0.5, 0.5);
-        private _collider = new Collider();
+        private _collider: Collider;
         private _previousPosition = Vector3.Zero();
         private _collisionVelocity = Vector3.Zero();
         private _newPosition = Vector3.Zero();
@@ -193,6 +196,8 @@
         private _previousRadius: number;
         //due to async collision inspection
         private _collisionTriggered: boolean;
+        
+        private _targetBoundingCenter: Vector3;
 
         constructor(name: string, alpha: number, beta: number, radius: number, target: Vector3, scene: Scene) {
             super(name, Vector3.Zero(), scene);
@@ -209,8 +214,8 @@
 
             this.getViewMatrix();
             this.inputs = new ArcRotateCameraInputsManager(this);
-            this.inputs.addKeyboard().addMouseWheel().addPointers().addGamepad();
-        }
+            this.inputs.addKeyboard().addMouseWheel().addPointers();
+        }      
 
         // Cache
         public _initCache(): void {
@@ -236,7 +241,8 @@
 
         private _getTargetPosition(): Vector3 {
             if ((<any>this.target).getAbsolutePosition) {
-                return (<any>this.target).getAbsolutePosition();
+                var pos : Vector3 = (<any>this.target).getAbsolutePosition();
+                return this._targetBoundingCenter ? pos.add(this._targetBoundingCenter) : pos;
             }
 
             return this.target;
@@ -285,13 +291,14 @@
             this.inputs.checkInputs();
             // Inertia
             if (this.inertialAlphaOffset !== 0 || this.inertialBetaOffset !== 0 || this.inertialRadiusOffset !== 0) {
-                this.beta += this.inertialBetaOffset;                    
-
+                
                 if (this.getScene().useRightHandedSystem) {
                     this.alpha -= this.beta <= 0 ? -this.inertialAlphaOffset : this.inertialAlphaOffset;
                 } else {
                     this.alpha += this.beta <= 0 ? -this.inertialAlphaOffset : this.inertialAlphaOffset;
                 }
+
+                this.beta += this.inertialBetaOffset;
 
                 this.radius -= this.inertialRadiusOffset;
                 this.inertialAlphaOffset *= this.inertia;
@@ -402,9 +409,15 @@
             this.rebuildAnglesAndRadius();
         }
 
-        public setTarget(target: Vector3): void {
-            if (this._getTargetPosition().equals(target)) {
+        public setTarget(target: Vector3, toBoundingCenter = false, allowSamePosition = false): void {            
+            if (!allowSamePosition && this._getTargetPosition().equals(target)) {
                 return;
+            }
+            
+            if (toBoundingCenter && (<any>target).getBoundingInfo){
+                this._targetBoundingCenter = (<any>target).getBoundingInfo().boundingBox.centerWorld.clone();
+            }else{
+                this._targetBoundingCenter = null;
             }
             this.target = target;
             this.rebuildAnglesAndRadius();
@@ -424,6 +437,9 @@
             var target = this._getTargetPosition();
             target.addToRef(new Vector3(this.radius * cosa * sinb, this.radius * cosb, this.radius * sina * sinb), this._newPosition);
             if (this.getScene().collisionsEnabled && this.checkCollisions) {
+                if (!this._collider) {
+                    this._collider = new Collider();
+                }
                 this._collider.radius = this.collisionRadius;
                 this._newPosition.subtractToRef(this.position, this._collisionVelocity);
                 this._collisionTriggered = true;
@@ -432,7 +448,7 @@
                 this.position.copyFrom(this._newPosition);
 
                 var up = this.upVector;
-                if (this.allowUpsideDown && this.beta < 0) {
+                if (this.allowUpsideDown && sinb < 0) {
                     up = up.clone();
                     up = up.negate();
                 }
@@ -445,6 +461,7 @@
                 this._viewMatrix.m[12] += this.targetScreenOffset.x;
                 this._viewMatrix.m[13] += this.targetScreenOffset.y;
             }
+            this._currentTarget = target;
             return this._viewMatrix;
         }
 
@@ -577,7 +594,7 @@
             super.dispose();
         }
 
-        public getTypeName(): string {
+        public getClassName(): string {
             return "ArcRotateCamera";
         }
     }

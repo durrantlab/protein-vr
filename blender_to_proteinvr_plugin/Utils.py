@@ -40,10 +40,10 @@ def decimate_obj(obj, ratio):
     obj.modifiers["Decimate"].ratio = ratio
     apply_all_modifiers(obj)
 
-def decimatable_objs(min_verts_to_decimate):
+def decimatable_objs(params):
     objs = []
     for obj in bpy.data.objects:
-        if num_verts(obj) > min_verts_to_decimate:
+        if num_verts(obj) > params["min_verts_to_decimate"]:
             objs.append(obj)
     return objs
 
@@ -54,6 +54,9 @@ def apply_all_modifiers(obj):
         except RuntimeError as ex:
             # print the error incase its important... but continue
             print(ex)
-def pwd():
-    basedir = "proteinvr_scene_prepped"
-    return "/var/tmp/" + basedir + os.sep if bpy.data.filepath == '' else os.path.dirname(bpy.data.filepath) + os.sep + basedir + os.sep
+def pwd(params):
+    basedir = params["output_dir"] # "proteinvr_scene_prepped"
+    if bpy.data.filepath == '':
+        return "/var/tmp/" + basedir + os.sep
+    else:
+        return os.path.dirname(bpy.data.filepath) + os.sep + basedir + os.sep

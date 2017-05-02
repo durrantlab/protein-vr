@@ -14,6 +14,7 @@
         private _matrices: { [name: string]: Matrix } = {};
         private _matrices3x3: { [name: string]: Float32Array } = {};
         private _matrices2x2: { [name: string]: Float32Array } = {};
+        private _vectors3Arrays: { [name: string]: number[] } = {};
         private _cachedWorldViewMatrix = new Matrix();
         private _renderId: number;
 
@@ -29,6 +30,10 @@
             options.defines = options.defines || [];
 
             this._options = options;
+        }
+
+        public getClassName(): string {
+            return "ShaderMaterial";
         }
 
         public needAlphaBlending(): boolean {
@@ -136,13 +141,34 @@
             return this;
         }
 
+        public setArray3(name: string, value: number[]): ShaderMaterial {
+            this._checkUniform(name);
+            this._vectors3Arrays[name] = value;
+
+            return this;
+        }
+
+        private _checkCache(scene: Scene, mesh?: AbstractMesh, useInstances?: boolean): boolean {
+            if (!mesh) {
+                return true;
+            }
+
+            if (this._effect && (this._effect.defines.indexOf("#define INSTANCES") !== -1) !== useInstances) {
+                return false;
+            }
+
+            return false;
+        }
+        
         public isReady(mesh?: AbstractMesh, useInstances?: boolean): boolean {
             var scene = this.getScene();
             var engine = scene.getEngine();
 
             if (!this.checkReadyOnEveryCall) {
                 if (this._renderId === scene.getRenderId()) {
-                    return true;
+                    if (this._checkCache(scene, mesh, useInstances)) {
+                        return true;
+                    }
                 }
             }
 
@@ -162,6 +188,13 @@
                 defines.push("#define NUM_BONE_INFLUENCERS " + mesh.numBoneInfluencers);
                 defines.push("#define BonesPerMesh " + (mesh.skeleton.bones.length + 1));
                 fallbacks.addCPUSkinningFallback(0, mesh);
+            }
+
+            // Textures
+            for (var name in this._textures) {
+                if (!this._textures[name].isReady()) {
+                    return false;
+                }
             }
 
             // Alpha test
@@ -226,9 +259,7 @@
                 }
 
                 // Bones
-                if (mesh && mesh.useBones && mesh.computeBonesUsingShaders) {
-                    this._effect.setMatrices("mBones", mesh.skeleton.getTransformMatrices(mesh));
-                }
+                MaterialHelper.BindBonesParameters(mesh, this._effect);
 
                 var name: string;
                 // Texture
@@ -291,9 +322,14 @@
                 for (name in this._matrices2x2) {
                     this._effect.setMatrix2x2(name, this._matrices2x2[name]);
                 }
+                
+                // Vector3Array   
+                for (name in this._vectors3Arrays) {
+                    this._effect.setArray3(name, this._vectors3Arrays[name]);
+                }
             }
 
-            super.bind(world, mesh);
+            this._afterBind(mesh);
         }
 
         public clone(name: string): ShaderMaterial {
@@ -408,6 +444,12 @@
                 serializationObject.matrices2x2[name] = this._matrices2x2[name];
             }
 
+            // Vector3Array
+            serializationObject.vectors3Arrays = {};
+            for (name in this._vectors3Arrays) {
+                serializationObject.vectors3Arrays[name] = this._vectors3Arrays[name];
+            }
+            
             return serializationObject;
         }
 
@@ -482,6 +524,11 @@
                 material.setMatrix2x2(name, source.matrices2x2[name]);
             }
 
+            // Vector3Array
+            for (name in source.vectors3Arrays) {
+                material.setArray3(name, source.vectors3Arrays[name]);
+            }
+            
             return material;
         }
     }

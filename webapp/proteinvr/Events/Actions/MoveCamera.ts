@@ -1,11 +1,11 @@
-import Timers from "../Timers";
+import * as Timers from "../Timers";
 
 import parent from "./ActionParent";
-import CameraChar from "../../CameraChar";
+import * as CameraChar from "../../CameraChar";
 
 
 declare var BABYLON;
-declare var jQuery;
+var jQuery = PVRGlobals.jQuery;
 
 interface DoInterface{
     camera: any; //camera object
@@ -37,7 +37,7 @@ class MoveCamera extends parent {
             interpValEnd: 1.0,
             tickCallback: function(val){
                 let camera = this.parameters["camera"];
-                let sp = CameraChar.camera.position;
+                let sp = PVRGlobals.camera.position;
                 let ep = this.parameters['endPoint'];
 
                 camera.position.x = sp.x + ((ep.x-sp.x) * val);

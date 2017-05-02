@@ -16,5 +16,10 @@ if os.path.exists(vmd_param):
 # Run the docker file, mounting the present directory and passing the
 # parameter
 host_dir = os.path.abspath(os.getcwd())
-#os.system("docker run --rm -it -v " + host_dir + ":/mounted/ durrantlab_pdb_to_obj bash")
-os.system("docker run --rm -v " + host_dir + ":/mounted/ durrantlab_pdb_to_obj " + vmd_param)
+
+interactive = False
+
+if interactive:
+    os.system("docker run --rm -it -v " + host_dir + ":/mounted/ durrantlab_pdb_to_obj " + vmd_param + " bash")
+else:
+    os.system("docker run --rm -v " + host_dir + ":/mounted/ durrantlab_pdb_to_obj " + vmd_param)

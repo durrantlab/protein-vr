@@ -44,7 +44,7 @@
             }
 
             if (urls) {
-                this.video.addEventListener("canplaythrough", () => {
+                this.video.addEventListener("canplay", () => {
                     this._createTexture();
                 });
                 urls.forEach(url => {
@@ -61,15 +61,17 @@
 
         private _createTexture(): void {
             this._texture = this.getScene().getEngine().createDynamicTexture(this.video.videoWidth, this.video.videoHeight, this._generateMipMaps, this._samplingMode);
-            this._texture.isReady = true;
-        }
 
-        public update(): boolean {
             if (this._autoLaunch) {
                 this._autoLaunch = false;
                 this.video.play();
             }
+            this.video.addEventListener("playing", () => {
+                this._texture.isReady = true;
+            });
+        }
 
+        public update(): boolean {
             var now = Tools.Now;
 
             if (now - this._lastUpdate < 15 || this.video.readyState !== this.video.HAVE_ENOUGH_DATA) {
@@ -79,6 +81,56 @@
             this._lastUpdate = now;
             this.getScene().getEngine().updateVideoTexture(this._texture, this.video, this._invertY);
             return true;
+        }
+
+        public static CreateFromWebCam(scene: Scene, onReady: (videoTexture: VideoTexture) => void, constraints: { 
+                minWidth: number, 
+                maxWidth: number, 
+                minHeight: number, 
+                maxHeight: number,
+                deviceId: string
+            }): void {
+            var video = document.createElement("video");
+            var constraintsDeviceId;
+            if (constraints && constraints.deviceId){
+                constraintsDeviceId = { 
+                    exact: constraints.deviceId                     
+                }
+            }
+
+		    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+		    window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+
+		    if (navigator.getUserMedia) {
+			    navigator.getUserMedia({                     
+                    video: {
+                        deviceId: constraintsDeviceId,
+                        width: {
+                            min: (constraints && constraints.minWidth) || 256,
+                            max: (constraints && constraints.maxWidth) || 640
+                        },
+                        height: {
+                            min: (constraints && constraints.minHeight) || 256,
+                            max: (constraints && constraints.maxHeight) || 480
+                        }
+                    }
+                }, (stream) => {
+
+                    if (video.mozSrcObject !== undefined) { // hack for Firefox < 19
+                        video.mozSrcObject = stream;
+                    } else {
+                        video.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
+                    }
+                    
+                    video.play();
+
+                    if (onReady) {
+                        onReady(new BABYLON.VideoTexture("video", video, scene, true, true));
+                    }
+			    }, function (e) {
+                    Tools.Error(e.name); 
+                });
+            }
         }
     }
 }

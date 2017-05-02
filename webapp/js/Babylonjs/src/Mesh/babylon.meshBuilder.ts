@@ -1,31 +1,15 @@
 ﻿module BABYLON {
     export class MeshBuilder {
-        private static updateSideOrientationForRightHandedSystem(orientation: number, scene: Scene): number {
-            if (!scene.useRightHandedSystem) {
-                if (orientation === undefined || orientation === null) {
-                    return Mesh.FRONTSIDE;
-                }
-
-                switch (orientation) {
-                    case Mesh.FRONTSIDE:
-                    case Mesh.DEFAULTSIDE:
-                        return Mesh.FRONTSIDE;
-                    default:
-                        return Mesh.BACKSIDE;
-                }
+        private static updateSideOrientation(orientation: number, scene: Scene): number {
+            if (orientation == Mesh.DOUBLESIDE) {
+                return Mesh.DOUBLESIDE;
             }
 
             if (orientation === undefined || orientation === null) {
-                return Mesh.BACKSIDE;
+                return Mesh.FRONTSIDE;
             }
 
-            switch (orientation) {
-                case Mesh.FRONTSIDE:
-                case Mesh.DEFAULTSIDE:
-                    return Mesh.BACKSIDE;
-                default:
-                    return Mesh.FRONTSIDE;
-            }
+            return orientation;
         }
 
         /**
@@ -42,8 +26,9 @@
         public static CreateBox(name: string, options: { size?: number, width?: number, height?: number, depth?: number, faceUV?: Vector4[], faceColors?: Color4[], sideOrientation?: number, updatable?: boolean }, scene: Scene): Mesh {
             var box = new Mesh(name, scene);
 
-            options.sideOrientation = this.updateSideOrientationForRightHandedSystem(options.sideOrientation, scene);
-
+            options.sideOrientation = MeshBuilder.updateSideOrientation(options.sideOrientation, scene);
+            box.sideOrientation = options.sideOrientation;
+            
             var vertexData = VertexData.CreateBox(options);
 
             vertexData.applyToMesh(box, options.updatable);
@@ -66,8 +51,9 @@
         public static CreateSphere(name: string, options: { segments?: number, diameter?: number, diameterX?: number, diameterY?: number, diameterZ?: number, arc?: number, slice?: number, sideOrientation?: number, updatable?: boolean }, scene: any): Mesh {
             var sphere = new Mesh(name, scene);
 
-            options.sideOrientation = this.updateSideOrientationForRightHandedSystem(options.sideOrientation, scene);
-
+            options.sideOrientation = MeshBuilder.updateSideOrientation(options.sideOrientation, scene);
+            sphere.sideOrientation = options.sideOrientation;
+            
             var vertexData = VertexData.CreateSphere(options);
 
             vertexData.applyToMesh(sphere, options.updatable);
@@ -88,8 +74,9 @@
         public static CreateDisc(name: string, options: { radius?: number, tessellation?: number, arc?: number, updatable?: boolean, sideOrientation?: number }, scene: Scene): Mesh {
             var disc = new Mesh(name, scene);
 
-            options.sideOrientation = this.updateSideOrientationForRightHandedSystem(options.sideOrientation, scene);
-
+            options.sideOrientation = MeshBuilder.updateSideOrientation(options.sideOrientation, scene);
+            disc.sideOrientation = options.sideOrientation;
+            
             var vertexData = VertexData.CreateDisc(options);
 
             vertexData.applyToMesh(disc, options.updatable);
@@ -111,8 +98,9 @@
         public static CreateIcoSphere(name: string, options: { radius?: number, radiusX?: number, radiusY?: number, radiusZ?: number, flat?: boolean, subdivisions?: number, sideOrientation?: number, updatable?: boolean }, scene: Scene): Mesh {
             var sphere = new Mesh(name, scene);
 
-            options.sideOrientation = this.updateSideOrientationForRightHandedSystem(options.sideOrientation, scene);
-
+            options.sideOrientation = MeshBuilder.updateSideOrientation(options.sideOrientation, scene);
+            sphere.sideOrientation = options.sideOrientation;
+            
             var vertexData = VertexData.CreateIcoSphere(options);
 
             vertexData.applyToMesh(sphere, options.updatable);
@@ -134,14 +122,19 @@
          * You can also set the mesh side orientation with the values : BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or BABYLON.Mesh.DOUBLESIDE  
          * Detail here : http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation    
          * The optional parameter `invertUV` (boolean, default false) swaps in the geometry the U and V coordinates to apply a texture.  
+         * The parameter `uvs` is an optional flat array of `Vector2` to update/set each ribbon vertex with its own custom UV values instead of the computed ones.  
+         * The parameters `colors` is an optional flat array of `Color4` to set/update each ribbon vertex with its own custom color values.  
+         * Note that if you use the parameters `uvs` or `colors`, the passed arrays must be populated with the right number of elements, it is to say the number of ribbon vertices. Remember that 
+         * if you set `closePath` to `true`, there's one extra vertex per path in the geometry.  
+         * Moreover, you can use the parameter `color` with `instance` (to update the ribbon), only if you previously used it at creation time.  
          * The mesh can be set to updatable with the boolean parameter `updatable` (default false) if its internal geometry is supposed to change once created.  
          */
-        public static CreateRibbon(name: string, options: { pathArray: Vector3[][], closeArray?: boolean, closePath?: boolean, offset?: number, updatable?: boolean, sideOrientation?: number, instance?: Mesh, invertUV?: boolean }, scene?: Scene): Mesh {
+        public static CreateRibbon(name: string, options: { pathArray: Vector3[][], closeArray?: boolean, closePath?: boolean, offset?: number, updatable?: boolean, sideOrientation?: number, instance?: Mesh, invertUV?: boolean, uvs?: Vector2[], colors?: Color4[] }, scene?: Scene): Mesh {
             var pathArray = options.pathArray;
             var closeArray = options.closeArray;
             var closePath = options.closePath;
             var offset = options.offset;
-            var sideOrientation = this.updateSideOrientationForRightHandedSystem(options.sideOrientation, scene);
+            var sideOrientation = MeshBuilder.updateSideOrientation(options.sideOrientation, scene);
             var instance = options.instance;
             var updatable = options.updatable;
 
@@ -199,10 +192,29 @@
                 instance._boundingInfo = new BoundingInfo(Tmp.Vector3[0], Tmp.Vector3[1]);
                 instance._boundingInfo.update(instance._worldMatrix);
                 instance.updateVerticesData(VertexBuffer.PositionKind, positions, false, false);
-                if (!(instance.areNormalsFrozen)) {
+                if (options.colors) {
+                    var colors = instance.getVerticesData(VertexBuffer.ColorKind);
+                    for (var c = 0; c < options.colors.length; c++) {
+                        colors[c * 4] = options.colors[c].r;
+                        colors[c * 4 + 1] = options.colors[c].g;
+                        colors[c * 4 + 2] = options.colors[c].b;
+                        colors[c * 4 + 3] = options.colors[c].a;
+                    }
+                    instance.updateVerticesData(VertexBuffer.ColorKind, colors, false, false);
+                }
+                if (options.uvs) {
+                    var uvs = instance.getVerticesData(VertexBuffer.UVKind);
+                    for (var i = 0; i < options.uvs.length; i++) {
+                        uvs[i * 2] = options.uvs[i].x;
+                        uvs[i * 2 + 1] = options.uvs[i].y;
+                    }
+                    instance.updateVerticesData(VertexBuffer.UVKind, uvs, false, false);
+                }
+                if (!instance.areNormalsFrozen || instance.isFacetDataEnabled) {
                     var indices = instance.getIndices();
                     var normals = instance.getVerticesData(VertexBuffer.NormalKind);
-                    VertexData.ComputeNormals(positions, indices, normals);
+                    var params = instance.isFacetDataEnabled ? instance.getFacetDataParameters() : null;
+                    VertexData.ComputeNormals(positions, indices, normals, params);
 
                     if ((<any>instance)._closePath) {
                         var indexFirst: number = 0;
@@ -223,8 +235,9 @@
                             normals[indexLast + 2] = normals[indexFirst + 2];
                         }
                     }
-
-                    instance.updateVerticesData(VertexBuffer.NormalKind, normals, false, false);
+                    if (!(instance.areNormalsFrozen)) {
+                        instance.updateVerticesData(VertexBuffer.NormalKind, normals, false, false);
+                    }
                 }
 
                 return instance;
@@ -272,9 +285,10 @@
          */
         public static CreateCylinder(name: string, options: { height?: number, diameterTop?: number, diameterBottom?: number, diameter?: number, tessellation?: number, subdivisions?: number, arc?: number, faceColors?: Color4[], faceUV?: Vector4[], updatable?: boolean, hasRings?: boolean, enclose?: boolean, sideOrientation?: number }, scene: any): Mesh {
             var cylinder = new Mesh(name, scene);
-
-            options.sideOrientation = this.updateSideOrientationForRightHandedSystem(options.sideOrientation, scene);
-
+            
+            options.sideOrientation = MeshBuilder.updateSideOrientation(options.sideOrientation, scene);
+            cylinder.sideOrientation = options.sideOrientation;
+            
             var vertexData = VertexData.CreateCylinder(options);
 
             vertexData.applyToMesh(cylinder, options.updatable);
@@ -295,8 +309,9 @@
         public static CreateTorus(name: string, options: { diameter?: number, thickness?: number, tessellation?: number, updatable?: boolean, sideOrientation?: number }, scene: any): Mesh {
             var torus = new Mesh(name, scene);
 
-            options.sideOrientation = this.updateSideOrientationForRightHandedSystem(options.sideOrientation, scene);
-
+            options.sideOrientation = MeshBuilder.updateSideOrientation(options.sideOrientation, scene);
+            torus.sideOrientation = options.sideOrientation;
+            
             var vertexData = VertexData.CreateTorus(options);
 
             vertexData.applyToMesh(torus, options.updatable);
@@ -318,8 +333,9 @@
         public static CreateTorusKnot(name: string, options: { radius?: number, tube?: number, radialSegments?: number, tubularSegments?: number, p?: number, q?: number, updatable?: boolean, sideOrientation?: number }, scene: any): Mesh {
             var torusKnot = new Mesh(name, scene);
 
-            options.sideOrientation = this.updateSideOrientationForRightHandedSystem(options.sideOrientation, scene);
-
+            options.sideOrientation = MeshBuilder.updateSideOrientation(options.sideOrientation, scene);
+            torusKnot.sideOrientation = options.sideOrientation;
+            
             var vertexData = VertexData.CreateTorusKnot(options);
 
             vertexData.applyToMesh(torusKnot, options.updatable);
@@ -482,7 +498,7 @@
             var rotation = options.rotation || 0;
             var cap = (options.cap === 0) ? 0 : options.cap || Mesh.NO_CAP;
             var updatable = options.updatable;
-            var sideOrientation = this.updateSideOrientationForRightHandedSystem(options.sideOrientation, scene);
+            var sideOrientation = MeshBuilder.updateSideOrientation(options.sideOrientation, scene);
             var instance = options.instance;
             var invertUV = options.invertUV || false;
 
@@ -533,7 +549,7 @@
             var ribbonClosePath = options.ribbonClosePath || false;
             var cap = (options.cap === 0) ? 0 : options.cap || Mesh.NO_CAP;
             var updatable = options.updatable;
-            var sideOrientation = this.updateSideOrientationForRightHandedSystem(options.sideOrientation, scene);
+            var sideOrientation = MeshBuilder.updateSideOrientation(options.sideOrientation, scene);
             var instance = options.instance;
             var invertUV = options.invertUV || false;
             return MeshBuilder._ExtrudeShapeGeneric(name, shape, path, null, null, scaleFunction, rotationFunction, ribbonCloseArray, ribbonClosePath, cap, true, scene, updatable, sideOrientation, instance, invertUV);
@@ -557,13 +573,13 @@
          * The mesh can be set to updatable with the boolean parameter `updatable` (default false) if its internal geometry is supposed to change once created.  
          */
         public static CreateLathe(name: string, options: { shape: Vector3[], radius?: number, tessellation?: number, arc?: number, closed?: boolean, updatable?: boolean, sideOrientation?: number, cap?: number, invertUV?: boolean }, scene: Scene): Mesh {
-            var arc: number = (options.arc <= 0 || options.arc > 1) ? 1.0 : options.arc || 1.0;
+            var arc: number = options.arc ? ((options.arc <= 0 || options.arc > 1) ? 1.0 : options.arc) : 1.0;
             var closed: boolean = (options.closed === undefined) ? true : options.closed;
             var shape = options.shape;
             var radius = options.radius || 1;
             var tessellation = options.tessellation || 64;
             var updatable = options.updatable;
-            var sideOrientation = this.updateSideOrientationForRightHandedSystem(options.sideOrientation, scene);
+            var sideOrientation = MeshBuilder.updateSideOrientation(options.sideOrientation, scene);
             var cap = options.cap || Mesh.NO_CAP;
             var pi2 = Math.PI * 2;
             var paths = new Array();
@@ -609,8 +625,9 @@
         public static CreatePlane(name: string, options: { size?: number, width?: number, height?: number, sideOrientation?: number, updatable?: boolean, sourcePlane?: Plane }, scene: Scene): Mesh {
             var plane = new Mesh(name, scene);
 
-            options.sideOrientation = this.updateSideOrientationForRightHandedSystem(options.sideOrientation, scene);
-
+            options.sideOrientation = MeshBuilder.updateSideOrientation(options.sideOrientation, scene);
+            plane.sideOrientation = options.sideOrientation;
+            
             var vertexData = VertexData.CreatePlane(options);
 
             vertexData.applyToMesh(plane, options.updatable);
@@ -685,6 +702,7 @@
          * The parameter `subdivisions` (positive integer, default 1) sets the number of subdivision per side.  
          * The parameter `minHeight` (float, default 0) is the minimum altitude on the ground.     
          * The parameter `maxHeight` (float, default 1) is the maximum altitude on the ground.   
+         * The parameter `colorFilter` (optional Color3, default (0.3, 0.59, 0.11) ) is the filter to apply to the image pixel colors to compute the height.  
          * The parameter `onReady` is a javascript callback function that will be called  once the mesh is just built (the height map download can last some time).  
          * This function is passed the newly built mesh : 
          * ```javascript
@@ -693,12 +711,13 @@
          * ```
          * The mesh can be set to updatable with the boolean parameter `updatable` (default false) if its internal geometry is supposed to change once created.  
          */
-        public static CreateGroundFromHeightMap(name: string, url: string, options: { width?: number, height?: number, subdivisions?: number, minHeight?: number, maxHeight?: number, updatable?: boolean, onReady?: (mesh: GroundMesh) => void }, scene: Scene): GroundMesh {
+        public static CreateGroundFromHeightMap(name: string, url: string, options: { width?: number, height?: number, subdivisions?: number, minHeight?: number, maxHeight?: number, colorFilter?: Color3, updatable?: boolean, onReady?: (mesh: GroundMesh) => void }, scene: Scene): GroundMesh {
             var width = options.width || 10.0;
             var height = options.height || 10.0;
             var subdivisions = options.subdivisions || 1|0;
             var minHeight = options.minHeight || 0.0;
             var maxHeight = options.maxHeight || 10.0;
+            var filter = options.colorFilter || new Color3(0.3, 0.59, 0.11);
             var updatable = options.updatable;
             var onReady = options.onReady;
 
@@ -729,10 +748,10 @@
                 // Cast is due to wrong definition in lib.d.ts from ts 1.3 - https://github.com/Microsoft/TypeScript/issues/949
                 var buffer = <Uint8Array>(<any>context.getImageData(0, 0, bufferWidth, bufferHeight).data);
                 var vertexData = VertexData.CreateGroundFromHeightMap({
-                    width, height,
-                    subdivisions,
-                    minHeight, maxHeight,
-                    buffer, bufferWidth, bufferHeight
+                    width: width, height: height,
+                    subdivisions: subdivisions,
+                    minHeight: minHeight, maxHeight: maxHeight, colorFilter: filter,
+                    buffer: buffer, bufferWidth: bufferWidth, bufferHeight: bufferHeight
                 });
 
                 vertexData.applyToMesh(ground, updatable);
@@ -782,7 +801,7 @@
             var cap = options.cap || Mesh.NO_CAP;
             var invertUV = options.invertUV || false;
             var updatable = options.updatable;
-            var sideOrientation = this.updateSideOrientationForRightHandedSystem(options.sideOrientation, scene);
+            var sideOrientation = MeshBuilder.updateSideOrientation(options.sideOrientation, scene);
             var instance = options.instance;
             options.arc = (options.arc <= 0.0 || options.arc > 1.0) ? 1.0 : options.arc || 1.0;
 
@@ -895,8 +914,9 @@
         public static CreatePolyhedron(name: string, options: { type?: number, size?: number, sizeX?: number, sizeY?: number, sizeZ?: number, custom?: any, faceUV?: Vector4[], faceColors?: Color4[], flat?: boolean, updatable?: boolean, sideOrientation?: number }, scene: Scene): Mesh {
             var polyhedron = new Mesh(name, scene);
 
-            options.sideOrientation = this.updateSideOrientationForRightHandedSystem(options.sideOrientation, scene);
-
+            options.sideOrientation = MeshBuilder.updateSideOrientation(options.sideOrientation, scene);
+            polyhedron.sideOrientation = options.sideOrientation;
+            
             var vertexData = VertexData.CreatePolyhedron(options);
 
             vertexData.applyToMesh(polyhedron, options.updatable);
@@ -959,6 +979,7 @@
 
                 // Get normal
                 result.normal = new Vector3(normals[vertexId * 3], normals[vertexId * 3 + 1], normals[vertexId * 3 + 2]);
+                result.normal = Vector3.TransformNormal(result.normal, transformMatrix);
 
                 return result;
             }; // Inspired by https://github.com/mrdoob/three.js/blob/eee231960882f6f3b6113405f524956145148146/examples/js/geometries/DecalGeometry.js
@@ -1097,7 +1118,7 @@
                 for (var vIndex = 0; vIndex < faceVertices.length; vIndex++) {
                     var vertex = faceVertices[vIndex];
 
-                    //TODO check for Int32Array
+                    //TODO check for Int32Array | Uint32Array | Uint16Array
                     (<number[]>vertexData.indices).push(currentVertexDataIndex);
                     vertex.position.toArray(vertexData.positions, currentVertexDataIndex * 3);
                     vertex.normal.toArray(vertexData.normals, currentVertexDataIndex * 3);
@@ -1159,7 +1180,7 @@
                     for (i = 0; i < shapePath.length; i++) {
                         barycenter.addInPlace(shapePath[i]);
                     }
-                    barycenter.scaleInPlace(1 / shapePath.length);
+                    barycenter.scaleInPlace(1.0 / shapePath.length);
                     for (i = 0; i < shapePath.length; i++) {
                         pointCap.push(barycenter);
                     }
@@ -1170,7 +1191,7 @@
                         break;
                     case Mesh.CAP_START:
                         shapePaths[0] = capPath(shapePaths[2]);
-                        shapePaths[1] = shapePaths[2].slice(0);
+                        shapePaths[1] = shapePaths[2];
                         break;
                     case Mesh.CAP_END:
                         shapePaths[index] = shapePaths[index - 1];
@@ -1178,7 +1199,7 @@
                         break;
                     case Mesh.CAP_ALL:
                         shapePaths[0] = capPath(shapePaths[2]);
-                        shapePaths[1] = shapePaths[2].slice(0);
+                        shapePaths[1] = shapePaths[2];
                         shapePaths[index] = shapePaths[index - 1];
                         shapePaths[index + 1] = capPath(shapePaths[index - 1]);
                         break;
@@ -1192,7 +1213,7 @@
             if (instance) { // instance update
                 path3D = ((<any>instance).path3D).update(curve);
                 pathArray = extrusionPathArray(shape, curve, (<any>instance).path3D, (<any>instance).pathArray, scale, rotation, scaleFunction, rotateFunction, (<any>instance).cap, custom);
-                instance = Mesh.CreateRibbon(null, pathArray, null, null, null, null, null, null, instance);
+                instance = Mesh.CreateRibbon(null, pathArray, null, null, null, scene, null, null, instance);
 
                 return instance;
             }

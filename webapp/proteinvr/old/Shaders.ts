@@ -1,4 +1,4 @@
-///<reference path="../../js/Babylonjs/dist/babylon.2.4.d.ts" />
+///<reference path="../../js/Babylonjs/dist/babylon.2.5.d.ts" />
 
 import Shaders from "../Shader/Shader"
 

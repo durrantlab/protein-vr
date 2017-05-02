@@ -1,11 +1,11 @@
-import Timers from "../Timers";
+import * as Timers from "../Timers";
 
 import parent from "./ActionParent";
 
 declare var BABYLON;
 
 // Useful variables:
-// Location of camera: CameraChar.camera.position
+// Location of camera: PVRGlobals.camera.position
 // The same is true of a mesh. mesh.position is the location of the mesh.
 // Timers will be useful here. Let's talk about it if it's not clear from the
 // examples below.
@@ -51,12 +51,12 @@ class FadeOutMesh extends parent {
             interpValStart: 1.0,
             interpValEnd: 0.0,
             tickCallback: function(val) {
-                // this.material.alpha = val;
-                this.customShader.alpha = val;
+                this.material.alpha = val;
+                // this.customShader.alpha = val;
             }.bind(params.mesh),
             doneCallback: function() {
-                // this.material.alpha = 0;
-                this.customShader.alpha = 0;
+                this.material.alpha = 0;
+                // this.customShader.alpha = 0;
                 this.material.alphaMode = BABYLON.Engine.ALPHA_COMBINE;
             }.bind(params.mesh)
         });

@@ -1,8 +1,8 @@
 import parent from "./TriggerConditionalParent";
-import MouseState from "../../Core/MouseState";
+import * as MouseState from "../../Core/MouseState";
 
 declare var BABYLON;
-declare var jQuery;
+var jQuery = PVRGlobals.jQuery;
 
 
 interface CheckInterface{

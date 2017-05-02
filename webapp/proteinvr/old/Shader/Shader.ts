@@ -1,11 +1,11 @@
 import VertexShaderCode from "./VertexShaderCode";
 import FragmentShaderCode from "./FragmentShaderCode";
-import Core from "../Core/Core";
-import RenderLoop from '../Core/RenderLoop';
-import CameraChar from "../CameraChar";
+import * as Core from "../Core/Core";
+import * as RenderLoop from '../Core/RenderLoop';
+import * as CameraChar from "../CameraChar";
 
 declare var BABYLON;
-declare var jQuery;
+var jQuery = PVRGlobals.jQuery;
 
 // Shaders.shadersLibrary is the one to use. Attaching it to window just for
 // convenient access.
@@ -105,10 +105,10 @@ export namespace Shaders {
             "animationStrength": 0.7,
             "animationNoiseTurbulenceFactor": 1.,
             "animationOrigin": new BABYLON.Vector3(0., 0., 0.),
-            "textureSampler1": BABYLON.Texture.CreateFromBase64String(this.tinyJpgEncoded(), "tiny", Core.scene),  // a placeholder
-            "textureSampler2": BABYLON.Texture.CreateFromBase64String(this.tinyJpgEncoded(), "tiny", Core.scene),
-            "textureSampler3": BABYLON.Texture.CreateFromBase64String(this.tinyJpgEncoded(), "tiny", Core.scene),
-            "shadowMapSampler": BABYLON.Texture.CreateFromBase64String(this.tinyJpgEncoded(), "tiny", Core.scene),
+            "textureSampler1": BABYLON.Texture.CreateFromBase64String(this.tinyJpgEncoded(), "tiny", PVRGlobals.scene),  // a placeholder
+            "textureSampler2": BABYLON.Texture.CreateFromBase64String(this.tinyJpgEncoded(), "tiny", PVRGlobals.scene),
+            "textureSampler3": BABYLON.Texture.CreateFromBase64String(this.tinyJpgEncoded(), "tiny", PVRGlobals.scene),
+            "shadowMapSampler": BABYLON.Texture.CreateFromBase64String(this.tinyJpgEncoded(), "tiny", PVRGlobals.scene),
             "textureRepeat1": 1.0,
             "textureRepeat2": 1.0,
             "textureRepeat3": 1.0,
@@ -171,7 +171,7 @@ export namespace Shaders {
             //console.log("+++++++++++++");
             //console.log(FSCode);
 
-            this.material = new BABYLON.ShaderMaterial("shader" + uniq, Core.scene, {
+            this.material = new BABYLON.ShaderMaterial("shader" + uniq, PVRGlobals.scene, {
                 vertex: "panGUI" + uniq,
                 fragment: "panGUI" + uniq,
             }, {
@@ -232,14 +232,14 @@ export namespace Shaders {
         */
         private setupVarsConstantlyChanging(inputsVarsNeeded: string[]): void {
             if (inputsVarsNeeded.indexOf("time") !== -1) {
-                RenderLoop.extraFunctionsToRunInLoop_BeforeCameraLocFinalized.push(function() {
+                PVRGlobals.extraFunctionsToRunInLoop_BeforeCameraLocFinalized.push(function() {
                     this.updateTime();
                 }.bind(this));
             }
 
             if (inputsVarsNeeded.indexOf("cameraPosition") !== -1) {
-                RenderLoop.extraFunctionsToRunInLoop_BeforeCameraLocFinalized.push(function() {
-                    this.cameraPosition = CameraChar.previousPos;
+                PVRGlobals.extraFunctionsToRunInLoop_BeforeCameraLocFinalized.push(function() {
+                    this.cameraPosition = PVRGlobals.previousPos;
                 }.bind(this));
             }
         }
@@ -312,8 +312,8 @@ export namespace Shaders {
                         break;
                     case "cameraPosition":
                         // Update this shader's camera position with every turn of the render loop
-                        RenderLoop.extraFunctionsToRunInLoop_BeforeCameraLocFinalized.push(function() {
-                            this.cameraPosition = CameraChar.previousPos;
+                        PVRGlobals.extraFunctionsToRunInLoop_BeforeCameraLocFinalized.push(function() {
+                            this.cameraPosition = PVRGlobals.previousPos;
                         }.bind(this));
 
                         this.cameraPosition = this.defaults["cameraPosition"];

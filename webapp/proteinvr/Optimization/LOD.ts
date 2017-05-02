@@ -1,21 +1,28 @@
-///<reference path="../../js/Babylonjs/dist/babylon.2.4.d.ts" />
+///<reference path="../../js/Babylonjs/dist/babylon.2.5.d.ts" />
 
-import Core from "../Core/Core";
+import * as Core from "../Core/Core";
+import * as UserVars from "../Settings/UserVars";
+
+export var LODLevelOptions = [
+    [40, 60],
+    [15, 30],
+    [5, 15]
+];
 
 export class mySceneOptimizationLOD extends BABYLON.SceneOptimization {
     public apply = (scene): boolean => {
         switch (this.priority) {
             case 1:
                 // adjust the LOD distances to be more agressive.
-                adjustLODDistances(40, 60);  // change this num
+                adjustLODDistances(LODLevelOptions[0]);  // change this num
                 break;
             case 2:
                 // adjust the LOD distances to be more agressive.
-                adjustLODDistances(15, 30);  // change this num
+                adjustLODDistances(LODLevelOptions[1]);  // change this num
                 break;
             case 3:
                 // adjust the LOD distances to be more agressive.
-                adjustLODDistances(5, 15);  // change this num
+                adjustLODDistances(LODLevelOptions[2]);  // change this num
                 break;
             default:
                 alert("Error in LOD code! Priority with unknown value!");                
@@ -40,9 +47,19 @@ function isMeshEligibleForLOD(m): boolean {
     }
 }
 
-function adjustLODDistances(dist1: number, dist2ForNull: number) { //, dist3ForNull: number) {
-    for (let i = 0; i < Core.scene.meshes.length; i++) {
-        let m = Core.scene.meshes[i];
+export function adjustLODDistances(dists) { //, dist3ForNull: number) {
+    // Make sure that it's never better than the user-specified resolution.
+    let bestLODDistsAllowed = LODLevelOptions[UserVars.getParam("objects")]
+    if (bestLODDistsAllowed[0] < dists[0]) {
+        dists = bestLODDistsAllowed;
+    }
+
+    let dist1 = dists[0];
+    let dist2ForNull = dists[1];
+
+
+    for (let i = 0; i < PVRGlobals.scene.meshes.length; i++) {
+        let m = PVRGlobals.scene.meshes[i];
 
         if (m.hasLODLevels === true) {
             // Get LOD distances
@@ -77,7 +94,7 @@ function adjustLODDistances(dist1: number, dist2ForNull: number) { //, dist3ForN
             m.addLODLevel(dist1, lodLevel1);
             m.addLODLevel(dist2ForNull, lodLevel2);
             // m.addLODLevel(dist3ForNull, lodMesh3);
-            console.log(m._LODLevels);
+            // console.log(m._LODLevels);
         }
     }
 }

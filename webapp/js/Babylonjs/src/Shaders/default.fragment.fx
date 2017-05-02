@@ -124,7 +124,7 @@ uniform sampler2D reflection2DSampler;
 #ifdef REFLECTIONMAP_SKYBOX
 varying vec3 vPositionUVW;
 #else
-#ifdef REFLECTIONMAP_EQUIRECTANGULAR_FIXED
+#if defined(REFLECTIONMAP_EQUIRECTANGULAR_FIXED) || defined(REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED)
 varying vec3 vDirectionW;
 #endif
 
@@ -176,14 +176,14 @@ void main(void) {
 	vec3 normalW = vec3(1.0, 1.0, 1.0);
 #endif
 
-#ifdef DIFFUSE
-	vec2 diffuseUV = vDiffuseUV;
-#endif
-
 #include<bumpFragment>
 
+#ifdef TWOSIDEDLIGHTING
+	normalW = gl_FrontFacing ? normalW : -normalW;
+#endif
+
 #ifdef DIFFUSE
-	baseColor = texture2D(diffuseSampler, diffuseUV);
+	baseColor = texture2D(diffuseSampler, vDiffuseUV + uvOffset);
 
 #ifdef ALPHATEST
 	if (baseColor.a < 0.4)
@@ -205,7 +205,7 @@ void main(void) {
 	vec3 baseAmbientColor = vec3(1., 1., 1.);
 
 #ifdef AMBIENT
-	baseAmbientColor = texture2D(ambientSampler, vAmbientUV).rgb * vAmbientInfos.y;
+	baseAmbientColor = texture2D(ambientSampler, vAmbientUV + uvOffset).rgb * vAmbientInfos.y;
 #endif
 
 	// Specular map
@@ -214,7 +214,7 @@ void main(void) {
 	vec3 specularColor = vSpecularColor.rgb;
 
 #ifdef SPECULAR
-	vec4 specularMapColor = texture2D(specularSampler, vSpecularUV);
+	vec4 specularMapColor = texture2D(specularSampler, vSpecularUV + uvOffset);
 	specularColor = specularMapColor.rgb;
 #ifdef GLOSSINESS
 	glossiness = glossiness * specularMapColor.a;
@@ -233,7 +233,7 @@ void main(void) {
 	float shadow = 1.;
 
 #ifdef LIGHTMAP
-	vec3 lightmapColor = texture2D(lightmapSampler, vLightmapUV).rgb * vLightmapInfos.y;
+	vec3 lightmapColor = texture2D(lightmapSampler, vLightmapUV + uvOffset).rgb * vLightmapInfos.y;
 #endif
 
 #include<lightFragment>[0..maxSimultaneousLights]
@@ -319,7 +319,7 @@ void main(void) {
 #endif
 
 #ifdef OPACITY
-	vec4 opacityMap = texture2D(opacitySampler, vOpacityUV);
+	vec4 opacityMap = texture2D(opacitySampler, vOpacityUV + uvOffset);
 
 #ifdef OPACITYRGB
 	opacityMap.rgb = opacityMap.rgb * vec3(0.3, 0.59, 0.11);
@@ -343,7 +343,7 @@ void main(void) {
 	// Emissive
 	vec3 emissiveColor = vEmissiveColor;
 #ifdef EMISSIVE
-	emissiveColor += texture2D(emissiveSampler, vEmissiveUV).rgb * vEmissiveInfos.y;
+	emissiveColor += texture2D(emissiveSampler, vEmissiveUV + uvOffset).rgb * vEmissiveInfos.y;
 #endif
 
 #ifdef EMISSIVEFRESNEL
@@ -372,12 +372,11 @@ void main(void) {
 
 #ifdef SPECULARTERM
 	vec3 finalSpecular = specularBase * specularColor;
+	#ifdef SPECULAROVERALPHA
+		alpha = clamp(alpha + dot(finalSpecular, vec3(0.3, 0.59, 0.11)), 0., 1.);
+	#endif
 #else
 	vec3 finalSpecular = vec3(0.0);
-#endif
-
-#ifdef SPECULAROVERALPHA
-	alpha = clamp(alpha + dot(finalSpecular, vec3(0.3, 0.59, 0.11)), 0., 1.);
 #endif
 
 #ifdef REFLECTIONOVERALPHA

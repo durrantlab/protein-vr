@@ -1,5 +1,5 @@
-import CameraChar from "../../CameraChar";
-import Core from "../../Core/Core";
+import * as CameraChar from "../../CameraChar";
+import * as Core from "../../Core/Core";
 
 declare var BABYLON;
 
@@ -43,7 +43,12 @@ abstract class TriggerConditionalParent {
         :rtype: :any:`BABYLON.Vector3`
         */
 
-        return CameraChar.camera.position;
+        // if (PVRGlobals.camera !== undefined) {
+        return PVRGlobals.camera.position;
+        // } else {
+            // Not loaded yet?
+            // return new BABYLON.Vector3(0,0,0);
+        // }
     }
 
     public distanceToCamera(vec3: any): number {
@@ -70,7 +75,7 @@ abstract class TriggerConditionalParent {
         */
 
         // Now check if the camera is looking at the target.
-        let frustumPlanes = BABYLON.Frustum.GetPlanes(Core.scene.getTransformMatrix());
+        let frustumPlanes = BABYLON.Frustum.GetPlanes(PVRGlobals.scene.getTransformMatrix());
         if (mesh.isInFrustum(frustumPlanes)) {
             return true;
         } else {

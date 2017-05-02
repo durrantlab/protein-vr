@@ -1,9 +1,9 @@
-import Timers from "../Timers";
+import * as Timers from "../Timers";
 
 import parent from "./ActionParent";
 
 declare var BABYLON;
-declare var jQuery;
+var jQuery = PVRGlobals.jQuery;
 
 interface DoInterface {
     mesh: any;

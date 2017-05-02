@@ -1,4 +1,4 @@
-﻿module BABYLON {
+module BABYLON {
     export class Sound {
         public name: string;
         public autoplay: boolean = false;
@@ -161,6 +161,7 @@
                     }
                     else {
                         if (!codecSupportedFound) {
+                            this._isReadyToPlay = true;
                             // Simulating a ready to play event to avoid breaking code path
                             if (this._readyToPlayCallback) {
                                 window.setTimeout(() => {
@@ -224,6 +225,10 @@
                     this._connectedMesh = null;
                 }
             }
+        }
+
+        public isReady(): boolean {
+            return this._isReadyToPlay;
         }
 
         private _soundLoaded(audioData: ArrayBuffer) {

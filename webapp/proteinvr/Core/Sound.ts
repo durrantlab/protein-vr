@@ -1,11 +1,11 @@
-///<reference path="../../js/Babylonjs/dist/babylon.2.4.d.ts" />
+///<reference path="../../js/Babylonjs/dist/babylon.2.5.d.ts" />
 
-import Core from "../Core/Core";
-import UserVars from "../UserVars";
+import * as Core from "../Core/Core";
+import * as UserVars from "../Settings/UserVars";
 
 export function addSound(mp3FileName, location) {
     let panningModel: string = undefined;  // Assume speakers by default
-    switch (UserVars.userVars["audio"]) {
+    switch (UserVars.getParam("audio")) {
         case UserVars.audios.Speakers:
             panningModel = "equalpower";
             break;
@@ -24,8 +24,8 @@ export function addSound(mp3FileName, location) {
         soundParams["panningModel"] = panningModel;
     }
 
-    var sound = new BABYLON.Sound(mp3FileName, UserVars.userVars["scenePath"] + mp3FileName,
-        Core.scene, null, soundParams
+    var sound = new BABYLON.Sound(mp3FileName, UserVars.getParam("scenePath") + mp3FileName,
+        PVRGlobals.scene, null, soundParams
     );
 
     sound.setPosition(location);

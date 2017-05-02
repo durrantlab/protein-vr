@@ -1,7 +1,7 @@
 import parent from "./TriggerConditionalParent";
 
 declare var BABYLON;
-declare var jQuery;
+var jQuery = PVRGlobals.jQuery;
 
 interface CheckInterface{
     event: string;

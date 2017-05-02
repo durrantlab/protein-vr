@@ -14,21 +14,14 @@ def remove_material(obj):
 
     return material_of_active
 
-def bake_maps():
-    print("Baking shadows...")
-
-    # Make sure sky isn't selected
-    for obj in bpy.data.objects:
-        obj.select = False
-
-    # Hide the sky because it has no shadow.
-    bpy.data.objects["sky"].hide = True
-    bpy.data.objects["sky"].hide_render = True
-
+def get_objs_to_consider(params):
     # Get a list of the objects to consider.
     objs = []
     for obj in bpy.data.objects:
         if "Decimate" in obj.name:
+            continue
+        
+        if "light" in obj.name:
             continue
 
         if obj.name == "sky":
@@ -41,7 +34,7 @@ def bake_maps():
             # Cameras and things don't count
             continue
 
-        filepath =  Utils.pwd() + obj.name + "shadow.png"
+        filepath =  Utils.pwd(params) + obj.name + "shadow.png"
 
         if os.path.exists(filepath):
             resp = input(filepath + " already exists. Overwrite? (y/N) ")
@@ -49,7 +42,10 @@ def bake_maps():
                 continue
         
         objs.append(obj)
-    
+
+    return objs
+
+def render_shadows(params, objs):
     # Save current materials and remove them. Everything is pure white.
     orig_mats = []
     img_filenames = []
@@ -75,7 +71,7 @@ def bake_maps():
     for i, obj in enumerate(objs):
         print("\tBaking shadows for " + obj.name)
 
-        filepath =  Utils.pwd() + obj.name + "shadow.png"
+        filepath =  Utils.pwd(params) + obj.name + "shadow.png"
         Utils.select(obj)
 
         # Not enough just to select object... need to add texture node to
@@ -87,8 +83,8 @@ def bake_maps():
         img_filenames.append(image_name)
         image = bpy.ops.image.new(
             name   = image_name,
-            width  = 512,
-            height = 512,
+            width  = params["shadow_maps_resolution"],
+            height = params["shadow_maps_resolution"],
             color  = (1.0, 1.0, 1.0, 1.0),
             alpha  = False
         )
@@ -107,7 +103,7 @@ def bake_maps():
 
         # Bake the shadow map
         oldCyclesSamples = bpy.context.scene.cycles.samples
-        bpy.context.scene.cycles.samples = 10 #200
+        bpy.context.scene.cycles.samples = params["cycles_samples"] #200
 
         uv_textures = obj.data.uv_textures
         uv_textures.active = obj.data.uv_textures[0]  # Assuming just one uv map
@@ -115,7 +111,7 @@ def bake_maps():
         # try:
         bpy.ops.object.bake(type='COMBINED', use_selected_to_active=False)
         # except:
-        #     pwd = Utils.pwd()
+        #     pwd = Utils.pwd(parms)
         #     bpy.ops.wm.save_as_mainfile(filepath=pwd + 'fixed.blend', check_existing=False)
         #     import pdb; pdb.set_trace()
         #     hhgh
@@ -130,6 +126,52 @@ def bake_maps():
 
         print("\t\tShadow map saved to " + filepath) # + ".\n\t\tNow blur the image and convert to black and white in a program like PhotoShop.")
 
+
+def bake_maps(params):
+    print("Baking shadows...")
+
+    # Make sure sky isn't selected
+    for obj in bpy.data.objects:
+        obj.select = False
+
+    # Hide the sky because it has no shadow.
+    bpy.data.objects["sky"].hide = True
+    bpy.data.objects["sky"].hide_render = True
+
+    # Get the objects to consider
+    objs = get_objs_to_consider(params)
+
+    # Seaprate out the inner ones from the outer ones.
+    inner_objs = [o for o in objs if "inner" in o.name.lower()]
+    outer_objs = [o for o in objs if "outer" in o.name.lower()]
+    not_inner_objs = [o for o in objs if "inner" not in o.name.lower()]
+
+    # Hide the inner objs for now.
+    for obj in inner_objs:
+        obj.hide = True
+        obj.hide_render = True
+
+    # Render the objects that aren't hidden.
+    render_shadows(params, not_inner_objs)
+
+    # Now show the inner objects and hide the outer objects.
+    for obj in inner_objs:
+        obj.hide = False
+        obj.hide_render = False
+
+    for obj in outer_objs:
+        obj.hide = True
+        obj.hide_render = True
+    
+    # Now render the inner-object shadows
+    render_shadows(params, inner_objs)
+
+    # Show the outer objs.
+    for obj in outer_objs:
+        obj.hide = False
+        obj.hide_render = False
+    
+
     # Restore materials No more... material information is now stored to
     # proteinvr.json. Leaving these materials off will prevent babylon
     # exporter from doing bakes. 
@@ -138,6 +180,13 @@ def bake_maps():
     #     # Remove the temporary material
     #     remove_material(obj)
     #     obj.data.materials.append(orig_mats[i])
+
+    # Remove any lights now that you're done rendering shadows.
+    for obj in bpy.data.objects:
+        if "light" in obj.name:
+            print("Removing " + obj.name + " from scene...")
+            Utils.select(obj)
+            bpy.ops.object.delete()
 
     # Show the sky now that you're done rendering shadows.
     bpy.data.objects["sky"].hide = False

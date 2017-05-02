@@ -1,24 +1,23 @@
-﻿#ifdef BUMP
-	vec2 bumpUV = vBumpUV;
-#endif
+﻿vec2 uvOffset = vec2(0.0, 0.0);
 
 #if defined(BUMP) || defined(PARALLAX)
-	mat3 TBN = cotangent_frame(normalW * vBumpInfos.y, -viewDirectionW, bumpUV);
+	#if defined(TANGENT) && defined(NORMAL)
+		mat3 TBN = vTBN;
+	#else
+		mat3 TBN = cotangent_frame(normalW * vBumpInfos.y, vPositionW, vBumpUV);
+	#endif
 #endif
 
 #ifdef PARALLAX
 	mat3 invTBN = transposeMat3(TBN);
 
 	#ifdef PARALLAXOCCLUSION
-		vec2 uvOffset = parallaxOcclusion(invTBN * -viewDirectionW, invTBN * normalW, bumpUV, vBumpInfos.z);
+		uvOffset = parallaxOcclusion(invTBN * -viewDirectionW, invTBN * normalW, vBumpUV, vBumpInfos.z);
 	#else
-		vec2 uvOffset = parallaxOffset(invTBN * viewDirectionW, vBumpInfos.z);
+		uvOffset = parallaxOffset(invTBN * viewDirectionW, vBumpInfos.z);
 	#endif
-
-	diffuseUV += uvOffset;
-	bumpUV += uvOffset;
 #endif
 
 #ifdef BUMP
-	normalW = perturbNormal(viewDirectionW, TBN, bumpUV);
+	normalW = perturbNormal(TBN, vBumpUV + uvOffset);
 #endif

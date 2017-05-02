@@ -1,10 +1,10 @@
 import parent from "./ActionParent";
-import Core from "../../Core/Core";
-import camera from "../../CameraChar";
-import UserVars from "../../UserVars";
+import * as Core from "../../Core/Core";
+import * as CameraChar from "../../CameraChar";
+import * as UserVars from "../../Settings/UserVars";
 
 declare var BABYLON;
-declare var jQuery;
+var jQuery = PVRGlobals.jQuery;
 
 interface LabelInterface{
     label: String;
@@ -42,9 +42,9 @@ class LabelOnMesh extends parent {
         let point = BABYLON.Vector3.Project(pt,
             BABYLON.Matrix.Identity(), 
             super.scene().getTransformMatrix(), 
-            camera.camera.viewport.toGlobal(
-                Core.engine.getRenderWidth(), 
-                Core.engine.getRenderHeight()
+            PVRGlobals.camera.camera.viewport.toGlobal(
+                PVRGlobals.engine.getRenderWidth(), 
+                PVRGlobals.engine.getRenderHeight()
             )
         );
 
@@ -54,14 +54,14 @@ class LabelOnMesh extends parent {
         // console.log(point);
 
         console.log("v2 point");
-        console.log(point.x + ", " + (Core.engine.getRenderHeight() -  point.y));
+        console.log(point.x + ", " + (PVRGlobals.engine.getRenderHeight() -  point.y));
         // console.log("camera part working?");
         // console.log(camera.camera.viewport);
         // console.log("Camera info");
         // console.log(camera.camera);
 
         // console.log("engine?");
-        // console.log(Core.engine);
+        // console.log(PVRGlobals.engine);
 
 
         // console.log("transform matrix working?");
@@ -75,7 +75,7 @@ class LabelOnMesh extends parent {
         let id = Math.random();
         let canvas = new BABYLON.ScreenSpaceCanvas2D(super.scene(), {
             id: id.toString(),
-            position: new BABYLON.Vector2(point.x, Core.engine.getRenderHeight() - point.y),
+            position: new BABYLON.Vector2(point.x, PVRGlobals.engine.getRenderHeight() - point.y),
             size: new BABYLON.Size(300, 100),
             backgroundFill: "#4040408F",
             backgroundRoundRadius: 50,
@@ -92,8 +92,8 @@ class LabelOnMesh extends parent {
 
         super.scene().render();
 
-        console.log("Retrieving device in use from sys vars");
-        console.log(UserVars.getDevice());
+        // console.log("Retrieving device in use from sys vars");
+        // console.log(UserVars.getViewer());
     
         console.log("Canvas created, another click should remove the canvas");
         jQuery('#renderCanvas').click(function(){

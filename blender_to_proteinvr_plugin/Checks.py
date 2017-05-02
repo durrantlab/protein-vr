@@ -18,6 +18,15 @@ def preliminary_checks(scene_data):
     if not "grnd" in obj_names:
         print('\tError. You need a mesh named "grnd" for the ground.')
         sys.exit(0)
+    
+    light = False
+    for nm in obj_names:
+        if "light" in nm:
+            light = True
+            break
+    if not light:
+        print("\tError. No object contains substring \"light\".")
+        sys.exit(0)
 
     # Only cycles scenes are supported.
     print("Making sure CYCLES is being used...")
@@ -36,6 +45,13 @@ def preliminary_checks(scene_data):
             print('"' + obj.name + '" isn\'t visible, so deleteing.')
             bpy.ops.object.delete()
 
+        # Apply all modifiers in reverse order
+        print("Applying modifiers to " + obj.name + "...")
+        if bpy.context.object is not None:
+            for modifier in bpy.context.object.modifiers:
+                print("\tApplying modifier " + modifier.name)
+                bpy.ops.object.modifier_apply(modifier=modifier.name)
+
         # Check if has uv
         try:
             has_uv_layers = bpy.context.object.data.uv_layers
@@ -49,8 +65,9 @@ def preliminary_checks(scene_data):
             print(obj.name + " has " + str(has_uv_layers) + " uv layers. Only one is allowed.")
             sys.exit(0)
         else:
-            print(obj.name + " has no UV. You need to unwrap it before proceeding.")
-            sys.exit(0)
+            if not "light" in obj.name:  # Because lights don't need to be UV unwrapped
+                print(obj.name + " has no UV. You need to unwrap it before proceeding.")
+                sys.exit(0)
     
         # Check if has material. In the same look because everything that can
         # have a uv can have a material.
@@ -96,7 +113,7 @@ def preliminary_checks(scene_data):
                         scene.render.image_settings.file_format='PNG'
                         image.file_format = "PNG"
                         base_filename = textureNameMappings[image_name] # obj.name + "_tex.png"
-                        filename = Utils.pwd() + base_filename
+                        filename = Utils.pwd(params) + base_filename
                         image.save_render(filename, scene)
 
                         scene_data["materials"][obj.name]["color"] = base_filename

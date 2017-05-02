@@ -1,7 +1,7 @@
 // Let Typescript know there is a global variable called BABYLON
 declare var BABYLON;
 declare var html2canvas;
-declare var jQuery;
+var jQuery = PVRGlobals.jQuery;
 
 function html_texture(planeMesh, url) {
     // Use jQuery to add a div to the document body, with id "html_rendered".
@@ -32,7 +32,7 @@ function html_texture(planeMesh, url) {
 // Cara, don't change this function.
 function createScene() {
     // Where to render the scene?
-    var canvas = document.getElementById('renderCanvas');
+    var canvas: any = document.getElementById('renderCanvas');
 
     // Load the engine
     var engine = new BABYLON.Engine(canvas, true);

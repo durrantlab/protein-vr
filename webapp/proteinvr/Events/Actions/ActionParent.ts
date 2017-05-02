@@ -1,4 +1,4 @@
-import Core from "../../Core/Core";
+import * as Core from "../../Core/Core";
 
 abstract class ActionParent {
     /**
@@ -33,7 +33,7 @@ abstract class ActionParent {
         :returns: The BABYLON scene.
         */
 
-        return Core.scene;
+        return PVRGlobals.scene;
     }
 }
 
