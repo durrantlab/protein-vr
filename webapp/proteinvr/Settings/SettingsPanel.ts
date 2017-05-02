@@ -4,6 +4,7 @@ import * as Core from "../Core/Core";
 
 var jQuery;
 declare var screenfull;
+declare var PVRGlobals;
 
 export function show() {
     // Add div 
@@ -55,7 +56,7 @@ export function show() {
                 )
             )
         ) + 
-        panel(
+        panelCollapsible(
             "Initial Performance Settings",
             `<div id="settings-msg" class="alert alert-info">
                 Initial performance settings. ProteinVR will adjust in game to maintain 30 frames per second.
@@ -100,8 +101,29 @@ export function show() {
 function panel(title, html) {
     return `
         <div class="panel panel-primary">
-            <div class="panel-heading"><h3 class="panel-title">${title}</h3></div>
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    ${title}
+                </h3>
+            </div>
             <div class="panel-body">${html}</div>
+        </div>
+    `;
+}
+
+function panelCollapsible(title, html) {
+    let rnd = Math.floor(Math.random() * 1000000).toString();
+    return `
+        <div class="panel panel-primary">
+            <div class="panel-heading" onclick="jQuery('#collapse-${rnd}-href').get(0).click();" style="cursor: pointer;">
+                <h3 class="panel-title">
+                    <a data-toggle="collapse" id="collapse-${rnd}-href" href="#collapse-${rnd}"></a>${title}
+                    <i class="indicator glyphicon glyphicon-chevron-up pull-right"></i>
+                </h3>
+            </div>
+            <div id="collapse-${rnd}" class="panel-collapse collapse">
+                <div class="panel-body">${html}</div>
+            </div>
         </div>
     `;
 }
@@ -313,6 +335,17 @@ function addJavaScript() {
         msg.removeClass("alert-info");
         msg.addClass("alert-warning");
     });
+
+    
+    function toggleChevron(e) {
+        jQuery(e.target)
+            .prev('.panel-heading')
+            .find("i.indicator")
+            .toggleClass('glyphicon-chevron-down glyphicon-chevron-right');
+    }
+    let collapsibles = jQuery('.panel-collapse');
+    collapsibles.on('hidden.bs.collapse', toggleChevron);
+    collapsibles.on('shown.bs.collapse', toggleChevron);
 
     // start button. Wrapped in screenful in case you want to go full screen
     // when you press the start button.
