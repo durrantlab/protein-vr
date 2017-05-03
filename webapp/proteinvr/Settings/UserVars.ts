@@ -235,7 +235,7 @@ export function stringToEnumVal(s: any): any {
         }
     }
 
-    console.log("string id not found", s);
+    // console.log("string id not found", s);
     return s;
 }
 

@@ -19,6 +19,8 @@ interface MyDocument extends Document{
 }
 declare var document: MyDocument;
 declare var PVRGlobals;
+// var jQuery = PVRGlobals.jQuery;
+// declare var jQuery;
 
 let lens: any = null;
 
@@ -48,6 +50,7 @@ export function setup(): void {
     });
 
     // "Capture" the mouse from the browser.
+    // This now launched from the settings input panel.
     //PointerLock.pointerLock();
 
     // Optimize the scene to keep it running fast.
@@ -193,12 +196,13 @@ export namespace PointerLock {
         // http://www.pixelcodr.com/tutos/shooter/shooter.html
 
         // Get the rendering canvas.
-        var canvas = PVRGlobals.scene.getEngine().getRenderingCanvas();
+        // var canvas = jQuery("canvas"); // PVRGlobals.scene.getEngine().getRenderingCanvas();
+        let canvas = document.getElementsByTagName("canvas")[0];
 
         // On click event, request pointer lock.
-        canvas.addEventListener("click", function(evt) { 
-            PointerLock.actuallyRequestLock(canvas); 
-        }, false);
+        // canvas.addEventListener("click", function(evt) { 
+        //     PointerLock.actuallyRequestLock(canvas); 
+        // }, false);
 
         // Event listener when the pointerlock is updated (or removed
         // by pressing ESC for example).
@@ -228,7 +232,9 @@ export namespace PointerLock {
                                     pointerlockchange, false);
 
         // Tell user to click somehow.
-        console.log('Tell user to click...');
+        // console.log('Tell user to click...');
+
+        PointerLock.actuallyRequestLock(canvas);
     }
         // if limiting fps, remove dof_gain and dof_aperature first
 

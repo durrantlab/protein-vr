@@ -1,6 +1,7 @@
 import * as UserVars from "./UserVars";
 import * as Setup from "../Core/Setup";
 import * as Core from "../Core/Core";
+import { PointerLock } from "../Environment";
 
 var jQuery;
 declare var screenfull;
@@ -342,6 +343,12 @@ function addJavaScript() {
             if ((UserVars.getParam("display") === UserVars.displays.FullScreen) && (screenfull.enabled)) {
                 screenfull.request();
             }
+
+            if (UserVars.getParam("looking") == UserVars.looking.MouseMove) {
+                PointerLock.pointerLock();
+            }
+
+            jQuery("canvas").focus();  // to make sure keypresses work.
         });
     });
 }
