@@ -7,13 +7,15 @@ import * as Environment from "../Environment";
 import * as Core from "./Core";
 import * as RenderLoop from "./RenderLoop";
 import * as MouseState from "./MouseState";
-import addSound from "./Sound";
+import * as Sound from "./Sound";
 import * as UserVars from "../Settings/UserVars";
 
 // jQuery is an external library, so declare it here to avoid Typescript
 // errors.
 
 declare var BABYLON;
+
+var proteinVRInfo: any;
 
 // var jQuery = PVRGlobals.jQuery;
 // debugger;
@@ -79,12 +81,14 @@ export function setup(setEventsFunc?: any): void {
             jQuery.ajax({
                 url: UserVars.getParam("scenePath") + "proteinvr.json",
                 dataType: "json"
-            }).done(function(proteinvr_info) {
+            }).done(function(proteinVRInfoResponse) {
+                proteinVRInfo = proteinVRInfoResponse;  // setting the global copy
+
                 // I would expect that updating the version in the .manifest
                 // file would prevent this, but in testing I'm not 100% it's
                 // true.
                 let disableCaching: boolean = true;
-                let urlCacheBreakTxt: string = (disableCaching ? "?" + proteinvr_info["file_id"] : "")
+                let urlCacheBreakTxt: string = (disableCaching ? "?" + proteinVRInfo["file_id"] : "")
 
                 // Load a scene from a BABYLON file.
                 BABYLON.SceneLoader.Load(UserVars.getParam("scenePath"), "scene.babylon" + urlCacheBreakTxt, 
@@ -131,8 +135,8 @@ export function setup(setEventsFunc?: any): void {
                             // new CollisionMeshes().checkMesh(m, json);
 
                             // Create a material if the info is available.
-                            if (this.proteinvr_info["materials"][m.name] !== undefined) {
-                                let mat_inf = this.proteinvr_info["materials"][m.name];
+                            if (this.proteinVRInfo["materials"][m.name] !== undefined) {
+                                let mat_inf = this.proteinVRInfo["materials"][m.name];
                                 // Generate a key for this material. Doing it
                                 // this way so you can reuse materials.
                                 let mat_key = "";
@@ -215,14 +219,6 @@ export function setup(setEventsFunc?: any): void {
                             }
                         });
 
-                        // Set up sounds
-                        for (let soundIdx = 0; soundIdx < proteinvr_info["sounds"].length; soundIdx++) {
-                            let sound = proteinvr_info["sounds"][soundIdx];
-                            let filename = sound[0];
-                            let loc = new BABYLON.Vector3(sound[1][0], sound[1][2], sound[1][1]);
-                            addSound(filename, loc);
-                        }
-
                         // The below should be delayed until user is done with settings window
                         // *********
 
@@ -248,11 +244,11 @@ export function setup(setEventsFunc?: any): void {
                         sceneLoadedAndReady = true;
                     }.bind({
                         urlCacheBreakTxt: this.urlCacheBreakTxt,
-                        proteinvr_info: this.proteinvr_info
+                        proteinVRInfo: this.proteinVRInfo
                     }));
                 }.bind({
                     urlCacheBreakTxt: urlCacheBreakTxt,
-                    proteinvr_info: proteinvr_info
+                    proteinVRInfo: proteinVRInfo
                 }));
             });
         });
@@ -268,6 +264,15 @@ export function continueSetupAfterSettingsPanelClosed() {
         // Scene has been loaded, ready to set up additional stuff...
 
         // PVRGlobals.engine.getCaps().maxTextureSize = 32;
+
+        // Set up sounds
+        for (let soundIdx = 0; soundIdx < proteinVRInfo["sounds"].length; soundIdx++) {
+            let sound = proteinVRInfo["sounds"][soundIdx];
+            let filename = sound[0];
+            let loc = new BABYLON.Vector3(sound[1][0], sound[1][2], sound[1][1]);
+            Sound.addSound(filename, loc);
+        }
+
 
         // Set up the game character/camera.
         CameraChar.setup();

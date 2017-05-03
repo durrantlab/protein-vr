@@ -2,7 +2,7 @@ import bpy
 import os
 import Utils
 
-def save_sounds(scene_data):
+def save_sounds(scene_data, params):
     scene_data["sounds"] = []
     for obj in bpy.data.objects:
         if obj.name[-4:] == ".mp3":

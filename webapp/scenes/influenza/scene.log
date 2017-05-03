@@ -1,10 +1,10 @@
-Exporter version: 5.0.6, Blender version: 2.78 (sub 0)
+Exporter version: 5.2.1, Blender version: 2.78 (sub 0)
 ========= Conversion from Blender to Babylon.js =========
 	Scene settings used:
 		selected layers only:  false
 		flat shading entire scene:  false
 		inline textures:  false
-		texture directory:  /home/jdurrant/influenza_image_tmp/proteinvr/./influenza/
+		texture directory:  /Users/jdurrant/Documents/Work/proteinvr_scenes/influenza/../../durrant_git/protein-vr/webapp/scenes/influenza/
 	Python World class constructor completed
 	processing begun of mesh:  tube.007_innerDecimated
 		WARNING: No materials have been assigned: 
@@ -40,9 +40,9 @@ Exporter version: 5.0.6, Blender version: 2.78 (sub 0)
 		num indices        :  40503
 	processing begun of mesh:  Na_textDecimated
 		WARNING: No materials have been assigned: 
-		num positions      :  6617
-		num normals        :  6617
-		num uvs            :  13234
+		num positions      :  6610
+		num normals        :  6610
+		num uvs            :  13220
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  15096
@@ -166,11 +166,12 @@ Exporter version: 5.0.6, Blender version: 2.78 (sub 0)
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  32118
+	processing begun of node:  /var/tmp/brook-pub-domain.mp3
 	processing begun of mesh:  Na_text
 		WARNING: No materials have been assigned: 
-		num positions      :  22437
-		num normals        :  22437
-		num uvs            :  44874
+		num positions      :  22425
+		num normals        :  22425
+		num uvs            :  44850
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  75492
@@ -338,4 +339,4 @@ Exporter version: 5.0.6, Blender version: 2.78 (sub 0)
 ========= Writing of scene file started =========
 ========= Writing of scene file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 34.1683 secs
+elapsed time:  0 min, 34.8283 secs

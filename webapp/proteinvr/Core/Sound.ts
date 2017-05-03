@@ -12,12 +12,14 @@ export function addSound(mp3FileName, location) {
         case UserVars.audios.Headphones:
             panningModel = "HRTF";
             break;
+        case UserVars.audios.None:
+            return;
     }
 
     let soundParams = {
         "loop": true, "autoplay": true, "spatialSound": true,
-        //distanceModel: "exponential", rolloffFactor: 2,
-        "distanceModel": "linear", maxDistance: 15
+        "distanceModel": "exponential", "rolloffFactor": 5,
+        // "distanceModel": "linear", maxDistance: 5
     }
 
     if (panningModel !== undefined) {
@@ -31,4 +33,3 @@ export function addSound(mp3FileName, location) {
     sound.setPosition(location);
 }
 
-export default addSound;
