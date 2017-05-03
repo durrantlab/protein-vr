@@ -9,6 +9,8 @@ import * as RenderLoop from "./RenderLoop";
 import * as MouseState from "./MouseState";
 import addSound from "./Sound";
 import * as UserVars from "../Settings/UserVars";
+import {LensFlare} from "../Environment";
+
 
 // jQuery is an external library, so declare it here to avoid Typescript
 // errors.
