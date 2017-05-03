@@ -34,26 +34,39 @@ export function show() {
         </div>` + 
         panel(
             "Hardware", 
-            row_thirds_split(
-                [3,4,5],
+            row_even_split(
+                // [3,4,5],
                 radioBoxes(
                     "Viewer",
-                    ["Screen", "VR Headset"],  // must be same order as enum above
+                    UserVars.paramNames.viewer,
                     ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>']
                     // [85, 115]
                 ),
                 radioBoxes(
                     "Audio",
-                    ["Speakers", "Headphones", "None"],  // must be same order as enum above
+                    UserVars.paramNames.audio,
                     ['<i class="icon-speaker"></i>', '<i class="icon-headphones"></i>', '<span class="glyphicon glyphicon-volume-off" aria-hidden=true></span>']
                     // [100, 120, 75]
-                ),
+                )
+            ) +
+            row_even_split(
                 radioBoxes(
                     "Device",
-                    ["Mobile", "Laptop", "Desktop"],  // must be same order as enum above
+                    UserVars.paramNames.device,
                     ['<i class="icon-iphone"></i>', '<i class="icon-laptop"></i>', '<i class="icon-connectedpc"></i>']
                     // [100, 100, 100]
-                )
+                ),
+                radioBoxes(
+                    "Moving",
+                    UserVars.paramNames.moving,
+                    ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
+                    // [100, 100, 100]
+                ) + radioBoxes(
+                    "Looking",
+                    UserVars.paramNames.looking,
+                    ['<i class="icon-mouse"></i>', '<i class="icon-hand-up"></i>'] //, '<i class="icon-connectedpc"></i>']
+                    // [100, 100, 100]
+                ),
             )
         ) + 
         panelCollapsible(
@@ -65,17 +78,17 @@ export function show() {
                 [4, 4, 4],
                 radioBoxes(
                     "Textures",
-                    ["Sharp", "Medium", "Grainy"],  // must be same order as enum above
+                    UserVars.paramNames.textures,
                     // [70, 85, 80]
                 ),
                 radioBoxes(
                     "Objects",
-                    ["Detailed", "Normal", "Simple"],  // must be same order as enum above
+                    UserVars.paramNames.objects,
                     // [90, 85, 85]
                 ),
                 radioBoxes(
                     "Fog",
-                    ["Clear", "Thin", "Thick"],  // must be same order as enum above
+                    UserVars.paramNames.fog,
                     // [60, 55, 55]
                 )
             ) + 
@@ -83,7 +96,7 @@ export function show() {
                 [4, 4, 4],
                 radioBoxes(
                     "Display",
-                    ["Full Screen", "Windowed"],  // must be same order as enum above
+                    UserVars.paramNames.display,
                     // [70, 85, 80]
                 ),
                 "",
@@ -130,16 +143,15 @@ function panelCollapsible(title, html) {
 
 function section(html) { // panel without header
     return `<div class="panel panel-default"><div class="panel-body">${html}</div></div>`;
-    // return `<div class="well">${html}</div>`;
 }
 
 function row_even_split(html1, html2) {
     return `
         <div class="row">
-            <div class="col-lg-6 col-xs-12">
+            <div class="col-sm-6 col-xs-12">
                 ${html1}
             </div>
-            <div class="col-lg-6 col-xs-12">
+            <div class="col-sm-6 col-xs-12">
                 ${html2}
             </div>
         </div>                
@@ -162,21 +174,21 @@ function row_thirds_split(widths, html1, html2, html3) {
     `;
 }
 
-function formGroup(label, html) {
-    return `
-    <div class="input-group">
-        <div class="form-group">
-            <!-- <label class="col-xs-2">${label}:</label> -->
-            <!-- <div class="col-xs-10">${html}</div> -->
-            ${html}
-        </div>
-    </div>
-    `;
-}
+// function formGroup(label, html) {
+//     return `
+//     <div class="input-group">
+//         <div class="form-group">
+//             <!-- <label class="col-xs-2">${label}:</label> -->
+//             <!-- <div class="col-xs-10">${html}</div> -->
+//             ${html}
+//         </div>
+//     </div>
+//     `;
+// }
 
-function radioBoxes(label, values, icons_if_phone = undefined) {
+function radioBoxes(label, values: any, icons_if_phone = undefined) {
     let id = label.toLowerCase().replace(/ /g, '');
-    let html = `<div class="form-group">
+    let html = `<div class="form-group buttonbar-${id}">
                     <div class="btn-group btn-group-justified" data-toggle="buttons">
                         <div class="btn disabled btn-default" style="background-color: #eeeeee; opacity: 1;">${label}</div>`;
     
@@ -188,10 +200,11 @@ function radioBoxes(label, values, icons_if_phone = undefined) {
         } else {
             iconHtml = value;
         }
-        // Label: width:${widths_in_pixels[i]}px; 
-        // input: <div class="glyphicon glyphicon-ok" style="display: none; margin-right: 3px; margin-left: -4px;" aria-hidden=true></div> 
-        html +=         `<label class="btn btn-default ${id}-labels proteinvr-radio-label" data-description="${label}: ${value}" style="padding-left: 0; padding-right: 0; left:-${i+1}px;">
-                            <input type="radio" name="${id}" id="${id}${i}" autocomplete="off" value="${value.replace(/ /g, '')}"><span class="the-icon visible-xs">${iconHtml}</span><span class="hidden-xs">${value}</span>
+
+        let valueNoSpaces = value.replace(/ /g, '');
+
+        html +=         `<label class="btn btn-default ${id}-labels proteinvr-radio-label ${valueNoSpaces.toLowerCase()}-label" data-description="${label}: ${value}" style="padding-left: 0; padding-right: 0; left:-${i+1}px;">
+                            <input type="radio" name="${id}" id="${id}${i}" autocomplete="off" value="${valueNoSpaces}"><span class="the-icon visible-xs">${iconHtml}</span><span class="hidden-xs">${value}</span>
                         </label>`;
     }
     html +=         `</div>
@@ -199,49 +212,23 @@ function radioBoxes(label, values, icons_if_phone = undefined) {
     return html;
 }
 
-
-// function radioBoxes(label, values, widths_in_pixels) {
-//     let id = label.toLowerCase();
-//     let html = `<div class="input-group">
-//                     <div class="input-group-addon" style="width: 20%; min-width: 50px;">${label}:</div>
-//                     <div class="btn-group btn-group-justified" data-toggle="buttons">`;
-    
-//     for (let i = 0; i < values.length; i++) {
-//         let value = values[i];
-//         let labelStyle = '';
-//         if (i == 0) {
-//             labelStyle = 'border-top-left-radius: 0; border-bottom-left-radius: 0;';
-//         }
-
-//         labelStyle += "padding-left: 0; padding-right: 0;"
-
-//         html +=         `<label class="btn btn-default ${id}-labels proteinvr-radio-label" style="width:${widths_in_pixels[i]}px; ${labelStyle}">
-//                             <input type="radio" name="${id}" id="${id}${i}" autocomplete="off" value="${value.replace(/ /g, '')}"><div class="glyphicon glyphicon-ok" style="display: none; margin-right: 3px; margin-left: -4px;" aria-hidden=true></div> ${value}
-//                         </label>`;
+// function toggle(text: string, checked: boolean, width_in_pixels: number = 41) {
+//     let doCheck = "";
+//     let styles = "display: none;";
+//     if (checked) {
+//         doCheck = " checked";
+//         styles = "display: inline-block;";
 //     }
-//     html +=         `</div>
-//                 </div>`;
+
+//     let html =`
+//         <div class="btn-group" data-toggle="buttons">
+//             <label class="btn btn-primary active toggle_box" style="width:${width_in_pixels}px;"> <!-- style="padding-left: 35px; padding-right: 35px;"> -->
+//                 <input type="checkbox" autocomplete="off"${doCheck}><div class="glyphicon glyphicon-ok" style="${styles}" aria-hidden=true></div> &nbsp;${text}
+//             </label>
+//         </div>
+//     `;
 //     return html;
 // }
-
-function toggle(text: string, checked: boolean, width_in_pixels: number = 41) {
-    let doCheck = "";
-    let styles = "display: none;";
-    if (checked) {
-        doCheck = " checked";
-        styles = "display: inline-block;";
-    }
-    // styles += "display: inline-block;"; // position: absolute; top: 8px; left: 15px;";
-
-    let html =`
-        <div class="btn-group" data-toggle="buttons">
-            <label class="btn btn-primary active toggle_box" style="width:${width_in_pixels}px;"> <!-- style="padding-left: 35px; padding-right: 35px;"> -->
-                <input type="checkbox" autocomplete="off"${doCheck}><div class="glyphicon glyphicon-ok" style="${styles}" aria-hidden=true></div> &nbsp;${text}
-            </label>
-        </div>
-    `;
-    return html;
-}
 
 function setRadioState(id, varsToUse) {
     setTimeout(function() {
@@ -268,26 +255,29 @@ function setRadioState(id, varsToUse) {
 export function setGUIState() {
     let varsToUse = jQuery.parseJSON(localStorage.getItem("proteinvr_params"));
     
-    // Set the viewer field
-    setRadioState("viewer", varsToUse);
+    // Set the various radio states
+    for (var key in UserVars.paramNames) {
+        if (UserVars.paramNames.hasOwnProperty(key)) {
+            let key2 = key.toLowerCase();
+            setRadioState(key2, varsToUse);
+        }
+    }
 
-    // Set the audio field
-    setRadioState("audio", varsToUse);
+    // Control moving button visibiliy depending on other issues.
+    let buttonbarMoving = jQuery(".buttonbar-moving");
+    let buttonbarLooking = jQuery(".buttonbar-looking");
 
-    // Set the device field
-    setRadioState("device", varsToUse);
-    
-    // Set the textures field
-    setRadioState("textures", varsToUse);
+    if ((varsToUse.viewer == UserVars.viewers.VRHeadset) || (varsToUse.device == UserVars.devices.Mobile)) {
+        buttonbarMoving.show();
+        buttonbarLooking.hide();
 
-    // Set the fog field
-    setRadioState("fog", varsToUse);
-
-    // Set the fog field
-    setRadioState("objects", varsToUse);
-
-    // Set the fog field
-    setRadioState("display", varsToUse);
+        // make sure no pointerlock used in this scenario.
+        varsToUse["looking"] = UserVars.looking.Click;
+        UserVars.saveLocalStorageParams(varsToUse);
+    } else {
+        buttonbarMoving.hide();
+        buttonbarLooking.show();
+    }
 }
 
 function addJavaScript() {
@@ -296,15 +286,7 @@ function addJavaScript() {
         setTimeout(function() {
             // This to move it to bottom of stack.
             let This = jQuery(this);
-            // let checked = This.find("input").prop("checked");
-            // if (checked) {
-            //     This.find('.glyphicon-ok').show(); //css("opacity", 1);
-            // } else {
-            //     This.find('.glyphicon-ok').hide(); //css("opacity", 0);
-            // }
-
             This.removeClass("focus");
-
         }.bind(this));
     });
 
@@ -361,27 +343,5 @@ function addJavaScript() {
                 screenfull.request();
             }
         });
-    
-
-        // debugger;
-
-        // for (var index = 0; index < PVRGlobals.scene.textures.length; index++) {
-        //     var texture = PVRGlobals.scene.textures[index];
-            
-        //     // if (!texture.canRescale) {
-        //     //     continue;
-        //     // }
-
-        //     var currentSize = texture.getSize();
-        //     var maxDimension = Math.max(currentSize.width, currentSize.height);
-        //     var scale = 128.0 / maxDimension;
-        //     // if (maxDimension > 128) {
-        //     if (scale < 1.0) {
-        //         texture.scale(scale);
-        //     }
-        //     // }
-        // }
-
-
     });
 }

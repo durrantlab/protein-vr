@@ -1,12 +1,3 @@
 {
-    "audio": "headphones",
-    "viewer": "screen",
-    "animations": false,
-    "textures": "highdef",
-    "fog": "clear",
-    "objects": "detailed",
-    "display": "fullscreen",
-    "visibility": 2,
-    "scenePath": "./scenes/influenza/",
-    "navigation": "InstantaneousForward"
+    "scenePath": "./scenes/influenza/"
 }

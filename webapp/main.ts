@@ -18,6 +18,7 @@ BABYLON is an external JavaScript library. This prevents Typescript from
 throwing errors because BABYLON isn't defined in the TypeScript file.
 */
 declare var BABYLON: any;
+declare var PVRGlobals;
 var jQuery = PVRGlobals.jQuery;
 
 // declare var Core: any;  // attached to window in RequireConfig.ts

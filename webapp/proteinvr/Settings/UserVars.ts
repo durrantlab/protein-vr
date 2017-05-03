@@ -4,69 +4,125 @@
 
 import * as Core from "../Core/Core";
 import * as SettingsPanel from "./SettingsPanel";
-var jQuery;
+declare var jQuery;
+declare var PVRGlobals;
 
-// Set enums for several different types.
+// The interface
+interface userVarsInterface {
+    audio?: audios,
+    viewer?: viewers,
+    device?: devices,
+    textures?: textures,
+    fog?: fog,
+    objects?: objects,
+    display?: displays
+    animations?: boolean,
+    visibility?: number,
+    scenePath?: string,
+    moving?: moving,
+    looking?: looking
+}
+
+// Setting up user parameters
+let mobileDefaults: userVarsInterface;
+let laptopDefaults: userVarsInterface;
+let desktopDefaults: userVarsInterface;
+export var paramDefaults: {mobile: userVarsInterface, 
+                    laptop: userVarsInterface, 
+                    desktop: userVarsInterface} = {
+    mobile: {},
+    laptop: {},
+    desktop: {}
+}
+
+export var paramNames: any = {};
+
 export enum audios {
     Speakers,
     Headphones,
     None
 }
+paramNames.audio = ["Speakers", "Headphones", "None"];
+paramDefaults.mobile.audio = audios.Headphones;
+paramDefaults.laptop.audio = audios.Speakers;
+paramDefaults.desktop.audio = audios.Speakers;
 
 export enum viewers {
     Screen,
     VRHeadset
 }
+paramNames.viewer = ["Screen", "VR Headset"];
+paramDefaults.mobile.viewer = viewers.Screen;
+paramDefaults.laptop.viewer = viewers.Screen;
+paramDefaults.desktop.viewer = viewers.Screen;
 
 export enum devices {
     Mobile,
     Laptop,
     Desktop
 }
+paramNames.device = ["Mobile", "Laptop", "Desktop"];
+paramDefaults.mobile.device = devices.Mobile;
+paramDefaults.laptop.device = devices.Laptop;
+paramDefaults.desktop.device = devices.Desktop;
 
 export enum textures {
     Sharp,  // no modification
     Medium,  // 512
     Grainy  // 256
 }
+paramNames.textures = ["Sharp", "Medium", "Grainy"];
+paramDefaults.mobile.textures = textures.Medium;
+paramDefaults.laptop.textures = textures.Sharp;
+paramDefaults.desktop.textures = textures.Sharp;
 
 export enum fog {
     Clear,
     Thin,
     Thick
 }
+paramNames.fog = ["Clear", "Thin", "Thick"];
+paramDefaults.mobile.fog = fog.Clear;
+paramDefaults.laptop.fog = fog.Thin;
+paramDefaults.desktop.fog = fog.Thick;
 
 export enum objects {  // actually LOD settings
     Detailed,
     Normal,
     Simple
 }
+paramNames.objects = ["Detailed", "Normal", "Simple"];
+paramDefaults.mobile.objects = objects.Normal;
+paramDefaults.laptop.objects = objects.Detailed;
+paramDefaults.desktop.objects = objects.Detailed;
 
 export enum displays {
     FullScreen,
     Windowed
 }
+paramNames.display = ["Full Screen", "Windowed"];
+paramDefaults.mobile.display = displays.FullScreen;
+paramDefaults.laptop.display = displays.FullScreen;
+paramDefaults.desktop.display = displays.FullScreen;
 
-export enum navMethods {
-    InstantaneousForward,
-    GradualForward,
-    IntantaneousDirect
+export enum moving {
+    Advance,
+    Jump,
+    Teleport
 }
+paramNames.moving = ["Advance", "Jump", "Teleport"];
+paramDefaults.mobile.moving = moving.Advance;
+paramDefaults.laptop.moving = moving.Advance;
+paramDefaults.desktop.moving = moving.Advance;
 
-// The interface
-interface userVarsInterface {
-    audio: audios,
-    viewer: viewers,
-    device: devices,
-    textures: textures,
-    fog: fog,
-    objects: objects,
-    display: displays
-    animations: boolean,
-    visibility: number,
-    scenePath: string,
-    navigation: navMethods
+export enum looking {
+    MouseMove,
+    Click
 }
+paramNames.looking = ["Mouse Move", "Click"];
+paramDefaults.mobile.looking = looking.Click;
+paramDefaults.laptop.looking = looking.MouseMove;
+paramDefaults.desktop.looking = looking.MouseMove;
 
 /**
  * This function will assign values to the system variables based on user input.
@@ -82,22 +138,12 @@ export function setup(callBackFunc: any) :void {
         dataType: "json",
         cache: false
     }).done(function(user_vars) {
-        // Default values before anything.
-        var userVars: userVarsInterface = {
-            "audio": audios.Speakers,
-            "viewer": viewers.Screen,
-            "device": devices.Mobile,  // do default values here are those for mobile.
-            "animations": true,
-            "textures": textures.Sharp,
-            "fog": fog.Clear,
-            "objects": objects.Detailed,
-            "display": displays.FullScreen,
-            "visibility": 5,
-            "scenePath": "./scenes/test/",
-            "navigation": navMethods.InstantaneousForward 
-        }
+        // Default values before anything. For now just use laptop defaults,
+        // but in future would be good to detect device...
+        var userVars: userVarsInterface = paramDefaults.laptop;
 
-        // Here you overwrite with values from params.json
+        // Here you overwrite with values from params.json. At this point,
+        // this is just the proteinvr scene to use.
         let keys = Object.keys(user_vars);
         for (let i = 0; i < keys.length; i++) {
             let key = keys[i];
@@ -118,16 +164,6 @@ export function setup(callBackFunc: any) :void {
 
         // Save to local storage what you've got so far.
         saveLocalStorageParams(userVars);
-
-        // Now prompt user. This will be a GUI with the defaults displayed
-        // in the future. So user will always have option of changing
-        // defaults. Ignore this for now (debugging);
-        // userVars['viewer'] = stringToEnumVal(prompt("What viewer are you using?\nDesktop\nLaptop\nVRHeadset", "all lowercase please"));
-        // userVars['animations'] = stringToEnumVal(confirm("Would you like animations in your experince?"));
-        // userVars['textureDetail'] = stringToEnumVal(parseInt(prompt("On a scale of 1-5 how detailed would you like the textures to be?"), 10));
-        // userVars['audio'] = stringToEnumVal(prompt("What audio are you using?\nSpeakers\nHeadsets\nNone"));
-        // userVars['fog'] = stringToEnumVal(confirm("You down with F.O.G?"));
-        // userVars['visibility'] = stringToEnumVal(parseInt(prompt("Enter your desired visibility level on a scale of 1-5") ,10)); 
 
         // Show the settings panel
         SettingsPanel.show();
@@ -180,107 +216,26 @@ export function updateLocalStorageParams(paramName, value) {
 // Convert strings to enums. A helper function.
 export function stringToEnumVal(s: any): any {
     if (typeof(s) === "string") {
-        s = s.toLowerCase();
+        s = s.toLowerCase().replace(/ /g, '');
     }
 
-    switch(s) {
-        case "screen":
-            return viewers.Screen;
-        case "vrheadset":
-            return viewers.VRHeadset;
-        case "speakers":
-            return audios.Speakers;
-        case "headphones":
-            return audios.Headphones;
-        case "none":
-            return audios.None;
-        case "mobile":
-            return devices.Mobile;
-        case "laptop":
-            return devices.Laptop;
-        case "desktop":
-            return devices.Desktop;
-        case "sharp":
-            return textures.Sharp;
-        case "medium":
-            return textures.Medium;
-        case "grainy":
-            return textures.Grainy;
-        case "clear":
-            return fog.Clear;
-        case "thin":
-            return fog.Thin;
-        case "thick":
-            return fog.Thick;
-        case "detailed":
-            return objects.Detailed;
-        case "normal":
-            return objects.Normal;
-        case "simple":
-            return objects.Simple;
-        case "fullscreen":
-            return displays.FullScreen;
-        case "windowed":
-            return displays.Windowed;
-        case "instantaneous":
-            return navMethods.InstantaneousForward;
-        case "gradual":
-            return navMethods.GradualForward;
-        case "maintain direction":
-            return navMethods.IntantaneousDirect; 
-        default:
-            return s;
+    // see http://stackoverflow.com/questions/684672/how-do-i-loop-through-or-enumerate-a-javascript-object
+    for (var key in paramNames) {
+        if (paramNames.hasOwnProperty(key)) {
+            let paramNamesOptions = paramNames[key];
+            let newParamNamesOptions = [];
+            for (let p = 0; p < paramNamesOptions.length; p++) {
+                newParamNamesOptions.push(paramNamesOptions[p].toLowerCase().replace(/ /g, ''));
+            }
+
+            let loc = newParamNamesOptions.indexOf(s);
+            if (loc !== -1) {
+                return loc;
+            }
+        }
     }
+
+    console.log("string id not found", s);
+    return s;
 }
 
-// // Getters
-// export function getViewer(): viewers {
-//     return userVars['viewer'];
-// }
-
-// export function getAnimations(): boolean {
-//     return userVars['animations'];
-// }
-
-// export function getTextureDetail(): number {
-//     return userVars['textureDetail'];
-// }
-
-// export function getAudio(): audios {
-//     return userVars['audio'];
-// }
-
-// export function getFog(): boolean {
-//     return userVars['fog'];
-// }
-
-// export function getVisibility(): number {
-//     return userVars['visibility'];
-// }
-
-// // Setters
-// export function setViewer(d: viewers): void {
-//     userVars['viewer'] = d;
-// }
-
-// export function setAnimations(b: boolean) :void {
-//     userVars['animations'] = b;
-// }
-
-// export function setTextureDetail(level: number) :void {
-//     userVars['textureDetail'] = level;
-// }
-
-// export function setAudio(b: audios): void {
-//     userVars['audio'] = b;
-// }
-
-// export function setFog(b: boolean): void {
-//     userVars['fog'] = b;
-// }
-
-// export function setVisibility(level: number) :void {
-//     userVars['visibility'] = level;
-// }
-
-// export default UserVars;
