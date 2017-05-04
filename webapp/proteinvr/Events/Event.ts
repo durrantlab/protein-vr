@@ -27,7 +27,7 @@ class Event {
     */
     public countdownThatChecksCondition: Countdowns.Countdown;
 
-    public constructor(triggerToCheck: any, actionIfTriggered: any, async?: boolean, $?: any) {
+    public constructor(triggerToCheck: any, actionIfTriggered: any) {
         /**
         The constructor.
 
@@ -42,51 +42,27 @@ class Event {
         this.triggerToCheck = triggerToCheck;
         this.actionIfTriggered = actionIfTriggered;
     
-        // There are two kinds of trigger...action relationships.
-        if (async) {
-            let eventType: any = this.triggerToCheck.asyncSetup();
-            this.execAsync(eventType);
-        } else {
-            // Now you need to register a countdown to check for the trigger.
-            this.countdownThatChecksCondition = Countdowns.addCountdown({
-                name: "trigger" + Math.floor(Math.random() * 100000).toString(),
-                countdownDurationMilliseconds: 500,  // Check every half a second to see
-                                            // if trigger satisfied.
-                autoRestartAfterCountdownDone: true,  // Keep checking until satisfied.
-                afterCountdownAdvanced: function() {
-                    // Check if trigger satisfied.
-                    let conditionSatisfied: boolean = this.triggerToCheck.checkIfTriggered();
-                    if (conditionSatisfied) {
-                        // Do the associated action
-                        this.actionIfTriggered.do();
-                        
-                        // It is, you just did the associated action, so
-                        // dispose of the countdown so it doesn't keep
-                        // restarting.
-                        this.countdownThatChecksCondition.dispose();
-                        
-                        // Core.debugMsg("Trigger firing.");
-                    }
-                }.bind(this)
-            });
-        }
-    }
-
-    public execAsync(eventMetaData: any) :void{
-    /**
-     * Executes async functions for trigger conditionals.
-     * 
-     * :param any eventMetaData: An object containing metadata about the event listener to be created. 
-     * */
-        let action = this.actionIfTriggered;
-        let target = eventMetaData["target"];
-        let eventTrigger = eventMetaData["event"];
-        jQuery(target).ready( function(event){
-            // console.log("action triggered");         
-            setTimeout(function(){
-                // console.log("delay complete");
-                action.do();
-            }, 3000);          
+        // Now you need to register a countdown to check for the trigger.
+        this.countdownThatChecksCondition = Countdowns.addCountdown({
+            name: "trigger" + Math.floor(Math.random() * 100000).toString(),
+            countdownDurationMilliseconds: 500,  // Check every half a second to see
+                                        // if trigger satisfied.
+            autoRestartAfterCountdownDone: true,  // Keep checking until satisfied.
+            afterCountdownAdvanced: function() {
+                // Check if trigger satisfied.
+                let conditionSatisfied: boolean = this.triggerToCheck.checkIfTriggered();
+                if (conditionSatisfied) {
+                    // Do the associated action
+                    this.actionIfTriggered.do();
+                    
+                    // It is, you just did the associated action, so
+                    // dispose of the countdown so it doesn't keep
+                    // restarting.
+                    this.countdownThatChecksCondition.dispose();
+                    
+                    // Core.debugMsg("Trigger firing.");
+                }
+            }.bind(this)
         });
     }
 }
