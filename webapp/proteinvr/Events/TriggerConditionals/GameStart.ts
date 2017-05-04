@@ -11,7 +11,7 @@ class GameStart extends parent {
     }
 
     
-    public check() :boolean{
+    public checkIfTriggered() :boolean{
     /**
      * useless method, required to extend parent class
      */

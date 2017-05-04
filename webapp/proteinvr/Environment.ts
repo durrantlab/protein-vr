@@ -80,7 +80,7 @@ export function setup(): void {
     // lens = lensEffect();
     // limitLensEffect();
 
-    // timers();
+    // countdowns();
 
 }
 
@@ -98,7 +98,7 @@ export function setFog(density: number = 0.015): void {
         density = 0.6;
     }
 
-    // timers();
+    // countdowns();
 
 
     if (density !== 0) {

@@ -1,7 +1,8 @@
-import * as Timers from "../Timers";
+import * as Countdowns from "../Countdowns";
 import parent from "./ActionParent";
 
 declare var BABYLON;
+declare var PVRGlobals;
 var jQuery = PVRGlobals.jQuery;
 
 // interface DoInterface {
@@ -41,12 +42,12 @@ class ScreenWhite extends parent {
         //this.scene().FOGMODE_EXP2;
         this.canvasJQuery = jQuery("#renderCanvas");
 
-        Timers.addTimer({
+        Countdowns.addCountdown({
             name: "ScreenWhite" + Math.random().toString(),
-            durationInMiliseconds: 200, //milliseconds,
-            interpValStart: 1.0,
-            interpValEnd: 0.0,
-            tickCallback: function(val) {
+            countdownDurationMilliseconds: 200, //milliseconds,
+            countdownStartVal: 1.0,
+            countdownEndVal: 0.0,
+            afterCountdownAdvanced: function(val) {
                 // this.material.alpha = val;
                 //this.customShader.alpha = val;
                 //this.scene().fogDensity = val;

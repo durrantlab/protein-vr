@@ -1,10 +1,11 @@
-import * as Timers from "../Timers";
+import * as Countdowns from "../Countdowns";
 
 import parent from "./ActionParent";
 import * as CameraChar from "../../CameraChar";
 
 
 declare var BABYLON;
+declare var PVRGlobals;
 var jQuery = PVRGlobals.jQuery;
 
 interface DoInterface{
@@ -30,12 +31,12 @@ class MoveCamera extends parent {
      */
     public do(){
         console.log("Move Camera action initiated!");
-        Timers.addTimer({
+        Countdowns.addCountdown({
             name: "MoveCamera" + Math.random().toString(),
-            durationInMiliseconds: this.parameters["milliseconds"],
-            interpValStart: 0.0,
-            interpValEnd: 1.0,
-            tickCallback: function(val){
+            countdownDurationMilliseconds: this.parameters["milliseconds"],
+            countdownStartVal: 0.0,
+            countdownEndVal: 1.0,
+            afterCountdownAdvanced: function(val){
                 let camera = this.parameters["camera"];
                 let sp = PVRGlobals.camera.position;
                 let ep = this.parameters['endPoint'];

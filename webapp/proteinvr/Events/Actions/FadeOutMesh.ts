@@ -1,4 +1,4 @@
-import * as Timers from "../Timers";
+import * as Countdowns from "../Countdowns";
 
 import parent from "./ActionParent";
 
@@ -45,12 +45,12 @@ class FadeOutMesh extends parent {
 
         params.mesh.material.alphaMode = BABYLON.Engine.ALPHA_ADD;
 
-        Timers.addTimer({
+        Countdowns.addCountdown({
             name: "FadeOut" + Math.random().toString(),
-            durationInMiliseconds: params.milliseconds, //milliseconds,
-            interpValStart: 1.0,
-            interpValEnd: 0.0,
-            tickCallback: function(val) {
+            countdownDurationMilliseconds: params.milliseconds, //milliseconds,
+            countdownStartVal: 1.0,
+            countdownEndVal: 0.0,
+            afterCountdownAdvanced: function(val) {
                 this.material.alpha = val;
                 // this.customShader.alpha = val;
             }.bind(params.mesh),

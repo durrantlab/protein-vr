@@ -1,6 +1,8 @@
 import parent from "./TriggerConditionalParent";
 
 declare var BABYLON;
+declare var PVRGlobals;
+
 var jQuery = PVRGlobals.jQuery;
 
 interface CheckInterface{
@@ -28,7 +30,7 @@ class KeyPress extends parent {
     }
 
     
-    public check() :boolean{
+    public checkIfTriggered() :boolean{
         /**
          * This method is effectively useless, only kept here because it is required to extend TriggerConditionalParent
          * This method should not be executed, all logic is contained in the constructor

@@ -43,7 +43,7 @@ class LabelOnMesh extends parent {
    
         let point = BABYLON.Vector3.Project(pt,
             BABYLON.Matrix.Identity(), 
-            super.scene().getTransformMatrix(), 
+            PVRGlobals.scene.getTransformMatrix(), 
             PVRGlobals.camera.camera.viewport.toGlobal(
                 PVRGlobals.engine.getRenderWidth(), 
                 PVRGlobals.engine.getRenderHeight()
@@ -75,7 +75,7 @@ class LabelOnMesh extends parent {
         
         // give a random id so a new label appears/disappears with each click
         let id = Math.random();
-        let canvas = new BABYLON.ScreenSpaceCanvas2D(super.scene(), {
+        let canvas = new BABYLON.ScreenSpaceCanvas2D(PVRGlobals.scene, {
             id: id.toString(),
             position: new BABYLON.Vector2(point.x, PVRGlobals.engine.getRenderHeight() - point.y),
             size: new BABYLON.Size(300, 100),
@@ -92,7 +92,7 @@ class LabelOnMesh extends parent {
             ]
         });
 
-        super.scene().render();
+        PVRGlobals.scene.render();
 
         // console.log("Retrieving device in use from sys vars");
         // console.log(UserVars.getViewer());

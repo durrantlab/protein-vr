@@ -1,8 +1,9 @@
-import * as Timers from "./Timers";
+import * as Countdowns from "./Countdowns";
 import * as Core from "../Core/Core";
 import * as CameraChar from "../CameraChar";
 
 declare var BABYLON;
+declare var PVRGlobals;
 var jQuery = PVRGlobals.jQuery;
 
 class Event {
@@ -13,86 +14,77 @@ class Event {
     /**
     The conditional trigger associated with this Event. 
     */
-    public triggerConditionObj: any; // a function that returns true or false.
+    public triggerToCheck: any; // a function that returns true or false.
     
     /**
     The action associated with this event.
     */
-    public actionOnTriggerObj: any; // the action to run when triggered.
+    public actionIfTriggered: any; // the action to run when triggered.
                                     // Overwrite this.
     
     /**
-    The timer that checks whether or not the conditional is satisfied.
+    The countdown that checks whether or not the conditional is satisfied.
     */
-    public timerThatChecksCondition: Timers.Timer;
+    public countdownThatChecksCondition: Countdowns.Countdown;
 
-    public constructor(triggerConditionObj: any, actionOnTriggerObj?: any, async?: boolean, $?: any) {
+    public constructor(triggerToCheck: any, actionIfTriggered: any, async?: boolean, $?: any) {
         /**
         The constructor.
 
-        :param any triggerConditionObj: The trigger conditional object.
+        :param any triggerToCheck: The trigger conditional object.
 
-        :param any actionOnTriggerObj:  The action object.
+        :param any actionIfTriggered:  The action object.
+        :param boolean async: Whether or not to 
         */
 
         // Set class variables (the function that define a trigger and say
         // what to do if found.)
-        this.triggerConditionObj = triggerConditionObj;
-        if(actionOnTriggerObj) {
-            this.actionOnTriggerObj = actionOnTriggerObj;
-        
-            if(async){
-                let eventType :any = this.triggerConditionObj.asyncSetup();
-                this.execAsync(eventType);
-            } else{
-                // Now you need to register a timer to check for the trigger.
-                this.timerThatChecksCondition = Timers.addTimer({
-                    name: "trigger" + Math.floor(Math.random() * 100000).toString(),
-                    durationInMiliseconds: 500,  // Check every half a second to see
-                                                // if trigger satisfied.
-                    repeated: true,  // Keep checking until satisfied.
-                    tickCallback: function() {
-                        if (this.triggerIfSatisfied()) {
-                            this.timerThatChecksCondition.dispose();
-                        }
-                    }.bind(this)
-                });
-            }
-        }
-    }
-
-    public triggerIfSatisfied(): boolean {
-        /**
-        Determines whether or not the associated condition has been satisfied.
-
-        :returns: true if satisfied, false otherwise.
-        :rtype: :any:`bool`
-        */
-
-        Core.debugMsg("Checking a trigger.");
-        let conditionSatisfied: boolean = this.triggerConditionObj.check();
-        if (conditionSatisfied) {
-            this.actionOnTriggerObj.do();
-            Core.debugMsg("Trigger firing.");
-        }
-
-        return conditionSatisfied;
-    }
-
+        this.triggerToCheck = triggerToCheck;
+        this.actionIfTriggered = actionIfTriggered;
     
+        // There are two kinds of trigger...action relationships.
+        if (async) {
+            let eventType: any = this.triggerToCheck.asyncSetup();
+            this.execAsync(eventType);
+        } else {
+            // Now you need to register a countdown to check for the trigger.
+            this.countdownThatChecksCondition = Countdowns.addCountdown({
+                name: "trigger" + Math.floor(Math.random() * 100000).toString(),
+                countdownDurationMilliseconds: 500,  // Check every half a second to see
+                                            // if trigger satisfied.
+                autoRestartAfterCountdownDone: true,  // Keep checking until satisfied.
+                afterCountdownAdvanced: function() {
+                    // Check if trigger satisfied.
+                    let conditionSatisfied: boolean = this.triggerToCheck.checkIfTriggered();
+                    if (conditionSatisfied) {
+                        // Do the associated action
+                        this.actionIfTriggered.do();
+                        
+                        // It is, you just did the associated action, so
+                        // dispose of the countdown so it doesn't keep
+                        // restarting.
+                        this.countdownThatChecksCondition.dispose();
+                        
+                        // Core.debugMsg("Trigger firing.");
+                    }
+                }.bind(this)
+            });
+        }
+    }
+
     public execAsync(eventMetaData: any) :void{
     /**
      * Executes async functions for trigger conditionals.
      * 
      * :param any eventMetaData: An object containing metadata about the event listener to be created. 
      * */
-        let action = this.actionOnTriggerObj;
+        let action = this.actionIfTriggered;
         let target = eventMetaData["target"];
         let eventTrigger = eventMetaData["event"];
         jQuery(target).ready( function(event){
-            console.log("action triggered");         
+            // console.log("action triggered");         
             setTimeout(function(){
-                console.log("delay complete");
+                // console.log("delay complete");
                 action.do();
             }, 3000);          
         });
