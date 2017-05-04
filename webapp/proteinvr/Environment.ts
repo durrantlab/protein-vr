@@ -79,6 +79,7 @@ export function setup(): void {
     // timers();
 
     // testing lens flares
+    // uses nonexistant texture, rest of code works
     let flares = LensFlare.buildFlareSys({
         name: "LensFlareSystem",
         emitter: PVRGlobals.camera,
