@@ -12,8 +12,9 @@ params = GetParams.get_params()
 
 # First, run things through blender
 script_dir = os.path.abspath(os.path.dirname(__file__))
+blend_file = os.path.abspath(sys.argv[1])
 torun = (params["blender_exec"] + " -b " + 
-    sys.argv[1] + " -P " + 
+    blend_file + " -P " + 
     script_dir + "/make_babylon_scene.py")
 
 # It there's an output directory, use that
@@ -21,6 +22,7 @@ output_dir = "proteinvr_scene_prepped/"
 if len(sys.argv) > 2:
     output_dir = sys.argv[2] + (os.sep if sys.argv[2][-1:] != os.sep else "")
 torun = torun + " -- " + output_dir
+
 
 print "\n" + torun + "\n"
 

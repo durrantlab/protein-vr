@@ -166,7 +166,7 @@ Exporter version: 5.2.1, Blender version: 2.78 (sub 0)
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  32118
-	processing begun of node:  /var/tmp/brook-pub-domain.mp3
+	processing begun of node:  ./brook-pub-domain.mp3
 	processing begun of mesh:  Na_text
 		WARNING: No materials have been assigned: 
 		num positions      :  22425
@@ -339,4 +339,4 @@ Exporter version: 5.2.1, Blender version: 2.78 (sub 0)
 ========= Writing of scene file started =========
 ========= Writing of scene file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 34.8283 secs
+elapsed time:  0 min, 39.1358 secs

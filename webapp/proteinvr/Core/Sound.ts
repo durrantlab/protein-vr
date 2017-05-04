@@ -2,6 +2,7 @@
 
 import * as Core from "../Core/Core";
 import * as UserVars from "../Settings/UserVars";
+declare var PVRGlobals;
 
 export function addSound(mp3FileName, location) {
     let panningModel: string = undefined;  // Assume speakers by default
