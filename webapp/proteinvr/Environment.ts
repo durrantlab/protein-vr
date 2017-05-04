@@ -56,6 +56,10 @@ export function setup(): void {
     // Optimize the scene to keep it running fast.
     startOptimizing();
 
+    // No shadows and lights because everything rendered
+    PVRGlobals.scene.shadowsEnabled = false;
+    PVRGlobals.scene.lightsEnabled = false;
+
     // Set up the fog.
     setFog(0.0);
 

@@ -152,7 +152,7 @@ function optimizationOptions() {
 
     priority++;  // 1  
     // Minor impact on appearance. Introducing LOD.
-    optim.optimizations.push(new BABYLON.PostProcessesOptimization(priority));  // This removes barrel distortion, which might be important...
+    // HERE PUT SOMETHING THAT DEACTIVATES ALL POST PROCESSES BUT BARREL...
     optim.optimizations.push(new BABYLON.ParticlesOptimization(priority));
     optim.optimizations.push(new mySceneOptimizationLOD(priority));  // LOD #1
 
@@ -163,12 +163,12 @@ function optimizationOptions() {
     optim.optimizations.push(new BABYLON.TextureOptimization(priority, 512));
     optim.optimizations.push(new mySceneOptimizationLOD(priority));  // LOD #2
 
-
     // Next priority
     priority++;  // 3
     // Major impact on apperance. Only 1 color texture on your custom
     // shader. Even more aggressive LOD.
     optim.optimizations.push(new mySceneOptimizationLOD(priority));  // LOD #3
+    optim.optimizations.push(new BABYLON.PostProcessesOptimization(priority));  // This removes barrel distortion, which might be important...
 
     priority++;  // 4
     // Very severe impact on appearance. Bring in fog and get rid of baked
