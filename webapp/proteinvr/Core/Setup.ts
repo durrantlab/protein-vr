@@ -10,6 +10,7 @@ import * as MouseState from "./MouseState";
 import * as Sound from "./Sound";
 import * as UserVars from "../Settings/UserVars";
 import {LensFlare} from "../Environment";
+import MoveCamera from "../Events/Actions/MoveCamera";
 
 
 // jQuery is an external library, so declare it here to avoid Typescript
@@ -285,6 +286,23 @@ export function continueSetupAfterSettingsPanelClosed() {
         // Set up events.
         // debugger;
         setEvents();
+
+        // base type of movement based on navigation user var
+
+        let movement = UserVars.getParam("movement");
+        if (movement == UserVars.stringToEnumVal("advance")) {
+            let action = new MoveCamera({
+                camera: PVRGlobals.camera,
+                milliseconds: 1000,
+                startPoint: PVRGlobals.camera.position,
+                endPoint: null
+            });
+            MouseState.mouseClickDownFunctions.push(function(results) {
+
+                action.setEndPoint(results.worldLoc);
+                action.do();
+             });
+        }
 
         RenderLoop.start();
     }

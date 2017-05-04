@@ -32,6 +32,7 @@ export function start(Core) {
         /**
         A function to register any events.
         */
+
         // new Event(
         //     new GameStart({}, jQuery),
         //     new MoveCamera({

@@ -53,6 +53,10 @@ class MoveCamera extends parent {
         });
 
     }
+
+    public setEndPoint(ep: any) {
+        this.parameters['endPoint'] = ep;
+    }
 }
 
 export default MoveCamera;
