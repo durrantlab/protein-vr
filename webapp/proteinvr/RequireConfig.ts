@@ -61,13 +61,9 @@ require(['../main', 'jquery', "bootstrap", "./Core/Core", "./Core/Setup"], (main
     // window.Core = Core.default;  // not sure why the default is needed here.
     PVRGlobals.jQuery = jQuery;
 
+    // Get custom events from main.ts
     let setEvents = main.start(Core);
 
     // Setup the VR program.
     Setup.setup(setEvents);  // again with the default. Why needed?
-
-    // console.log("Sys vars should be setup!");
-    // console.log(UserVars);
-
-
 });

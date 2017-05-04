@@ -8,9 +8,10 @@ import ScreenWhite from "./proteinvr/Events/Actions/ScreenWhite";
 import MoveCamera from "./proteinvr/Events/Actions/MoveCamera";
 import AdministerQuiz from "./proteinvr/Events/Actions/AdministerQuiz";
 import KeyPress from "./proteinvr/Events/TriggerConditionals/KeyPress";
-import GameStart from "./proteinvr/Events/TriggerConditionals/GameStart";
+import AlwaysTrue from "./proteinvr/Events/TriggerConditionals/AlwaysTrue";
 import ClickedObject from "./proteinvr/Events/TriggerConditionals/ClickedObject";
 import LabelOnMesh from "./proteinvr/Events/Actions/LabelOnMesh";
+import DoInInterval from "./proteinvr/Events/Actions/DoInInterval";
 import * as CameraChar from "./proteinvr/CameraChar";
 import {LensFlare} from "./proteinvr/Environment";
 
@@ -20,7 +21,7 @@ throwing errors because BABYLON isn't defined in the TypeScript file.
 */
 declare var BABYLON: any;
 declare var PVRGlobals;
-var jQuery = PVRGlobals.jQuery;
+//var jQuery = PVRGlobals.jQuery;
 
 // declare var Core: any;  // attached to window in RequireConfig.ts
 
@@ -100,16 +101,18 @@ export function start(Core) {
         );
 
         // new Event(
-            // new GameStart({}, jQuery),
-            // new MoveCamera({
-                // camera: PVRGlobals.camera,
-                // milliseconds: 1000,
-                // startPoint: PVRGlobals.camera.position,
-                // endPoint: new BABYLON.Vector3(PVRGlobals.camera.position.x + 25, PVRGlobals.camera.position.y, PVRGlobals.camera.position.z)
-            // }),
-            // true,
-            // jQuery
+        //     new AlwaysTrue({}),
+        //     new DoInInterval({
+        //         milliseconds: 5000,
+        //         action: new MoveCamera({
+        //             camera: PVRGlobals.camera,
+        //             milliseconds: 1000,
+        //             startPoint: PVRGlobals.camera.position,
+        //             endPoint: new BABYLON.Vector3(PVRGlobals.camera.position.x + 25, PVRGlobals.camera.position.y, PVRGlobals.camera.position.z)
+        //         })
+        //     })
         // );
+
         // new Event(
         //     new ClickedObject({
         //         triggerMesh: PVRGlobals.meshesByName["grnd"],

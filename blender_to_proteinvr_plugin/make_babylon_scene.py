@@ -104,7 +104,7 @@ for obj in bpy.data.objects:
         Utils.object_mode()
         break
 
-# SavSete any specified sounds
-scene_data = Sounds.save_sounds(scene_data)
+# Save any specified sounds
+scene_data = Sounds.save_sounds(scene_data, params)
 
 Save.save_it(scene_data, manifest_id, params)

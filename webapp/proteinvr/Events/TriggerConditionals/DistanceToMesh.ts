@@ -26,7 +26,7 @@ class DistanceToMesh extends parent {
         super(params);
     }
 
-    public check(): boolean {
+    public checkIfTriggered(): boolean {
         /**
         Check if the conditions of this trigger are satisfied.
 

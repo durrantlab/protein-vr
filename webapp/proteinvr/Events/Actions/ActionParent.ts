@@ -1,4 +1,5 @@
 import * as Core from "../../Core/Core";
+declare var PVRGlobals;
 
 abstract class ActionParent {
     /**
@@ -24,17 +25,6 @@ abstract class ActionParent {
     Perform the action.
     */
     public abstract do(): void;
-
-    public scene(): any {
-        /**
-        A function that returns the current BABYLON scene. Here for
-            convenience.
-
-        :returns: The BABYLON scene.
-        */
-
-        return PVRGlobals.scene;
-    }
 }
 
 export default ActionParent;

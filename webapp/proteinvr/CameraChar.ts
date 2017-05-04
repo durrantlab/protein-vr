@@ -5,6 +5,7 @@ import * as MouseState from "./Core/MouseState";
 import * as UserVars from "./Settings/UserVars";
 
 declare var BABYLON;
+declare var PVRGlobals;
 var jQuery;
 
 // namespace CameraChar {

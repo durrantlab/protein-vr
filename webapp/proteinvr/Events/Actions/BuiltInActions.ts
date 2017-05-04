@@ -1,4 +1,4 @@
-import * as Timers from "../Timers";
+import * as Countdowns from "../Countdowns";
 import * as Core from "../../Core/Core";
 import * as CameraChar from "../../CameraChar";
 
@@ -28,12 +28,12 @@ namespace BuiltInActions {
 
         mesh.material.alphaMode = BABYLON.Engine.ALPHA_ADD;
 
-        Timers.addTimer({
+        Countdowns.addCountdown({
             name: "FadeOut" + Math.random().toString(),
-            durationInMiliseconds: milliseconds, //milliseconds,
-            interpValStart: 1.0,
-            interpValEnd: 0.0,
-            tickCallback: function(val) {
+            countdownDurationMilliseconds: milliseconds, //milliseconds,
+            countdownStartVal: 1.0,
+            countdownEndVal: 0.0,
+            afterCountdownAdvanced: function(val) {
                 this.material.alpha = val;
             }.bind(mesh),
             doneCallback: function() {
@@ -58,10 +58,10 @@ namespace BuiltInActions {
 
         mesh.material.alphaMode = BABYLON.Engine.ALPHA_ADD;
 
-        Timers.addTimer({
+        Countdowns.addCountdown({
             name: "FadeIn" + Math.random().toString(),
-            durationInMiliseconds: milliseconds, //milliseconds,
-            tickCallback: function(val) {
+            countdownDurationMilliseconds: milliseconds, //milliseconds,
+            afterCountdownAdvanced: function(val) {
                 this.material.alpha = val;
             }.bind(mesh),
             doneCallback: function() {

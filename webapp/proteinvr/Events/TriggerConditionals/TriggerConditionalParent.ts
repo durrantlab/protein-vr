@@ -2,6 +2,7 @@ import * as CameraChar from "../../CameraChar";
 import * as Core from "../../Core/Core";
 
 declare var BABYLON;
+declare var PVRGlobals;
 
 abstract class TriggerConditionalParent {
     /**
@@ -16,7 +17,7 @@ abstract class TriggerConditionalParent {
     :returns: true if the conditions are satisfied, false otherwise.
     :rtype: :any:`bool`
     */
-    public abstract check(params: any): boolean;
+    public abstract checkIfTriggered(params: any): boolean;
 
     /**
     Class variable to store parameters.

@@ -56,6 +56,10 @@ export function setup(): void {
     // Optimize the scene to keep it running fast.
     startOptimizing();
 
+    // No shadows and lights because everything rendered
+    PVRGlobals.scene.shadowsEnabled = false;
+    PVRGlobals.scene.lightsEnabled = false;
+
     // Set up the fog.
     setFog(0.0);
 
@@ -76,7 +80,7 @@ export function setup(): void {
     // lens = lensEffect();
     // limitLensEffect();
 
-    // timers();
+    // countdowns();
 
     // testing lens flares
     // uses nonexistant texture, rest of code works
@@ -109,7 +113,7 @@ export function setFog(density: number = 0.015): void {
         density = 0.6;
     }
 
-    // timers();
+    // countdowns();
 
 
     if (density !== 0) {

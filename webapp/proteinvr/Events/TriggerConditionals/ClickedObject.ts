@@ -2,6 +2,7 @@ import parent from "./TriggerConditionalParent";
 import * as MouseState from "../../Core/MouseState";
 
 declare var BABYLON;
+declare var PVRGlobals;
 var jQuery = PVRGlobals.jQuery;
 
 
@@ -41,7 +42,7 @@ class ClickedObject extends parent {
      * 
      * In place of a boolean method, the action is triggered from an event listener within the constructor
      */
-    public check() :boolean {
+    public checkIfTriggered() :boolean {
         return true;
     }
 }

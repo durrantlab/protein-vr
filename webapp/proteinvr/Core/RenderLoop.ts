@@ -1,7 +1,6 @@
 import * as Core from "./Core";
 import * as CameraChar from "../CameraChar";
 import Ground from "../Objects/Ground";
-import * as Timers from "../Events/Timers";
 
 // namespace RenderLoop {
 /**
@@ -12,6 +11,7 @@ A namespace that stores functions related to the BABYLON render loop.
 The time the loop was last run.
 */
 export var timeOfLastLoop: number = 0;
+declare var PVRGlobals;
 
 export function start(): void {
     /**
@@ -56,9 +56,6 @@ export function inLoop(): void {
     PVRGlobals.previousPos = PVRGlobals.camera.position.clone();
 
     // }
-
-    // These do run every frame
-    // Timers.tickAllTimers();
 
     // Set variables based on current frame rate
     // let animationRatio = PVRGlobals.scene.getAnimationRatio();
