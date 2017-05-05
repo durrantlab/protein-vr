@@ -45,7 +45,8 @@ console.log(window);
 // requirejs configuration file
 require.config({
     paths: {
-        jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min',
+        // jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min',
+        jquery: '../js/jquery.min',
         bootstrap: '../js/bootstrap-3.3.7/dist/js/bootstrap.min'
     },
     shim: {

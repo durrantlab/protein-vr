@@ -93,16 +93,16 @@ export function setup(setEventsFunc?: any): void {
                 // Load a scene from a BABYLON file.
                 BABYLON.SceneLoader.Load(UserVars.getParam("scenePath"), "scene.babylon" + urlCacheBreakTxt, 
                                         PVRGlobals.engine,
-                                        function (newScene: any): void {
+                                        function (ns: any): void {
 
 
                     // Wait for textures and shaders to be ready before
                     // proceeding.
-                    newScene.executeWhenReady(function () {
+                    ns.executeWhenReady(function () {
 
                         // Store the scene in a variable so you can reference it
                         // later.
-                        PVRGlobals.scene = newScene;
+                        PVRGlobals.scene = ns;
 
                         // Setup mouse events
                         MouseState.setup();

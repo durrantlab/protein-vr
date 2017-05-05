@@ -66,10 +66,10 @@ export function setup(): void {
     // Set up LOD
     let lodLevel = UserVars.getParam("objects");
     switch(lodLevel) {
-        case UserVars.objects.Normal:
+        case UserVars.objects["Normal"]:
             LOD.adjustLODDistances(LOD.LODLevelOptions[1]);
             break;
-        case UserVars.objects.Simple:
+        case UserVars.objects["Simple"]:
             LOD.adjustLODDistances(LOD.LODLevelOptions[2]);
             break;
         default:
@@ -92,9 +92,9 @@ export function setFog(density: number = 0.015): void {
     */
 
     let userVarFog = UserVars.getParam("fog");
-    if ((userVarFog === UserVars.fog.Thin) && (density < 0.015)) {
+    if ((userVarFog === UserVars.fog["Thin"]) && (density < 0.015)) {
         density = 0.35;
-    } else if ((userVarFog === UserVars.fog.Thick) && (density < 0.045)) {
+    } else if ((userVarFog === UserVars.fog["Thick"]) && (density < 0.045)) {
         density = 0.6;
     }
 

@@ -65,14 +65,13 @@ define(["require", "exports", "./proteinvr/Events/Event", "./proteinvr/Events/Tr
             }), new FadeOutMesh_1.default({
                 mesh: PVRGlobals.meshesByName["NA_patch_single_outer"],
                 milliseconds: 2000
-            })
+            }));
             // new MoveCamera({
             //     camera: PVRGlobals.camera,
             //     milliseconds: 1000,
             //     startPoint: PVRGlobals.camera.position,
             //     endPoint: new BABYLON.Vector3(PVRGlobals.camera.position.x + 25, PVRGlobals.camera.position.y, PVRGlobals.camera.position.z)
             // })
-            );
             // new Event(
             //     new AlwaysTrue({}),
             //     new DoInInterval({

@@ -7,13 +7,13 @@ declare var PVRGlobals;
 export function addSound(mp3FileName, location) {
     let panningModel: string = undefined;  // Assume speakers by default
     switch (UserVars.getParam("audio")) {
-        case UserVars.audios.Speakers:
+        case UserVars.audios["Speakers"]:
             panningModel = "equalpower";
             break;
-        case UserVars.audios.Headphones:
+        case UserVars.audios["Headphones"]:
             panningModel = "HRTF";
             break;
-        case UserVars.audios.None:
+        case UserVars.audios["None"]:
             return;
     }
 
