@@ -1,6 +1,7 @@
 # First, you need to build the project, combining modules into one.
 # Remove old compiled directory
 rm -r ../webapp-compiled/
+mkdir ../webapp-compiled/
 
 # Babylonjs needs to be kept out of the loop for now, since it's not loaded through requirejs.
 rm -r ../babylonjs.tmp_storage
