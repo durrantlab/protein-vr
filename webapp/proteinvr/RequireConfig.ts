@@ -46,11 +46,11 @@ console.log('window loaded?');
 console.log(window);
 // requirejs configuration file
 require.config({
-    paths: {
-        // jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min',
-        jquery: '../js/jquery.min',
-        bootstrap: '../js/bootstrap-3.3.7/dist/js/bootstrap.min'
-    },
+    // paths: {
+    //     // jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min',
+    //     jquery: '../js/jquery.min',
+    //     bootstrap: '../js/bootstrap-3.3.7/dist/js/bootstrap.min'
+    // },
     // shim: {
     //     bootstrap: {
     //         deps: ['jquery']
@@ -60,7 +60,7 @@ require.config({
 });
 
 // This require function starts the app
-require(['../main', /* 'jquery', */ "bootstrap", "./Core/Core", "./Core/Setup"], (main, /* jQuery,*/ bootstrap, Core, Setup) => {
+require(['../main', /* 'jquery', "bootstrap",*/  "./Core/Core", "./Core/Setup"], (main, /* jQuery, bootstrap,*/  Core, Setup) => {
     // window.Core = Core.default;  // not sure why the default is needed here.
     //PVRGlobals.jQuery = jQuery;
 
