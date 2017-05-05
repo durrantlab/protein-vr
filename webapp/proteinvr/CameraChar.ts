@@ -29,7 +29,7 @@ export function setup(): void {
 
     // The active camera from the babylon file is used (keep it
     // simple)
-    if (UserVars.getParam("viewer") === UserVars.viewers.VRHeadset) {
+    if (UserVars.getParam("viewer") === UserVars.viewers["VRHeadset"]) {
         // VR camera
         setUpVRCameraControls();
     } else {
