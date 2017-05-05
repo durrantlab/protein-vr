@@ -36,22 +36,6 @@ abstract class TriggerConditionalParent {
         this.parameters = params;
     }
 
-    public get cameraPos(): any {
-        /**
-        Get the current location of the scene camera. A convenience function.
-
-        :returns: The location of the camera.
-        :rtype: :any:`BABYLON.Vector3`
-        */
-
-        // if (PVRGlobals.camera !== undefined) {
-        return PVRGlobals.camera.position;
-        // } else {
-            // Not loaded yet?
-            // return new BABYLON.Vector3(0,0,0);
-        // }
-    }
-
     public distanceToCamera(vec3: any): number {
         /**
         The distance from a 3D point to the camera.
@@ -62,7 +46,7 @@ abstract class TriggerConditionalParent {
         :rtype: :any:`number`
         */
 
-        return BABYLON.Vector3.Distance(vec3, this.cameraPos);
+        return BABYLON.Vector3.Distance(vec3, PVRGlobals.camera.position);
     }
 
     public meshVisibleToCamera(mesh: any): boolean {

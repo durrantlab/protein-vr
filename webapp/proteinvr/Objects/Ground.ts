@@ -3,6 +3,7 @@ import * as Core from "../Core/Core";
 import * as CameraChar from "../CameraChar"; 
 
 declare var BABYLON;
+declare var PVRGlobals;
 
 class Ground extends parent {
     /**

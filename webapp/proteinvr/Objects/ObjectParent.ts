@@ -1,4 +1,5 @@
 import * as Core from "../Core/Core";
+declare var PVRGlobals;
 
 abstract class ObjectParent {
     /**

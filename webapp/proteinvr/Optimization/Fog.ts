@@ -2,6 +2,7 @@
 
 import * as Core from "../Core/Core";
 import * as Environment from "../Environment";
+declare var PVRGlobals;
 
 export class mySceneOptimizationFog extends BABYLON.SceneOptimization {
     public apply = (scene): boolean => {

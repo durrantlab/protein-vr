@@ -14,6 +14,7 @@ import * as UserVars from "../Settings/UserVars";
 // errors.
 
 declare var BABYLON;
+declare var PVRGlobals;
 
 var proteinVRInfo: any;
 

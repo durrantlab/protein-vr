@@ -2,6 +2,7 @@
 
 import * as Core from "../Core/Core";
 import * as UserVars from "../Settings/UserVars";
+declare var PVRGlobals;
 
 export var LODLevelOptions = [
     [40, 60],

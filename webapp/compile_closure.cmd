@@ -16,13 +16,12 @@ cp -r ../babylonjs.tmp_storage/* ../webapp-compiled/js/
 mv ../babylonjs.tmp_storage/* js/
 rm -r ../babylonjs.tmp_storage/
 
+cd ../webapp-compiled/
 echo "Make sure you're in the compile directory!"
 pwd
-echo "<Press Enter>"
-read -n1 -r -p "Press space to continue..." key
+read -n1 -r -p "<Press Enter> " key
 
 # Clean up some files
-cd ../webapp-compiled/
 find . -name "*.cmd" | awk '{print "rm " $1}' | bash
 find . -name "*.ts" | awk '{print "rm " $1}' | bash
 cd proteinvr
