@@ -6,7 +6,7 @@ import glob
 
 params = urllib.urlencode([
     ('js_code', open(sys.argv[1]).read()), # <--- This parameter has a new name!
-    ('compilation_level', ['WHITESPACE_ONLY', 'SIMPLE_OPTIMIZATIONS', 'ADVANCED_OPTIMIZATIONS'][1]),
+    ('compilation_level', ['WHITESPACE_ONLY', 'SIMPLE_OPTIMIZATIONS', 'ADVANCED_OPTIMIZATIONS'][2]),
     ('output_format', 'text'),
     ('output_info', ['compiled_code', 'errors'][0]),
     ('js_externs', "\n".join([open(f).read() for f in glob.glob('./js/closure-externs/*')])),

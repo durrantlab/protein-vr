@@ -1,5 +1,7 @@
 ///<reference path="Definitions/require.d.ts" />
 
+declare var jQuery;
+
 // I know it's bad practice to polute the global namespace, but some variables
 // are just far easier to use when declared globally.
 var PVRGlobals = {
@@ -28,7 +30,7 @@ var PVRGlobals = {
     previousPos: undefined,
 
     // jQuery
-    jQuery: undefined,
+    jQuery: jQuery,
 
     screenfull: undefined,
 
@@ -49,18 +51,18 @@ require.config({
         jquery: '../js/jquery.min',
         bootstrap: '../js/bootstrap-3.3.7/dist/js/bootstrap.min'
     },
-    shim: {
-        bootstrap: {
-            deps: ['jquery']
-        }
-    }, 
+    // shim: {
+    //     bootstrap: {
+    //         deps: ['jquery']
+    //     }
+    // }, 
     urlArgs: "bust=" + (new Date()).getTime()
 });
 
 // This require function starts the app
-require(['../main', 'jquery', "bootstrap", "./Core/Core", "./Core/Setup"], (main, jQuery, bootstrap, Core, Setup) => {
+require(['../main', /* 'jquery', */ "bootstrap", "./Core/Core", "./Core/Setup"], (main, /* jQuery,*/ bootstrap, Core, Setup) => {
     // window.Core = Core.default;  // not sure why the default is needed here.
-    PVRGlobals.jQuery = jQuery;
+    //PVRGlobals.jQuery = jQuery;
 
     // Get custom events from main.ts
     let setEvents = main.start(Core);
