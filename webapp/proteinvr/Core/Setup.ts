@@ -159,27 +159,30 @@ export function setup(setEventsFunc?: any): void {
 
                                 // HERE DO THE SHADER LIBRARY THING TO NOT DUPLICATE EFFORTS!!!
 
-                                var mat = new BABYLON.StandardMaterial(mat_key, PVRGlobals.scene);
-                                mat.diffuseColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
-                                mat.specularColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
-                                mat.fogEnabled = true;
+                                // var mat = new BABYLON.PBRMaterial(mat_key, PVRGlobals.scene);
+
+
+                                let mat_params: MaterialInterface = {
+                                    name: mat_key,
+                                    glossiness: mat_inf.glossiness,
+                                    color: undefined,
+                                    texture: undefined,
+                                    shadowMap: undefined
+                                }
 
                                 if (colorType === "color") {
                                     // set the diffuse colors
-                                    mat.emissiveColor = new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
+                                    mat_params.color = new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
                                 } else {  // so it's an image
-                                    mat.emissiveColor = new BABYLON.Color3(0,0,0);
                                     let img_path = UserVars.getParam("scenePath") + mat_inf.color + this.urlCacheBreakTxt;
-                                    mat.emissiveTexture = new BABYLON.Texture(img_path, PVRGlobals.scene);
+                                    mat_params.texture = new BABYLON.Texture(img_path, PVRGlobals.scene);
                                 }
 
-                                // Now do glossiness
-                                mat.specularColor = new BABYLON.Color3(mat_inf.glossiness, mat_inf.glossiness, mat_inf.glossiness);
 
                                 // Add shadows
                                 if (m.name !== "sky") { // sky has no shadow
                                     let nameToUse = m.name.replace(/Decimated/g, "");
-                                    mat.ambientTexture = new BABYLON.Texture(UserVars.getParam("scenePath") + nameToUse + "shadow.png" + this.urlCacheBreakTxt, PVRGlobals.scene);
+                                    mat_params.shadowMap = new BABYLON.Texture(UserVars.getParam("scenePath") + nameToUse + "shadow.png" + this.urlCacheBreakTxt, PVRGlobals.scene);
                                 }
 
                                 // Now add this material to the object.
@@ -189,7 +192,7 @@ export function setup(setEventsFunc?: any): void {
 
                                 // mat.backFaceCulling = false;
 
-                                m.material = mat;
+                                m.material = makeStandardMaterial(mat_params);
                             }
 
                             // Make the mesh collidable
@@ -291,6 +294,40 @@ export function continueSetupAfterSettingsPanelClosed() {
 
 function roundToHundredth(num: number) {
     return Math.round(num * 100) / 100;
+}
+
+interface MaterialInterface {
+    name: string,
+    glossiness: number,
+    color?: BABYLON.Color3,
+    texture?: BABYLON.Texture,
+    shadowMap?: BABYLON.Texture
+}
+
+function makeStandardMaterial(params: MaterialInterface) {
+    var mat = new BABYLON.StandardMaterial(params.name, PVRGlobals.scene);
+
+    mat.diffuseColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
+    mat.specularColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
+    mat.fogEnabled = true;
+
+    if (params.color !== undefined) {
+        mat.emissiveColor = params.color; // new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
+    }
+
+    if (params.texture !== undefined) {
+        mat.emissiveColor = new BABYLON.Color3(0,0,0);
+        mat.emissiveTexture = params.texture;
+    }
+
+    mat.specularColor = new BABYLON.Color3(params.glossiness, params.glossiness, params.glossiness);
+
+    if (params.shadowMap !== undefined) {
+        mat.ambientTexture = params.shadowMap;
+    }
+
+
+    return mat;
 }
 
 // export default Setup;
