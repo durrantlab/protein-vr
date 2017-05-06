@@ -67,7 +67,7 @@ export function setup(): void {
     camera.checkCollisions = true;
 
     // Additional control keys.
-    alert("hi");
+    // alert("hi");
     camera.keysUp.push(87);  // W
     camera.keysLeft.push(65);  // A
     camera.keysDown.push(83);  // S

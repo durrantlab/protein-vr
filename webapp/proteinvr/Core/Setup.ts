@@ -193,6 +193,7 @@ export function setup(setEventsFunc?: any): void {
                                 // mat.backFaceCulling = false;
 
                                 m.material = makeStandardMaterial(mat_params);
+                                // m.material = makePBRMaterial(mat_params);
                             }
 
                             // Make the mesh collidable
@@ -321,6 +322,35 @@ function makeStandardMaterial(params: MaterialInterface) {
     }
 
     mat.specularColor = new BABYLON.Color3(params.glossiness, params.glossiness, params.glossiness);
+
+    if (params.shadowMap !== undefined) {
+        mat.ambientTexture = params.shadowMap;
+    }
+
+
+    return mat;
+}
+
+function makePBRMaterial(params: MaterialInterface) {
+    // Note: This doesn't work. Not sure it's necessary given that shadows are
+    // baked in and there are no lights?
+    var mat = new BABYLON.PBRMaterial(params.name, PVRGlobals.scene);
+
+    mat.albedoColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
+    mat.reflectivityColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
+    mat.fogEnabled = true;
+
+    if (params.color !== undefined) {
+        mat.emissiveColor = params.color; // new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
+    }
+
+    if (params.texture !== undefined) {
+        mat.emissiveColor = new BABYLON.Color3(0,0,0);
+        mat.emissiveTexture = params.texture;
+    }
+
+    mat.reflectivityColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+    mat.microSurface = params.glossiness;
 
     if (params.shadowMap !== undefined) {
         mat.ambientTexture = params.shadowMap;
