@@ -44,7 +44,7 @@ class MoveCamera extends parent {
                 camera.position.x = sp.x + ((ep.x-sp.x) * val);
                 camera.position.y = sp.y + ((ep.y-sp.y) * val);
                 camera.position.z = sp.z + ((ep.z-sp.z) * val);
-                camera.direction = this.parameters["direction"];
+                // camera.direction = this.parameters["direction"];
             }.bind(this),
             doneCallback: function() {
                 this.parameters["camera"].position = this.parameters["endPoint"];

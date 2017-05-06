@@ -289,18 +289,53 @@ export function continueSetupAfterSettingsPanelClosed() {
 
         // base type of movement based on navigation user var
 
-        let movement = UserVars.getParam("movement");
-        if (movement == UserVars.stringToEnumVal("advance")) {
-            let action = new MoveCamera({
-                camera: PVRGlobals.camera,
-                milliseconds: 1000,
-                startPoint: PVRGlobals.camera.position,
-                endPoint: null
-            });
+        let movement = UserVars.getParam("moving");
+        console.log("movement var = " + movement);
+        if (movement == UserVars.stringToEnumVal("Advance")) {
+            console.log("Advance movement method");
+            
             MouseState.mouseClickDownFunctions.push(function(results) {
 
-                action.setEndPoint(results.worldLoc);
-                action.do();
+                if (results.worldLoc){
+                    let action = new MoveCamera({
+                        camera: PVRGlobals.camera,
+                        milliseconds: 2000,
+                        startPoint: PVRGlobals.camera.position,
+                        endPoint: results.worldLoc
+                    });
+                    console.log("End Point Set"); 
+                    console.log(results.worldLoc);
+                    console.log("About to move");
+                    action.do();
+                }
+                else {
+                    console.log("no mesh clicked. Just return");
+                    return;
+                }
+             });
+        }
+
+        else if(movement == UserVars.stringToEnumVal("Jump")) {
+            console.log("Jump movement method");
+            
+            MouseState.mouseClickDownFunctions.push(function(results) {
+
+                if (results.worldLoc){
+                    let action = new MoveCamera({
+                        camera: PVRGlobals.camera,
+                        milliseconds: 0,
+                        startPoint: PVRGlobals.camera.position,
+                        endPoint: results.worldLoc
+                    });
+                    console.log("End Point Set");
+                    console.log(results.worldLoc);
+                    console.log("About to move");
+                    action.do();
+                }
+                else {
+                    console.log("no mesh clicked. Just return");
+                    return;
+                }
              });
         }
 

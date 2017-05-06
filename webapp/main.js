@@ -1,8 +1,6 @@
 // THIS IS WHERE ANY CUSTOM CODE GOES. DEFINING SHADERS AND TRIGGERS AND SUCH.
 define(["require", "exports", "./proteinvr/Events/Event", "./proteinvr/Events/TriggerConditionals/DistanceToMesh", "./proteinvr/Events/Actions/FadeOutMesh"], function (require, exports, Event_1, DistanceToMesh_1, FadeOutMesh_1) {
     "use strict";
-
-    Object.defineProperty(exports, "__esModule", { value: true });
     //var jQuery = PVRGlobals.jQuery;
     // declare var Core: any;  // attached to window in RequireConfig.ts
     // this function was added in so the app could be run from the config.ts file with requirejs
