@@ -303,6 +303,8 @@ export function continueSetupAfterSettingsPanelClosed() {
                         startPoint: PVRGlobals.camera.position,
                         endPoint: results.worldLoc
                     });
+                    PVRGlobals.camera.setTarget(results.worldLoc);
+                    console.log(PVRGlobals.camera.getTarget());
                     console.log("End Point Set"); 
                     console.log(results.worldLoc);
                     console.log("About to move");
@@ -327,6 +329,7 @@ export function continueSetupAfterSettingsPanelClosed() {
                         startPoint: PVRGlobals.camera.position,
                         endPoint: results.worldLoc
                     });
+                    PVRGlobals.camera.setTarget(results.worldLoc);
                     console.log("End Point Set");
                     console.log(results.worldLoc);
                     console.log("About to move");
@@ -337,6 +340,35 @@ export function continueSetupAfterSettingsPanelClosed() {
                     return;
                 }
              });
+        }
+
+        else if(movement == UserVars.stringToEnumVal("Teleport")) {
+            console.log("Teleport movement method");
+            
+            MouseState.mouseClickDownFunctions.push(function(results) {
+
+                if (results.worldLoc){
+                    let action = new MoveCamera({
+                        camera: PVRGlobals.camera,
+                        milliseconds: 0,
+                        startPoint: PVRGlobals.camera.position,
+                        endPoint: results.worldLoc
+                    });
+                    PVRGlobals.camera.setTarget(PVRGlobals.camera.getTarget());
+                    console.log("End Point Set");
+                    console.log(results.worldLoc);
+                    console.log("About to move");
+                    action.do();
+                }
+                else {
+                    console.log("no mesh clicked. Just return");
+                    return;
+                }
+             });
+        }
+
+        else {
+            console.error("Expected a variable for Moving parameter. None found.");
         }
 
         RenderLoop.start();
