@@ -236,8 +236,53 @@ export function teacherGatherClass() :void{
             console.log("Data processed: " + msg);
         });
     }
+    else{
+        return;
+    }
+}
 
+    // student function
     
+export function goToLocation(VRCamera: boolean) :void{
+    jQuery = PVRGlobals.jQuery;
+    let url = window.location.href;
+    console.log("Current url is: " + url);
+    let pattern = "?id=";
+
+    // maintain old data from previous calls
+    let oldData:any = [];
+    if (url.indexOf(pattern) > -1) {
+        let parsed = url.split('=');
+        let uniqueCode = parsed[1];
+        console.log("ID: " + uniqueCode);
+
+        //begin checking script every few seconds
+        setInterval(function(){
+            jQuery.ajax({
+                method: "GET",
+                data: {id: uniqueCode},
+                success: function(data){
+                    if(oldData.indexOf(data) != -1) {
+                        return;
+                    }
+                    else{
+                        oldData.push(data);
+                        PVRGlobals.camera.position.x = data.locx;
+                        PVRGlobals.camera.position.y = data.locy;
+                        PVRGlobals.camera.position.z = data.locz;
+                        if (!VRCamera){
+                            PVRGlobals.camera.rotation.x = data.rotx;
+                            PVRGlobals.camera.rotation.y = data.roty;
+                            PVRGlobals.camera.rotation.z = data.rotz;
+                        }
+                    }
+                }
+            })
+        }, 3000);
+    }
+    else{
+        return;
+    } 
 }
 
 // export default CameraChar;

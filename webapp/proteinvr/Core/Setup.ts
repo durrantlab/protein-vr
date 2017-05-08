@@ -373,6 +373,9 @@ export function continueSetupAfterSettingsPanelClosed() {
             console.error("Expected a variable for Moving parameter. None found.");
         }
 
+        // test student function
+        CameraChar.goToLocation(false);
+
         RenderLoop.start();
     }
 }
