@@ -255,6 +255,7 @@ export function setup(setEventsFunc?: any): void {
                 }));
             });
         });
+        // CameraChar.teacherGatherClass();
     });
 }
 // }
@@ -312,6 +313,7 @@ export function continueSetupAfterSettingsPanelClosed() {
                 }
                 else {
                     console.log("no mesh clicked. Just return");
+                    CameraChar.teacherGatherClass();
                     return;
                 }
              });

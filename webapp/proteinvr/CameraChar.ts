@@ -192,4 +192,52 @@ export function setupCrosshair() {
 }
 // }
 
+// Teacher function
+
+export function teacherGatherClass() :void{
+    jQuery = PVRGlobals.jQuery;
+    let url = window.location.href;
+    console.log("Current url is: " + url);
+    let pattern = "?transmit=";
+    if (url.indexOf(pattern) > -1) {
+        let parsed = url.split('=');
+        let uniqueCode = parsed[1];
+        console.log("ID: " + uniqueCode);
+        let locx = PVRGlobals.camera.position.x;
+        let locy = PVRGlobals.camera.position.y;
+        let locz = PVRGlobals.camera.position.z;
+        let rotx = PVRGlobals.camera.rotation.x;
+        let roty = PVRGlobals.camera.rotation.y;
+        let rotz = PVRGlobals.camera.rotation.z;
+
+        let obj = {
+            'id': uniqueCode,
+            'locx': locx,
+            'locy': locy,
+            'locz': locz,
+            'rotx': rotx,
+            'roty': roty,
+            'rotz': rotz
+        };
+        console.log("JSON object: " + obj.id);
+        jQuery.ajax({
+            method: "POST",
+            url: "./proteinvr/transmit/transmit.php",
+            data: {
+                id: uniqueCode,
+                locx: locx,
+                locy: locy,
+                locz: locz,
+                rotx: rotx,
+                roty: roty,
+                rotz: rotz
+            }
+        }).done(function(msg){
+            console.log("Data processed: " + msg);
+        });
+    }
+
+    
+}
+
 // export default CameraChar;
