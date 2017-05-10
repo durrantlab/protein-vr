@@ -12,7 +12,7 @@ interface DoInterface{
     camera: any; //camera object
     milliseconds: number;
    // direction: any;  // vector object
-    startPoint: any; // vector object
+    // startPoint: any; // vector object
     endPoint: any;   // vector object
 }
 
@@ -36,8 +36,9 @@ class MoveCamera extends parent {
             console.log("Destination: " + destination);
             this.ep = destination;
             // keep camera above ground
-            this.ep.y += 0.5;
+            this.ep.y += 0.5;    
             console.log("Updated destination: " + this.ep);
+            console.log("For reference, sp = " + this.parameters["camera"].position);
         } else{
             this.ep = this.parameters["endPoint"];
         }
@@ -48,15 +49,22 @@ class MoveCamera extends parent {
             countdownEndVal: 1.0,
             afterCountdownAdvanced: function(val){
                 let camera = this.parameters["camera"];
-                let sp = this.parameters["startPoint"];
+                let sp = camera.position;
                 // this.ep = this.parameters["endPoint"];
                 
                 console.log("Beginning movement in countdown");
                 console.log("Val: " + val);
                 camera.position.x = sp.x + ((this.ep.x-sp.x) * val);
+                console.log("y coord before calc: " + camera.position.y);
+                console.log("sp.y: " + sp.y);
+                console.log("ep.y: " + this.ep.y);
+                console.log("y calculation:");
+                console.log("this.ep.y - sp.y = " + (this.ep.y-sp.y));
+                console.log("That * val = " + (this.ep.y-sp.y)*val);
                 camera.position.y = sp.y + ((this.ep.y-sp.y) * val);
                 camera.position.z = sp.z + ((this.ep.z-sp.z) * val);
                 console.log("Ending this iteration");
+                console.log("Y coordinate: " + camera.position.y);
                 // camera.direction = this.parameters["direction"];
             }.bind(this),
             doneCallback: function() {

@@ -302,95 +302,35 @@ export function continueSetupAfterSettingsPanelClosed() {
                 action: new MoveCamera({
                         camera: PVRGlobals.camera,
                         milliseconds: 2000,
-                        startPoint: PVRGlobals.camera.position,
                         endPoint: null
                     })
             }), null, true);
-            // MouseState.mouseClickDownFunctions.push(function(results) {
-
-            //     if (results.worldLoc){
-            //         let dest = results.worldLoc;
-            //         console.log("Destination before: " + dest);
-            //         dest.y = dest.y + .5;
-            //         console.log("Destination after: " + dest);
-
-            //         let action = new MoveCamera({
-            //             camera: PVRGlobals.camera,
-            //             milliseconds: 2000,
-            //             startPoint: PVRGlobals.camera.position,
-            //             endPoint: dest
-            //         });
-            //         console.log("start point: " + action.parameters['startPoint']);
-            //        // PVRGlobals.camera.setTarget(results.worldLoc);
-            //        // console.log(PVRGlobals.camera.getTarget());
-            //        console.log("current position before moving: " + PVRGlobals.camera.position);
-                    
-            //         console.log("About to move");
-            //         console.log("picked point: " + results.worldLoc);
-            //         console.log("End point: " + action.parameters['endPoint']);
-            //         // console.log("Normal: " + results.normal);
-            //         action.do();
-            //         console.log("Current Position: " + PVRGlobals.camera.position);
-            //         console.log("any change in Position?: " + PVRGlobals.camera.position);
-            //     }
-            //     else {
-            //         console.log("no mesh clicked. Just return");
-            //         // CameraChar.teacherGatherClass();
-            //         return;
-            //     }
-            //  });
-             console.log("mouseClickDownFunctions");
-             console.log(MouseState.mouseClickDownFunctions)
         }
 
         else if(movement == UserVars.stringToEnumVal("Jump")) {
             console.log("Jump movement method");
             
-            MouseState.mouseClickDownFunctions.push(function(results) {
-
-                if (results.worldLoc){
-                    let action = new MoveCamera({
+            new Event(new ClickedObject({
+                triggerMesh: PVRGlobals.meshesByName["grnd"],
+                action: new MoveCamera({
                         camera: PVRGlobals.camera,
                         milliseconds: 0,
-                        startPoint: PVRGlobals.camera.position,
-                        endPoint: results.worldLoc
-                    });
-                    PVRGlobals.camera.setTarget(results.worldLoc);
-                    console.log("End Point Set");
-                    console.log(results.worldLoc);
-                    console.log("About to move");
-                    action.do();
-                }
-                else {
-                    console.log("no mesh clicked. Just return");
-                    return;
-                }
-             });
+                        endPoint: null
+                    })
+            }), null, true);
         }
 
         else if(movement == UserVars.stringToEnumVal("Teleport")) {
             console.log("Teleport movement method");
             
-            MouseState.mouseClickDownFunctions.push(function(results) {
-
-                if (results.worldLoc){
-                    let action = new MoveCamera({
+            new Event(new ClickedObject({
+                triggerMesh: PVRGlobals.meshesByName["grnd"],
+                action: new MoveCamera({
                         camera: PVRGlobals.camera,
                         milliseconds: 0,
-                        startPoint: PVRGlobals.camera.position,
-                        endPoint: results.worldLoc
-                    });
-                    PVRGlobals.camera.setTarget(PVRGlobals.camera.getTarget());
-                    console.log("End Point Set");
-                    console.log(results.worldLoc);
-                    console.log("About to move");
-                    action.do();
-                }
-                else {
-                    console.log("no mesh clicked. Just return");
-                    return;
-                }
-             });
+                        endPoint: null
+                    })
+            }), null, true);
         }
 
         else {
@@ -398,7 +338,7 @@ export function continueSetupAfterSettingsPanelClosed() {
         }
 
         // test student function
-        CameraChar.goToLocation(false);
+        // CameraChar.goToLocation(false);
 
         RenderLoop.start();
     }
