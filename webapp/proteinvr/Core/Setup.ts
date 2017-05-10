@@ -306,7 +306,6 @@ export function continueSetupAfterSettingsPanelClosed() {
                     })
             }), null, true);
         }
-
         else if(movement == UserVars.stringToEnumVal("Jump")) {
             console.log("Jump movement method");
             
@@ -319,7 +318,6 @@ export function continueSetupAfterSettingsPanelClosed() {
                     })
             }), null, true);
         }
-
         else if(movement == UserVars.stringToEnumVal("Teleport")) {
             console.log("Teleport movement method");
             
@@ -332,7 +330,6 @@ export function continueSetupAfterSettingsPanelClosed() {
                     })
             }), null, true);
         }
-
         else {
             console.error("Expected a variable for Moving parameter. None found.");
         }
