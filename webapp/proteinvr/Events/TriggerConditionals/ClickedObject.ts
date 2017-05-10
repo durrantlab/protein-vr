@@ -14,7 +14,7 @@ interface CheckInterface{
 class ClickedObject extends parent {
     public canvasJQuery = undefined;
 
-    constructor(params: CheckInterface, Core :any){
+    constructor(params: CheckInterface){
         /**
          * This is the constructor.
          * 
