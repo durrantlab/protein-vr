@@ -192,17 +192,21 @@ export function setupCrosshair() {
 }
 // }
 
-// Teacher function
+/**
+ * Checks url for '?transmit=' with a following id. Saves the camera location and rotation info
+ * to a json object and sends it to the transmit.php script to be maintained. Students can then be 
+ * teleported to the saved location via the same php script.
+ */
 
 export function teacherGatherClass() :void{
     jQuery = PVRGlobals.jQuery;
     let url = window.location.href;
-    console.log("Current url is: " + url);
+    // console.log("Current url is: " + url);
     let pattern = "?transmit=";
     if (url.indexOf(pattern) > -1) {
         let parsed = url.split('=');
         let uniqueCode = parsed[1];
-        console.log("ID: " + uniqueCode);
+        // console.log("ID: " + uniqueCode);
         let locx = PVRGlobals.camera.position.x;
         let locy = PVRGlobals.camera.position.y;
         let locz = PVRGlobals.camera.position.z;
@@ -210,16 +214,6 @@ export function teacherGatherClass() :void{
         let roty = PVRGlobals.camera.rotation.y;
         let rotz = PVRGlobals.camera.rotation.z;
 
-        let obj = {
-            'id': uniqueCode,
-            'locx': locx,
-            'locy': locy,
-            'locz': locz,
-            'rotx': rotx,
-            'roty': roty,
-            'rotz': rotz
-        };
-        console.log("JSON object: " + obj.id);
         jQuery.ajax({
             method: "POST",
             url: "./proteinvr/transmit/transmit.php",
@@ -233,20 +227,26 @@ export function teacherGatherClass() :void{
                 rotz: rotz
             }
         }).done(function(msg){
-            console.log("Data processed: " + msg);
+            console.log("Data processed. " + msg);
         });
     }
     else{
+        console.log("No teacher id in url :/");
         return;
     }
 }
 
-    // student function
+/**
+ * Checks the url every 3 seconds for '?id=' and scans the associated id against the
+ * known teacher id's with the backend transmit.php script. If there is a match, current user
+ * is teleported to the saved location.
+ * @param VRCamera Is this user on a VR device?
+ */
     
 export function goToLocation(VRCamera: boolean) :void{
     jQuery = PVRGlobals.jQuery;
     let url = window.location.href;
-    console.log("Current url is: " + url);
+    // console.log("Current url is: " + url);
     let pattern = "?id=";
 
     // maintain old data from previous calls
@@ -254,35 +254,45 @@ export function goToLocation(VRCamera: boolean) :void{
     if (url.indexOf(pattern) > -1) {
         let parsed = url.split('=');
         let uniqueCode = parsed[1];
-        console.log("ID: " + uniqueCode);
+        // console.log("ID: " + uniqueCode);
 
         //begin checking script every few seconds
         setInterval(function(){
             jQuery.ajax({
-                method: "GET",
-                data: {id: uniqueCode},
-                success: function(data){
+                url: "./proteinvr/transmit/transmit.php",
+                method: "POST",
+                data: {id: uniqueCode}
+            }).done(function(data){
                     if(oldData.indexOf(data) != -1) {
+                        console.log("INVALID ID");
                         return;
                     }
                     else{
+                        
                         oldData.push(data);
-                        PVRGlobals.camera.position.x = data.locx;
-                        PVRGlobals.camera.position.y = data.locy;
-                        PVRGlobals.camera.position.z = data.locz;
+                        let obj = JSON.parse(data.toString());
+                        PVRGlobals.camera.position = new BABYLON.Vector3(
+                            Number(obj.locx), 
+                            Number(obj.locy), 
+                            Number(obj.locz)
+                        );
+                        
                         if (!VRCamera){
-                            PVRGlobals.camera.rotation.x = data.rotx;
-                            PVRGlobals.camera.rotation.y = data.roty;
-                            PVRGlobals.camera.rotation.z = data.rotz;
+                            PVRGlobals.camera.rotation = new BABYLON.Vector3(
+                                Number(obj.rotx), 
+                                Number(obj.roty), 
+                                Number(obj.rotz)
+                            );
                         }
                     }
-                }
-            })
+            }).fail(function( jqXHR, textStatus, errorThrown ) {
+                console.log("jqXHR: " + jqXHR);
+                console.log("Text status: " + textStatus);
+                console.log("Error thrown: " + errorThrown);
+            });
         }, 3000);
     }
     else{
         return;
     } 
 }
-
-// export default CameraChar;

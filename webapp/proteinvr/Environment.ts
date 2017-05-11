@@ -84,18 +84,18 @@ export function setup(): void {
 
     // testing lens flares
     // uses nonexistant texture, rest of code works
-    let flares = LensFlare.buildFlareSys({
-        name: "LensFlareSystem",
-        emitter: PVRGlobals.camera,
-        flares: [{
-            size: 1,
-            position: 0,
-            color: new BABYLON.Color3(1, 1, 1),
-            texture: "sampletexture.png"
-        }]
-    });
+    // let flares = LensFlare.buildFlareSys({
+    //     name: "LensFlareSystem",
+    //     emitter: PVRGlobals.camera,
+    //     flares: [{
+    //         size: 1,
+    //         position: 0,
+    //         color: new BABYLON.Color3(1, 1, 1),
+    //         texture: "sampletexture.png"
+    //     }]
+    // });
 
-    console.log(flares);
+    // console.log(flares);
 
 }
 
@@ -275,6 +275,8 @@ export namespace PointerLock {
     }
 }
 
+// lens flare code
+
 interface Flare{
     size: number;
     position: number;
@@ -287,6 +289,9 @@ interface FlareSystem {
     emitter: any;
     flares: Flare[];
 }
+
+// Lens Flares tested above (line 87)
+
 
 /**
  * namespace for creating a lens flare system

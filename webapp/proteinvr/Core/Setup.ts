@@ -294,17 +294,19 @@ export function continueSetupAfterSettingsPanelClosed() {
 
         let movement = UserVars.getParam("moving");
         console.log("movement var = " + movement);
+
+        // Just move straight forward (arrows and such)
         if (movement == UserVars.stringToEnumVal("Advance")) {
             console.log("Advance movement method");
             
-            new Event(new ClickedObject({
-                triggerMesh: PVRGlobals.meshesByName["grnd"],
-                action: new MoveCamera({
-                        camera: PVRGlobals.camera,
-                        milliseconds: 2000,
-                        endPoint: null
-                    })
-            }), null, true);
+            // new Event(new ClickedObject({
+            //     triggerMesh: PVRGlobals.meshesByName["grnd"],
+            //     action: new MoveCamera({
+            //             camera: PVRGlobals.camera,
+            //             milliseconds: 2000,
+            //             endPoint: null
+            //         })
+            // }), null, true);
         }
         else if(movement == UserVars.stringToEnumVal("Jump")) {
             console.log("Jump movement method");
@@ -313,7 +315,7 @@ export function continueSetupAfterSettingsPanelClosed() {
                 triggerMesh: PVRGlobals.meshesByName["grnd"],
                 action: new MoveCamera({
                         camera: PVRGlobals.camera,
-                        milliseconds: 0,
+                        milliseconds: 2000,
                         endPoint: null
                     })
             }), null, true);
@@ -335,8 +337,9 @@ export function continueSetupAfterSettingsPanelClosed() {
         }
 
         // test student function
-        // CameraChar.goToLocation(false);
-
+        console.log("Calling student function");
+        CameraChar.goToLocation(false);
+        console.log("Returned from goToLocation()");
         RenderLoop.start();
     }
 }
