@@ -61,6 +61,23 @@ class MorphMesh extends parent {
                 let endTargetName = this.extraVars.endTargetName;
                 let runningForward = this.extraVars.runningForward;
 
+                // Make sure the animations exist
+                if ((startTargetName !== "Base") && (
+                        (PVRGlobals.allMorphTargets[meshName] === undefined) ||
+                        (PVRGlobals.allMorphTargets[meshName][startTargetName] === undefined)
+                    )) {
+                    console.log("No animation found: " + meshName + " : " + startTargetName);
+                    return;
+                }
+
+                if ((endTargetName !== "Base") && (
+                        (PVRGlobals.allMorphTargets[meshName] === undefined) ||
+                        (PVRGlobals.allMorphTargets[meshName][endTargetName] === undefined)
+                    )) {
+                    console.log("No animation found: " + meshName + " : " + endTargetName);
+                    return;
+                }
+
                 let endInfluence = 0.0;
                 let startInfluence = 0.0;
 

@@ -45,7 +45,10 @@ var PVRGlobals = {
     sounds: [],
 
     // place to store skape-key animation targets.
-    allMorphTargets: {}
+    allMorphTargets: {},
+
+    // if you just jumped, you can't jump again.
+    jumpRefractoryPeriod: false
 };
 
 console.log('window loaded?');

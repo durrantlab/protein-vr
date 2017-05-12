@@ -1,6 +1,4 @@
-REM #!/bin/bash
-REM #cd ../
-
+#!/bin/bash
 
 tsc --target ES5 --module amd main.ts proteinvr/Settings/UserVars.ts proteinvr/Core/Setup.ts proteinvr/RequireConfig.ts proteinvr/Environment.ts proteinvr/CameraChar.ts --allowUnreachableCode --pretty
 

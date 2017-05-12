@@ -187,7 +187,13 @@ export class Countdown {
             let rise = this.parameters.countdownStartVal - this.parameters.countdownEndVal;
             let run = this.parameters.countdownDurationMilliseconds;
             let m = rise / run;
-            let interpVal = m * this.timeRemaining + this.parameters.countdownEndVal;
+
+            let timeRemainingToUse = this.timeRemaining;
+            if (timeRemainingToUse < 0.0) {
+                timeRemainingToUse = 0.0;
+            }
+
+            let interpVal = m * timeRemainingToUse + this.parameters.countdownEndVal;
 
             // Be sure to also pass the extraVars to any callback.
             this.parameters.afterCountdownAdvanced(interpVal, this.parameters.extraVars);
@@ -196,7 +202,7 @@ export class Countdown {
         // If timeRemaining is less than 0, trigger doneCallback
         if (this.timeRemaining < 0) {
             if (this.parameters.doneCallback !== undefined) {
-                Core.debugMsg("Countdown " + this.parameters.name + ": Calling doneCallBack. Time remaining: " + this.timeRemaining.toString() + " ms");
+                // Core.debugMsg("Countdown " + this.parameters.name + ": Calling doneCallBack. Time remaining: " + this.timeRemaining.toString() + " ms");
 
                 // Be sure to pass extraVars to any callback.
                 this.parameters.doneCallback(this.parameters.extraVars);
@@ -211,10 +217,10 @@ export class Countdown {
 
             // If it's autoRestartAfterCountdownDone, add the interval time to timeRemaining.
             if (this.parameters.autoRestartAfterCountdownDone === true) {
-                Core.debugMsg("Countdown " + this.parameters.name + ": Restarting");
+                // Core.debugMsg("Countdown " + this.parameters.name + ": Restarting");
                 this.timeRemaining = this.timeRemaining + this.parameters.countdownDurationMilliseconds;
             } else {
-                Core.debugMsg("Countdown " + this.parameters.name + ": Removing");
+                // Core.debugMsg("Countdown " + this.parameters.name + ": Removing");
 
                 // Otherwise, remove the countdown from the list so it is no
                 // longer called.

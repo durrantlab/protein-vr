@@ -175,11 +175,14 @@ export function setup(setEventsFunc?: any): void {
                                     shadowMap: undefined
                                 }
 
+                                let img_extensions = ["", ".512px.png", ".256px.png"][2];  // hard coded for now.
+
                                 if (colorType === "color") {
                                     // set the diffuse colors
                                     mat_params.color = new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
                                 } else {  // so it's an image
                                     let img_path = UserVars.getParam("scenePath") + mat_inf.color + this.urlCacheBreakTxt;
+                                    img_path = img_path + img_extensions;
                                     mat_params.texture = new BABYLON.Texture(img_path, PVRGlobals.scene);
                                 }
 
@@ -187,7 +190,7 @@ export function setup(setEventsFunc?: any): void {
                                 // Add shadows
                                 if (m.name !== "sky") { // sky has no shadow
                                     let nameToUse = m.name.replace(/Decimated/g, "");
-                                    mat_params.shadowMap = new BABYLON.Texture(UserVars.getParam("scenePath") + nameToUse + "shadow.png" + this.urlCacheBreakTxt, PVRGlobals.scene);
+                                    mat_params.shadowMap = new BABYLON.Texture(UserVars.getParam("scenePath") + nameToUse + "shadow.png" + img_extensions + this.urlCacheBreakTxt, PVRGlobals.scene);
                                 }
 
                                 // Now add this material to the object.
@@ -228,7 +231,6 @@ export function setup(setEventsFunc?: any): void {
                                 parentMesh.addLODLevel(25, null);
                             }
                         });
-
 
                         // Add any animations.
                         Animations.addAnimations();
@@ -299,56 +301,15 @@ export function continueSetupAfterSettingsPanelClosed() {
         // debugger;
         setEvents();
 
-        // base type of movement based on navigation user var
-
-        let movement = UserVars.getParam("moving");
-        console.log("movement var = " + movement);
-
-        // Just move straight forward (arrows and such)
-        if (movement == UserVars.stringToEnumVal("Advance")) {
-            console.log("Advance movement method");
-            
-            // new Event(new ClickedObject({
-            //     triggerMesh: PVRGlobals.meshesByName["grnd"],
-            //     action: new MoveCamera({
-            //             camera: PVRGlobals.camera,
-            //             milliseconds: 2000,
-            //             endPoint: null
-            //         })
-            // }), null, true);
-        }
-        else if(movement == UserVars.stringToEnumVal("Jump")) {
-            console.log("Jump movement method");
-            
-            new Event(new ClickedObject({
-                triggerMesh: PVRGlobals.meshesByName["grnd"],
-                action: new MoveCamera({
-                        camera: PVRGlobals.camera,
-                        milliseconds: 2000,
-                        endPoint: null
-                    })
-            }), null, true);
-        }
-        else if(movement == UserVars.stringToEnumVal("Teleport")) {
-            console.log("Teleport movement method");
-            
-            new Event(new ClickedObject({
-                triggerMesh: PVRGlobals.meshesByName["grnd"],
-                action: new MoveCamera({
-                        camera: PVRGlobals.camera,
-                        milliseconds: 0,
-                        endPoint: null
-                    })
-            }), null, true);
-        }
-        else {
-            console.error("Expected a variable for Moving parameter. None found.");
-        }
+        // Set up the mouse-click navegation
+        // debugger;
+        CameraChar.setMouseClickNavigation();
 
         // test student function
-        console.log("Calling student function");
-        CameraChar.goToLocation(false);
-        console.log("Returned from goToLocation()");
+        // console.log("Calling student function");
+        // CameraChar.goToLocation(false);
+        // console.log("Returned from goToLocation()");
+
         RenderLoop.start();
     }
 }
