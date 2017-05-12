@@ -7,11 +7,11 @@ var jQuery = PVRGlobals.jQuery;
 
 
 interface CheckInterface{
-    triggerMesh: any;
+    // triggerMesh: any;
     action: any;
 }
 
-class ClickedObject extends parent {
+class ClickAnywhere extends parent {
     public canvasJQuery = undefined;
 
     constructor(params: CheckInterface){
@@ -23,17 +23,16 @@ class ClickedObject extends parent {
         super(params);
 
         //assign parameters to variables because 'this' refers to the render canvas inside ananymous function
-        let target = this.parameters['triggerMesh'];
         let action = this.parameters['action'];
 
         // There's a new click detection system. Use that here...
         MouseState.mouseClickDownFunctions.push(function(results) {
-            if (results.mesh == target) {
+            
                 console.log('mesh clicked!');
 
                 action.do(results.worldLoc);
 
-            }
+            
         });
     }
 
@@ -47,4 +46,4 @@ class ClickedObject extends parent {
     }
 }
 
-export default ClickedObject;
+export default ClickAnywhere;

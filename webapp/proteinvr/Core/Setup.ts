@@ -10,6 +10,10 @@ import * as MouseState from "./MouseState";
 import * as Sound from "./Sound";
 import * as UserVars from "../Settings/UserVars";
 import * as Animations from "./Animations";
+import {LensFlare} from "../Environment";
+import MoveCamera from "../Events/Actions/MoveCamera";
+import Event from "../Events/Event";
+import ClickedObject from "../Events/TriggerConditionals/ClickedObject";
 
 // jQuery is an external library, so declare it here to avoid Typescript
 // errors.
@@ -262,6 +266,7 @@ export function setup(setEventsFunc?: any): void {
                 }));
             });
         });
+        // CameraChar.teacherGatherClass();
     });
 }
 // }
@@ -294,6 +299,56 @@ export function continueSetupAfterSettingsPanelClosed() {
         // debugger;
         setEvents();
 
+        // base type of movement based on navigation user var
+
+        let movement = UserVars.getParam("moving");
+        console.log("movement var = " + movement);
+
+        // Just move straight forward (arrows and such)
+        if (movement == UserVars.stringToEnumVal("Advance")) {
+            console.log("Advance movement method");
+            
+            // new Event(new ClickedObject({
+            //     triggerMesh: PVRGlobals.meshesByName["grnd"],
+            //     action: new MoveCamera({
+            //             camera: PVRGlobals.camera,
+            //             milliseconds: 2000,
+            //             endPoint: null
+            //         })
+            // }), null, true);
+        }
+        else if(movement == UserVars.stringToEnumVal("Jump")) {
+            console.log("Jump movement method");
+            
+            new Event(new ClickedObject({
+                triggerMesh: PVRGlobals.meshesByName["grnd"],
+                action: new MoveCamera({
+                        camera: PVRGlobals.camera,
+                        milliseconds: 2000,
+                        endPoint: null
+                    })
+            }), null, true);
+        }
+        else if(movement == UserVars.stringToEnumVal("Teleport")) {
+            console.log("Teleport movement method");
+            
+            new Event(new ClickedObject({
+                triggerMesh: PVRGlobals.meshesByName["grnd"],
+                action: new MoveCamera({
+                        camera: PVRGlobals.camera,
+                        milliseconds: 0,
+                        endPoint: null
+                    })
+            }), null, true);
+        }
+        else {
+            console.error("Expected a variable for Moving parameter. None found.");
+        }
+
+        // test student function
+        console.log("Calling student function");
+        CameraChar.goToLocation(false);
+        console.log("Returned from goToLocation()");
         RenderLoop.start();
     }
 }

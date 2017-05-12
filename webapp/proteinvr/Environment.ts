@@ -18,7 +18,10 @@ interface MyDocument extends Document{
     msPointerLockElement: any;
 }
 declare var document: MyDocument;
+
 declare var PVRGlobals;
+
+// declare var PVRGlobals;
 // var jQuery = PVRGlobals.jQuery;
 // declare var jQuery;
 
@@ -81,6 +84,21 @@ export function setup(): void {
     // limitLensEffect();
 
     // countdowns();
+
+    // testing lens flares
+    // uses nonexistant texture, rest of code works
+    // let flares = LensFlare.buildFlareSys({
+    //     name: "LensFlareSystem",
+    //     emitter: PVRGlobals.camera,
+    //     flares: [{
+    //         size: 1,
+    //         position: 0,
+    //         color: new BABYLON.Color3(1, 1, 1),
+    //         texture: "sampletexture.png"
+    //     }]
+    // });
+
+    // console.log(flares);
 
 }
 
@@ -259,6 +277,46 @@ export namespace PointerLock {
         if (canvas.requestPointerLock) {
             canvas.requestPointerLock();
         }
+    }
+}
+
+// lens flare code
+
+interface Flare{
+    size: number;
+    position: number;
+    color: BABYLON.Color3;
+    texture: string;
+}
+
+interface FlareSystem {
+    name: string;
+    emitter: any;
+    flares: Flare[];
+}
+
+// Lens Flares tested above (line 87)
+
+
+/**
+ * namespace for creating a lens flare system
+ */
+export namespace LensFlare{
+    /**
+     * returns an array of lens flares
+     * @param params FlareSystem interface
+     */
+    export function buildFlareSys(params: FlareSystem) :BABYLON.LensFlare[] {
+        let scene = PVRGlobals.scene;
+        console.log(scene);
+        let flareSys = new BABYLON.LensFlareSystem(params['name'], params['emitter'], PVRGlobals.scene);
+        
+        let flareArr :BABYLON.LensFlare[] = new Array(params['flares'].length);
+        let index :number = 0;
+        for (let flare of params['flares']) {
+           flareArr[index++] = new BABYLON.LensFlare(flare.size, flare.position, flare.color, flare.texture, flareSys);
+        }
+        return flareArr;
     }
 }
 // }

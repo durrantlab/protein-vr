@@ -14,6 +14,7 @@ import ClickedObject from "./proteinvr/Events/TriggerConditionals/ClickedObject"
 import LabelOnMesh from "./proteinvr/Events/Actions/LabelOnMesh";
 import DoInInterval from "./proteinvr/Events/Actions/DoInInterval";
 import * as CameraChar from "./proteinvr/CameraChar";
+import {LensFlare} from "./proteinvr/Environment";
 
 /**
 BABYLON is an external JavaScript library. This prevents Typescript from
@@ -32,6 +33,7 @@ export function start(Core) {
         /**
         A function to register any events.
         */
+
         // new Event(
         //     new GameStart({}, jQuery),
         //     new MoveCamera({
@@ -155,12 +157,13 @@ export function start(Core) {
             })
         );
 
-            // new MoveCamera({
-            //     camera: PVRGlobals.camera,
-            //     milliseconds: 1000,
-            //     startPoint: PVRGlobals.camera.position,
-            //     endPoint: new BABYLON.Vector3(PVRGlobals.camera.position.x + 25, PVRGlobals.camera.position.y, PVRGlobals.camera.position.z)
-            // })
+        // new MoveCamera({
+        //     camera: PVRGlobals.camera,
+        //     milliseconds: 1000,
+        //     startPoint: PVRGlobals.camera.position,
+        //     endPoint: new BABYLON.Vector3(PVRGlobals.camera.position.x + 25, PVRGlobals.camera.position.y, PVRGlobals.camera.position.z)
+        // })
+        
         // new Event(
         //     new AlwaysTrue({}),
         //     new DoInInterval({
@@ -195,7 +198,6 @@ export function start(Core) {
         //     }, Core),
         // );
     }
-
 
     return setEvents;
 }

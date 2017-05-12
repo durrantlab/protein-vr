@@ -18,6 +18,7 @@ interface mouseDownVarInterface {
     worldLoc: BABYLON.Vector3;
     distance: number;
     mesh: BABYLON.Mesh;
+    normal: BABYLON.Vector3;
 }
 
 export function setup() {
@@ -30,7 +31,8 @@ export function setup() {
             screenLoc: new BABYLON.Vector2(PVRGlobals.scene.pointerX, PVRGlobals.scene.pointerY),
             worldLoc: pickResult.pickedPoint,
             distance: pickResult.distance,
-            mesh: pickResult.pickedMesh
+            mesh: pickResult.pickedMesh,
+            normal: pickResult.getNormal()
         }
 
         console.log(clickInfo);
