@@ -9,6 +9,7 @@ import * as RenderLoop from "./RenderLoop";
 import * as MouseState from "./MouseState";
 import * as Sound from "./Sound";
 import * as UserVars from "../Settings/UserVars";
+import * as Animations from "./Animations";
 
 // jQuery is an external library, so declare it here to avoid Typescript
 // errors.
@@ -223,6 +224,10 @@ export function setup(setEventsFunc?: any): void {
                                 parentMesh.addLODLevel(25, null);
                             }
                         });
+
+
+                        // Add any animations.
+                        Animations.addAnimations();
 
                         // The below should be delayed until user is done with settings window
                         // *********

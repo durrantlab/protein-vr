@@ -1,6 +1,9 @@
 import * as Core from "./Core";
 import * as CameraChar from "../CameraChar";
 import Ground from "../Objects/Ground";
+import * as MouseState from "./MouseState";
+import * as UserVars from "../Settings/UserVars";
+import * as Sound from "../Core/Sound";
 
 // namespace RenderLoop {
 /**
@@ -12,11 +15,14 @@ The time the loop was last run.
 */
 export var timeOfLastLoop: number = 0;
 declare var PVRGlobals;
+declare var screenfull;
 
 export function start(): void {
     /**
     Start the render loop.
     */
+
+    Sound.playAll();
 
     // Once the scene is loaded, register a render loop and
     // start rendering the frames.
@@ -29,6 +35,8 @@ export function pause(): void {
     /**
     Pause the game.
     */
+
+    Sound.pauseAll();
 
     PVRGlobals.engine.stopRenderLoop();
 }

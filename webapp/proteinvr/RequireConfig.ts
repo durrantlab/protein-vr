@@ -18,7 +18,7 @@ var PVRGlobals = {
 
     // Whether or not to run the current app in debug mode. Whether or not to
     // run in debug mode (shows certain messages in the console, etc.)
-    debug: false,
+    debug: true,
 
     // A JSON object that maps a mesh name to the mesh object.
     meshesByName: {},
@@ -39,7 +39,13 @@ var PVRGlobals = {
 
     // A list of functions to run in the render loop, after camera placed
     // above ground and everything (finalized)
-    extraFunctionsToRunInLoop_AfterCameraLocFinalized: []
+    extraFunctionsToRunInLoop_AfterCameraLocFinalized: [],
+
+    // Sound objects (for pausing and restarting sounds)
+    sounds: [],
+
+    // place to store skape-key animation targets.
+    allMorphTargets: {}
 };
 
 console.log('window loaded?');

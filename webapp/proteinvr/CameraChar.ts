@@ -50,9 +50,6 @@ export function setup(): void {
 
     setupCrosshair()
 
-    // Get the camera object for reference.
-    //let camera = PVRGlobals.camera;
-
     // Define an elipsoid raround the camera
     camera.ellipsoid = new BABYLON.Vector3(
         1, characterHeight / 2, 1
@@ -64,10 +61,9 @@ export function setup(): void {
 
     // Now enable collisions between the camera and relevant objects.
     scene.collisionsEnabled = true;
-    camera.checkCollisions = true;
+    // camera.checkCollisions = true;
 
     // Additional control keys.
-    // alert("hi");
     camera.keysUp.push(87);  // W
     camera.keysLeft.push(65);  // A
     camera.keysDown.push(83);  // S

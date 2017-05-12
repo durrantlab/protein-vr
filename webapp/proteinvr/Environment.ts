@@ -117,9 +117,12 @@ export function setFog(density: number = 0.015): void {
         for (let i = 0; i < PVRGlobals.scene.meshes.length; i++) {
             let m = PVRGlobals.scene.meshes[i];
             // Everything on same renderingroup
-            // m.renderingGroupId = 1;
+            m.renderingGroupId = 1;
             if (m.name === "sky") {
                 m.isVisible = false;
+            } else if (m.name === "crosshair") {
+                m.renderingGroupId = 2;
+                m.applyFog = false;
             } else {
                 m.applyFog = true;
             }
@@ -131,12 +134,11 @@ export function setFog(density: number = 0.015): void {
             if (m.name === "sky") {
                 m.isVisible = true;
                 m.renderingGroupId = 0;
-            } 
-            // else if (m.name === "crosshair") {
-            //     m.renderingGroupId = 2;
-            // } else {
-            //     m.renderingGroupId = 1;
-            // }
+            } else if (m.name === "crosshair") {
+                m.renderingGroupId = 2;
+            } else {
+                m.renderingGroupId = 1;
+            }
         }
         
     }

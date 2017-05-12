@@ -1,8 +1,9 @@
-import * as Timers from "../Timers";
+import * as Coutndowns from "../Countdowns";
 
 import parent from "./ActionParent";
 
 declare var BABYLON;
+declare var PVRGlobals;
 var jQuery = PVRGlobals.jQuery;
 
 interface DoInterface {
@@ -36,7 +37,7 @@ class MoveMesh extends parent {
 
         //let params = this.parameters;
   
-        Timers.addTimer({
+        Coutndowns.addCountdown({
             name: "MoveMesh" + Math.random().toString(),
             durationInMiliseconds: this.parameters["milliseconds"],
             interpValStart: 0.0,

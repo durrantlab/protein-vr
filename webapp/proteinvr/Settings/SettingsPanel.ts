@@ -340,9 +340,19 @@ function addJavaScript() {
             Setup.continueSetupAfterSettingsPanelClosed();
 
             if ((UserVars.getParam("display") === UserVars.displays["FullScreen"]) && (screenfull.enabled)) {
+                jQuery("body").on('click', function(e) {
+                    // If you're using VR and the user clicks, make sure you're full screen.
+                    // This is because the browser automatically goes windowed when you
+                    // Note that all clicks will now call this function... could
+                    // effect performance.
+                    if (screenfull.isFullscreen === false) {
+                        screenfull.request();
+                    }
+                });
+
                 screenfull.request();
             }
-
+            
             if (UserVars.getParam("looking") == UserVars.looking["MouseMove"]) {
                 PointerLock.pointerLock();
             }

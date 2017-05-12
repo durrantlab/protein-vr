@@ -32,5 +32,18 @@ export function addSound(mp3FileName, location) {
     );
 
     sound.setPosition(location);
+
+    PVRGlobals.sounds.push(sound);
 }
 
+export function pauseAll() {
+    for (let t = 0; t < PVRGlobals.sounds.length; t++) {
+        PVRGlobals.sounds[t].pause();
+    }
+}
+
+export function playAll() {
+    for (let t = 0; t < PVRGlobals.sounds.length; t++) {
+        PVRGlobals.sounds[t].play(0);
+    }
+}
