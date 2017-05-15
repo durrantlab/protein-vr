@@ -2,6 +2,8 @@
 
 // I know it's bad practice to polute the global namespace, but some variables
 // are just far easier to use when declared globally.
+
+declar var MobileDetect;
 var PVRGlobals = {
     // The BABYLON engine.
     engine: undefined,
@@ -37,7 +39,10 @@ var PVRGlobals = {
 
     // A list of functions to run in the render loop, after camera placed
     // above ground and everything (finalized)
-    extraFunctionsToRunInLoop_AfterCameraLocFinalized: []
+    extraFunctionsToRunInLoop_AfterCameraLocFinalized: [],
+
+    // mobile device detection
+    mobileDetect: new MobileDetect(window.navigator.userAgent);
 };
 
 console.log('window loaded?');
