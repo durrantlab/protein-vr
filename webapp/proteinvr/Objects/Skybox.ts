@@ -6,6 +6,7 @@ BABYLON is an external JavaScript library. This prevents Typescript from
 throwing errors because BABYLON isn't defined in the TypeScript file.
 */
 declare var BABYLON: any;
+declare var PVRGlobals;
 
 class Skybox extends parent {
     /**

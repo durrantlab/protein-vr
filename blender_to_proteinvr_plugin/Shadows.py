@@ -2,6 +2,7 @@ import bpy
 import Utils
 import random
 import os
+import glob
 
 def remove_material(obj):
     # Save that objects current material, and then remove it. This assumes one
@@ -191,5 +192,3 @@ def bake_maps(params):
     # Show the sky now that you're done rendering shadows.
     bpy.data.objects["sky"].hide = False
     bpy.data.objects["sky"].hide_render = False
-
-

@@ -9,16 +9,17 @@ import * as RenderLoop from "./RenderLoop";
 import * as MouseState from "./MouseState";
 import * as Sound from "./Sound";
 import * as UserVars from "../Settings/UserVars";
+import * as Animations from "./Animations";
 import {LensFlare} from "../Environment";
 import MoveCamera from "../Events/Actions/MoveCamera";
 import Event from "../Events/Event";
 import ClickedObject from "../Events/TriggerConditionals/ClickedObject";
 
-
 // jQuery is an external library, so declare it here to avoid Typescript
 // errors.
 
 declare var BABYLON;
+declare var PVRGlobals;
 
 var proteinVRInfo: any;
 
@@ -98,16 +99,16 @@ export function setup(setEventsFunc?: any): void {
                 // Load a scene from a BABYLON file.
                 BABYLON.SceneLoader.Load(UserVars.getParam("scenePath"), "scene.babylon" + urlCacheBreakTxt, 
                                         PVRGlobals.engine,
-                                        function (newScene: any): void {
+                                        function (ns: any): void {
 
 
                     // Wait for textures and shaders to be ready before
                     // proceeding.
-                    newScene.executeWhenReady(function () {
+                    ns.executeWhenReady(function () {
 
                         // Store the scene in a variable so you can reference it
                         // later.
-                        PVRGlobals.scene = newScene;
+                        PVRGlobals.scene = ns;
 
                         // Setup mouse events
                         MouseState.setup();
@@ -163,27 +164,33 @@ export function setup(setEventsFunc?: any): void {
 
                                 // HERE DO THE SHADER LIBRARY THING TO NOT DUPLICATE EFFORTS!!!
 
-                                var mat = new BABYLON.StandardMaterial(mat_key, PVRGlobals.scene);
-                                mat.diffuseColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
-                                mat.specularColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
-                                mat.fogEnabled = true;
+                                // var mat = new BABYLON.PBRMaterial(mat_key, PVRGlobals.scene);
+
+
+                                let mat_params: MaterialInterface = {
+                                    name: mat_key,
+                                    glossiness: mat_inf.glossiness,
+                                    color: undefined,
+                                    texture: undefined,
+                                    shadowMap: undefined
+                                }
+
+                                let img_extensions = ["", ".512px.png", ".256px.png"][2];  // hard coded for now.
 
                                 if (colorType === "color") {
                                     // set the diffuse colors
-                                    mat.emissiveColor = new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
+                                    mat_params.color = new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
                                 } else {  // so it's an image
-                                    mat.emissiveColor = new BABYLON.Color3(0,0,0);
                                     let img_path = UserVars.getParam("scenePath") + mat_inf.color + this.urlCacheBreakTxt;
-                                    mat.emissiveTexture = new BABYLON.Texture(img_path, PVRGlobals.scene);
+                                    img_path = img_path + img_extensions;
+                                    mat_params.texture = new BABYLON.Texture(img_path, PVRGlobals.scene);
                                 }
 
-                                // Now do glossiness
-                                mat.specularColor = new BABYLON.Color3(mat_inf.glossiness, mat_inf.glossiness, mat_inf.glossiness);
 
                                 // Add shadows
                                 if (m.name !== "sky") { // sky has no shadow
                                     let nameToUse = m.name.replace(/Decimated/g, "");
-                                    mat.ambientTexture = new BABYLON.Texture(UserVars.getParam("scenePath") + nameToUse + "shadow.png" + this.urlCacheBreakTxt, PVRGlobals.scene);
+                                    mat_params.shadowMap = new BABYLON.Texture(UserVars.getParam("scenePath") + nameToUse + "shadow.png" + img_extensions + this.urlCacheBreakTxt, PVRGlobals.scene);
                                 }
 
                                 // Now add this material to the object.
@@ -193,7 +200,8 @@ export function setup(setEventsFunc?: any): void {
 
                                 // mat.backFaceCulling = false;
 
-                                m.material = mat;
+                                m.material = makeStandardMaterial(mat_params);
+                                // m.material = makePBRMaterial(mat_params);
                             }
 
                             // Make the mesh collidable
@@ -223,6 +231,9 @@ export function setup(setEventsFunc?: any): void {
                                 parentMesh.addLODLevel(25, null);
                             }
                         });
+
+                        // Add any animations.
+                        Animations.addAnimations();
 
                         // The below should be delayed until user is done with settings window
                         // *********
@@ -290,62 +301,84 @@ export function continueSetupAfterSettingsPanelClosed() {
         // debugger;
         setEvents();
 
-        // base type of movement based on navigation user var
-
-        let movement = UserVars.getParam("moving");
-        console.log("movement var = " + movement);
-
-        // Just move straight forward (arrows and such)
-        if (movement == UserVars.stringToEnumVal("Advance")) {
-            console.log("Advance movement method");
-            
-            // new Event(new ClickedObject({
-            //     triggerMesh: PVRGlobals.meshesByName["grnd"],
-            //     action: new MoveCamera({
-            //             camera: PVRGlobals.camera,
-            //             milliseconds: 2000,
-            //             endPoint: null
-            //         })
-            // }), null, true);
-        }
-        else if(movement == UserVars.stringToEnumVal("Jump")) {
-            console.log("Jump movement method");
-            
-            new Event(new ClickedObject({
-                triggerMesh: PVRGlobals.meshesByName["grnd"],
-                action: new MoveCamera({
-                        camera: PVRGlobals.camera,
-                        milliseconds: 2000,
-                        endPoint: null
-                    })
-            }), null, true);
-        }
-        else if(movement == UserVars.stringToEnumVal("Teleport")) {
-            console.log("Teleport movement method");
-            
-            new Event(new ClickedObject({
-                triggerMesh: PVRGlobals.meshesByName["grnd"],
-                action: new MoveCamera({
-                        camera: PVRGlobals.camera,
-                        milliseconds: 0,
-                        endPoint: null
-                    })
-            }), null, true);
-        }
-        else {
-            console.error("Expected a variable for Moving parameter. None found.");
-        }
+        // Set up the mouse-click navegation
+        // debugger;
+        CameraChar.setMouseClickNavigation();
 
         // test student function
-        console.log("Calling student function");
-        CameraChar.goToLocation(false);
-        console.log("Returned from goToLocation()");
+        // console.log("Calling student function");
+        // CameraChar.goToLocation(false);
+        // console.log("Returned from goToLocation()");
+
         RenderLoop.start();
     }
 }
 
 function roundToHundredth(num: number) {
     return Math.round(num * 100) / 100;
+}
+
+interface MaterialInterface {
+    name: string,
+    glossiness: number,
+    color?: BABYLON.Color3,
+    texture?: BABYLON.Texture,
+    shadowMap?: BABYLON.Texture
+}
+
+function makeStandardMaterial(params: MaterialInterface) {
+    var mat = new BABYLON.StandardMaterial(params.name, PVRGlobals.scene);
+
+    mat.diffuseColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
+    mat.specularColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
+    mat.fogEnabled = true;
+
+    if (params.color !== undefined) {
+        mat.emissiveColor = params.color; // new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
+    }
+
+    if (params.texture !== undefined) {
+        mat.emissiveColor = new BABYLON.Color3(0,0,0);
+        mat.emissiveTexture = params.texture;
+    }
+
+    mat.specularColor = new BABYLON.Color3(params.glossiness, params.glossiness, params.glossiness);
+
+    if (params.shadowMap !== undefined) {
+        mat.ambientTexture = params.shadowMap;
+    }
+
+
+    return mat;
+}
+
+function makePBRMaterial(params: MaterialInterface) {
+    // Note: This doesn't work. Not sure it's necessary given that shadows are
+    // baked in and there are no lights?
+    var mat = new BABYLON.PBRMaterial(params.name, PVRGlobals.scene);
+
+    mat.albedoColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
+    mat.reflectivityColor = new BABYLON.Color3(0, 0, 0);  // to make shadeless
+    mat.fogEnabled = true;
+
+    if (params.color !== undefined) {
+        mat.emissiveColor = params.color; // new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
+    }
+
+    if (params.texture !== undefined) {
+        mat.emissiveColor = new BABYLON.Color3(0,0,0);
+        mat.emissiveTexture = params.texture;
+    }
+
+    mat.reflectivityColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+    mat.microSurface = params.glossiness;
+
+    if (params.shadowMap !== undefined) {
+        mat.ambientTexture = params.shadowMap;
+    }
+
+
+    return mat;
 }
 
 // export default Setup;

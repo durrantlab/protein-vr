@@ -1,5 +1,6 @@
 import * as Core from "./Core";
 
+declare var PVRGlobals;
 var jQuery = PVRGlobals.jQuery;
 
 // A list of functions to call on mouse click. In each case

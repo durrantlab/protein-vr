@@ -3,6 +3,9 @@ import CollisionMeshes from "./Objects/CollisionMeshes";
 import * as RenderLoop from "./Core/RenderLoop";
 import * as MouseState from "./Core/MouseState";
 import * as UserVars from "./Settings/UserVars";
+import Event from "./Events/Event";
+import MoveCamera from "./Events/Actions/MoveCamera";
+import ClickedObject from "./Events/TriggerConditionals/ClickedObject";
 
 declare var BABYLON;
 declare var PVRGlobals;
@@ -29,7 +32,7 @@ export function setup(): void {
 
     // The active camera from the babylon file is used (keep it
     // simple)
-    if (UserVars.getParam("viewer") === UserVars.viewers.VRHeadset) {
+    if (UserVars.getParam("viewer") === UserVars.viewers["VRHeadset"]) {
         // VR camera
         setUpVRCameraControls();
     } else {
@@ -50,9 +53,6 @@ export function setup(): void {
 
     setupCrosshair()
 
-    // Get the camera object for reference.
-    //let camera = PVRGlobals.camera;
-
     // Define an elipsoid raround the camera
     camera.ellipsoid = new BABYLON.Vector3(
         1, characterHeight / 2, 1
@@ -64,7 +64,7 @@ export function setup(): void {
 
     // Now enable collisions between the camera and relevant objects.
     scene.collisionsEnabled = true;
-    camera.checkCollisions = true;
+    // camera.checkCollisions = true;
 
     // Additional control keys.
     camera.keysUp.push(87);  // W
@@ -131,7 +131,7 @@ export function repositionPlayerIfCollision(): void {
         let mesh = CollisionMeshes.meshesThatCollide[i];
         if (mesh.intersectsPoint(PVRGlobals.camera.position)) {
             intersect = true;
-            PVRGlobals.camera.position = PVRGlobals.previousPos.clone();
+            setPosition(PVRGlobals.previousPos.clone());
             break;
         }
     }
@@ -152,18 +152,6 @@ export function setUpVRCameraControls() {
     );
 
     jQuery = PVRGlobals.jQuery;
-
-    // If using a VR camera, auto advance forward
-    setTimeout(function() {  // give time for stuff to load. This is hackish... fix later.
-        PVRGlobals.extraFunctionsToRunInLoop_BeforeCameraLocFinalized.push(function() {
-            if (MouseState.mouseDown === true) {
-                camera.position = camera.getFrontPosition(
-                    0.01 * PVRGlobals.scene.getAnimationRatio()
-                );
-            }
-        });
-
-    }, 5000);
 
     switchCamera(camera);
 }
@@ -191,6 +179,12 @@ export function setupCrosshair() {
     }.bind(crosshair));
 }
 // }
+
+export function setPosition(vec) {
+    if ((vec !== undefined) && (!isNaN(vec.x))) {
+        PVRGlobals.camera.position = vec;
+    }
+}
 
 /**
  * Checks url for '?transmit=' with a following id. Saves the camera location and rotation info
@@ -271,11 +265,11 @@ export function goToLocation(VRCamera: boolean) :void{
                         
                         oldData.push(data);
                         let obj = JSON.parse(data.toString());
-                        PVRGlobals.camera.position = new BABYLON.Vector3(
+                        setPosition(new BABYLON.Vector3(
                             Number(obj.locx), 
                             Number(obj.locy), 
                             Number(obj.locz)
-                        );
+                        ));
                         
                         if (!VRCamera){
                             PVRGlobals.camera.rotation = new BABYLON.Vector3(
@@ -291,8 +285,79 @@ export function goToLocation(VRCamera: boolean) :void{
                 console.log("Error thrown: " + errorThrown);
             });
         }, 3000);
-    }
-    else{
+    } else{
         return;
     } 
+}
+
+export function setMouseClickNavigation() {
+    // Note that the keys will always work. This only determines who mouse
+    // navigation happens. 
+    
+    // If mouse click turning selected, switch mouse click navigation to
+    // none.
+
+    // base type of movement based on navigation user var
+
+
+    // Just move straight forward (arrows and such)
+    // console.log("FIX THIS HERE!");
+    // setTimeout(function() {  // give time for stuff to load. This is hackish... fix later.
+        let movement = UserVars.getParam("moving");
+        console.log("movement var = " + movement);
+
+        switch(movement) {
+            case UserVars.moving.Advance:
+                console.log("Advance movement method");
+                
+                // If using a VR camera, auto advance forward
+                PVRGlobals.extraFunctionsToRunInLoop_BeforeCameraLocFinalized.push(function() {
+                    if (MouseState.mouseDown === true) {
+                        setPosition(PVRGlobals.camera.getFrontPosition(
+                            0.01 * PVRGlobals.scene.getAnimationRatio()
+                        ));
+                    }
+                });
+
+                // new Event(new ClickedObject({
+                //     triggerMesh: PVRGlobals.meshesByName["grnd"],
+                //     action: new MoveCamera({
+                //             camera: PVRGlobals.camera,
+                //             milliseconds: 2000,
+                //             endPoint: null
+                //         })
+                // }), null, true);
+                break;
+            case UserVars.moving.Jump:
+                console.log("Jump movement method");
+
+                new Event(new ClickedObject({
+                    triggerMesh: PVRGlobals.meshesByName["grnd"],
+                    action: new MoveCamera({
+                            milliseconds: 750,  // Keep it fast so they don't have time to look in another direction while moving in a different direction.
+                            endPoint: null,
+                            onStart: function() { 
+                                PVRGlobals.jumpRefractoryPeriod = true;
+                            },
+                            onEnd: function() { 
+                                PVRGlobals.jumpRefractoryPeriod = false;
+                            }
+                        })
+                }), null, true);
+                break;
+            case UserVars.moving.Teleport:
+                console.log("Teleport movement method");
+                
+                new Event(new ClickedObject({
+                    triggerMesh: PVRGlobals.meshesByName["grnd"],
+                    action: new MoveCamera({
+                            milliseconds: 0,
+                            endPoint: null
+                        })
+                }), null, true);
+                break;
+            default:
+                console.error("Expected a variable for Moving parameter. None found.");
+        }
+    // }, 500);
 }

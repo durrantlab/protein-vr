@@ -44,3 +44,21 @@ def save_it(scene_data, manifest_id, params):
         }, 
         open(pwd + "scene.babylon.manifest", 'w')
     )
+
+    # Save the morphTarget stuff separately. In the future, I expect babylon
+    # will play nicer with the expoerter. But for now, you'll need to do this
+    # by hand.
+    morphTargetData = json.load(open(pwd + "scene.babylon", 'r'))
+    morph_data = {}
+    if "meshes" in morphTargetData.keys():
+        for mesh in morphTargetData["meshes"]:
+            # No need to do the animation if it's decimated.
+            if not "Decimated" in mesh["name"]:
+                if "MorphTargetManager" in mesh.keys():
+                    targets = {}
+                    for target in mesh["MorphTargetManager"]["targets"]:
+                        targets[target["name"]] = target["position"]
+
+                    morph_data[mesh["name"]] = targets
+    json.dump(morph_data, open(pwd + "morph_data.json", 'w'))
+   

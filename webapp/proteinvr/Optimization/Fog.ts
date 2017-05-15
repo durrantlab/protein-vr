@@ -2,12 +2,13 @@
 
 import * as Core from "../Core/Core";
 import * as Environment from "../Environment";
+declare var PVRGlobals;
 
 export class mySceneOptimizationFog extends BABYLON.SceneOptimization {
     public apply = (scene): boolean => {
         
         switch (this.priority) {
-            case 4:
+            case 3:
                 // Fog far away
                 Environment.setFog(0.05);
 

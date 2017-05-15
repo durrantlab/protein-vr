@@ -39,13 +39,13 @@ export function show() {
                 // [3,4,5],
                 radioBoxes(
                     "Viewer",
-                    UserVars.paramNames.viewer,
+                    UserVars.paramNames["viewer"],
                     ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>']
                     // [85, 115]
                 ),
                 radioBoxes(
                     "Audio",
-                    UserVars.paramNames.audio,
+                    UserVars.paramNames["audio"],
                     ['<i class="icon-speaker"></i>', '<i class="icon-headphones"></i>', '<span class="glyphicon glyphicon-volume-off" aria-hidden=true></span>']
                     // [100, 120, 75]
                 )
@@ -53,18 +53,18 @@ export function show() {
             row_even_split(
                 radioBoxes(
                     "Device",
-                    UserVars.paramNames.device,
+                    UserVars.paramNames["device"],
                     ['<i class="icon-iphone"></i>', '<i class="icon-laptop"></i>', '<i class="icon-connectedpc"></i>']
                     // [100, 100, 100]
                 ),
                 radioBoxes(
                     "Moving",
-                    UserVars.paramNames.moving,
+                    UserVars.paramNames["moving"],
                     ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
                     // [100, 100, 100]
                 ) + radioBoxes(
                     "Looking",
-                    UserVars.paramNames.looking,
+                    UserVars.paramNames["looking"],
                     ['<i class="icon-mouse"></i>', '<i class="icon-hand-up"></i>'] //, '<i class="icon-connectedpc"></i>']
                     // [100, 100, 100]
                 ),
@@ -79,17 +79,17 @@ export function show() {
                 [4, 4, 4],
                 radioBoxes(
                     "Textures",
-                    UserVars.paramNames.textures,
+                    UserVars.paramNames["textures"],
                     // [70, 85, 80]
                 ),
                 radioBoxes(
                     "Objects",
-                    UserVars.paramNames.objects,
+                    UserVars.paramNames["objects"],
                     // [90, 85, 85]
                 ),
                 radioBoxes(
                     "Fog",
-                    UserVars.paramNames.fog,
+                    UserVars.paramNames["fog"],
                     // [60, 55, 55]
                 )
             ) + 
@@ -97,7 +97,7 @@ export function show() {
                 [4, 4, 4],
                 radioBoxes(
                     "Display",
-                    UserVars.paramNames.display,
+                    UserVars.paramNames["display"],
                     // [70, 85, 80]
                 ),
                 "",
@@ -268,12 +268,12 @@ export function setGUIState() {
     let buttonbarMoving = jQuery(".buttonbar-moving");
     let buttonbarLooking = jQuery(".buttonbar-looking");
 
-    if ((varsToUse.viewer == UserVars.viewers.VRHeadset) || (varsToUse.device == UserVars.devices.Mobile)) {
+    if ((varsToUse["viewer"] == UserVars.viewers["VRHeadset"]) || (varsToUse["device"] == UserVars.devices["Mobile"])) {
         buttonbarMoving.show();
         buttonbarLooking.hide();
 
         // make sure no pointerlock used in this scenario.
-        varsToUse["looking"] = UserVars.looking.Click;
+        varsToUse["looking"] = UserVars.looking["Click"];
         UserVars.saveLocalStorageParams(varsToUse);
     } else {
         buttonbarMoving.hide();
@@ -293,7 +293,6 @@ function addJavaScript() {
 
     // Make radio buttons clickable
     jQuery(".proteinvr-radio-label").mouseup(function() {
-        let This = jQuery(this);
         setTimeout(function() {  // This to move it to bottom of stack.
             let This = jQuery(this);
             let associatedInput = This.find("input");
@@ -340,11 +339,21 @@ function addJavaScript() {
             jQuery("#settings_panel").fadeOut(1000);
             Setup.continueSetupAfterSettingsPanelClosed();
 
-            if ((UserVars.getParam("display") === UserVars.displays.FullScreen) && (screenfull.enabled)) {
+            if ((UserVars.getParam("display") === UserVars.displays["FullScreen"]) && (screenfull.enabled)) {
+                jQuery("body").on('click', function(e) {
+                    // If you're using VR and the user clicks, make sure you're full screen.
+                    // This is because the browser automatically goes windowed when you
+                    // Note that all clicks will now call this function... could
+                    // effect performance.
+                    if (screenfull.isFullscreen === false) {
+                        screenfull.request();
+                    }
+                });
+
                 screenfull.request();
             }
-
-            if (UserVars.getParam("looking") == UserVars.looking.MouseMove) {
+            
+            if (UserVars.getParam("looking") == UserVars.looking["MouseMove"]) {
                 PointerLock.pointerLock();
             }
 

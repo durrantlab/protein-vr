@@ -30,9 +30,9 @@ let desktopDefaults: userVarsInterface;
 export var paramDefaults: {mobile: userVarsInterface, 
                     laptop: userVarsInterface, 
                     desktop: userVarsInterface} = {
-    mobile: {},
-    laptop: {},
-    desktop: {}
+    "mobile": {},
+    "laptop": {},
+    "desktop": {}
 }
 
 export var paramNames: any = {};
@@ -42,87 +42,87 @@ export enum audios {
     Headphones,
     None
 }
-paramNames.audio = ["Speakers", "Headphones", "None"];
-paramDefaults.mobile.audio = audios.Headphones;
-paramDefaults.laptop.audio = audios.Speakers;
-paramDefaults.desktop.audio = audios.Speakers;
+paramNames["audio"] = ["Speakers", "Headphones", "None"];
+paramDefaults["mobile"]["audio"] = audios["Headphones"];
+paramDefaults["laptop"]["audio"] = audios["Speakers"];
+paramDefaults["desktop"]["audio"] = audios["Speakers"];
 
 export enum viewers {
     Screen,
     VRHeadset
 }
-paramNames.viewer = ["Screen", "VR Headset"];
-paramDefaults.mobile.viewer = viewers.Screen;
-paramDefaults.laptop.viewer = viewers.Screen;
-paramDefaults.desktop.viewer = viewers.Screen;
+paramNames["viewer"] = ["Screen", "VR Headset"];
+paramDefaults["mobile"]["viewer"] = viewers["Screen"];
+paramDefaults["laptop"]["viewer"] = viewers["Screen"];
+paramDefaults["desktop"]["viewer"] = viewers["Screen"];
 
 export enum devices {
     Mobile,
     Laptop,
     Desktop
 }
-paramNames.device = ["Mobile", "Laptop", "Desktop"];
-paramDefaults.mobile.device = devices.Mobile;
-paramDefaults.laptop.device = devices.Laptop;
-paramDefaults.desktop.device = devices.Desktop;
+paramNames["device"] = ["Mobile", "Laptop", "Desktop"];
+paramDefaults["mobile"]["device"] = devices["Mobile"];
+paramDefaults["laptop"]["device"] = devices["Laptop"];
+paramDefaults["desktop"]["device"] = devices["Desktop"];
 
 export enum textures {
     Sharp,  // no modification
     Medium,  // 512
     Grainy  // 256
 }
-paramNames.textures = ["Sharp", "Medium", "Grainy"];
-paramDefaults.mobile.textures = textures.Medium;
-paramDefaults.laptop.textures = textures.Sharp;
-paramDefaults.desktop.textures = textures.Sharp;
+paramNames["textures"] = ["Sharp", "Medium", "Grainy"];
+paramDefaults["mobile"]["textures"] = textures["Medium"];
+paramDefaults["laptop"]["textures"] = textures["Sharp"];
+paramDefaults["desktop"]["textures"] = textures["Sharp"];
 
 export enum fog {
     Clear,
     Thin,
     Thick
 }
-paramNames.fog = ["Clear", "Thin", "Thick"];
-paramDefaults.mobile.fog = fog.Clear;
-paramDefaults.laptop.fog = fog.Thin;
-paramDefaults.desktop.fog = fog.Thick;
+paramNames["fog"] = ["Clear", "Thin", "Thick"];
+paramDefaults["mobile"]["fog"] = fog["Clear"];
+paramDefaults["laptop"]["fog"] = fog["Thin"];
+paramDefaults["desktop"]["fog"] = fog["Thick"];
 
 export enum objects {  // actually LOD settings
     Detailed,
     Normal,
     Simple
 }
-paramNames.objects = ["Detailed", "Normal", "Simple"];
-paramDefaults.mobile.objects = objects.Normal;
-paramDefaults.laptop.objects = objects.Detailed;
-paramDefaults.desktop.objects = objects.Detailed;
+paramNames["objects"] = ["Detailed", "Normal", "Simple"];
+paramDefaults["mobile"]["objects"] = objects["Normal"];
+paramDefaults["laptop"]["objects"] = objects["Detailed"];
+paramDefaults["desktop"]["objects"] = objects["Detailed"];
 
 export enum displays {
     FullScreen,
     Windowed
 }
-paramNames.display = ["Full Screen", "Windowed"];
-paramDefaults.mobile.display = displays.FullScreen;
-paramDefaults.laptop.display = displays.FullScreen;
-paramDefaults.desktop.display = displays.FullScreen;
+paramNames["display"] = ["Full Screen", "Windowed"];
+paramDefaults["mobile"]["display"] = displays["FullScreen"];
+paramDefaults["laptop"]["display"] = displays["FullScreen"];
+paramDefaults["desktop"]["display"] = displays["FullScreen"];
 
 export enum moving {
     Advance,
     Jump,
     Teleport
 }
-paramNames.moving = ["Advance", "Jump", "Teleport"];
-paramDefaults.mobile.moving = moving.Advance;
-paramDefaults.laptop.moving = moving.Advance;
-paramDefaults.desktop.moving = moving.Advance;
+paramNames["moving"] = ["Advance", "Jump", "Teleport"];
+paramDefaults["mobile"]["moving"] = moving["Advance"];
+paramDefaults["laptop"]["moving"] = moving["Advance"];
+paramDefaults["desktop"]["moving"] = moving["Advance"];
 
 export enum looking {
     MouseMove,
     Click
 }
-paramNames.looking = ["Mouse Move", "Click"];
-paramDefaults.mobile.looking = looking.Click;
-paramDefaults.laptop.looking = looking.MouseMove;
-paramDefaults.desktop.looking = looking.MouseMove;
+paramNames["looking"] = ["Mouse Move", "Click"];
+paramDefaults["mobile"]["looking"] = looking["Click"];
+paramDefaults["laptop"]["looking"] = looking["MouseMove"];
+paramDefaults["desktop"]["looking"] = looking["MouseMove"];
 
 /**
  * This function will assign values to the system variables based on user input.
@@ -142,10 +142,10 @@ export function setup(callBackFunc: any) :void {
         // but in future would be good to detect device...
         var userVars: userVarsInterface;
         if(PVRGlobals.mobileDetect.mobile()){
-            userVars = paramDefaults.mobile;
+            userVars = paramDefaults["mobile"];
         }
         else{
-            userVars = paramDefaults.laptop;
+            userVars = paramDefaults["laptop"];
         }
 
         // Here you overwrite with values from params.json. At this point,

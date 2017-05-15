@@ -18,6 +18,9 @@ interface MyDocument extends Document{
     msPointerLockElement: any;
 }
 declare var document: MyDocument;
+
+declare var PVRGlobals;
+
 // declare var PVRGlobals;
 // var jQuery = PVRGlobals.jQuery;
 // declare var jQuery;
@@ -66,10 +69,10 @@ export function setup(): void {
     // Set up LOD
     let lodLevel = UserVars.getParam("objects");
     switch(lodLevel) {
-        case UserVars.objects.Normal:
+        case UserVars.objects["Normal"]:
             LOD.adjustLODDistances(LOD.LODLevelOptions[1]);
             break;
-        case UserVars.objects.Simple:
+        case UserVars.objects["Simple"]:
             LOD.adjustLODDistances(LOD.LODLevelOptions[2]);
             break;
         default:
@@ -107,9 +110,9 @@ export function setFog(density: number = 0.015): void {
     */
 
     let userVarFog = UserVars.getParam("fog");
-    if ((userVarFog === UserVars.fog.Thin) && (density < 0.015)) {
+    if ((userVarFog === UserVars.fog["Thin"]) && (density < 0.015)) {
         density = 0.35;
-    } else if ((userVarFog === UserVars.fog.Thick) && (density < 0.045)) {
+    } else if ((userVarFog === UserVars.fog["Thick"]) && (density < 0.045)) {
         density = 0.6;
     }
 
@@ -132,9 +135,12 @@ export function setFog(density: number = 0.015): void {
         for (let i = 0; i < PVRGlobals.scene.meshes.length; i++) {
             let m = PVRGlobals.scene.meshes[i];
             // Everything on same renderingroup
-            // m.renderingGroupId = 1;
+            m.renderingGroupId = 1;
             if (m.name === "sky") {
                 m.isVisible = false;
+            } else if (m.name === "crosshair") {
+                m.renderingGroupId = 2;
+                m.applyFog = false;
             } else {
                 m.applyFog = true;
             }
@@ -146,12 +152,11 @@ export function setFog(density: number = 0.015): void {
             if (m.name === "sky") {
                 m.isVisible = true;
                 m.renderingGroupId = 0;
-            } 
-            // else if (m.name === "crosshair") {
-            //     m.renderingGroupId = 2;
-            // } else {
-            //     m.renderingGroupId = 1;
-            // }
+            } else if (m.name === "crosshair") {
+                m.renderingGroupId = 2;
+            } else {
+                m.renderingGroupId = 1;
+            }
         }
         
     }

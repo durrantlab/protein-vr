@@ -3,6 +3,7 @@ import * as Core from "../Core/Core";
 import * as CameraChar from "../CameraChar"; 
 
 declare var BABYLON;
+declare var PVRGlobals;
 
 class Ground extends parent {
     /**
@@ -72,7 +73,7 @@ class Ground extends parent {
         */
 
         // Get a point in 3D space that is three feet above the camera.
-        let pointAboveCamera = PVRGlobals.camera.position.add(
+        let pointAboveCamera = PVRGlobals.camera.position.clone().add(
             new BABYLON.Vector3(0, 3, 0)
         );
 
@@ -85,7 +86,7 @@ class Ground extends parent {
         ).pickedPoint;
 
         // Get a point in 3D space that is three feet above the camera.
-        let pointBelowCamera = PVRGlobals.camera.position.subtract(
+        let pointBelowCamera = PVRGlobals.camera.position.clone().subtract(
             new BABYLON.Vector3(0, 3, 0)
         );
 

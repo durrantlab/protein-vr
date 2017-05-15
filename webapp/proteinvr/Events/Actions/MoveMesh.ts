@@ -1,8 +1,9 @@
-import * as Timers from "../Timers";
+import * as Countdowns from "../Countdowns";
 
 import parent from "./ActionParent";
 
 declare var BABYLON;
+declare var PVRGlobals;
 var jQuery = PVRGlobals.jQuery;
 
 interface DoInterface {
@@ -36,12 +37,12 @@ class MoveMesh extends parent {
 
         //let params = this.parameters;
   
-        Timers.addTimer({
+        Countdowns.addCountdown({
             name: "MoveMesh" + Math.random().toString(),
-            durationInMiliseconds: this.parameters["milliseconds"],
-            interpValStart: 0.0,
-            interpValEnd: 1.0,
-            tickCallback: function(val) {
+            countdownDurationMilliseconds: this.parameters["milliseconds"],
+            countdownStartVal: 0.0,
+            countdownEndVal: 1.0,
+            afterCountdownAdvanced: function(val) {
                 // Position object between endpoint and start point, based on
                 // how far val is between 0.0 and 1.0.
                 // https://doc.babylonjs.com/classes/2.4/Vector3

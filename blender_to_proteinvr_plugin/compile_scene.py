@@ -28,11 +28,44 @@ print "\n" + torun + "\n"
 
 os.system(torun)
 
+# Do some additional image manipulation with PIL. Has to be here because PIL
+# isn't installed in Blender's Python 3
+
+# Now save low-res versions if necessary
+# save low-res versions of the maps too.
+imgs = glob.glob(output_dir + "*.png")
+imgs = [i for i in imgs if not i.endswith(".512px.png") and not i.endswith(".256px.png")]
+
+for img in imgs:
+    file_name_512 = img + ".512px.png"
+    file_name_256 = img + ".256px.png"
+
+    if os.path.exists(file_name_512) and os.path.exists():
+        continue
+
+    img_obj = Image.open(img)
+    width, height = img_obj.size
+
+    if width > 512 and not os.path.exists(file_name_512):
+        size = 512, 512
+        img_obj.thumbnail(size, Image.ANTIALIAS)
+        img_obj.save(file_name_512, "PNG")
+    else:
+        os.system("cp " + img + " " + file_name_512)
+    
+    if width > 256 and not os.path.exists(file_name_256):
+        size = 256, 256
+        img_obj.thumbnail(size, Image.ANTIALIAS)
+        img_obj.save(file_name_256, "PNG")
+    else:
+        os.system("cp " + img + " " + file_name_256)
+
 # Now blur shadows and save as black and white
 resp = raw_input("Blur shadows and save as black and white png? (y/N) ")
 if resp.upper() == "Y":
-    for filename in glob.glob(output_dir + "*shadow.png"):
+    for filename in glob.glob(output_dir + "*shadow*png"):
         img = Image.open(filename)
         blurred_img = img.filter(ImageFilter.GaussianBlur(radius=5))
         gray_img = blurred_img.convert('L')
         gray_img.save(filename)
+

@@ -3,6 +3,7 @@
 
 import Event from "./proteinvr/Events/Event";
 import DistanceToMesh from "./proteinvr/Events/TriggerConditionals/DistanceToMesh";
+import MorphMesh from "./proteinvr/Events/Actions/MorphMesh";
 import FadeOutMesh from "./proteinvr/Events/Actions/FadeOutMesh";
 import ScreenWhite from "./proteinvr/Events/Actions/ScreenWhite";
 import MoveCamera from "./proteinvr/Events/Actions/MoveCamera";
@@ -84,23 +85,85 @@ export function start(Core) {
         //     })   
         // );
 
+// ***
+        // new Event(
+        //     new DistanceToMesh({
+        //         triggerMesh: PVRGlobals.meshesByName["NA_patch_single_outer"], 
+        //         cutOffDistance: 2.0
+        //     }),
+        //     new FadeOutMesh({
+        //         mesh: PVRGlobals.meshesByName["NA_patch_single_outer"],
+        //         milliseconds: 2000
+        //     })
+        // );
+
         new Event(
             new DistanceToMesh({
-                triggerMesh: PVRGlobals.meshesByName["NA_patch_single_outer"], 
-                cutOffDistance: 2.0
+                triggerMesh: PVRGlobals.meshesByName["Na_text"], 
+                cutOffDistance: 5.0
             }),
-            new FadeOutMesh({
-                mesh: PVRGlobals.meshesByName["NA_patch_single_outer"],
-                milliseconds: 2000
+            new MorphMesh({
+                meshName: "tube.004_inner",
+                milliseconds: 5000,
+                startTargetName: "sway",
+                endTargetName: "sway2",
+                looping: true,
+                easeInOut: true
             })
-            // new MoveCamera({
-            //     camera: PVRGlobals.camera,
-            //     milliseconds: 1000,
-            //     startPoint: PVRGlobals.camera.position,
-            //     endPoint: new BABYLON.Vector3(PVRGlobals.camera.position.x + 25, PVRGlobals.camera.position.y, PVRGlobals.camera.position.z)
-            // })
         );
 
+        new Event(
+            new DistanceToMesh({
+                triggerMesh: PVRGlobals.meshesByName["Na_text"], 
+                cutOffDistance: 5.0
+            }),
+            new MorphMesh({
+                meshName: "tube.005_inner",
+                milliseconds: 5000,
+                startTargetName: "sway",
+                endTargetName: "Base",
+                looping: true,
+                easeInOut: true
+            })
+        );
+
+        new Event(
+            new DistanceToMesh({
+                triggerMesh: PVRGlobals.meshesByName["Na_text"], 
+                cutOffDistance: 5.0
+            }),
+            new MorphMesh({
+                meshName: "tube.006_inner",
+                milliseconds: 5000,
+                startTargetName: "sway",
+                endTargetName: "Base",
+                looping: true,
+                easeInOut: true
+            })
+        );
+
+        new Event(
+            new DistanceToMesh({
+                triggerMesh: PVRGlobals.meshesByName["Na_text"], 
+                cutOffDistance: 5.0
+            }),
+            new MorphMesh({
+                meshName: "tube.007_inner",
+                milliseconds: 5000,
+                startTargetName: "sway",
+                endTargetName: "Base",
+                looping: true,
+                easeInOut: true
+            })
+        );
+
+        // new MoveCamera({
+        //     camera: PVRGlobals.camera,
+        //     milliseconds: 1000,
+        //     startPoint: PVRGlobals.camera.position,
+        //     endPoint: new BABYLON.Vector3(PVRGlobals.camera.position.x + 25, PVRGlobals.camera.position.y, PVRGlobals.camera.position.z)
+        // })
+        
         // new Event(
         //     new AlwaysTrue({}),
         //     new DoInInterval({
@@ -135,7 +198,6 @@ export function start(Core) {
         //     }, Core),
         // );
     }
-
 
     return setEvents;
 }
