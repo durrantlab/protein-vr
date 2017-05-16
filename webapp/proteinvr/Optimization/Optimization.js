@@ -134,12 +134,12 @@ define(["require", "exports", "../Environment", "./LOD", "./Fog"], function (req
         // Major impact on apperance. Only 1 color texture on your custom
         // shader. Even more aggressive LOD.
         optim.optimizations.push(new LOD_1.mySceneOptimizationLOD(priority)); // LOD #3
-        optim.optimizations.push(new BABYLON.PostProcessesOptimization(priority)); // This removes barrel distortion, which might be important...
+        optim.optimizations.push(new Fog_1.mySceneOptimizationFog(priority)); // Fog #1
         priority++; // 4
         // Very severe impact on appearance. Bring in fog and get rid of baked
         // shadows on custom shaders.
         optim.optimizations.push(new BABYLON.RenderTargetsOptimization(priority));
-        optim.optimizations.push(new Fog_1.mySceneOptimizationFog(priority)); // Fog #1
+        optim.optimizations.push(new BABYLON.PostProcessesOptimization(priority)); // This removes barrel distortion, which might be important...
         priority++; // 5
         // Fog thicker to avoid rendering things in the distance.
         optim.optimizations.push(new Fog_1.mySceneOptimizationFog(priority)); // Fog #2

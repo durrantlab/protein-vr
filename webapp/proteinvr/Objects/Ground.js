@@ -61,12 +61,12 @@ define(["require", "exports", "./ObjectParent", "../CameraChar"], function (requ
             ground.
             */
             // Get a point in 3D space that is three feet above the camera.
-            var pointAboveCamera = PVRGlobals.camera.position.add(new BABYLON.Vector3(0, 3, 0));
+            var pointAboveCamera = PVRGlobals.camera.position.clone().add(new BABYLON.Vector3(0, 3, 0));
             // Cast a ray straight down from that point, and get the point
             // where that ray intersects with the ground.
             var groundPt = PVRGlobals.scene.pickWithRay(new BABYLON.Ray(pointAboveCamera, new BABYLON.Vector3(0, -0.1, 0))).pickedPoint;
             // Get a point in 3D space that is three feet above the camera.
-            var pointBelowCamera = PVRGlobals.camera.position.subtract(new BABYLON.Vector3(0, 3, 0));
+            var pointBelowCamera = PVRGlobals.camera.position.clone().subtract(new BABYLON.Vector3(0, 3, 0));
             // If there is no such point, check above the camera. Maybe the
             // camera has accidentally fallen through the ground.
             if (groundPt === null) {

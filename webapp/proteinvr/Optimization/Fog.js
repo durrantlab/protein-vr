@@ -13,7 +13,7 @@ define(["require", "exports", "../Environment"], function (require, exports, Env
             _super.apply(this, arguments);
             this.apply = function (scene) {
                 switch (_this.priority) {
-                    case 4:
+                    case 3:
                         // Fog far away
                         Environment.setFog(0.05);
                         // No need to render things beyond the fog.

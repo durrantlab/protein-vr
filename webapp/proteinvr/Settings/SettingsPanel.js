@@ -22,13 +22,13 @@ define(["require", "exports", "./UserVars", "../Core/Setup", "../Environment"], 
         var html = panel('ProteinVR 1.0', "<div id=\"hardware-msg\" class=\"alert alert-info\">\n            Select your hardware setup:\n        </div>" +
             panel("Hardware", row_even_split(
             // [3,4,5],
-            radioBoxes("Viewer", UserVars.paramNames.viewer, ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>']), radioBoxes("Audio", UserVars.paramNames.audio, ['<i class="icon-speaker"></i>', '<i class="icon-headphones"></i>', '<span class="glyphicon glyphicon-volume-off" aria-hidden=true></span>'])) +
-                row_even_split(radioBoxes("Device", UserVars.paramNames.device, ['<i class="icon-iphone"></i>', '<i class="icon-laptop"></i>', '<i class="icon-connectedpc"></i>']), radioBoxes("Moving", UserVars.paramNames.moving, ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
-                ) + radioBoxes("Looking", UserVars.paramNames.looking, ['<i class="icon-mouse"></i>', '<i class="icon-hand-up"></i>'] //, '<i class="icon-connectedpc"></i>']
+            radioBoxes("Viewer", UserVars.paramNames["viewer"], ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>']), radioBoxes("Audio", UserVars.paramNames["audio"], ['<i class="icon-speaker"></i>', '<i class="icon-headphones"></i>', '<span class="glyphicon glyphicon-volume-off" aria-hidden=true></span>'])) +
+                row_even_split(radioBoxes("Device", UserVars.paramNames["device"], ['<i class="icon-iphone"></i>', '<i class="icon-laptop"></i>', '<i class="icon-connectedpc"></i>']), radioBoxes("Moving", UserVars.paramNames["moving"], ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
+                ) + radioBoxes("Looking", UserVars.paramNames["looking"], ['<i class="icon-mouse"></i>', '<i class="icon-hand-up"></i>'] //, '<i class="icon-connectedpc"></i>']
                 ))) +
             panelCollapsible("Initial Performance Settings", "<div id=\"settings-msg\" class=\"alert alert-info\">\n                Initial performance settings. ProteinVR will adjust in game to maintain 30 frames per second.\n            </div>" +
-                row_thirds_split([4, 4, 4], radioBoxes("Textures", UserVars.paramNames.textures), radioBoxes("Objects", UserVars.paramNames.objects), radioBoxes("Fog", UserVars.paramNames.fog)) +
-                row_thirds_split([4, 4, 4], radioBoxes("Display", UserVars.paramNames.display), "", "")) +
+                row_thirds_split([4, 4, 4], radioBoxes("Textures", UserVars.paramNames["textures"]), radioBoxes("Objects", UserVars.paramNames["objects"]), radioBoxes("Fog", UserVars.paramNames["fog"])) +
+                row_thirds_split([4, 4, 4], radioBoxes("Display", UserVars.paramNames["display"]), "", "")) +
             "<button id=\"start_game_button\" type=\"button\" class=\"btn btn-primary\">Start</button>");
         settingsPanel.html(html);
         addJavaScript();
@@ -127,11 +127,11 @@ define(["require", "exports", "./UserVars", "../Core/Setup", "../Environment"], 
         // Control moving button visibiliy depending on other issues.
         var buttonbarMoving = jQuery(".buttonbar-moving");
         var buttonbarLooking = jQuery(".buttonbar-looking");
-        if ((varsToUse.viewer == UserVars.viewers.VRHeadset) || (varsToUse.device == UserVars.devices.Mobile)) {
+        if ((varsToUse["viewer"] == UserVars.viewers["VRHeadset"]) || (varsToUse["device"] == UserVars.devices["Mobile"])) {
             buttonbarMoving.show();
             buttonbarLooking.hide();
             // make sure no pointerlock used in this scenario.
-            varsToUse["looking"] = UserVars.looking.Click;
+            varsToUse["looking"] = UserVars.looking["Click"];
             UserVars.saveLocalStorageParams(varsToUse);
         }
         else {
@@ -151,7 +151,6 @@ define(["require", "exports", "./UserVars", "../Core/Setup", "../Environment"], 
         });
         // Make radio buttons clickable
         jQuery(".proteinvr-radio-label").mouseup(function () {
-            var This = jQuery(this);
             setTimeout(function () {
                 var This = jQuery(this);
                 var associatedInput = This.find("input");
@@ -191,10 +190,19 @@ define(["require", "exports", "./UserVars", "../Core/Setup", "../Environment"], 
             jQuery("#start_game_button").click(function () {
                 jQuery("#settings_panel").fadeOut(1000);
                 Setup.continueSetupAfterSettingsPanelClosed();
-                if ((UserVars.getParam("display") === UserVars.displays.FullScreen) && (screenfull.enabled)) {
+                if ((UserVars.getParam("display") === UserVars.displays["FullScreen"]) && (screenfull.enabled)) {
+                    jQuery("body").on('click', function (e) {
+                        // If you're using VR and the user clicks, make sure you're full screen.
+                        // This is because the browser automatically goes windowed when you
+                        // Note that all clicks will now call this function... could
+                        // effect performance.
+                        if (screenfull.isFullscreen === false) {
+                            screenfull.request();
+                        }
+                    });
                     screenfull.request();
                 }
-                if (UserVars.getParam("looking") == UserVars.looking.MouseMove) {
+                if (UserVars.getParam("looking") == UserVars.looking["MouseMove"]) {
                     Environment_1.PointerLock.pointerLock();
                 }
                 jQuery("canvas").focus(); // to make sure keypresses work.

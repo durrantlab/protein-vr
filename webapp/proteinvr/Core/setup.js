@@ -1,4 +1,4 @@
-define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../CameraChar", "../Environment", "./RenderLoop", "./MouseState", "./Sound", "../Settings/UserVars", "../Events/Actions/MoveCamera", "../Events/Event", "../Events/TriggerConditionals/ClickedObject"], function (require, exports, Ground_1, Skybox_1, CameraChar, Environment, RenderLoop, MouseState, Sound, UserVars, MoveCamera_1, Event_1, ClickedObject_1) {
+define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../CameraChar", "../Environment", "./RenderLoop", "./MouseState", "./Sound", "../Settings/UserVars", "./Animations"], function (require, exports, Ground_1, Skybox_1, CameraChar, Environment, RenderLoop, MouseState, Sound, UserVars, Animations) {
     "use strict";
     var proteinVRInfo;
     // var jQuery = PVRGlobals.jQuery;
@@ -61,13 +61,13 @@ define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../Came
                     var disableCaching = true;
                     var urlCacheBreakTxt = (disableCaching ? "?" + proteinVRInfo["file_id"] : "");
                     // Load a scene from a BABYLON file.
-                    BABYLON.SceneLoader.Load(UserVars.getParam("scenePath"), "scene.babylon" + urlCacheBreakTxt, PVRGlobals.engine, function (newScene) {
+                    BABYLON.SceneLoader.Load(UserVars.getParam("scenePath"), "scene.babylon" + urlCacheBreakTxt, PVRGlobals.engine, function (ns) {
                         // Wait for textures and shaders to be ready before
                         // proceeding.
-                        newScene.executeWhenReady(function () {
+                        ns.executeWhenReady(function () {
                             // Store the scene in a variable so you can reference it
                             // later.
-                            PVRGlobals.scene = newScene;
+                            PVRGlobals.scene = ns;
                             // Setup mouse events
                             MouseState.setup();
                             if (PVRGlobals.debug === true) {
@@ -113,32 +113,35 @@ define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../Came
                                     mat_inf.glossiness = roundToHundredth(mat_inf.glossiness);
                                     mat_key += " " + mat_inf.glossiness.toString();
                                     // HERE DO THE SHADER LIBRARY THING TO NOT DUPLICATE EFFORTS!!!
-                                    var mat = new BABYLON.StandardMaterial(mat_key, PVRGlobals.scene);
-                                    mat.diffuseColor = new BABYLON.Color3(0, 0, 0); // to make shadeless
-                                    mat.specularColor = new BABYLON.Color3(0, 0, 0); // to make shadeless
-                                    mat.fogEnabled = true;
+                                    // var mat = new BABYLON.PBRMaterial(mat_key, PVRGlobals.scene);
+                                    var mat_params = {
+                                        name: mat_key,
+                                        glossiness: mat_inf.glossiness,
+                                        color: undefined,
+                                        texture: undefined,
+                                        shadowMap: undefined
+                                    };
+                                    var img_extensions = ["", ".512px.png", ".256px.png"][2]; // hard coded for now.
                                     if (colorType === "color") {
                                         // set the diffuse colors
-                                        mat.emissiveColor = new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
+                                        mat_params.color = new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
                                     }
                                     else {
-                                        mat.emissiveColor = new BABYLON.Color3(0, 0, 0);
                                         var img_path = UserVars.getParam("scenePath") + mat_inf.color + this.urlCacheBreakTxt;
-                                        mat.emissiveTexture = new BABYLON.Texture(img_path, PVRGlobals.scene);
+                                        img_path = img_path + img_extensions;
+                                        mat_params.texture = new BABYLON.Texture(img_path, PVRGlobals.scene);
                                     }
-                                    // Now do glossiness
-                                    mat.specularColor = new BABYLON.Color3(mat_inf.glossiness, mat_inf.glossiness, mat_inf.glossiness);
                                     // Add shadows
                                     if (m.name !== "sky") {
                                         var nameToUse = m.name.replace(/Decimated/g, "");
-                                        mat.ambientTexture = new BABYLON.Texture(UserVars.getParam("scenePath") + nameToUse + "shadow.png" + this.urlCacheBreakTxt, PVRGlobals.scene);
+                                        mat_params.shadowMap = new BABYLON.Texture(UserVars.getParam("scenePath") + nameToUse + "shadow.png" + img_extensions + this.urlCacheBreakTxt, PVRGlobals.scene);
                                     }
                                     // Now add this material to the object.
                                     if (m.material !== null) {
                                         m.material.dispose();
                                     }
                                     // mat.backFaceCulling = false;
-                                    m.material = mat;
+                                    m.material = makeStandardMaterial(mat_params);
                                 }
                                 // Make the mesh collidable
                                 // m.checkCollisions = true;
@@ -161,6 +164,8 @@ define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../Came
                                     parentMesh.addLODLevel(25, null);
                                 }
                             });
+                            // Add any animations.
+                            Animations.addAnimations();
                             // The below should be delayed until user is done with settings window
                             // *********
                             // Set up the system variables
@@ -217,48 +222,58 @@ define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../Came
             // Set up events.
             // debugger;
             setEvents();
-            // base type of movement based on navigation user var
-            var movement = UserVars.getParam("moving");
-            console.log("movement var = " + movement);
-            // Just move straight forward (arrows and such)
-            if (movement == UserVars.stringToEnumVal("Advance")) {
-                console.log("Advance movement method");
-            }
-            else if (movement == UserVars.stringToEnumVal("Jump")) {
-                console.log("Jump movement method");
-                new Event_1.default(new ClickedObject_1.default({
-                    triggerMesh: PVRGlobals.meshesByName["grnd"],
-                    action: new MoveCamera_1.default({
-                        camera: PVRGlobals.camera,
-                        milliseconds: 2000,
-                        endPoint: null
-                    })
-                }), null, true);
-            }
-            else if (movement == UserVars.stringToEnumVal("Teleport")) {
-                console.log("Teleport movement method");
-                new Event_1.default(new ClickedObject_1.default({
-                    triggerMesh: PVRGlobals.meshesByName["grnd"],
-                    action: new MoveCamera_1.default({
-                        camera: PVRGlobals.camera,
-                        milliseconds: 0,
-                        endPoint: null
-                    })
-                }), null, true);
-            }
-            else {
-                console.error("Expected a variable for Moving parameter. None found.");
-            }
+            // Set up the mouse-click navegation
+            // debugger;
+            CameraChar.setMouseClickNavigation();
             // test student function
-            console.log("Calling student function");
-            CameraChar.goToLocation(false);
-            console.log("Returned from goToLocation()");
+            // console.log("Calling student function");
+            // CameraChar.goToLocation(false);
+            // console.log("Returned from goToLocation()");
             RenderLoop.start();
         }
     }
     exports.continueSetupAfterSettingsPanelClosed = continueSetupAfterSettingsPanelClosed;
     function roundToHundredth(num) {
         return Math.round(num * 100) / 100;
+    }
+    function makeStandardMaterial(params) {
+        var mat = new BABYLON.StandardMaterial(params.name, PVRGlobals.scene);
+        mat.diffuseColor = new BABYLON.Color3(0, 0, 0); // to make shadeless
+        mat.specularColor = new BABYLON.Color3(0, 0, 0); // to make shadeless
+        mat.fogEnabled = true;
+        if (params.color !== undefined) {
+            mat.emissiveColor = params.color; // new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
+        }
+        if (params.texture !== undefined) {
+            mat.emissiveColor = new BABYLON.Color3(0, 0, 0);
+            mat.emissiveTexture = params.texture;
+        }
+        mat.specularColor = new BABYLON.Color3(params.glossiness, params.glossiness, params.glossiness);
+        if (params.shadowMap !== undefined) {
+            mat.ambientTexture = params.shadowMap;
+        }
+        return mat;
+    }
+    function makePBRMaterial(params) {
+        // Note: This doesn't work. Not sure it's necessary given that shadows are
+        // baked in and there are no lights?
+        var mat = new BABYLON.PBRMaterial(params.name, PVRGlobals.scene);
+        mat.albedoColor = new BABYLON.Color3(0, 0, 0); // to make shadeless
+        mat.reflectivityColor = new BABYLON.Color3(0, 0, 0); // to make shadeless
+        mat.fogEnabled = true;
+        if (params.color !== undefined) {
+            mat.emissiveColor = params.color; // new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
+        }
+        if (params.texture !== undefined) {
+            mat.emissiveColor = new BABYLON.Color3(0, 0, 0);
+            mat.emissiveTexture = params.texture;
+        }
+        mat.reflectivityColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+        mat.microSurface = params.glossiness;
+        if (params.shadowMap !== undefined) {
+            mat.ambientTexture = params.shadowMap;
+        }
+        return mat;
     }
 });
 // export default Setup;

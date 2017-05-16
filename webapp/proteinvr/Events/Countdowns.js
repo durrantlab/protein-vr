@@ -133,14 +133,18 @@ define(["require", "exports", "../Core/Core"], function (require, exports, Core)
                 var rise = this.parameters.countdownStartVal - this.parameters.countdownEndVal;
                 var run = this.parameters.countdownDurationMilliseconds;
                 var m = rise / run;
-                var interpVal = m * this.timeRemaining + this.parameters.countdownEndVal;
+                var timeRemainingToUse = this.timeRemaining;
+                if (timeRemainingToUse < 0.0) {
+                    timeRemainingToUse = 0.0;
+                }
+                var interpVal = m * timeRemainingToUse + this.parameters.countdownEndVal;
                 // Be sure to also pass the extraVars to any callback.
                 this.parameters.afterCountdownAdvanced(interpVal, this.parameters.extraVars);
             }
             // If timeRemaining is less than 0, trigger doneCallback
             if (this.timeRemaining < 0) {
                 if (this.parameters.doneCallback !== undefined) {
-                    Core.debugMsg("Countdown " + this.parameters.name + ": Calling doneCallBack. Time remaining: " + this.timeRemaining.toString() + " ms");
+                    // Core.debugMsg("Countdown " + this.parameters.name + ": Calling doneCallBack. Time remaining: " + this.timeRemaining.toString() + " ms");
                     // Be sure to pass extraVars to any callback.
                     this.parameters.doneCallback(this.parameters.extraVars);
                 }
@@ -152,11 +156,11 @@ define(["require", "exports", "../Core/Core"], function (require, exports, Core)
                 // you need to recheck it.
                 // If it's autoRestartAfterCountdownDone, add the interval time to timeRemaining.
                 if (this.parameters.autoRestartAfterCountdownDone === true) {
-                    Core.debugMsg("Countdown " + this.parameters.name + ": Restarting");
+                    // Core.debugMsg("Countdown " + this.parameters.name + ": Restarting");
                     this.timeRemaining = this.timeRemaining + this.parameters.countdownDurationMilliseconds;
                 }
                 else {
-                    Core.debugMsg("Countdown " + this.parameters.name + ": Removing");
+                    // Core.debugMsg("Countdown " + this.parameters.name + ": Removing");
                     // Otherwise, remove the countdown from the list so it is no
                     // longer called.
                     this.dispose();

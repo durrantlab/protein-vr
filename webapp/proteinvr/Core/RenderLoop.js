@@ -1,4 +1,4 @@
-define(["require", "exports", "../CameraChar"], function (require, exports, CameraChar) {
+define(["require", "exports", "../CameraChar", "../Core/Sound"], function (require, exports, CameraChar, Sound) {
     "use strict";
     // namespace RenderLoop {
     /**
@@ -12,6 +12,7 @@ define(["require", "exports", "../CameraChar"], function (require, exports, Came
         /**
         Start the render loop.
         */
+        Sound.playAll();
         // Once the scene is loaded, register a render loop and
         // start rendering the frames.
         PVRGlobals.engine.runRenderLoop(function () {
@@ -23,6 +24,7 @@ define(["require", "exports", "../CameraChar"], function (require, exports, Came
         /**
         Pause the game.
         */
+        Sound.pauseAll();
         PVRGlobals.engine.stopRenderLoop();
     }
     exports.pause = pause;

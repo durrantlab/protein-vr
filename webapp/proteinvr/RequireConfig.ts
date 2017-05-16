@@ -5,7 +5,7 @@ declare var jQuery;
 // I know it's bad practice to polute the global namespace, but some variables
 // are just far easier to use when declared globally.
 
-declar var MobileDetect;
+declare var MobileDetect;
 var PVRGlobals = {
     // The BABYLON engine.
     engine: undefined,

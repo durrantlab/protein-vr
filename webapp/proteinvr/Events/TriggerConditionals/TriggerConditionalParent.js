@@ -11,24 +11,6 @@ define(["require", "exports"], function (require, exports) {
             // Constructor sets the creation parameters.
             this.parameters = params;
         }
-        Object.defineProperty(TriggerConditionalParent.prototype, "cameraPos", {
-            get: function () {
-                /**
-                Get the current location of the scene camera. A convenience function.
-        
-                :returns: The location of the camera.
-                :rtype: :any:`BABYLON.Vector3`
-                */
-                // if (PVRGlobals.camera !== undefined) {
-                return PVRGlobals.camera.position;
-                // } else {
-                // Not loaded yet?
-                // return new BABYLON.Vector3(0,0,0);
-                // }
-            },
-            enumerable: true,
-            configurable: true
-        });
         TriggerConditionalParent.prototype.distanceToCamera = function (vec3) {
             /**
             The distance from a 3D point to the camera.
@@ -38,7 +20,7 @@ define(["require", "exports"], function (require, exports) {
             :returns: The distance.
             :rtype: :any:`number`
             */
-            return BABYLON.Vector3.Distance(vec3, this.cameraPos);
+            return BABYLON.Vector3.Distance(vec3, PVRGlobals.camera.position);
         };
         TriggerConditionalParent.prototype.meshVisibleToCamera = function (mesh) {
             /**

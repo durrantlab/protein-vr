@@ -43,10 +43,10 @@ define(["require", "exports", "./Settings/UserVars", "./Core/RenderLoop", "./Opt
         // Set up LOD
         var lodLevel = UserVars.getParam("objects");
         switch (lodLevel) {
-            case UserVars.objects.Normal:
+            case UserVars.objects["Normal"]:
                 LOD.adjustLODDistances(LOD.LODLevelOptions[1]);
                 break;
-            case UserVars.objects.Simple:
+            case UserVars.objects["Simple"]:
                 LOD.adjustLODDistances(LOD.LODLevelOptions[2]);
                 break;
             default:
@@ -79,10 +79,10 @@ define(["require", "exports", "./Settings/UserVars", "./Core/RenderLoop", "./Opt
         */
         if (density === void 0) { density = 0.015; }
         var userVarFog = UserVars.getParam("fog");
-        if ((userVarFog === UserVars.fog.Thin) && (density < 0.015)) {
+        if ((userVarFog === UserVars.fog["Thin"]) && (density < 0.015)) {
             density = 0.35;
         }
-        else if ((userVarFog === UserVars.fog.Thick) && (density < 0.045)) {
+        else if ((userVarFog === UserVars.fog["Thick"]) && (density < 0.045)) {
             density = 0.6;
         }
         // countdowns();
@@ -100,9 +100,13 @@ define(["require", "exports", "./Settings/UserVars", "./Core/RenderLoop", "./Opt
             for (var i = 0; i < PVRGlobals.scene.meshes.length; i++) {
                 var m = PVRGlobals.scene.meshes[i];
                 // Everything on same renderingroup
-                // m.renderingGroupId = 1;
+                m.renderingGroupId = 1;
                 if (m.name === "sky") {
                     m.isVisible = false;
+                }
+                else if (m.name === "crosshair") {
+                    m.renderingGroupId = 2;
+                    m.applyFog = false;
                 }
                 else {
                     m.applyFog = true;
@@ -116,6 +120,12 @@ define(["require", "exports", "./Settings/UserVars", "./Core/RenderLoop", "./Opt
                 if (m.name === "sky") {
                     m.isVisible = true;
                     m.renderingGroupId = 0;
+                }
+                else if (m.name === "crosshair") {
+                    m.renderingGroupId = 2;
+                }
+                else {
+                    m.renderingGroupId = 1;
                 }
             }
         }

@@ -4,13 +4,13 @@ define(["require", "exports", "../Settings/UserVars"], function (require, export
     function addSound(mp3FileName, location) {
         var panningModel = undefined; // Assume speakers by default
         switch (UserVars.getParam("audio")) {
-            case UserVars.audios.Speakers:
+            case UserVars.audios["Speakers"]:
                 panningModel = "equalpower";
                 break;
-            case UserVars.audios.Headphones:
+            case UserVars.audios["Headphones"]:
                 panningModel = "HRTF";
                 break;
-            case UserVars.audios.None:
+            case UserVars.audios["None"]:
                 return;
         }
         var soundParams = {
@@ -22,6 +22,19 @@ define(["require", "exports", "../Settings/UserVars"], function (require, export
         }
         var sound = new BABYLON.Sound(mp3FileName, UserVars.getParam("scenePath") + mp3FileName, PVRGlobals.scene, null, soundParams);
         sound.setPosition(location);
+        PVRGlobals.sounds.push(sound);
     }
     exports.addSound = addSound;
+    function pauseAll() {
+        for (var t = 0; t < PVRGlobals.sounds.length; t++) {
+            PVRGlobals.sounds[t].pause();
+        }
+    }
+    exports.pauseAll = pauseAll;
+    function playAll() {
+        for (var t = 0; t < PVRGlobals.sounds.length; t++) {
+            PVRGlobals.sounds[t].play(0);
+        }
+    }
+    exports.playAll = playAll;
 });

@@ -1,4 +1,4 @@
-define(["require", "exports", "./Objects/CollisionMeshes", "./Core/MouseState", "./Settings/UserVars"], function (require, exports, CollisionMeshes_1, MouseState, UserVars) {
+define(["require", "exports", "./Objects/CollisionMeshes", "./Core/MouseState", "./Settings/UserVars", "./Events/Event", "./Events/Actions/MoveCamera", "./Events/TriggerConditionals/ClickedObject"], function (require, exports, CollisionMeshes_1, MouseState, UserVars, Event_1, MoveCamera_1, ClickedObject_1) {
     "use strict";
     var jQuery;
     // namespace CameraChar {
@@ -18,7 +18,7 @@ define(["require", "exports", "./Objects/CollisionMeshes", "./Core/MouseState", 
         var scene = PVRGlobals.scene;
         // The active camera from the babylon file is used (keep it
         // simple)
-        if (UserVars.getParam("viewer") === UserVars.viewers.VRHeadset) {
+        if (UserVars.getParam("viewer") === UserVars.viewers["VRHeadset"]) {
             // VR camera
             setUpVRCameraControls();
         }
@@ -36,8 +36,6 @@ define(["require", "exports", "./Objects/CollisionMeshes", "./Core/MouseState", 
         //     PVRGlobals.camera.setTarget(new BABYLON.Vector3(1000,0,0));
         // }, 1500);
         setupCrosshair();
-        // Get the camera object for reference.
-        //let camera = PVRGlobals.camera;
         // Define an elipsoid raround the camera
         camera.ellipsoid = new BABYLON.Vector3(1, exports.characterHeight / 2, 1);
         // Enable gravity on the camera. The actual strength of the
@@ -45,7 +43,7 @@ define(["require", "exports", "./Objects/CollisionMeshes", "./Core/MouseState", 
         camera.applyGravity = false;
         // Now enable collisions between the camera and relevant objects.
         scene.collisionsEnabled = true;
-        camera.checkCollisions = true;
+        // camera.checkCollisions = true;
         // Additional control keys.
         camera.keysUp.push(87); // W
         camera.keysLeft.push(65); // A
@@ -103,7 +101,7 @@ define(["require", "exports", "./Objects/CollisionMeshes", "./Core/MouseState", 
             var mesh = CollisionMeshes_1.default.meshesThatCollide[i];
             if (mesh.intersectsPoint(PVRGlobals.camera.position)) {
                 intersect = true;
-                PVRGlobals.camera.position = PVRGlobals.previousPos.clone();
+                setPosition(PVRGlobals.previousPos.clone());
                 break;
             }
         }
@@ -117,14 +115,6 @@ define(["require", "exports", "./Objects/CollisionMeshes", "./Core/MouseState", 
         var camera = new BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", PVRGlobals.scene.activeCamera.position, PVRGlobals.scene, true, // compensate distortion
         metrics);
         jQuery = PVRGlobals.jQuery;
-        // If using a VR camera, auto advance forward
-        setTimeout(function () {
-            PVRGlobals.extraFunctionsToRunInLoop_BeforeCameraLocFinalized.push(function () {
-                if (MouseState.mouseDown === true) {
-                    camera.position = camera.getFrontPosition(0.01 * PVRGlobals.scene.getAnimationRatio());
-                }
-            });
-        }, 5000);
         switchCamera(camera);
     }
     exports.setUpVRCameraControls = setUpVRCameraControls;
@@ -149,6 +139,12 @@ define(["require", "exports", "./Objects/CollisionMeshes", "./Core/MouseState", 
     }
     exports.setupCrosshair = setupCrosshair;
     // }
+    function setPosition(vec) {
+        if ((vec !== undefined) && (!isNaN(vec.x))) {
+            PVRGlobals.camera.position = vec;
+        }
+    }
+    exports.setPosition = setPosition;
     /**
      * Checks url for '?transmit=' with a following id. Saves the camera location and rotation info
      * to a json object and sends it to the transmit.php script to be maintained. Students can then be
@@ -222,7 +218,7 @@ define(["require", "exports", "./Objects/CollisionMeshes", "./Core/MouseState", 
                     else {
                         oldData.push(data);
                         var obj = JSON.parse(data.toString());
-                        PVRGlobals.camera.position = new BABYLON.Vector3(Number(obj.locx), Number(obj.locy), Number(obj.locz));
+                        setPosition(new BABYLON.Vector3(Number(obj.locx), Number(obj.locy), Number(obj.locz)));
                         if (!VRCamera) {
                             PVRGlobals.camera.rotation = new BABYLON.Vector3(Number(obj.rotx), Number(obj.roty), Number(obj.rotz));
                         }
@@ -239,4 +235,65 @@ define(["require", "exports", "./Objects/CollisionMeshes", "./Core/MouseState", 
         }
     }
     exports.goToLocation = goToLocation;
+    function setMouseClickNavigation() {
+        // Note that the keys will always work. This only determines who mouse
+        // navigation happens. 
+        // If mouse click turning selected, switch mouse click navigation to
+        // none.
+        // base type of movement based on navigation user var
+        // Just move straight forward (arrows and such)
+        // console.log("FIX THIS HERE!");
+        // setTimeout(function() {  // give time for stuff to load. This is hackish... fix later.
+        var movement = UserVars.getParam("moving");
+        console.log("movement var = " + movement);
+        switch (movement) {
+            case UserVars.moving.Advance:
+                console.log("Advance movement method");
+                // If using a VR camera, auto advance forward
+                PVRGlobals.extraFunctionsToRunInLoop_BeforeCameraLocFinalized.push(function () {
+                    if (MouseState.mouseDown === true) {
+                        setPosition(PVRGlobals.camera.getFrontPosition(0.01 * PVRGlobals.scene.getAnimationRatio()));
+                    }
+                });
+                // new Event(new ClickedObject({
+                //     triggerMesh: PVRGlobals.meshesByName["grnd"],
+                //     action: new MoveCamera({
+                //             camera: PVRGlobals.camera,
+                //             milliseconds: 2000,
+                //             endPoint: null
+                //         })
+                // }), null, true);
+                break;
+            case UserVars.moving.Jump:
+                console.log("Jump movement method");
+                new Event_1.default(new ClickedObject_1.default({
+                    triggerMesh: PVRGlobals.meshesByName["grnd"],
+                    action: new MoveCamera_1.default({
+                        milliseconds: 750,
+                        endPoint: null,
+                        onStart: function () {
+                            PVRGlobals.jumpRefractoryPeriod = true;
+                        },
+                        onEnd: function () {
+                            PVRGlobals.jumpRefractoryPeriod = false;
+                        }
+                    })
+                }), null, true);
+                break;
+            case UserVars.moving.Teleport:
+                console.log("Teleport movement method");
+                new Event_1.default(new ClickedObject_1.default({
+                    triggerMesh: PVRGlobals.meshesByName["grnd"],
+                    action: new MoveCamera_1.default({
+                        milliseconds: 0,
+                        endPoint: null
+                    })
+                }), null, true);
+                break;
+            default:
+                console.error("Expected a variable for Moving parameter. None found.");
+        }
+        // }, 500);
+    }
+    exports.setMouseClickNavigation = setMouseClickNavigation;
 });
