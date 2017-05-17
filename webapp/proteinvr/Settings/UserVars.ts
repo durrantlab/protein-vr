@@ -140,7 +140,13 @@ export function setup(callBackFunc: any) :void {
     }).done(function(user_vars) {
         // Default values before anything. For now just use laptop defaults,
         // but in future would be good to detect device...
-        var userVars: userVarsInterface = paramDefaults["laptop"];
+        var userVars: userVarsInterface;
+        if(PVRGlobals.mobileDetect.mobile()){
+            userVars = paramDefaults["mobile"];
+        }
+        else{
+            userVars = paramDefaults["laptop"];
+        }
 
         // Here you overwrite with values from params.json. At this point,
         // this is just the proteinvr scene to use.
