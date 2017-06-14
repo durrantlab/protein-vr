@@ -10,6 +10,11 @@ export function addAnimations() {
     // Load in information re. the scene
     let jQuery = PVRGlobals.jQuery;
 
+    // Check to make sure animations are enabled.
+    if (UserVars.getParam("animations") !== UserVars.animations["Moving"]) {
+        return;
+    }
+
     jQuery.ajax({
         url: UserVars.getParam("scenePath") + "morph_data.json",
         dataType: "json"

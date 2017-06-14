@@ -1,5 +1,6 @@
 define(["require", "exports", "./UserVars", "../Core/Setup", "../Environment"], function (require, exports, UserVars, Setup, Environment_1) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var jQuery;
     function show() {
         // Add div 
@@ -22,14 +23,22 @@ define(["require", "exports", "./UserVars", "../Core/Setup", "../Environment"], 
         var html = panel('ProteinVR 1.0', "<div id=\"hardware-msg\" class=\"alert alert-info\">\n            Select your hardware setup:\n        </div>" +
             panel("Hardware", row_even_split(
             // [3,4,5],
-            radioBoxes("Viewer", UserVars.paramNames["viewer"], ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>']), radioBoxes("Audio", UserVars.paramNames["audio"], ['<i class="icon-speaker"></i>', '<i class="icon-headphones"></i>', '<span class="glyphicon glyphicon-volume-off" aria-hidden=true></span>'])) +
-                row_even_split(radioBoxes("Device", UserVars.paramNames["device"], ['<i class="icon-iphone"></i>', '<i class="icon-laptop"></i>', '<i class="icon-connectedpc"></i>']), radioBoxes("Moving", UserVars.paramNames["moving"], ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
+            radioBoxes("Viewer", UserVars.paramNames["viewer"], ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>']
+            // [85, 115]
+            ), radioBoxes("Audio", UserVars.paramNames["audio"], ['<i class="icon-speaker"></i>', '<i class="icon-headphones"></i>', '<span class="glyphicon glyphicon-volume-off" aria-hidden=true></span>']
+            // [100, 120, 75]
+            )) +
+                row_even_split(radioBoxes("Device", UserVars.paramNames["device"], ['<i class="icon-iphone"></i>', '<i class="icon-laptop"></i>', '<i class="icon-connectedpc"></i>']
+                // [100, 100, 100]
+                ), radioBoxes("Moving", UserVars.paramNames["moving"], ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
+                // [100, 100, 100]
                 ) + radioBoxes("Looking", UserVars.paramNames["looking"], ['<i class="icon-mouse"></i>', '<i class="icon-hand-up"></i>'] //, '<i class="icon-connectedpc"></i>']
+                // [100, 100, 100]
                 ))) +
             panelCollapsible("Initial Performance Settings", "<div id=\"settings-msg\" class=\"alert alert-info\">\n                Initial performance settings. ProteinVR will adjust in game to maintain 30 frames per second.\n            </div>" +
                 row_thirds_split([4, 4, 4], radioBoxes("Textures", UserVars.paramNames["textures"]), radioBoxes("Objects", UserVars.paramNames["objects"]), radioBoxes("Fog", UserVars.paramNames["fog"])) +
-                row_thirds_split([4, 4, 4], radioBoxes("Display", UserVars.paramNames["display"]), "", "")) +
-            "<button id=\"start_game_button\" type=\"button\" class=\"btn btn-primary\">Start</button>");
+                row_thirds_split([4, 4, 4], radioBoxes("Display", UserVars.paramNames["display"]), radioBoxes("Animations", UserVars.paramNames["animations"]), "")) +
+            "<button id=\"start_game_button\" type=\"button\" class=\"btn btn-primary\">Start</button>\n        <button id=\"broadcast_game_button\" style=\"display: none;\" type=\"button\" class=\"btn btn-primary\">Broadcast</button>");
         settingsPanel.html(html);
         addJavaScript();
     }
@@ -207,6 +216,35 @@ define(["require", "exports", "./UserVars", "../Core/Setup", "../Environment"], 
                 }
                 jQuery("canvas").focus(); // to make sure keypresses work.
             });
+            // Broadcast button
+            PVRGlobals.broadcastID = Math.floor(100000000 * Math.random()).toString();
+            addBroadcastModal();
+            jQuery("#broadcast_game_button").click(function () {
+                jQuery('#broadcast_modal').modal('show');
+            });
+            // Show the broadcast button if "?id=" is not in the url.
+            if (window.location.href.indexOf("?id=") === -1) {
+                jQuery("#broadcast_game_button").show();
+            }
+        });
+    }
+    function addBroadcastModal() {
+        var broadcastURL = window.location.href + '?id=' + PVRGlobals.broadcastID;
+        jQuery("body").append("\n        <div class=\"modal fade\" id=\"broadcast_modal\" tabindex=\"-1\" role=\"dialog\">\n            <div class=\"modal-dialog\" role=\"document\">\n                <div class=\"modal-content\">\n                    <div class=\"modal-header\">\n                        <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>\n                        <h4 class=\"modal-title\">Broadcast ProteinVR Session</h4>\n                    </div>\n                    <div class=\"modal-body\">\n                        <div id=\"hardware-msg\" class=\"alert alert-info\">\n                            Give your students the URL below so they can accompany you in the virtual-reality world. Then click the \"Start\" button to enter the world yourself.\n                        </div>\n                        <div class=\"input-group\">\n                            <span class=\"input-group-addon\" id=\"url_text\">URL:</span>\n                            <input type=\"text\" value=\"" + broadcastURL + "\" class=\"form-control\" id=\"broadcast-url\" aria-describedby=\"url_text\">\n                        </div>\n                    </div>\n                    <div class=\"modal-footer\">\n                        <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cancel</button>\n                        <button id=\"start_game_from_modal\" type=\"button\" class=\"btn btn-primary\">Start</button>\n                    </div>\n                </div>\n            </div>\n        </div>");
+        jQuery("#start_game_from_modal").click(function () {
+            jQuery('#broadcast_modal').modal('hide');
+            PVRGlobals.teacherBroadcasting = true;
+            jQuery("#start_game_button").click();
+        });
+        jQuery('#broadcast_modal').on('shown.bs.modal', function () {
+            jQuery('#broadcast-url').focus();
+        });
+        // Start trying to get a tinyurl link instead
+        jQuery.ajax({
+            url: "js/url-shortener/shortener.php?url=" + broadcastURL,
+            dataType: 'text',
+        }).done(function (newUrl) {
+            jQuery("#broadcast-url").val(newUrl);
         });
     }
 });

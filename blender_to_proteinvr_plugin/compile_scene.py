@@ -40,7 +40,7 @@ for img in imgs:
     file_name_512 = img + ".512px.png"
     file_name_256 = img + ".256px.png"
 
-    if os.path.exists(file_name_512) and os.path.exists():
+    if os.path.exists(file_name_512) and os.path.exists(file_name_256):
         continue
 
     img_obj = Image.open(img)

@@ -39,7 +39,7 @@ if (!(is_numeric($_POST["id"]))) {
     die();
 }
 $id = strval(intval($_POST["id"]));
-$id = hash('ripemd160', $id);
+// $id = hash('ripemd160', $id); // needlessly computationally intensive. Just make sure it's an int.
 $filename = $id.'.cache';
 
 // Now figure out what kind of call you're looking at a proceed...

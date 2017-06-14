@@ -1,5 +1,6 @@
 define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../CameraChar", "../Environment", "./RenderLoop", "./MouseState", "./Sound", "../Settings/UserVars", "./Animations"], function (require, exports, Ground_1, Skybox_1, CameraChar, Environment, RenderLoop, MouseState, Sound, UserVars, Animations) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var proteinVRInfo;
     // var jQuery = PVRGlobals.jQuery;
     // debugger;
@@ -19,6 +20,16 @@ define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../Came
     */
     var setEvents;
     var sceneLoadedAndReady = false;
+    function recomputeNormals(mesh) {
+        // see http://www.babylonjs-playground.com/#1U5GPV#50
+        var normals = [];
+        var positions = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+        if (positions !== null) {
+            normals = mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind);
+            BABYLON.VertexData.ComputeNormals(positions, mesh.getIndices(), normals);
+            mesh.setVerticesData(BABYLON.VertexBuffer.NormalKind, normals);
+        }
+    }
     // pass $ as an arg to utilize the jquery module from the config.ts path
     function setup(setEventsFunc) {
         /**
@@ -58,10 +69,11 @@ define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../Came
                     // I would expect that updating the version in the .manifest
                     // file would prevent this, but in testing I'm not 100% it's
                     // true.
-                    var disableCaching = true;
+                    var disableCaching = false;
                     var urlCacheBreakTxt = (disableCaching ? "?" + proteinVRInfo["file_id"] : "");
                     // Load a scene from a BABYLON file.
-                    BABYLON.SceneLoader.Load(UserVars.getParam("scenePath"), "scene.babylon" + urlCacheBreakTxt, PVRGlobals.engine, function (ns) {
+                    BABYLON.SceneLoader.Load(UserVars.getParam("scenePath"), "scene.babylon", // + urlCacheBreakTxt, 
+                    PVRGlobals.engine, function (ns) {
                         // Wait for textures and shaders to be ready before
                         // proceeding.
                         ns.executeWhenReady(function () {
@@ -78,6 +90,7 @@ define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../Came
                             // PVRGlobals.scene.meshes.forEach(function(m) { // Avoid this because requires binding...
                             for (var meshIdx = 0; meshIdx < PVRGlobals.scene.meshes.length; meshIdx++) {
                                 var m = PVRGlobals.scene.meshes[meshIdx];
+                                // recomputeNormals(m);
                                 //try {
                                 // Convert the mesh name to a json object with
                                 // information about the mesh.
@@ -121,7 +134,8 @@ define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../Came
                                         texture: undefined,
                                         shadowMap: undefined
                                     };
-                                    var img_extensions = ["", ".512px.png", ".256px.png"][2]; // hard coded for now.
+                                    var img_extensions = ["", ".512px.png", ".256px.png"][0]; // hard coded for now.
+                                    console.log("img_extensions hardcoded for now: ", img_extensions);
                                     if (colorType === "color") {
                                         // set the diffuse colors
                                         mat_params.color = new BABYLON.Color3(mat_inf.color[0], mat_inf.color[1], mat_inf.color[2]);
@@ -142,6 +156,7 @@ define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../Came
                                     }
                                     // mat.backFaceCulling = false;
                                     m.material = makeStandardMaterial(mat_params);
+                                    // m.material = makePBRMaterial(mat_params);
                                 }
                                 // Make the mesh collidable
                                 // m.checkCollisions = true;
@@ -149,6 +164,9 @@ define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../Came
                                 new Ground_1.default().checkMesh(m); //, json);
                                 // Check if the mesh is marked as a skybox.
                                 new Skybox_1.default().checkMesh(m); //, json);
+                                // Check if the mesh is marked as a billboard
+                                // mesh.
+                                // new BillboardMeshes().checkMesh(m, json);
                             }
                             ;
                             // Add LODs
@@ -164,8 +182,6 @@ define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../Came
                                     parentMesh.addLODLevel(25, null);
                                 }
                             });
-                            // Add any animations.
-                            Animations.addAnimations();
                             // The below should be delayed until user is done with settings window
                             // *********
                             // Set up the system variables
@@ -195,7 +211,6 @@ define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../Came
                     }));
                 });
             });
-            // CameraChar.teacherGatherClass();
         });
     }
     exports.setup = setup;
@@ -215,6 +230,8 @@ define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../Came
                 var loc = new BABYLON.Vector3(sound[1][0], sound[1][2], sound[1][1]);
                 Sound.addSound(filename, loc);
             }
+            // Add any animations.
+            Animations.addAnimations();
             // Set up the game character/camera.
             CameraChar.setup();
             // Set up the environment.
@@ -225,6 +242,18 @@ define(["require", "exports", "../Objects/Ground", "../Objects/Skybox", "../Came
             // Set up the mouse-click navegation
             // debugger;
             CameraChar.setMouseClickNavigation();
+            // Checks if it's a teacher broadcasting his/her location
+            if (PVRGlobals.teacherBroadcasting === true) {
+                setInterval(CameraChar.teacherGatherClass, CameraChar.broadcastCheckFrequency); // broadcast location every three seconds
+            }
+            // Checks if it's a student who should be following a teacher
+            var oldData = [];
+            var url = window.location.href;
+            if (url.indexOf("?id=") > -1) {
+                var parsed = url.split('=');
+                PVRGlobals.broadcastID = parsed[1];
+                setInterval(CameraChar.goToLocation, CameraChar.broadcastCheckFrequency); // Get new location every three seconds
+            }
             // test student function
             // console.log("Calling student function");
             // CameraChar.goToLocation(false);

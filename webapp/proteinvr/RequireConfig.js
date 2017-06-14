@@ -1,4 +1,6 @@
 ///<reference path="Definitions/require.d.ts" />
+// I know it's bad practice to polute the global namespace, but some variables
+// are just far easier to use when declared globally.
 var PVRGlobals = {
     // The BABYLON engine.
     engine: undefined,
@@ -9,7 +11,7 @@ var PVRGlobals = {
     camera: undefined,
     // Whether or not to run the current app in debug mode. Whether or not to
     // run in debug mode (shows certain messages in the console, etc.)
-    debug: true,
+    debug: false,
     // A JSON object that maps a mesh name to the mesh object.
     meshesByName: {},
     // The current frame number.
@@ -31,7 +33,11 @@ var PVRGlobals = {
     // place to store skape-key animation targets.
     allMorphTargets: {},
     // if you just jumped, you can't jump again.
-    jumpRefractoryPeriod: false
+    jumpRefractoryPeriod: false,
+    // session id, especially when broadcasting
+    broadcastID: 0,
+    // whether or not teacher broadcasting is set
+    teacherBroadcasting: false
 };
 console.log('window loaded?');
 console.log(window);
@@ -50,7 +56,7 @@ require.config({
     urlArgs: "bust=" + (new Date()).getTime()
 });
 // This require function starts the app
-require(['../main', "./Core/Core", "./Core/Setup"], function (main, /* jQuery, bootstrap,*/ Core, Setup) {
+require(['../main', /* 'jquery', "bootstrap",*/ "./Core/Core", "./Core/Setup"], function (main, /* jQuery, bootstrap,*/ Core, Setup) {
     // window.Core = Core.default;  // not sure why the default is needed here.
     //PVRGlobals.jQuery = jQuery;
     // Get custom events from main.ts

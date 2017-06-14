@@ -1,5 +1,6 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var ObjectParent = (function () {
         function ObjectParent() {
         }
@@ -47,6 +48,5 @@ define(["require", "exports"], function (require, exports) {
         };
         return ObjectParent;
     }());
-    Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = ObjectParent;
 });

@@ -1,11 +1,17 @@
 ///<reference path="../../js/Babylonjs/dist/babylon.2.5.d.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 define(["require", "exports", "../Settings/UserVars"], function (require, exports, UserVars) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     exports.LODLevelOptions = [
         [40, 60],
         [15, 30],
@@ -14,9 +20,8 @@ define(["require", "exports", "../Settings/UserVars"], function (require, export
     var mySceneOptimizationLOD = (function (_super) {
         __extends(mySceneOptimizationLOD, _super);
         function mySceneOptimizationLOD() {
-            var _this = this;
-            _super.apply(this, arguments);
-            this.apply = function (scene) {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.apply = function (scene) {
                 switch (_this.priority) {
                     case 1:
                         // adjust the LOD distances to be more agressive.
@@ -35,6 +40,7 @@ define(["require", "exports", "../Settings/UserVars"], function (require, export
                 }
                 return true;
             };
+            return _this;
         }
         return mySceneOptimizationLOD;
     }(BABYLON.SceneOptimization));
@@ -73,10 +79,14 @@ define(["require", "exports", "../Settings/UserVars"], function (require, export
                 if (m._LODLevels[1].mesh === null) {
                     curLODDist1 = m._LODLevels[0].distance;
                     curLODDist2 = m._LODLevels[1].distance;
+                    // nullMesh = m._LODLevels[0];
+                    // lodMesh = m._LODLevels[1];
                 }
                 else {
                     curLODDist1 = m._LODLevels[1].distance;
                     curLODDist2 = m._LODLevels[0].distance;
+                    // nullMesh = m._LODLevels[1];
+                    // lodMesh = m._LODLevels[0];                
                 }
                 // Get the meshes at those levels.
                 var lodLevel1 = m.getLODLevelAtDistance(curLODDist1);
@@ -89,10 +99,11 @@ define(["require", "exports", "../Settings/UserVars"], function (require, export
                 // Add them back in, with new distances
                 m.addLODLevel(dist1, lodLevel1);
                 m.addLODLevel(dist2ForNull, lodLevel2);
+                // m.addLODLevel(dist3ForNull, lodMesh3);
+                // console.log(m._LODLevels);
             }
         }
     }
     exports.adjustLODDistances = adjustLODDistances;
-    Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = mySceneOptimizationLOD;
 });

@@ -1,5 +1,6 @@
 define(["require", "exports", "./Countdowns"], function (require, exports, Countdowns) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var jQuery = PVRGlobals.jQuery;
     var Event = (function () {
         function Event(triggerToCheck, actionIfTriggered, async) {
@@ -32,6 +33,7 @@ define(["require", "exports", "./Countdowns"], function (require, exports, Count
                             // dispose of the countdown so it doesn't keep
                             // restarting.
                             this.countdownThatChecksCondition.dispose();
+                            // Core.debugMsg("Trigger firing.");
                         }
                     }.bind(this)
                 });
@@ -39,6 +41,5 @@ define(["require", "exports", "./Countdowns"], function (require, exports, Count
         }
         return Event;
     }());
-    Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = Event;
 });

@@ -1,10 +1,16 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 define(["require", "exports", "./TriggerConditionalParent"], function (require, exports, TriggerConditionalParent_1) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var AlwaysTrue = (function (_super) {
         __extends(AlwaysTrue, _super);
         /**
@@ -18,7 +24,7 @@ define(["require", "exports", "./TriggerConditionalParent"], function (require, 
             :param any params:  Any required parameters. To make sure the
                        correct ones are supplied, use an interface.
             */
-            _super.call(this, params);
+            return _super.call(this, params) || this;
         }
         AlwaysTrue.prototype.checkIfTriggered = function () {
             /**
@@ -33,6 +39,10 @@ define(["require", "exports", "./TriggerConditionalParent"], function (require, 
         };
         return AlwaysTrue;
     }(TriggerConditionalParent_1.default));
-    Object.defineProperty(exports, "__esModule", { value: true });
+    // Other ideas for conditionals:
+    // Game start.
+    // Game end.
+    // Keypress
+    // speech?
     exports.default = AlwaysTrue;
 });

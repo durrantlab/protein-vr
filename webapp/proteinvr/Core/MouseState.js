@@ -1,5 +1,6 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var jQuery = PVRGlobals.jQuery;
     // A list of functions to call on mouse click. In each case
     // THIS will be passed as a parameter.

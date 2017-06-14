@@ -1,5 +1,6 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var ActionParent = (function () {
         function ActionParent(params) {
             /**
@@ -11,6 +12,5 @@ define(["require", "exports"], function (require, exports) {
         }
         return ActionParent;
     }());
-    Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = ActionParent;
 });

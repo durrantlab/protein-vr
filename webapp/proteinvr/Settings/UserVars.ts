@@ -16,7 +16,7 @@ interface userVarsInterface {
     fog?: fog,
     objects?: objects,
     display?: displays
-    animations?: boolean,
+    animations?: animations,
     visibility?: number,
     scenePath?: string,
     moving?: moving,
@@ -124,6 +124,15 @@ paramDefaults["mobile"]["looking"] = looking["Click"];
 paramDefaults["laptop"]["looking"] = looking["MouseMove"];
 paramDefaults["desktop"]["looking"] = looking["MouseMove"];
 
+export enum animations {
+    Moving,
+    Fixed
+}
+paramNames["animations"] = ["Moving", "Fixed"];
+paramDefaults["mobile"]["animations"] = animations["Fixed"];
+paramDefaults["laptop"]["animations"] = animations["Moving"];
+paramDefaults["desktop"]["animations"] = animations["Moving"];
+
 /**
  * This function will assign values to the system variables based on user input.
  */
@@ -143,8 +152,7 @@ export function setup(callBackFunc: any) :void {
         var userVars: userVarsInterface;
         if(PVRGlobals.mobileDetect.mobile()){
             userVars = paramDefaults["mobile"];
-        }
-        else{
+        } else {
             userVars = paramDefaults["laptop"];
         }
 

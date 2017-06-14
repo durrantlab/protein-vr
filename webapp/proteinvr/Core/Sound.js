@@ -1,6 +1,7 @@
 ///<reference path="../../js/Babylonjs/dist/babylon.2.5.d.ts" />
 define(["require", "exports", "../Settings/UserVars"], function (require, exports, UserVars) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     function addSound(mp3FileName, location) {
         var panningModel = undefined; // Assume speakers by default
         switch (UserVars.getParam("audio")) {

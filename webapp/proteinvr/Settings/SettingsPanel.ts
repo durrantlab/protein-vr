@@ -100,11 +100,16 @@ export function show() {
                     UserVars.paramNames["display"],
                     // [70, 85, 80]
                 ),
-                "",
+                radioBoxes(
+                    "Animations",
+                    UserVars.paramNames["animations"],
+                    // [70, 85, 80]
+                ),
                 ""
             )
         ) + 
-        `<button id="start_game_button" type="button" class="btn btn-primary">Start</button>`
+        `<button id="start_game_button" type="button" class="btn btn-primary">Start</button>
+        <button id="broadcast_game_button" style="display: none;" type="button" class="btn btn-primary">Broadcast</button>`
     );
 
     settingsPanel.html(html);
@@ -359,5 +364,65 @@ function addJavaScript() {
 
             jQuery("canvas").focus();  // to make sure keypresses work.
         });
+
+        // Broadcast button
+        PVRGlobals.broadcastID = Math.floor(100000000 * Math.random()).toString();
+        addBroadcastModal();
+        jQuery("#broadcast_game_button").click(function() {
+            jQuery('#broadcast_modal').modal('show');
+        });
+
+        // Show the broadcast button if "?id=" is not in the url.
+        if (window.location.href.indexOf("?id=") === -1) {
+            jQuery("#broadcast_game_button").show();
+        }
+    });
+}
+
+function addBroadcastModal() {
+    let broadcastURL: string = window.location.href + '?id=' + PVRGlobals.broadcastID;
+
+    jQuery("body").append(`
+        <div class="modal fade" id="broadcast_modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Broadcast ProteinVR Session</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="hardware-msg" class="alert alert-info">
+                            Give your students the URL below so they can accompany you in the virtual-reality world. Then click the "Start" button to enter the world yourself.
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon" id="url_text">URL:</span>
+                            <input type="text" value="${broadcastURL}" class="form-control" id="broadcast-url" aria-describedby="url_text">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button id="start_game_from_modal" type="button" class="btn btn-primary">Start</button>
+                    </div>
+                </div>
+            </div>
+        </div>`
+    );
+
+    jQuery("#start_game_from_modal").click(function() {
+        jQuery('#broadcast_modal').modal('hide');
+        PVRGlobals.teacherBroadcasting = true;
+        jQuery("#start_game_button").click();
+    });
+
+    jQuery('#broadcast_modal').on('shown.bs.modal', function () {
+        jQuery('#broadcast-url').focus()
+    });
+
+    // Start trying to get a tinyurl link instead
+    jQuery.ajax({
+        url: "js/url-shortener/shortener.php?url=" + broadcastURL,
+        dataType: 'text',
+    }).done(function(newUrl) {
+        jQuery("#broadcast-url").val(newUrl);
     });
 }

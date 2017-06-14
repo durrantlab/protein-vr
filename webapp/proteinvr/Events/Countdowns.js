@@ -1,5 +1,6 @@
 define(["require", "exports", "../Core/Core"], function (require, exports, Core) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     // namespace Countdowns {
     /**
     This namespace stores countdowns.

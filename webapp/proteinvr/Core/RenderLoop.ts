@@ -36,6 +36,11 @@ export function pause(): void {
     Pause the game.
     */
 
+    if (window.location.href.indexOf("?id=") !== -1) {
+        // It's a student following a teacher. Pausing not allowed.
+        return;
+    }
+
     Sound.pauseAll();
 
     PVRGlobals.engine.stopRenderLoop();

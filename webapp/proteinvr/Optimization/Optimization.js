@@ -1,6 +1,7 @@
 ///<reference path="../../js/Babylonjs/dist/babylon.2.5.d.ts" />
 define(["require", "exports", "../Environment", "./LOD", "./Fog"], function (require, exports, Environment, LOD_1, Fog_1) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var optimizationWaitDuration = 10000; // how to long wait after successfull
     // optimization to check and see if
     // further optimization needed.

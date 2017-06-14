@@ -1,5 +1,6 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var TriggerConditionalParent = (function () {
         function TriggerConditionalParent(params) {
             /**
@@ -44,6 +45,5 @@ define(["require", "exports"], function (require, exports) {
         };
         return TriggerConditionalParent;
     }());
-    Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = TriggerConditionalParent;
 });

@@ -3,6 +3,7 @@
  */
 define(["require", "exports", "./SettingsPanel"], function (require, exports, SettingsPanel) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     // Setting up user parameters
     var mobileDefaults;
     var laptopDefaults;
@@ -13,93 +14,102 @@ define(["require", "exports", "./SettingsPanel"], function (require, exports, Se
         "desktop": {}
     };
     exports.paramNames = {};
+    var audios;
     (function (audios) {
         audios[audios["Speakers"] = 0] = "Speakers";
         audios[audios["Headphones"] = 1] = "Headphones";
         audios[audios["None"] = 2] = "None";
-    })(exports.audios || (exports.audios = {}));
-    var audios = exports.audios;
+    })(audios = exports.audios || (exports.audios = {}));
     exports.paramNames["audio"] = ["Speakers", "Headphones", "None"];
     exports.paramDefaults["mobile"]["audio"] = audios["Headphones"];
     exports.paramDefaults["laptop"]["audio"] = audios["Speakers"];
     exports.paramDefaults["desktop"]["audio"] = audios["Speakers"];
+    var viewers;
     (function (viewers) {
         viewers[viewers["Screen"] = 0] = "Screen";
         viewers[viewers["VRHeadset"] = 1] = "VRHeadset";
-    })(exports.viewers || (exports.viewers = {}));
-    var viewers = exports.viewers;
+    })(viewers = exports.viewers || (exports.viewers = {}));
     exports.paramNames["viewer"] = ["Screen", "VR Headset"];
     exports.paramDefaults["mobile"]["viewer"] = viewers["Screen"];
     exports.paramDefaults["laptop"]["viewer"] = viewers["Screen"];
     exports.paramDefaults["desktop"]["viewer"] = viewers["Screen"];
+    var devices;
     (function (devices) {
         devices[devices["Mobile"] = 0] = "Mobile";
         devices[devices["Laptop"] = 1] = "Laptop";
         devices[devices["Desktop"] = 2] = "Desktop";
-    })(exports.devices || (exports.devices = {}));
-    var devices = exports.devices;
+    })(devices = exports.devices || (exports.devices = {}));
     exports.paramNames["device"] = ["Mobile", "Laptop", "Desktop"];
     exports.paramDefaults["mobile"]["device"] = devices["Mobile"];
     exports.paramDefaults["laptop"]["device"] = devices["Laptop"];
     exports.paramDefaults["desktop"]["device"] = devices["Desktop"];
+    var textures;
     (function (textures) {
         textures[textures["Sharp"] = 0] = "Sharp";
         textures[textures["Medium"] = 1] = "Medium";
         textures[textures["Grainy"] = 2] = "Grainy"; // 256
-    })(exports.textures || (exports.textures = {}));
-    var textures = exports.textures;
+    })(textures = exports.textures || (exports.textures = {}));
     exports.paramNames["textures"] = ["Sharp", "Medium", "Grainy"];
     exports.paramDefaults["mobile"]["textures"] = textures["Medium"];
     exports.paramDefaults["laptop"]["textures"] = textures["Sharp"];
     exports.paramDefaults["desktop"]["textures"] = textures["Sharp"];
+    var fog;
     (function (fog) {
         fog[fog["Clear"] = 0] = "Clear";
         fog[fog["Thin"] = 1] = "Thin";
         fog[fog["Thick"] = 2] = "Thick";
-    })(exports.fog || (exports.fog = {}));
-    var fog = exports.fog;
+    })(fog = exports.fog || (exports.fog = {}));
     exports.paramNames["fog"] = ["Clear", "Thin", "Thick"];
     exports.paramDefaults["mobile"]["fog"] = fog["Clear"];
     exports.paramDefaults["laptop"]["fog"] = fog["Thin"];
     exports.paramDefaults["desktop"]["fog"] = fog["Thick"];
+    var objects;
     (function (objects) {
         objects[objects["Detailed"] = 0] = "Detailed";
         objects[objects["Normal"] = 1] = "Normal";
         objects[objects["Simple"] = 2] = "Simple";
-    })(exports.objects || (exports.objects = {}));
-    var objects = exports.objects;
+    })(objects = exports.objects || (exports.objects = {}));
     exports.paramNames["objects"] = ["Detailed", "Normal", "Simple"];
     exports.paramDefaults["mobile"]["objects"] = objects["Normal"];
     exports.paramDefaults["laptop"]["objects"] = objects["Detailed"];
     exports.paramDefaults["desktop"]["objects"] = objects["Detailed"];
+    var displays;
     (function (displays) {
         displays[displays["FullScreen"] = 0] = "FullScreen";
         displays[displays["Windowed"] = 1] = "Windowed";
-    })(exports.displays || (exports.displays = {}));
-    var displays = exports.displays;
+    })(displays = exports.displays || (exports.displays = {}));
     exports.paramNames["display"] = ["Full Screen", "Windowed"];
     exports.paramDefaults["mobile"]["display"] = displays["FullScreen"];
     exports.paramDefaults["laptop"]["display"] = displays["FullScreen"];
     exports.paramDefaults["desktop"]["display"] = displays["FullScreen"];
+    var moving;
     (function (moving) {
         moving[moving["Advance"] = 0] = "Advance";
         moving[moving["Jump"] = 1] = "Jump";
         moving[moving["Teleport"] = 2] = "Teleport";
-    })(exports.moving || (exports.moving = {}));
-    var moving = exports.moving;
+    })(moving = exports.moving || (exports.moving = {}));
     exports.paramNames["moving"] = ["Advance", "Jump", "Teleport"];
     exports.paramDefaults["mobile"]["moving"] = moving["Advance"];
     exports.paramDefaults["laptop"]["moving"] = moving["Advance"];
     exports.paramDefaults["desktop"]["moving"] = moving["Advance"];
+    var looking;
     (function (looking) {
         looking[looking["MouseMove"] = 0] = "MouseMove";
         looking[looking["Click"] = 1] = "Click";
-    })(exports.looking || (exports.looking = {}));
-    var looking = exports.looking;
+    })(looking = exports.looking || (exports.looking = {}));
     exports.paramNames["looking"] = ["Mouse Move", "Click"];
     exports.paramDefaults["mobile"]["looking"] = looking["Click"];
     exports.paramDefaults["laptop"]["looking"] = looking["MouseMove"];
     exports.paramDefaults["desktop"]["looking"] = looking["MouseMove"];
+    var animations;
+    (function (animations) {
+        animations[animations["Moving"] = 0] = "Moving";
+        animations[animations["Fixed"] = 1] = "Fixed";
+    })(animations = exports.animations || (exports.animations = {}));
+    exports.paramNames["animations"] = ["Moving", "Fixed"];
+    exports.paramDefaults["mobile"]["animations"] = animations["Fixed"];
+    exports.paramDefaults["laptop"]["animations"] = animations["Moving"];
+    exports.paramDefaults["desktop"]["animations"] = animations["Moving"];
     /**
      * This function will assign values to the system variables based on user input.
      */

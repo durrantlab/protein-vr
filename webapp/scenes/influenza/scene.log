@@ -50,6 +50,14 @@ Exporter version: 5.3-beta, Blender version: 2.78 (sub 0)
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  15096
+	processing begun of mesh:  NA_patch_single_outerDecimated
+		WARNING: No materials have been assigned: 
+		num positions      :  1334
+		num normals        :  1334
+		num uvs            :  2668
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  2646
 	processing begun of mesh:  NA_patch_002Decimated
 		WARNING: No materials have been assigned: 
 		num positions      :  1213
@@ -267,6 +275,14 @@ Exporter version: 5.3-beta, Blender version: 2.78 (sub 0)
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  720
+	processing begun of mesh:  NA_patch_single_outer
+		WARNING: No materials have been assigned: 
+		num positions      :  4720
+		num normals        :  4720
+		num uvs            :  9440
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  13254
 	processing begun of mesh:  grnd
 		WARNING: No materials have been assigned: 
 		num positions      :  48114
@@ -331,4 +347,4 @@ Exporter version: 5.3-beta, Blender version: 2.78 (sub 0)
 ========= Writing of scene file started =========
 ========= Writing of scene file completed =========
 ========= end of processing =========
-elapsed time:  1 min, 20.463 secs
+elapsed time:  1 min, 23.9787 secs

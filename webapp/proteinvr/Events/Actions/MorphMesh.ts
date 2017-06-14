@@ -1,6 +1,7 @@
 import * as Countdowns from "../Countdowns";
 import * as Animations from "../../Core/Animations";
 import parent from "./ActionParent";
+import * as UserVars from "../../Settings/UserVars";
 
 declare var BABYLON;
 declare var PVRGlobals;
@@ -39,6 +40,10 @@ class MorphMesh extends parent {
 
         // Note: For complex geometries, this will likely cause problems.
         // See http://www.html5gamedevs.com/topic/25430-transparency-issues/
+
+        if (UserVars.getParam("animations") !== UserVars.animations["Moving"]) {
+            return;
+        }
 
         let params: DoInterface = this.parameters;
 

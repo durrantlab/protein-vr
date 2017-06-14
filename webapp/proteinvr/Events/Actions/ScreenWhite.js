@@ -1,10 +1,16 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 define(["require", "exports", "../Countdowns", "./ActionParent"], function (require, exports, Countdowns, ActionParent_1) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var jQuery = PVRGlobals.jQuery;
     // interface DoInterface {
     //     mesh: any;
@@ -21,14 +27,15 @@ define(["require", "exports", "../Countdowns", "./ActionParent"], function (requ
                                interface to make sure the correct
                                parameters are always used.
             */
-            _super.call(this, params);
+            var _this = _super.call(this, params) || this;
             /**
             A class to fade the screen to white.
             */
             /**
             A jQuery object, where the canvas where the scene is being rendered.
             */
-            this.canvasJQuery = undefined;
+            _this.canvasJQuery = undefined;
+            return _this;
         }
         ScreenWhite.prototype.do = function () {
             /**
@@ -59,6 +66,5 @@ define(["require", "exports", "../Countdowns", "./ActionParent"], function (requ
         };
         return ScreenWhite;
     }(ActionParent_1.default));
-    Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = ScreenWhite;
 });

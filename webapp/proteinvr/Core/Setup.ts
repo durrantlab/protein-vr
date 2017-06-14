@@ -46,6 +46,17 @@ var setEvents;
 
 var sceneLoadedAndReady: boolean = false;
 
+function recomputeNormals(mesh) {
+    // see http://www.babylonjs-playground.com/#1U5GPV#50
+    var normals = [];
+    var positions = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+    if (positions !== null) {  // not every object has positions
+        normals = mesh.getVerticesData(BABYLON.VertexBuffer.NormalKind);
+        BABYLON.VertexData.ComputeNormals(positions, mesh.getIndices(), normals);
+        mesh.setVerticesData(BABYLON.VertexBuffer.NormalKind, normals);
+    }
+}
+
 // pass $ as an arg to utilize the jquery module from the config.ts path
 export function setup(setEventsFunc?: any): void {
     /**
@@ -93,11 +104,11 @@ export function setup(setEventsFunc?: any): void {
                 // I would expect that updating the version in the .manifest
                 // file would prevent this, but in testing I'm not 100% it's
                 // true.
-                let disableCaching: boolean = true;
+                let disableCaching: boolean = false;
                 let urlCacheBreakTxt: string = (disableCaching ? "?" + proteinVRInfo["file_id"] : "")
 
                 // Load a scene from a BABYLON file.
-                BABYLON.SceneLoader.Load(UserVars.getParam("scenePath"), "scene.babylon" + urlCacheBreakTxt, 
+                BABYLON.SceneLoader.Load(UserVars.getParam("scenePath"), "scene.babylon", // + urlCacheBreakTxt, 
                                         PVRGlobals.engine,
                                         function (ns: any): void {
 
@@ -123,6 +134,8 @@ export function setup(setEventsFunc?: any): void {
                         // PVRGlobals.scene.meshes.forEach(function(m) { // Avoid this because requires binding...
                         for (let meshIdx = 0; meshIdx < PVRGlobals.scene.meshes.length; meshIdx++) {
                             let m = PVRGlobals.scene.meshes[meshIdx];
+                            // recomputeNormals(m);
+
 
                             //try {
                             // Convert the mesh name to a json object with
@@ -175,7 +188,8 @@ export function setup(setEventsFunc?: any): void {
                                     shadowMap: undefined
                                 }
 
-                                let img_extensions = ["", ".512px.png", ".256px.png"][2];  // hard coded for now.
+                                let img_extensions = ["", ".512px.png", ".256px.png"][0];  // hard coded for now.
+                                console.log("img_extensions hardcoded for now: ", img_extensions);
 
                                 if (colorType === "color") {
                                     // set the diffuse colors
@@ -232,9 +246,6 @@ export function setup(setEventsFunc?: any): void {
                             }
                         });
 
-                        // Add any animations.
-                        Animations.addAnimations();
-
                         // The below should be delayed until user is done with settings window
                         // *********
 
@@ -268,7 +279,6 @@ export function setup(setEventsFunc?: any): void {
                 }));
             });
         });
-        // CameraChar.teacherGatherClass();
     });
 }
 // }
@@ -290,6 +300,8 @@ export function continueSetupAfterSettingsPanelClosed() {
             Sound.addSound(filename, loc);
         }
 
+        // Add any animations.
+        Animations.addAnimations();
 
         // Set up the game character/camera.
         CameraChar.setup();
@@ -304,6 +316,21 @@ export function continueSetupAfterSettingsPanelClosed() {
         // Set up the mouse-click navegation
         // debugger;
         CameraChar.setMouseClickNavigation();
+
+        // Checks if it's a teacher broadcasting his/her location
+        if (PVRGlobals.teacherBroadcasting === true) {
+            setInterval(CameraChar.teacherGatherClass, CameraChar.broadcastCheckFrequency);  // broadcast location every three seconds
+        }
+        
+        // Checks if it's a student who should be following a teacher
+        let oldData:any = [];
+        let url = window.location.href;
+        if (url.indexOf("?id=") > -1) {
+            let parsed = url.split('=');
+            PVRGlobals.broadcastID = parsed[1];
+            setInterval(CameraChar.goToLocation, CameraChar.broadcastCheckFrequency);  // Get new location every three seconds
+        }
+
 
         // test student function
         // console.log("Calling student function");

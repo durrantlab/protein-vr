@@ -282,7 +282,7 @@ export namespace PointerLock {
 
 // lens flare code
 
-interface Flare{
+interface Flare {
     size: number;
     position: number;
     color: BABYLON.Color3;
@@ -301,7 +301,7 @@ interface FlareSystem {
 /**
  * namespace for creating a lens flare system
  */
-export namespace LensFlare{
+export namespace LensFlare {
     /**
      * returns an array of lens flares
      * @param params FlareSystem interface
