@@ -86,16 +86,16 @@ export function start(Core) {
         // );
 
 // ***
-        new Event(
-            new DistanceToMesh({
-                triggerMesh: PVRGlobals.meshesByName["NA_patch_single_outer"], 
-                cutOffDistance: 2.0
-            }),
-            new FadeOutMesh({
-                mesh: PVRGlobals.meshesByName["NA_patch_single_outer"],
-                milliseconds: 2000
-            })
-        );
+        // new Event(
+        //     new DistanceToMesh({
+        //         triggerMesh: PVRGlobals.meshesByName["NA_patch_single_outer"], 
+        //         cutOffDistance: 2.0
+        //     }),
+        //     new FadeOutMesh({
+        //         mesh: PVRGlobals.meshesByName["NA_patch_single_outer"],
+        //         milliseconds: 2000
+        //     })
+        // );
 
         // new Event(
         //     new DistanceToMesh({

@@ -3,7 +3,7 @@ import Utils
 import sys
 import json
 
-def preliminary_checks(scene_data):
+def preliminary_checks(scene_data, params):
     # There always needs to be a few objects.
     obj_names = bpy.data.objects.keys()
     print("Checking if key objects exist in the scene...")
@@ -96,11 +96,16 @@ def preliminary_checks(scene_data):
 
                 # Now check if it's attached to a image node. If so, use that.
                 # See http://blender.stackexchange.com/questions/77365/getting-the-image-of-a-texture-node-that-feeds-into-a-node-group?noredirect=1#comment135993_77365
+                # try:
+                # Get the link that input to 'dif' and 'socket'
                 try:
-                    # Get the link that input to 'dif' and 'socket'
                     link = next( link for link in mat.node_tree.links if link.to_node == protein_vr and link.to_socket == color_input )
                     imageNode = link.from_node # The node this link is coming from
-
+                except:
+                    imageNode = None
+                
+                if not imageNode is None:
+                    # So it has a texture node hooked in... double check...
                     if imageNode.type == 'TEX_IMAGE': # Check if it is an image texture node
                         image = imageNode.image # Get the image
                         image_name = image.name
@@ -119,10 +124,15 @@ def preliminary_checks(scene_data):
                         scene_data["materials"][obj.name]["color"] = base_filename
                         #print( "result", image.name, image.filepath )
                     else:
-                        scene_data["materials"][obj.name]["color"] = color[:3]
-                except:
+                        # If it's here there's a problem.
+                        import pdb; pdb.set_trace()
+                    # except:
+                    #     scene_data["materials"][obj.name]["color"] = color[:3]
+
+                    break
+                else:
+                    # So no texture node. Just a color is specified.
                     scene_data["materials"][obj.name]["color"] = color[:3]
 
-                break
         
     return scene_data

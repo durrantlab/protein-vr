@@ -4,6 +4,6 @@
     "max_scene_verts_allowed": 250000,
     "LOD_decimation_ratio": 0.2,
     "shadow_maps_resolution": 512,
-    "cycles_samples": 10,
+    "cycles_samples": 100,
     "blender_exec": "/Applications/blender-2.78-OSX_10.6-x86_64/blender.app/Contents/MacOS/blender"
 }

@@ -49,7 +49,7 @@ scene_data = {
 }
 
 # Do some preliminary checks (exists if fails...)
-scene_data = Checks.preliminary_checks(scene_data)
+scene_data = Checks.preliminary_checks(scene_data, params)
 
 print("Applying basic changes to meshes...")
 for obj in bpy.data.objects:

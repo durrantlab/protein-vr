@@ -6,6 +6,8 @@ cd /image_tmp/
 if [ -f /mounted/${1} ]; then
     cp /mounted/${1} ./
     cp /mounted/*.pdb ./
+    cp /mounted/*.pqr ./
+    cp /mounted/*.pdbqt ./
 fi
 
 # First, get the obj files

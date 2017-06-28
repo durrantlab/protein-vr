@@ -17,7 +17,7 @@ if os.path.exists(vmd_param):
 # parameter
 host_dir = os.path.abspath(os.getcwd())
 
-interactive = False
+interactive = True
 
 if interactive:
     os.system("docker run --rm -it -v " + host_dir + ":/mounted/ durrantlab_pdb_to_obj " + vmd_param + " bash")
