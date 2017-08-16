@@ -134,5 +134,10 @@ def preliminary_checks(scene_data, params):
                     # So no texture node. Just a color is specified.
                     scene_data["materials"][obj.name]["color"] = color[:3]
 
-        
+        # All animations must be baked.
+        if obj.animation_data is not None and obj.animation_data.action is not None:
+            # An animation exists. Bake it.
+            print("Baking animation: " + obj.name)
+            bpy.ops.nla.bake(step=1, only_selected=True, visual_keying=True, clear_constraints=True, clear_parents=True, bake_types={"OBJECT"})
+            # frame_start=1, frame_end=20, 
     return scene_data

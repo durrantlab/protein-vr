@@ -13,6 +13,8 @@ import AlwaysTrue from "./proteinvr/Events/TriggerConditionals/AlwaysTrue";
 import ClickedObject from "./proteinvr/Events/TriggerConditionals/ClickedObject";
 import LabelOnMesh from "./proteinvr/Events/Actions/LabelOnMesh";
 import DoInInterval from "./proteinvr/Events/Actions/DoInInterval";
+import AnimateMesh from "./proteinvr/Events/Actions/AnimateMesh";
+import SetMeshFrame from "./proteinvr/Events/Actions/SetMeshFrame";
 import * as CameraChar from "./proteinvr/CameraChar";
 import {LensFlare} from "./proteinvr/Environment";
 
@@ -33,6 +35,27 @@ export function start(Core) {
         /**
         A function to register any events.
         */
+
+        new Event(
+            new DistanceToMesh({
+                triggerMesh: PVRGlobals.meshesByName["Cube"], 
+                cutOffDistance: 5.0
+            }),
+            new AnimateMesh({
+                mesh: PVRGlobals.meshesByName["Cube"],
+                startFrame: 1,
+                endFrame: 20,
+                loop: true
+            })
+        );
+
+        new Event(
+            new AlwaysTrue({}),
+            new SetMeshFrame({
+                mesh: PVRGlobals.meshesByName["Cube"],
+                frame: 1
+            })
+        );
 
         // new Event(
         //     new GameStart({}, jQuery),

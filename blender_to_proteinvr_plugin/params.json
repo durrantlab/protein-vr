@@ -5,5 +5,5 @@
     "LOD_decimation_ratio": 0.2,
     "shadow_maps_resolution": 512,
     "cycles_samples": 500,
-    "blender_exec": "/Applications/blender-2.78-OSX_10.6-x86_64/blender.app/Contents/MacOS/blender"
+    "blender_exec": "/Applications/blender-2.78c-OSX_10.6-x86_64/blender.app/Contents/MacOS/blender"
 }
