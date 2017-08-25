@@ -34,6 +34,9 @@ def preliminary_checks(scene_data, params):
         print("\tError. You must develop your scene in cycles.")
         sys.exit(0)
 
+    # Make sure at first frame
+    bpy.data.scenes["Scene"].frame_current = bpy.data.scenes["Scene"].frame_start
+
     # All objects with verticies must have UV maps. Required for shadows.
     scene_data["materials"] = {}
     textureNameMappings = {}
@@ -138,6 +141,13 @@ def preliminary_checks(scene_data, params):
         if obj.animation_data is not None and obj.animation_data.action is not None:
             # An animation exists. Bake it.
             print("Baking animation: " + obj.name)
+
+            # Apply scaling
+            # obj.scale[0] = 1.0
+            # obj.scale[1] = 1.0
+            # obj.scale[2] = 1.0
+
+            # Make animation
             bpy.ops.nla.bake(step=1, only_selected=True, visual_keying=True, clear_constraints=True, clear_parents=True, bake_types={"OBJECT"})
             # frame_start=1, frame_end=20, 
     return scene_data

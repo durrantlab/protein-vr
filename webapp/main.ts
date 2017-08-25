@@ -36,26 +36,44 @@ export function start(Core) {
         A function to register any events.
         */
 
-        new Event(
-            new DistanceToMesh({
-                triggerMesh: PVRGlobals.meshesByName["Cube"], 
-                cutOffDistance: 5.0
-            }),
-            new AnimateMesh({
-                mesh: PVRGlobals.meshesByName["Cube"],
-                startFrame: 1,
-                endFrame: 20,
-                loop: true
-            })
-        );
+        // new Event(
+        //     // new DistanceToMesh({
+        //     //     triggerMesh: PVRGlobals.meshesByName["jacob"], 
+        //     //     cutOffDistance: 5.0
+        //     // }),
+        //     new AlwaysTrue({}),
+        //     new AnimateMesh({
+        //         mesh: PVRGlobals.meshesByName["jacob"],
+        //         startFrame: 1,
+        //         endFrame: 240,
+        //         loop: true,
+        //         callBack: undefined
+        //     })
+        // );
 
-        new Event(
-            new AlwaysTrue({}),
-            new SetMeshFrame({
-                mesh: PVRGlobals.meshesByName["Cube"],
-                frame: 1
-            })
-        );
+        // new Event(
+        //     new AlwaysTrue({}),
+        //     new SetMeshFrame({
+        //         mesh: PVRGlobals.meshesByName["jacob"],
+        //         frame: 1
+        //     })
+        // );
+
+        // new Event(
+        //     new AlwaysTrue({}),
+        //     new SetMeshFrame({
+        //         mesh: PVRGlobals.meshesByName["carla"],
+        //         frame: 1
+        //     })
+        // );
+
+        // new Event(
+        //     new AlwaysTrue({}),
+        //     new SetMeshFrame({
+        //         mesh: PVRGlobals.meshesByName["max"],
+        //         frame: 1
+        //     })
+        // );
 
         // new Event(
         //     new GameStart({}, jQuery),

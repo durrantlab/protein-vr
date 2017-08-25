@@ -8,6 +8,7 @@ interface DoInterface {
     startFrame: number;
     endFrame: number;
     loop: boolean;
+    callBack?: any;
 }
 
 class AnimateMesh extends parent {
@@ -30,8 +31,17 @@ class AnimateMesh extends parent {
         Perform the action: Start the animation.
         */
 
-        PVRGlobals.scene.beginAnimation(this.parameters["mesh"], this.parameters["startFrame"], this.parameters["endFrame"], this.parameters["loop"], 1.0)
+        if (!this.parameters["callBack"]) {
+            this.parameters["callBack"] = function() {};
+        }
 
+        console.log(this.parameters["callBack"]);
+
+        PVRGlobals.scene.beginAnimation(
+            this.parameters["mesh"], this.parameters["startFrame"],
+            this.parameters["endFrame"], this.parameters["loop"], 1.0,
+            this.parameters["callBack"]
+        )
     }
 }
 

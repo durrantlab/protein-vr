@@ -30,7 +30,9 @@ def save_it(scene_data, manifest_id, params):
     bpy.ops.wm.save_as_mainfile(filepath=pwd + 'fixed.blend', check_existing=False)
 
     # save the babylon file
-    bpy.ops.bjs.main(filepath=pwd + "scene.babylon")
+    # bpy.ops.bjs.main(filepath=pwd + "scene.babylon") # 5.4.0
+    bpy.ops.scene.babylon(filepath=pwd + "scene.babylon")
+
 
     # Save scene info
     json.dump(scene_data, open(pwd + "proteinvr.json", 'w'))

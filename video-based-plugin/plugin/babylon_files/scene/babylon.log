@@ -1,0 +1,21 @@
+	Exporter version: 4.6.1, Blender version: 2.78 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Scene settings used:
+		selected layers only:  false
+		flat shading entire scene:  false
+		inline textures:  false
+		texture directory:  /Users/jdurrant/Documents/Work/durrant_git/protein-vr/video-based-plugin/plugin/babylon_files/scene/
+	Python World class constructor completed
+	processing begun of camera (FreeCamera):  Camera
+	processing begun of mesh:  ProteinVR_ViewerSphere
+		processing begun of Standard material:  material
+		num positions      :  59
+		num normals        :  59
+		num uvs            :  118
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  240
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========
+elapsed time:  0 min, 0.0089 secs
