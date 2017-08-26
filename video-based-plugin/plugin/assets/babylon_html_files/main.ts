@@ -1,3 +1,5 @@
+import { ExtractFrames } from "./VideoFrames";
+
 declare var BABYLON;
 declare var jQuery;
 
@@ -19,11 +21,14 @@ class Game {
 
     private _sphereVideo: any;
 
-    constructor() {
+    private _onDone: any;
+
+    constructor(onDone=function() {}) {
         if (!BABYLON.Engine.isSupported()) {
             alert("ERROR: Babylon not supported!");
         } else {  // Babylon is supported
             // Set the engine
+            this._onDone = onDone;
             this._engine = new BABYLON.Engine(this._canvas, true);
             this._loadScene();
         }
@@ -41,6 +46,7 @@ class Game {
                     this._startRenderLoop();
                 }.bind(this))
                 this._resizeWindow();
+                this._onDone();
 
                 this._scene.debugLayer.show();
             }.bind(this))
@@ -56,17 +62,55 @@ class Game {
     }
 
     private _setupVideoSphere() {
-        // Set up the video texture
-        let videoTexture = new BABYLON.VideoTexture("video", ["proteinvr_baked.mp4"], this._scene, true);
-        this._sphereVideo = videoTexture.video;
-        
-        this._sphereVideo.addEventListener('canplay', function() {
-            // this._sphereVideo.pause();
-            // this._sphereVideo.currentTime = 1.6;
-            console.log("Ready");
-        }.bind(this));
+        // HTML5 video controls are inconsistent, but you want to take
+        // advantage of the compression video provides. It's much better than
+        // loading the frames separately. So basically, load the video and
+        // then separate the frames to separate images.
 
-        // Start rendering video texture
+        // Add video element to DOM.
+        // jQuery("body").append(`<video src="" id="video"></video>`);
+        // jQuery("body").append(`<canvas id="canvas"></canvas>`);
+
+        // let canvas = document.createElement('canvas');
+        
+        // Load in the video.
+        // See https://stackoverflow.com/questions/13864795/wait-until-an-html5-video-loads
+        // var video: any = document.getElementById("video");
+        // video.src = 'proteinvr_baked.mp4';
+        // video.load();
+
+        // Wait for the video to load
+        // video.addEventListener('loadeddata', function() {
+        //     console.log(this.video.duration, "MOO");
+
+        //     let times = [0.0, 0.5]
+        //     for (let i=0; i<times.length; i++) {
+        //         let time = times[i];
+        //         // video.currentTime = time;
+        //         this.canvas.height = this.video.videoHeight;
+        //         this.canvas.width = this.video.videoWidth;
+        //         let ctx = canvas.getContext('2d');
+        //         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        //         let img = new Image();
+        //         img.src = canvas.toDataURL();
+        //         console.log(img.src);
+        //     }
+        //  }.bind({
+        //      video: video, 
+        //      canvas: canvas
+        //  }), false);
+
+        // // Set up the video texture
+        // let videoTexture = new BABYLON.VideoTexture("video", ["proteinvr_baked.mp4"], this._scene, true);
+        // this._sphereVideo = videoTexture.video;
+        
+        // this._sphereVideo.addEventListener('canplay', function() {
+        //     // this._sphereVideo.pause();
+        //     // this._sphereVideo.currentTime = 1.6;
+        //     console.log("Ready");
+        // }.bind(this));
+
+        // // Start rendering video texture
         this._viewerSphere = this._scene.meshes[0];  // Because sphere is only thing in scene.
         this._scene.activeCamera.position = this._viewerSphere.position;
         
@@ -76,21 +120,21 @@ class Game {
         mat.specularColor = new BABYLON.Color3(0, 0, 0);
         mat.diffuseTexture = null;
         mat.backFaceCulling = false;        
-        mat.emissiveTexture = videoTexture;
+        mat.emissiveTexture = null; // videoTexture;
         
         this._viewerSphere.material = mat;
         this._viewerSphere.isPickable = false;
 
         window.sphere = this._viewerSphere;
-        window.video = this._sphereVideo;
+        // window.video = this._sphereVideo;
 
 
 
-        console.log(this._sphereVideo);
+        // console.log(this._sphereVideo);
 
-        // var s1 = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, this._scene);
-        // s1.position = new BABYLON.Vector3(-3.2301483, 2.9906759, 3.6123595);
-        // s1.position = new BABYLON.Vector3(-3.2301483, 2.9906759, -3.6123595);
+        // // var s1 = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, this._scene);
+        // // s1.position = new BABYLON.Vector3(-3.2301483, 2.9906759, 3.6123595);
+        // // s1.position = new BABYLON.Vector3(-3.2301483, 2.9906759, -3.6123595);
         
     }
 
@@ -197,4 +241,11 @@ class Game {
     }
 }        
 
-let game = new Game();
+export function start() {
+    let game = new Game(function() {
+        console.log("DONE!!!");
+        let ef = new ExtractFrames("proteinvr_baked.mp4", BABYLON, this._scene, function() {
+            console.log("done");
+        });
+    });
+}
