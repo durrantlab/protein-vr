@@ -52,7 +52,7 @@ class OBJECT_OT_AddRequiredObjects(ButtonParentClass):
 
         # Get the sphere from the template blend file.
         obj_names.save_object_names()
-        blendfile = os.path.dirname(os.path.realpath(__file__)) + os.sep + "template.blend"
+        blendfile = os.path.dirname(os.path.realpath(__file__)) + os.sep + "assets" + os.sep + "template.blend"
         section = "\\Object\\"
         object = obj_name
 

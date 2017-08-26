@@ -67,11 +67,12 @@ class ProteinVR(PanelParentClass):
         """
 
         # Set up scene and object properties.
-        bpy.types.Scene.rough_draft_render = self.prop_funcs.boolProp("Use preview samples")
-        bpy.types.Scene.scratch_dir = self.prop_funcs.strProp("Scratch directory", "/tmp/", 'DIR_PATH')
-        # bpy.types.Object.frame_stride = self.prop_funcs.intProp("Keep every nth frame", 1, 100, 2)
-        # bpy.types.Object.overall_pruning_stride = self.prop_funcs.intProp("Keep every nth atom", 1, 100, 5)
-        # bpy.types.Object.sphere_pruning_stride = self.prop_funcs.intProp("Keep every nth atom", 1, 100, 2)
+        bpy.types.Scene.output_dir = self.prop_funcs.strProp("Output directory", "/tmp/proteinvr/", 'DIR_PATH')
+        bpy.types.Scene.use_existing_video = self.prop_funcs.boolProp("Existing video", False)
+        bpy.types.Scene.bake_texture_size = self.prop_funcs.intProp("Texture Size", min=128, max=8192, default=256)
+        bpy.types.Scene.num_cycles = self.prop_funcs.intProp("Number of Cycles", min=4, max=10000, default=16)
+        
+        bpy.types.Object.clickable = self.prop_funcs.boolProp("Clickable", False)
 
         self.SetupPanel = SetupPanel.SetupPanel(self.ui)
         self.CommandPanel = CommandPanel.CommandPanel(self.ui)
