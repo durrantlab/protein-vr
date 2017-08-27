@@ -2,7 +2,7 @@ define(["require", "exports"], function (require, exports) {
     "use strict";
     exports.__esModule = true;
     var ExtractFrames = (function () {
-        function ExtractFrames(videoUrl, BABYLON, babylonScene, callBack) {
+        function ExtractFrames(videoUrl, BABYLON, game, callBack) {
             if (callBack === void 0) { callBack = function () { }; }
             this._lastCurrentTime = 0;
             // Create storage elements and variables
@@ -11,7 +11,7 @@ define(["require", "exports"], function (require, exports) {
             this._sampledFrames = [];
             this._ctx = this._canvas.getContext('2d');
             this._callBack = callBack;
-            this._babylonScene = babylonScene;
+            this._game = game;
             this.BABYLON = BABYLON;
             // Start loading video
             this._video.autoplay = true;
@@ -33,16 +33,10 @@ define(["require", "exports"], function (require, exports) {
             if (this._video.currentTime - this._lastCurrentTime > 1 / 36.0) {
                 this._ctx.drawImage(this._video, 0, 0);
                 /*
-                this will save as a Blob, less memory consumptive than toDataURL
-                a polyfill can be found at
-                https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#Polyfill
+                Blob would be better than toDataURL, but I don't think babylon can easily work with blobs...
                 */
-                // Effort with blobs failed...
-                // let saveFrame = this._saveFrame.bind(this);
-                // this._canvas.toBlob(saveFrame, 'image/jpeg');  // Would be better, but I don't think babylon can handle this as well as a dataurl
                 var dataUrl = this._canvas.toDataURL('image/jpeg', 1.0); // full quality needed?
                 this._sampledFrames.push(dataUrl);
-                // pro.innerHTML = ((this.currentTime / this.duration) * 100).toFixed(2) + ' %';
                 // console.log(((this._video.currentTime / this._video.duration) * 100).toFixed(2) + ' %');
                 this._lastCurrentTime = this._video.currentTime;
             }
@@ -50,38 +44,59 @@ define(["require", "exports"], function (require, exports) {
                 this._video.play();
             }
         };
-        // private _saveFrame(blob) {
-        //     this._sampledFrames.push(blob);
-        // }
         ExtractFrames.prototype._onend = function (e) {
-            var img;
-            // do whatever with the frames
             // keep only ever so few frames (to match framerate)
-            var keepEvery = this._sampledFrames.length / (this._video.duration * 24.0);
-            this._frames = [];
-            var currentIndex = 0.0;
-            while (currentIndex <= this._sampledFrames.length) {
-                // let blob = this._sampledFrames[Math.round(currentIndex)];
-                // let url = URL.createObjectURL(blob);
-                // let tex = new window.BABYLON.Texture(url, this._babylonScene);
-                var dataUrl = this._sampledFrames[currentIndex];
-                console.log("dataURL:", dataUrl);
-                var tex = this.BABYLON.Texture.CreateFromBase64String(dataUrl, 'mymap', this._babylonScene);
-                // URL.revokeObjectURL(url); // don't keep the url
-                this._frames.push(tex);
-                currentIndex = currentIndex + keepEvery;
+            var indeciesToKeep = [];
+            var deltaIndex = (this._sampledFrames.length - 1) / (this._game.frameAndCameraPos.length - 1);
+            for (var i = 0; i < this._game.frameAndCameraPos.length; i++) {
+                indeciesToKeep.push(Math.floor(i * deltaIndex));
             }
-            console.log(this._frames);
+            var textures = [];
+            for (var i = 0; i < indeciesToKeep.length; i++) {
+                var indexToKeep = indeciesToKeep[i];
+                var dataUrl = this._sampledFrames[indexToKeep];
+                if (dataUrl === undefined) {
+                    // console.log("YYY", dataUrl, indexToKeep, this._sampledFrames.length);
+                    debugger;
+                }
+                textures.push(this.BABYLON.Texture.CreateFromBase64String(dataUrl, 'mytex' + Math.random().toString(), this._game.scene));
+                this._sampledFrames[indexToKeep] = null; // free for garbage collection
+            }
+            // let keepEvery = this._sampledFrames.length / (this._game.frameAndCameraPos.length - 1);
+            // let currentIndex = 0.0;
+            // while (currentIndex <= this._sampledFrames.length) {
+            //     let indexToUse = Math.round(currentIndex);
+            //     let dataUrl = this._sampledFrames[indexToUse];
+            //     console.log("YYY", dataUrl, indexToUse, this._sampledFrames.length);
+            //     textures.push(
+            //         this.BABYLON.Texture.CreateFromBase64String(dataUrl, 'mytex' + Math.random().toString(), this._game.scene)
+            //     );
+            //     currentIndex = currentIndex + keepEvery;
+            //     this._sampledFrames[indexToUse] = null;  // free for garbage collection
+            // }
+            // // debugger;
+            // // get last one if missing (rounding error, so it varies...)
+            // if (textures.length < this._game.frameAndCameraPos.length) {
+            //     let dataUrl = this._sampledFrames[this._sampledFrames.length - 1];
+            //     console.log("YYY2", dataUrl, "D", this._sampledFrames.length);
+            //     textures.push(
+            //         this.BABYLON.Texture.CreateFromBase64String(dataUrl, 'mytex' + Math.random().toString(), this._game.scene)
+            //     );
+            //     this._sampledFrames[this._sampledFrames.length - 1] = null;  // free for garbage collection
+            // }
+            // console.log(textures.length, this._game.frameAndCameraPos.length, "HEHEEHE");
+            // Update list in game
+            for (var i = 0; i < this._game.frameAndCameraPos.length; i++) {
+                this._game.frameAndCameraPos[i][2] = textures[i];
+                // textures[i] = null;  // Help with memory (garbage collection)
+            }
+            // free for garbage collection.
+            this._sampledFrames = null;
+            // textures = null;
             // Don't retain the video's objectURL
             URL.revokeObjectURL(this._video.src);
             // Fire the callback.
             this._callBack();
-        };
-        ExtractFrames.prototype.getFrame = function (frameIndex) {
-            var img = new Image();
-            img.onload = function (e) { URL.revokeObjectURL(this.src); }; // don't save the URL
-            img.src = URL.createObjectURL(this._frames[frameIndex]);
-            document.body.appendChild(img);
         };
         return ExtractFrames;
     }());

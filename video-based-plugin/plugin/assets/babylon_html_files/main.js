@@ -1,9 +1,16 @@
 define(["require", "exports", "./VideoFrames"], function (require, exports, VideoFrames_1) {
     "use strict";
     exports.__esModule = true;
+    var callbacksComplete = [];
+    var callBacks;
+    (function (callBacks) {
+        callBacks[callBacks["SCENE_READY"] = 0] = "SCENE_READY";
+        callBacks[callBacks["VIDEO_FRAMES_LOADED"] = 1] = "VIDEO_FRAMES_LOADED";
+        callBacks[callBacks["JSON_LOADED"] = 2] = "JSON_LOADED";
+    })(callBacks || (callBacks = {}));
     var Game = (function () {
-        function Game(onDone) {
-            if (onDone === void 0) { onDone = function () { }; }
+        function Game(params) {
+            // setInterval(function() {console.log(this.frameAndCameraPos);}.bind(this), 100);
             // Get the canvas element from our HTML above
             this._canvas = document.getElementById("renderCanvas");
             this._timeOfLastClick = new Date().getTime(); // A refractory period
@@ -12,24 +19,25 @@ define(["require", "exports", "./VideoFrames"], function (require, exports, Vide
             }
             else {
                 // Set the engine
-                this._onDone = onDone;
+                this._params = params;
                 this._engine = new BABYLON.Engine(this._canvas, true);
                 this._loadScene();
             }
         }
         Game.prototype._loadScene = function () {
             BABYLON.SceneLoader.Load("", "babylon.babylon", this._engine, function (scene) {
-                this._scene = scene;
+                this.scene = scene;
                 // Wait for textures and shaders to be ready
-                this._scene.executeWhenReady(function () {
+                this.scene.executeWhenReady(function () {
                     this._setupCamera();
                     this._setupVideoSphere();
                     this._setupFromJSON(function () {
                         this._startRenderLoop();
                     }.bind(this));
                     this._resizeWindow();
-                    this._onDone();
-                    this._scene.debugLayer.show();
+                    this._params.onDone();
+                    callbacksComplete.push(callBacks.SCENE_READY);
+                    this.scene.debugLayer.show();
                 }.bind(this));
             }.bind(this), function (progress) {
                 // To do: give progress feedback to user
@@ -37,7 +45,7 @@ define(["require", "exports", "./VideoFrames"], function (require, exports, Vide
         };
         Game.prototype._setupCamera = function () {
             // Attach camera to canvas inputs
-            this._scene.activeCamera.attachControl(this._canvas);
+            this.scene.activeCamera.attachControl(this._canvas);
         };
         Game.prototype._setupVideoSphere = function () {
             // HTML5 video controls are inconsistent, but you want to take
@@ -73,7 +81,7 @@ define(["require", "exports", "./VideoFrames"], function (require, exports, Vide
             //      canvas: canvas
             //  }), false);
             // // Set up the video texture
-            // let videoTexture = new BABYLON.VideoTexture("video", ["proteinvr_baked.mp4"], this._scene, true);
+            // let videoTexture = new BABYLON.VideoTexture("video", ["proteinvr_baked.mp4"], this.scene, true);
             // this._sphereVideo = videoTexture.video;
             // this._sphereVideo.addEventListener('canplay', function() {
             //     // this._sphereVideo.pause();
@@ -81,9 +89,9 @@ define(["require", "exports", "./VideoFrames"], function (require, exports, Vide
             //     console.log("Ready");
             // }.bind(this));
             // // Start rendering video texture
-            this._viewerSphere = this._scene.meshes[0]; // Because sphere is only thing in scene.
-            this._scene.activeCamera.position = this._viewerSphere.position;
-            var mat = new BABYLON.StandardMaterial("mat", this._scene);
+            this._viewerSphere = this.scene.meshes[0]; // Because sphere is only thing in scene.
+            this.scene.activeCamera.position = this._viewerSphere.position;
+            var mat = new BABYLON.StandardMaterial("mat", this.scene);
             mat.diffuseColor = new BABYLON.Color3(0, 0, 0);
             mat.specularColor = new BABYLON.Color3(0, 0, 0);
             mat.diffuseTexture = null;
@@ -94,7 +102,7 @@ define(["require", "exports", "./VideoFrames"], function (require, exports, Vide
             window.sphere = this._viewerSphere;
             // window.video = this._sphereVideo;
             // console.log(this._sphereVideo);
-            // // var s1 = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, this._scene);
+            // // var s1 = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, this.scene);
             // // s1.position = new BABYLON.Vector3(-3.2301483, 2.9906759, 3.6123595);
             // // s1.position = new BABYLON.Vector3(-3.2301483, 2.9906759, -3.6123595);
         };
@@ -104,11 +112,11 @@ define(["require", "exports", "./VideoFrames"], function (require, exports, Vide
                 var callBack = this.callBack;
                 var This = this.This;
                 // Load extra obj files
-                var loader = new BABYLON.AssetsManager(This._scene);
+                var loader = new BABYLON.AssetsManager(This.scene);
                 var objFilenames = data["clickableFiles"];
                 for (var i = 0; i < objFilenames.length; i++) {
                     var objFilename = objFilenames[i];
-                    console.log(objFilename);
+                    // console.log(objFilename);
                     var meshTask = loader.addMeshTask(objFilename + "_name", "", "", objFilename);
                     meshTask.onSuccess = function (task) {
                         var mesh = task.loadedMeshes[0]; // Why is this necessary?
@@ -120,14 +128,17 @@ define(["require", "exports", "./VideoFrames"], function (require, exports, Vide
                 // Make those meshes clickable
                 This._makeSomeMeshesClickable();
                 // Load camera tracks
-                This._frameAndCameraPos = [];
+                This.frameAndCameraPos = [];
                 for (var i = 0; i < data["cameraPos"].length; i++) {
                     var pt = data["cameraPos"][i];
                     var frame = pt[0];
                     var v = new BABYLON.Vector3(pt[1], pt[3], pt[2]); // note that Y and Z axes are switched on purpose.
-                    This._frameAndCameraPos.push([frame, v]);
+                    This.frameAndCameraPos.push([frame, v, null]); // null is texture, populated later.
                 }
-                var func = callBack.bind(this);
+                callbacksComplete.push(callBacks.JSON_LOADED);
+                var func = This._params.onJSONLoaded.bind(This);
+                func();
+                func = callBack.bind(This);
                 func();
             }.bind({
                 This: this,
@@ -141,7 +152,7 @@ define(["require", "exports", "./VideoFrames"], function (require, exports, Vide
                 if (now - this._timeOfLastClick > 500) {
                     this._timeOfLastClick = now;
                     // We try to pick an object
-                    var pickResult = this._scene.pick(evt.clientX, evt.clientY);
+                    var pickResult = this.scene.pick(evt.clientX, evt.clientY);
                     if ((pickResult !== null) && (pickResult.pickedMesh !== null) && (pickResult.pickedMesh.id != "ProteinVR_ViewerSphere")) {
                         console.log(pickResult.pickedMesh.id);
                     }
@@ -151,34 +162,59 @@ define(["require", "exports", "./VideoFrames"], function (require, exports, Vide
         Game.prototype._startRenderLoop = function () {
             // Once the scene is loaded, just register a render loop to render it
             this._engine.runRenderLoop(function () {
+                // let x = Math.round(this.scene.activeCamera.position.x * 100) / 100;
+                // let y = Math.round(this.scene.activeCamera.position.y * 100) / 100;
+                // let z = Math.round(this.scene.activeCamera.position.z * 100) / 100;
+                // console.log(bestFrame, x, y, z);
+                // console.log(x, y, z);
                 this._setCamera();
-                this._scene.render();
+                this.scene.render();
             }.bind(this));
         };
         Game.prototype._setCamera = function () {
+            // this.scene.activeCamera.position = new BABYLON.Vector3(1.0,1.0,1.0);
+            // return;
+            // console.log("=====");
+            // console.clear();
             // Get the current camera location
-            var cameraLoc = this._scene.activeCamera.position;
+            var cameraLoc = this.scene.activeCamera.position;
             var bestDist = 1000000000.0;
-            var bestFrame = -1;
+            var bestFrame = null;
             var bestPos = null;
-            for (var i = 0; i < this._frameAndCameraPos.length; i++) {
-                var frameAndCameraPos = this._frameAndCameraPos[i];
+            var bestTexture = null;
+            for (var i = 0; i < this.frameAndCameraPos.length; i++) {
+                var frameAndCameraPos = this.frameAndCameraPos[i];
                 var frame = frameAndCameraPos[0];
-                var pos = frameAndCameraPos[1];
+                var pos = frameAndCameraPos[1].clone();
                 var dist = pos.subtract(cameraLoc).length();
                 if (dist < bestDist) {
                     bestDist = dist;
-                    bestFrame = frame;
+                    bestFrame = i; // frame;  // TODO: Don't think FRAME (first element in frameAndCameraPos) is ever even used.
                     bestPos = pos;
-                    if (bestDist === 0.0) {
+                    bestTexture = frameAndCameraPos[2];
+                    if (dist === 0.0) {
                         break; // can't get closer than this.
                     }
                 }
+                // console.log("pos", pos, "dist", dist)
             }
+            // debug: ignore above and pick a random one.
+            // bestFrame = Math.floor(Math.random()*this.frameAndCameraPos.length);
+            // bestFrame = 45;
+            // if (bestFrame > 0) {bestFrame = bestFrame - 1;}
+            // let item = this.frameAndCameraPos[bestFrame];
+            // bestPos = item[1];
+            // bestTexture = item[2];
             // Move camera to best frame.
-            this._scene.activeCamera.position = bestPos;
+            this.scene.activeCamera.position = bestPos;
             // Move sphere
             this._viewerSphere.position = bestPos;
+            // Update texture
+            // console.log("bestFrame", bestFrame)
+            // console.log("bestPos", bestPos);
+            // console.log("cameraPos", this.scene.activeCamera.position);
+            this._viewerSphere.material.emissiveTexture = bestTexture;
+            // debugger;
         };
         Game.prototype._resizeWindow = function () {
             // Watch for browser/canvas resize events
@@ -188,12 +224,17 @@ define(["require", "exports", "./VideoFrames"], function (require, exports, Vide
         };
         return Game;
     }());
+    exports.Game = Game;
     function start() {
-        var game = new Game(function () {
-            console.log("DONE!!!");
-            var ef = new VideoFrames_1.ExtractFrames("proteinvr_baked.mp4", BABYLON, this._scene, function () {
-                console.log("done");
-            });
+        var game = new Game({
+            onJSONLoaded: function () {
+                console.log("DONE!!!");
+                var ef = new VideoFrames_1.ExtractFrames("proteinvr_baked.mp4", BABYLON, this, function () {
+                    callbacksComplete.push(callBacks.VIDEO_FRAMES_LOADED);
+                    console.log("done");
+                });
+            },
+            onDone: function () { }
         });
     }
     exports.start = start;
