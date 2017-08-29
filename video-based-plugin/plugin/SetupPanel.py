@@ -4,6 +4,7 @@ from . import Utils
 import bmesh
 import bpy
 import os
+from collections import OrderedDict
 
 obj_names = Utils.ObjNames()
 
@@ -11,29 +12,33 @@ class SetupPanel(ParentPanel):
     def draw_panel_if_needed(self):
         global obj_names
 
-        missing_objects = []
+        msgs = OrderedDict()
+        msgs["Missing Objects:"] = []
+        msgs["Render Settings:"] = []
 
+        # Are there missing objects?
         for name in ["Camera", "ProteinVR_ViewerSphere", "ProteinVR_ForwardSphere", "ProteinVR_BackwardsSphere"]:
             if not name in obj_names.obj_names():
-                missing_objects.append(name)
+                msgs["Missing Objects:"].append(name)
 
-        if len(missing_objects) > 0 or bpy.context.scene.render.engine != "CYCLES":
+        # Is it in cycles render?
+        if bpy.context.scene.render.engine != "CYCLES":
+            msgs["Render Settings:"].append("Not CYCLES")
+
+        # Show messages
+        if sum([len(msgs[k]) for k in msgs.keys()]) > 0:
             self.ui.use_layout_row()
-            self.ui.label("Setup")
+            self.ui.label("Problems!")
 
-            self.ui.use_box_row("Problems!")
-            
-            # Messages.display_message("LOAD_TRAJ_PROGRESS", self)
-            if len(missing_objects) > 0:
-                # self.ui.label("Required object(s) missing:")
-                for name in missing_objects:
-                    self.ui.label("Missing: " + name)
-            
-            if bpy.context.scene.render.engine != "CYCLES":
-                self.ui.label("Renderer: Not CYCLES")
+            for key in msgs.keys():
+                # self.ui.use_layout_row()
+                if len(msgs[key]) > 0:
+                    self.ui.use_box_row(key)
+                    for m in msgs[key]:
+                        self.ui.label(m)
 
             self.ui.use_layout_row()
-            self.ui.ops_button(rel_data_path="add.required_objects", button_label="Add Required Objects")
+            self.ui.ops_button(rel_data_path="proteinvr.fix", button_label="Fix Problems!")
 
             return True
         else:
@@ -44,8 +49,8 @@ class OBJECT_OT_AddRequiredObjects(ButtonParentClass):
     Button for making sure required objects are present in scene.
     """
 
-    bl_idname = "add.required_objects"
-    bl_label = "Add Required Objects"
+    bl_idname = "proteinvr.fix"
+    bl_label = "Fix"
 
     def append_from_template_file(self, obj_name):
         global obj_names
@@ -99,13 +104,6 @@ class OBJECT_OT_AddRequiredObjects(ButtonParentClass):
                 # Move obj to camera location
                 camera = bpy.data.objects["Camera"]
                 obj.location = camera.location
-
-                # if name == "ProteinVR_ViewerSphere":
-                #     # Parent viewer sphere to camera
-                #     camera.hide = False
-                #     obj.select = True
-                #     bpy.context.scene.objects.active = camera
-                #     bpy.ops.object.parent_set(type="OBJECT")
 
                 # Hide obj for now
                 obj.hide = True

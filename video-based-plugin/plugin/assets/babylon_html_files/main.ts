@@ -1,4 +1,5 @@
 import { ExtractFrames } from "./VideoFrames";
+import { Shader } from "./StandardShader";
 
 declare var BABYLON;
 declare var jQuery;
@@ -36,6 +37,10 @@ export class Game {
 
     private _params: GameInterface;
 
+    private _JSONData: any;
+
+    private _shader: any;
+
     constructor(params: GameInterface) {
 
         // setInterval(function() {console.log(this.frameAndCameraPos);}.bind(this), 100);
@@ -58,8 +63,8 @@ export class Game {
             // Wait for textures and shaders to be ready
             this.scene.executeWhenReady(function () {
                 this._setupCamera();
-                this._setupVideoSphere();
                 this._setupFromJSON(function() {
+                    this._setupVideoSphere();
                     this._startRenderLoop();
                 }.bind(this))
                 this._resizeWindow();
@@ -132,16 +137,22 @@ export class Game {
         this._viewerSphere = this.scene.meshes[0];  // Because sphere is only thing in scene.
         this.scene.activeCamera.position = this._viewerSphere.position;
         
-        let mat = new BABYLON.StandardMaterial("mat", this.scene);
+        // let mat = new BABYLON.StandardMaterial("mat", this.scene);
 
-        mat.diffuseColor = new BABYLON.Color3(0, 0, 0);
-        mat.specularColor = new BABYLON.Color3(0, 0, 0);
-        mat.diffuseTexture = null;
-        mat.backFaceCulling = false;        
-        mat.emissiveTexture = null; // videoTexture;
+        this._shader = new Shader(this.scene, BABYLON);
+
+        // this._shader.material.diffuseColor = new BABYLON.Color3(0, 0, 0);
+        // this._shader.material.specularColor = new BABYLON.Color3(0, 0, 0);
+        // this._shader.material.diffuseTexture = null;
+        // this._shader.material.backFaceCulling = false;
+        // this._shader.material.emissiveTexture = null; // videoTexture;
         
-        this._viewerSphere.material = mat;
+        this._viewerSphere.material = this._shader.material;
         this._viewerSphere.isPickable = false;
+
+        // Resize the viewer sphere
+        let radius = this._JSONData["viewer_sphere_size"];
+        this._viewerSphere.scaling = new BABYLON.Vector3(radius, radius, radius);
 
         window.sphere = this._viewerSphere;
         // window.video = this._sphereVideo;
@@ -160,6 +171,8 @@ export class Game {
         jQuery.get("data.json", function(data) {
             let callBack = this.callBack;
             let This = this.This;
+            
+            This._JSONData = data;
 
             // Load extra obj files
             var loader = new BABYLON.AssetsManager(This.scene);
@@ -238,30 +251,65 @@ export class Game {
         // console.log("=====");
         // console.clear();
         
-        // Get the current camera location
+        // Calculate distances to all camera positions
         let cameraLoc = this.scene.activeCamera.position;
-        let bestDist = 1000000000.0;
-        let bestFrame = null;
-        let bestPos = null;
-        let bestTexture = null;
+        let distData = [];
         for (let i=0; i<this.frameAndCameraPos.length; i++) {
             let frameAndCameraPos = this.frameAndCameraPos[i];
-            let frame = frameAndCameraPos[0];
             let pos = frameAndCameraPos[1].clone();
             let dist = pos.subtract(cameraLoc).length();
-            if (dist < bestDist) {
-                bestDist = dist;
-                bestFrame = i; // frame;  // TODO: Don't think FRAME (first element in frameAndCameraPos) is ever even used.
-                bestPos = pos;
-                bestTexture = frameAndCameraPos[2]
-
-                if (dist === 0.0) {
-                    break;  // can't get closer than this.
-                }
-            }
-
-            // console.log("pos", pos, "dist", dist)
+            distData.push([dist, frameAndCameraPos])
         }
+
+        // Sort by distance
+        let kf = function(a, b) {
+            a = a[0];
+            b = b[0];
+
+            if (a < b) {
+                return -1;
+            } else if (a > b) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+        distData.sort(kf);
+
+        let tex1 = distData[0][1][2];
+        let tex2 = distData[1][1][2];
+        let tex3 = distData[2][1][2];
+
+        let dist1 = distData[0][0];
+        let dist2 = distData[1][0];
+        let dist3 = distData[2][0];
+
+        let bestDist = dist1;
+        let bestPos = distData[0][1][1];
+
+        // Get the current camera location
+        // let bestDist = 1000000000.0;
+        // let bestFrame = null;
+        // let bestPos = null;
+        // let bestTexture = null;
+        // for (let i=0; i<this.frameAndCameraPos.length; i++) {
+        //     let frameAndCameraPos = this.frameAndCameraPos[i];
+        //     let frame = frameAndCameraPos[0];
+        //     let pos = frameAndCameraPos[1].clone();
+        //     let dist = pos.subtract(cameraLoc).length();
+        //     if (dist < bestDist) {
+        //         bestDist = dist;
+        //         bestFrame = i; // frame;  // TODO: Don't think FRAME (first element in frameAndCameraPos) is ever even used.
+        //         bestPos = pos;
+        //         bestTexture = frameAndCameraPos[2]
+
+        //         if (dist === 0.0) {
+        //             break;  // can't get closer than this.
+        //         }
+        //     }
+
+        //     // console.log("pos", pos, "dist", dist)
+        // }
 
         // debug: ignore above and pick a random one.
         // bestFrame = Math.floor(Math.random()*this.frameAndCameraPos.length);
@@ -273,7 +321,13 @@ export class Game {
         // bestTexture = item[2];
 
         // Move camera to best frame.
-        this.scene.activeCamera.position = bestPos;
+        let maxDistAllowed = 0.1 * this._JSONData["viewer_sphere_size"];
+        if (bestDist > maxDistAllowed) {
+            let vec = this.scene.activeCamera.position.subtract(bestPos).normalize().scale(maxDistAllowed);
+            // console.log(vec);
+            this.scene.activeCamera.position = bestPos.add(vec);
+        }
+        // this.scene.activeCamera.position = bestPos;
 
         // Move sphere
         this._viewerSphere.position = bestPos;
@@ -282,7 +336,8 @@ export class Game {
         // console.log("bestFrame", bestFrame)
         // console.log("bestPos", bestPos);
         // console.log("cameraPos", this.scene.activeCamera.position);
-        this._viewerSphere.material.emissiveTexture = bestTexture;
+        this._shader.setTextures(tex1); //, tex2, tex3, dist1, dist2, dist3);
+        // this._viewerSphere.material.emissiveTexture = bestTexture;
         // debugger;
 
     }

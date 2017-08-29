@@ -67,12 +67,13 @@ class ProteinVR(PanelParentClass):
         """
 
         # Set up scene and object properties.
-        bpy.types.Scene.output_dir = self.prop_funcs.strProp("Output directory", "/tmp/proteinvr/", 'DIR_PATH')
-        bpy.types.Scene.use_existing_video = self.prop_funcs.boolProp("Existing video", False)
-        bpy.types.Scene.bake_texture_size = self.prop_funcs.intProp("Texture Size", min=128, max=8192, default=256)
-        bpy.types.Scene.num_cycles = self.prop_funcs.intProp("Number of Cycles", min=4, max=10000, default=16)
+        bpy.types.Scene.output_dir = self.prop_funcs.strProp("Output directory", "/tmp/proteinvr/", 'DIR_PATH', description="The output directory where the ProteinVR scene will be saved.")
+        bpy.types.Scene.use_existing_video = self.prop_funcs.boolProp("Existing video", False, description="Whether to use a previously rendered (existing) video.")
+        bpy.types.Scene.bake_texture_size = self.prop_funcs.intProp("Texture Size", min=128, max=8192, default=256, description="The size of the square texture to render. Higher means higher resolution.")
+        bpy.types.Scene.num_cycles = self.prop_funcs.intProp("Number of Cycles", min=4, max=10000, default=16, description="The number of rendering cycles. Higher means better quality.")
+        bpy.types.Scene.viewer_sphere_size = self.prop_funcs.floatProp("Viewer Sphere Size", min=0.5, max=5.0, default=5.0, description="The size of the viewer sphere. Larger means close objects not allowed, but user can deviate further from set path.")
         
-        bpy.types.Object.clickable = self.prop_funcs.boolProp("Clickable", False)
+        bpy.types.Object.clickable = self.prop_funcs.boolProp("Clickable", False, description="Whether this object is clickable.")
 
         self.SetupPanel = SetupPanel.SetupPanel(self.ui)
         self.CommandPanel = CommandPanel.CommandPanel(self.ui)
@@ -328,7 +329,7 @@ class ProteinVR(PanelParentClass):
         self.ui.use_box_row("Finalize")
         self.ui.label("WARNING: Loading simulation may take a bit.")
         Messages.display_message("TRAJ_FILENAME_DOESNT_EXIST", self)
-        self.ui.ops_button(rel_data_path="load.traj", button_label="Load Trajectory")
+        self.ui.ops_button(rel_data_path="proteinvr.load_traj", button_label="Load Trajectory")
 
         self.ui.new_row()
 
@@ -347,7 +348,7 @@ class OBJECT_OT_LoadTrajButton(ButtonParentClass):
     Button for loading in a trajectory.
     """
 
-    bl_idname = "load.traj"
+    bl_idname = "proteinvr.load_traj"
     bl_label = "Load Trajectory"
 
     def __init__(self):

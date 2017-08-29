@@ -42,16 +42,18 @@ class CommandPanel(ParentPanel):
         if bpy.context.scene.use_existing_video == False:
             self.ui.scene_property("bake_texture_size")
             self.ui.scene_property("num_cycles")
+        
         # self.ui.use_layout_row()
-        self.ui.ops_button(rel_data_path="add.create_scene", button_label="Create ProteinVR Scene")
+        self.ui.scene_property("viewer_sphere_size")
+        self.ui.ops_button(rel_data_path="proteinvr.create_scene", button_label="Create Scene")
         
 class OBJECT_OT_CreateScene(ButtonParentClass):
     """
     Button for creating the ProteinVR scene.
     """
 
-    bl_idname = "add.create_scene"
-    bl_label = "Create ProteinVR Scene"
+    bl_idname = "proteinvr.create_scene"
+    bl_label = "Create Scene"
 
     def set_frame(self, frame):
         # self.scene.frame_current = frame
@@ -117,6 +119,9 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.backwards_sphere = bpy.data.objects["ProteinVR_BackwardsSphere"]
         self.view_sphere = bpy.data.objects["ProteinVR_ViewerSphere"]
 
+        # Make sure viewer sphere appropriate size
+        self.view_sphere.scale = Vector([self.scene.viewer_sphere_size, self.scene.viewer_sphere_size, self.scene.viewer_sphere_size])
+
         # Make the view sphere visible
         self.view_sphere.hide = False
 
@@ -126,7 +131,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         self.extra_data = {
             "cameraPos": [],
-            "clickableFiles": []
+            "clickableFiles": [],
+            "viewer_sphere_size": self.scene.viewer_sphere_size
         }
 
     def _step_2_get_camerea_positions(self):
