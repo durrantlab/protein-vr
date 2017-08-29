@@ -17,7 +17,7 @@ class SetupPanel(ParentPanel):
         msgs["Render Settings:"] = []
 
         # Are there missing objects?
-        for name in ["Camera", "ProteinVR_ViewerSphere", "ProteinVR_ForwardSphere", "ProteinVR_BackwardsSphere"]:
+        for name in ["Camera", "ProteinVR_ViewerSphere"]:  # "ProteinVR_ForwardSphere", "ProteinVR_BackwardsSphere"
             if not name in obj_names.obj_names():
                 msgs["Missing Objects:"].append(name)
 
@@ -97,7 +97,7 @@ class OBJECT_OT_AddRequiredObjects(ButtonParentClass):
         if not "Camera" in obj_names.obj_names():
             bpy.ops.object.camera_add()
 
-        for name in ["ProteinVR_ViewerSphere", "ProteinVR_ForwardSphere", "ProteinVR_BackwardsSphere"]:
+        for name in ["ProteinVR_ViewerSphere"]:  # "ProteinVR_ForwardSphere", "ProteinVR_BackwardsSphere"
             if not name in obj_names.obj_names():
                 obj = self.append_from_template_file(name)
 

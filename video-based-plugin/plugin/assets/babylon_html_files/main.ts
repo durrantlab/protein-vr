@@ -27,7 +27,7 @@ export class Game {
 
     public scene: any;
 
-    public frameAndCameraPos: any;
+    public cameraPositionsAndTextures: any;
 
     private _viewerSphere: any;
 
@@ -43,7 +43,7 @@ export class Game {
 
     constructor(params: GameInterface) {
 
-        // setInterval(function() {console.log(this.frameAndCameraPos);}.bind(this), 100);
+        // setInterval(function() {console.log(this.cameraPos);}.bind(this), 100);
         
         
         if (!BABYLON.Engine.isSupported()) {
@@ -193,12 +193,12 @@ export class Game {
             This._makeSomeMeshesClickable();
 
             // Load camera tracks
-            This.frameAndCameraPos = []
-            for (let i=0; i<data["cameraPos"].length; i++) {
-                let pt = data["cameraPos"][i];
-                let frame = pt[0];
-                let v = new BABYLON.Vector3(pt[1], pt[3], pt[2]);  // note that Y and Z axes are switched on purpose.
-                This.frameAndCameraPos.push([frame, v, null]);  // null is texture, populated later.
+            This.cameraPositionsAndTextures = []
+            for (let i=0; i<data["cameraPositionsAndTextures"].length; i++) {
+                let pt = data["cameraPositionsAndTextures"][i];
+                // let frame = pt[0];
+                let v = new BABYLON.Vector3(pt[0], pt[2], pt[1]);  // note that Y and Z axes are switched on purpose.
+                This.cameraPositionsAndTextures.push([v, null]);  // null is texture, populated later.
             }
 
             callbacksComplete.push(callBacks.JSON_LOADED);
@@ -254,11 +254,13 @@ export class Game {
         // Calculate distances to all camera positions
         let cameraLoc = this.scene.activeCamera.position;
         let distData = [];
-        for (let i=0; i<this.frameAndCameraPos.length; i++) {
-            let frameAndCameraPos = this.frameAndCameraPos[i];
-            let pos = frameAndCameraPos[1].clone();
+        for (let i=0; i<this.cameraPositionsAndTextures.length; i++) {
+            let cameraPos = this.cameraPositionsAndTextures[i];
+            let pos = cameraPos[0].clone();
+            let tex = cameraPos[1];
             let dist = pos.subtract(cameraLoc).length();
-            distData.push([dist, frameAndCameraPos])
+            distData.push([dist, pos, tex]);
+            // if dist = 0 temrinate early?
         }
 
         // Sort by distance
@@ -276,58 +278,27 @@ export class Game {
         }
         distData.sort(kf);
 
-        let tex1 = distData[0][1][2];
-        let tex2 = distData[1][1][2];
-        let tex3 = distData[2][1][2];
+        let tex1 = distData[0][2];
+        // let tex2 = distData[1][1][2];
+        // let tex3 = distData[2][1][2];
 
         let dist1 = distData[0][0];
-        let dist2 = distData[1][0];
-        let dist3 = distData[2][0];
+        // let dist2 = distData[1][0];
+        // let dist3 = distData[2][0];
 
         let bestDist = dist1;
-        let bestPos = distData[0][1][1];
+        let bestPos = distData[0][1];
 
-        // Get the current camera location
-        // let bestDist = 1000000000.0;
-        // let bestFrame = null;
-        // let bestPos = null;
-        // let bestTexture = null;
-        // for (let i=0; i<this.frameAndCameraPos.length; i++) {
-        //     let frameAndCameraPos = this.frameAndCameraPos[i];
-        //     let frame = frameAndCameraPos[0];
-        //     let pos = frameAndCameraPos[1].clone();
-        //     let dist = pos.subtract(cameraLoc).length();
-        //     if (dist < bestDist) {
-        //         bestDist = dist;
-        //         bestFrame = i; // frame;  // TODO: Don't think FRAME (first element in frameAndCameraPos) is ever even used.
-        //         bestPos = pos;
-        //         bestTexture = frameAndCameraPos[2]
-
-        //         if (dist === 0.0) {
-        //             break;  // can't get closer than this.
-        //         }
-        //     }
-
-        //     // console.log("pos", pos, "dist", dist)
-        // }
-
-        // debug: ignore above and pick a random one.
-        // bestFrame = Math.floor(Math.random()*this.frameAndCameraPos.length);
-        // bestFrame = 45;
-        // if (bestFrame > 0) {bestFrame = bestFrame - 1;}
-
-        // let item = this.frameAndCameraPos[bestFrame];
-        // bestPos = item[1];
-        // bestTexture = item[2];
+        // console.log(tex1, dist1, bestPos);
 
         // Move camera to best frame.
-        let maxDistAllowed = 0.1 * this._JSONData["viewer_sphere_size"];
-        if (bestDist > maxDistAllowed) {
-            let vec = this.scene.activeCamera.position.subtract(bestPos).normalize().scale(maxDistAllowed);
-            // console.log(vec);
-            this.scene.activeCamera.position = bestPos.add(vec);
-        }
-        // this.scene.activeCamera.position = bestPos;
+        // let maxDistAllowed = 0.1 * this._JSONData["viewer_sphere_size"];
+        // if (bestDist > maxDistAllowed) {
+        //     let vec = this.scene.activeCamera.position.subtract(bestPos).normalize().scale(maxDistAllowed);
+        //     // console.log(vec);
+        //     this.scene.activeCamera.position = bestPos.add(vec);
+        // }
+        this.scene.activeCamera.position = bestPos;
 
         // Move sphere
         this._viewerSphere.position = bestPos;

@@ -10,7 +10,7 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
     })(callBacks || (callBacks = {}));
     var Game = (function () {
         function Game(params) {
-            // setInterval(function() {console.log(this.frameAndCameraPos);}.bind(this), 100);
+            // setInterval(function() {console.log(this.cameraPos);}.bind(this), 100);
             // Get the canvas element from our HTML above
             this._canvas = document.getElementById("renderCanvas");
             this._timeOfLastClick = new Date().getTime(); // A refractory period
@@ -133,12 +133,12 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
                 // Make those meshes clickable
                 This._makeSomeMeshesClickable();
                 // Load camera tracks
-                This.frameAndCameraPos = [];
-                for (var i = 0; i < data["cameraPos"].length; i++) {
-                    var pt = data["cameraPos"][i];
-                    var frame = pt[0];
-                    var v = new BABYLON.Vector3(pt[1], pt[3], pt[2]); // note that Y and Z axes are switched on purpose.
-                    This.frameAndCameraPos.push([frame, v, null]); // null is texture, populated later.
+                This.cameraPositionsAndTextures = [];
+                for (var i = 0; i < data["cameraPositionsAndTextures"].length; i++) {
+                    var pt = data["cameraPositionsAndTextures"][i];
+                    // let frame = pt[0];
+                    var v = new BABYLON.Vector3(pt[0], pt[2], pt[1]); // note that Y and Z axes are switched on purpose.
+                    This.cameraPositionsAndTextures.push([v, null]); // null is texture, populated later.
                 }
                 callbacksComplete.push(callBacks.JSON_LOADED);
                 var func = This._params.onJSONLoaded.bind(This);
@@ -184,11 +184,13 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
             // Calculate distances to all camera positions
             var cameraLoc = this.scene.activeCamera.position;
             var distData = [];
-            for (var i = 0; i < this.frameAndCameraPos.length; i++) {
-                var frameAndCameraPos = this.frameAndCameraPos[i];
-                var pos = frameAndCameraPos[1].clone();
+            for (var i = 0; i < this.cameraPositionsAndTextures.length; i++) {
+                var cameraPos = this.cameraPositionsAndTextures[i];
+                var pos = cameraPos[0].clone();
+                var tex = cameraPos[1];
                 var dist = pos.subtract(cameraLoc).length();
-                distData.push([dist, frameAndCameraPos]);
+                distData.push([dist, pos, tex]);
+                // if dist = 0 temrinate early?
             }
             // Sort by distance
             var kf = function (a, b) {
@@ -205,50 +207,23 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
                 }
             };
             distData.sort(kf);
-            var tex1 = distData[0][1][2];
-            var tex2 = distData[1][1][2];
-            var tex3 = distData[2][1][2];
+            var tex1 = distData[0][2];
+            // let tex2 = distData[1][1][2];
+            // let tex3 = distData[2][1][2];
             var dist1 = distData[0][0];
-            var dist2 = distData[1][0];
-            var dist3 = distData[2][0];
+            // let dist2 = distData[1][0];
+            // let dist3 = distData[2][0];
             var bestDist = dist1;
-            var bestPos = distData[0][1][1];
-            // Get the current camera location
-            // let bestDist = 1000000000.0;
-            // let bestFrame = null;
-            // let bestPos = null;
-            // let bestTexture = null;
-            // for (let i=0; i<this.frameAndCameraPos.length; i++) {
-            //     let frameAndCameraPos = this.frameAndCameraPos[i];
-            //     let frame = frameAndCameraPos[0];
-            //     let pos = frameAndCameraPos[1].clone();
-            //     let dist = pos.subtract(cameraLoc).length();
-            //     if (dist < bestDist) {
-            //         bestDist = dist;
-            //         bestFrame = i; // frame;  // TODO: Don't think FRAME (first element in frameAndCameraPos) is ever even used.
-            //         bestPos = pos;
-            //         bestTexture = frameAndCameraPos[2]
-            //         if (dist === 0.0) {
-            //             break;  // can't get closer than this.
-            //         }
-            //     }
-            //     // console.log("pos", pos, "dist", dist)
-            // }
-            // debug: ignore above and pick a random one.
-            // bestFrame = Math.floor(Math.random()*this.frameAndCameraPos.length);
-            // bestFrame = 45;
-            // if (bestFrame > 0) {bestFrame = bestFrame - 1;}
-            // let item = this.frameAndCameraPos[bestFrame];
-            // bestPos = item[1];
-            // bestTexture = item[2];
+            var bestPos = distData[0][1];
+            // console.log(tex1, dist1, bestPos);
             // Move camera to best frame.
-            var maxDistAllowed = 0.1 * this._JSONData["viewer_sphere_size"];
-            if (bestDist > maxDistAllowed) {
-                var vec = this.scene.activeCamera.position.subtract(bestPos).normalize().scale(maxDistAllowed);
-                // console.log(vec);
-                this.scene.activeCamera.position = bestPos.add(vec);
-            }
-            // this.scene.activeCamera.position = bestPos;
+            // let maxDistAllowed = 0.1 * this._JSONData["viewer_sphere_size"];
+            // if (bestDist > maxDistAllowed) {
+            //     let vec = this.scene.activeCamera.position.subtract(bestPos).normalize().scale(maxDistAllowed);
+            //     // console.log(vec);
+            //     this.scene.activeCamera.position = bestPos.add(vec);
+            // }
+            this.scene.activeCamera.position = bestPos;
             // Move sphere
             this._viewerSphere.position = bestPos;
             // Update texture

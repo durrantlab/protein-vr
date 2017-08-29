@@ -115,8 +115,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
     def _step_1_setup(self):
         # Variables for the spheres
-        self.forward_sphere = bpy.data.objects["ProteinVR_ForwardSphere"]
-        self.backwards_sphere = bpy.data.objects["ProteinVR_BackwardsSphere"]
+        # self.forward_sphere = bpy.data.objects["ProteinVR_ForwardSphere"]
+        # self.backwards_sphere = bpy.data.objects["ProteinVR_BackwardsSphere"]
         self.view_sphere = bpy.data.objects["ProteinVR_ViewerSphere"]
 
         # Make sure viewer sphere appropriate size
@@ -130,7 +130,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.frame_end = self.scene.frame_end
 
         self.extra_data = {
-            "cameraPos": [],
+            "cameraPositionsAndTextures": [],
             "clickableFiles": [],
             "viewer_sphere_size": self.scene.viewer_sphere_size
         }
@@ -139,7 +139,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         for this_frame in range(self.frame_start, self.frame_end + 1):
             self.set_frame(this_frame)
             this_camera_pos = self.camera.location.copy()
-            self.extra_data["cameraPos"].append([this_frame, round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)])
+            # self.extra_data["cameraPos"].append([this_frame, round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)])
+            self.extra_data["cameraPositionsAndTextures"].append([round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)])
 
     def _step_3_render_baked_frames(self, debug=False):
         # Setup cycles samples
@@ -158,31 +159,31 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 self.view_sphere.location = this_camera_pos
 
                 # position forward sphere
-                self.forward_sphere.hide = True
-                for future_frame in range(this_frame + 1, self.frame_end + 1):
-                    self.set_frame(future_frame)
-                    future_camera_pos = self.camera.location.copy()
-                    if future_camera_pos != this_camera_pos:
-                        # print(this_frame, this_camera_pos, future_camera_pos)
-                        direc = future_camera_pos - this_camera_pos
-                        direc.normalize()
-                        direc = 5 * direc
-                        self.forward_sphere.location = this_camera_pos + direc
-                        self.forward_sphere.hide = False
-                        break
+                # self.forward_sphere.hide = True
+                # for future_frame in range(this_frame + 1, self.frame_end + 1):
+                #     self.set_frame(future_frame)
+                #     future_camera_pos = self.camera.location.copy()
+                #     if future_camera_pos != this_camera_pos:
+                #         # print(this_frame, this_camera_pos, future_camera_pos)
+                #         direc = future_camera_pos - this_camera_pos
+                #         direc.normalize()
+                #         direc = 5 * direc
+                #         self.forward_sphere.location = this_camera_pos + direc
+                #         self.forward_sphere.hide = False
+                #         break
                 
                 # position the backwards sphere
-                self.backwards_sphere.hide = True
-                for past_frame in range(this_frame - 1, self.frame_start, -1):
-                    self.set_frame(past_frame)
-                    past_camera_pos = self.camera.location.copy()
-                    if past_camera_pos != this_camera_pos:
-                        direc = past_camera_pos - this_camera_pos
-                        direc.normalize()
-                        direc = 5 * direc
-                        self.backwards_sphere.location = this_camera_pos + direc
-                        self.backwards_sphere.hide = False
-                        break
+                # self.backwards_sphere.hide = True
+                # for past_frame in range(this_frame - 1, self.frame_start, -1):
+                #     self.set_frame(past_frame)
+                #     past_camera_pos = self.camera.location.copy()
+                #     if past_camera_pos != this_camera_pos:
+                #         direc = past_camera_pos - this_camera_pos
+                #         direc.normalize()
+                #         direc = 5 * direc
+                #         self.backwards_sphere.location = this_camera_pos + direc
+                #         self.backwards_sphere.hide = False
+                #         break
                 
                 # Bake the view-sphere image
                 # See https://blender.stackexchange.com/questions/10860/baking-textures-on-headless-machine-batch-baking
@@ -328,8 +329,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
     def _step_6_cleanup(self):
         # Hide some spheres... cleaning up.
-        self.forward_sphere.hide = True
-        self.backwards_sphere.hide = True
+        # self.forward_sphere.hide = True
+        # self.backwards_sphere.hide = True
         self.view_sphere.hide = True
 
         

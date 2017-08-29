@@ -45,10 +45,10 @@ define(["require", "exports"], function (require, exports) {
             }
         };
         ExtractFrames.prototype._onend = function (e) {
-            // keep only ever so few frames (to match framerate)
+            // keep only every-so-few frames (to match framerate)
             var indeciesToKeep = [];
-            var deltaIndex = (this._sampledFrames.length - 1) / (this._game.frameAndCameraPos.length - 1);
-            for (var i = 0; i < this._game.frameAndCameraPos.length; i++) {
+            var deltaIndex = (this._sampledFrames.length - 1) / (this._game.cameraPositionsAndTextures.length - 1);
+            for (var i = 0; i < this._game.cameraPositionsAndTextures.length; i++) {
                 indeciesToKeep.push(Math.floor(i * deltaIndex));
             }
             var textures = [];
@@ -62,7 +62,7 @@ define(["require", "exports"], function (require, exports) {
                 textures.push(this.BABYLON.Texture.CreateFromBase64String(dataUrl, 'mytex' + Math.random().toString(), this._game.scene));
                 this._sampledFrames[indexToKeep] = null; // free for garbage collection
             }
-            // let keepEvery = this._sampledFrames.length / (this._game.frameAndCameraPos.length - 1);
+            // let keepEvery = this._sampledFrames.length / (this._game.cameraPos.length - 1);
             // let currentIndex = 0.0;
             // while (currentIndex <= this._sampledFrames.length) {
             //     let indexToUse = Math.round(currentIndex);
@@ -76,7 +76,7 @@ define(["require", "exports"], function (require, exports) {
             // }
             // // debugger;
             // // get last one if missing (rounding error, so it varies...)
-            // if (textures.length < this._game.frameAndCameraPos.length) {
+            // if (textures.length < this._game.cameraPos.length) {
             //     let dataUrl = this._sampledFrames[this._sampledFrames.length - 1];
             //     console.log("YYY2", dataUrl, "D", this._sampledFrames.length);
             //     textures.push(
@@ -84,10 +84,11 @@ define(["require", "exports"], function (require, exports) {
             //     );
             //     this._sampledFrames[this._sampledFrames.length - 1] = null;  // free for garbage collection
             // }
-            // console.log(textures.length, this._game.frameAndCameraPos.length, "HEHEEHE");
+            // console.log(textures.length, this._game.cameraPos.length, "HEHEEHE");
             // Update list in game
-            for (var i = 0; i < this._game.frameAndCameraPos.length; i++) {
-                this._game.frameAndCameraPos[i][2] = textures[i];
+            for (var i = 0; i < this._game.cameraPositionsAndTextures.length; i++) {
+                this._game.cameraPositionsAndTextures[i][1] = textures[i];
+                // debugger;
                 // textures[i] = null;  // Help with memory (garbage collection)
             }
             // free for garbage collection.
