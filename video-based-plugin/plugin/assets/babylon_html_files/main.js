@@ -48,6 +48,7 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
         Game.prototype._setupCamera = function () {
             // Attach camera to canvas inputs
             this.scene.activeCamera.attachControl(this._canvas);
+            // this.scene.activeCamera.inertia = 0.0;
         };
         Game.prototype._setupVideoSphere = function () {
             // HTML5 video controls are inconsistent, but you want to take
@@ -201,10 +202,6 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
                 // Camera hasn't moved.
                 return;
             }
-            // this.scene.activeCamera.position = new BABYLON.Vector3(1.0,1.0,1.0);
-            // return;
-            // console.log("=====");
-            // console.clear();
             // Calculate distances to all camera positions
             var distData = [];
             for (var i = 0; i < this.cameraPositionsAndTextures.length; i++) {
@@ -234,7 +231,6 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
                 }
             };
             distData.sort(kf);
-            // console.log(distData);
             var tex1 = distData[0][2];
             // let tex2 = distData[1][1][2];
             // let tex3 = distData[2][1][2];
@@ -243,8 +239,6 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
             // let dist3 = distData[2][0];
             var bestDist = dist1;
             var bestPos = distData[0][1];
-            // console.log(tex1, dist1, bestDist);
-            // console.log(tex1, dist1, bestPos);
             // Move camera to best frame.
             // let maxDistAllowed = 0.1 * this._JSONData["viewer_sphere_size"];
             // if (bestDist > maxDistAllowed) {
@@ -252,7 +246,23 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
             //     // console.log(vec);
             //     this.scene.activeCamera.position = bestPos.add(vec);
             // }
-            this.scene.activeCamera.position = bestPos;
+            // this.scene.activeCamera.position = bestPos;
+            // Move camera to point on line connecting nearest two positions, that
+            // is nearest current camera. See ****
+            // console.log(distData[1][1], bestPos);
+            var P1 = bestPos; // [0, 0, 0]
+            var v = distData[1][1].subtract(bestPos); // [1, 0, 0]
+            var P2 = this.scene.activeCamera.position; // [0.5, 1, 0] 
+            var newPos = P1.add(v.scale(BABYLON.Vector3.Dot(P2.subtract(P1), v) / BABYLON.Vector3.Dot(v, v))); // should be [0.5, 0, 0] in this example.
+            if (!this.scene.activeCamera.position.equals(newPos)) {
+                console.log("bestDist", bestDist);
+                console.log("bestPos", bestPos);
+                console.log("camera", this.scene.activeCamera.position);
+                console.log("newPos", newPos);
+                console.log("distData[1][1]", distData[1][1]); //debugger;
+                console.log("=======");
+            }
+            this.scene.activeCamera.position = newPos.clone();
             // Move sphere
             this._viewerSphere.position = bestPos;
             // Update texture
