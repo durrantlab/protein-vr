@@ -162,7 +162,7 @@ export class Game {
         this._viewerSphere.renderingGroupId = 2;
 
         // Resize the viewer sphere
-        let radius = this._JSONData["viewer_sphere_size"];
+        let radius = this._JSONData["viewerSphereSize"];
         this._viewerSphere.scaling = new BABYLON.Vector3(radius, radius, radius);
 
         window.sphere = this._viewerSphere;
@@ -206,7 +206,7 @@ export class Game {
             }
 
             // Set some guide-sphere parameters
-            let viewerSphereSize = data["viewer_sphere_size"];
+            let viewerSphereSize = data["viewerSphereSize"];
             This._guideSphereHiddenCutoffDist = 0.1 * viewerSphereSize;
             This._guideSphereShowCutoffDist = 2.0 * viewerSphereSize;
             This._guideSphereIntermediateFactor = This._guideSphereMaxVisibility / (This._guideSphereShowCutoffDist - This._guideSphereHiddenCutoffDist);

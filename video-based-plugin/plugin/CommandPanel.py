@@ -96,11 +96,11 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         if not os.path.exists(self.proteinvr_output_dir):
             os.mkdir(self.proteinvr_output_dir)
         
-        # Make sure scratch exists... delete if already existing
-        self.scratch_dir = self.proteinvr_output_dir + "frames" + os.sep
-        if os.path.exists(self.scratch_dir):
-            shutil.rmtree(self.scratch_dir)
-        os.mkdir(self.scratch_dir)
+        # Make sure frame dir exists...
+        self.frame_dir = self.proteinvr_output_dir + "frames" + os.sep
+        if not os.path.exists(self.frame_dir):
+            #shutil.rmtree(self.frame_dir)
+            os.mkdir(self.frame_dir)
 
         # Copy some files
         shutil.copyfile(self.plugin_asset_dir + os.sep + "babylon.babylon", self.proteinvr_output_dir + "babylon.babylon")
@@ -134,8 +134,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         self.extra_data = {
             "cameraPositionsAndTextures": [],
-            "proteinvr_clickableFiles": [],
-            "proteinvr_viewer_sphere_size": self.scene.proteinvr_viewer_sphere_size,
+            "clickableFiles": [],
+            "viewerSphereSize": self.scene.proteinvr_viewer_sphere_size,
             "guideSphereLocations": None
         }
 
@@ -178,7 +178,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 image.file_format = 'JPEG'
                 self.scene.render.image_settings.quality = 50
                
-                image.filepath_raw = self.scratch_dir + "proteinvr_baked_texture" + str(this_frame) + ".jpg"
+                image.filepath_raw = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".jpg"
                 frame_file_names.append("proteinvr_baked_texture" + str(this_frame) + ".jpg")
 
                 # Select which texture you want to bake to. Find the node of
@@ -217,48 +217,48 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                     bpy.data.images.remove(img)
         
         # Save list of all rendered frames
-        json.dump(frame_file_names, open(self.scratch_dir + "filenames.json",'w'))
+        json.dump(frame_file_names, open(self.frame_dir + "filenames.json",'w'))
 
-    def _step_4_compile_baked_images_into_video(self, debug=False):
-        # I've decided this is no good. I don't think I can reliably pull data
-        # from the video on mobile. So we'll do it based on images instead.
-        return
+    # def _step_4_compile_baked_images_into_video(self, debug=False):
+    #     # I've decided this is no good. I don't think I can reliably pull data
+    #     # from the video on mobile. So we'll do it based on images instead.
+    #     return
 
-        if not debug:
-            # Having rendered all the images, load them into the video sequencer.
-            # see https://blender.stackexchange.com/questions/8107/how-to-automate-blender-video-sequencer
-            files = [os.path.basename(f) for f in glob.glob(self.scratch_dir + "proteinvr_baked_texture*.jpg")]
-            def get_key(a): return int(a.replace("proteinvr_baked_texture", "").replace(".jpg", ""))
-            files.sort(key=get_key)
+    #     if not debug:
+    #         # Having rendered all the images, load them into the video sequencer.
+    #         # see https://blender.stackexchange.com/questions/8107/how-to-automate-blender-video-sequencer
+    #         files = [os.path.basename(f) for f in glob.glob(self.frame_dir + "proteinvr_baked_texture*.jpg")]
+    #         def get_key(a): return int(a.replace("proteinvr_baked_texture", "").replace(".jpg", ""))
+    #         files.sort(key=get_key)
 
-            bpy.context.scene.sequence_editor_create()
-            seq = bpy.context.scene.sequence_editor.sequences.new_image(
-                    name="MyStrip",
-                    filepath=os.path.join(self.scratch_dir, files[0]),
-                    channel=1, frame_start=self.frame_start)
+    #         bpy.context.scene.sequence_editor_create()
+    #         seq = bpy.context.scene.sequence_editor.sequences.new_image(
+    #                 name="MyStrip",
+    #                 filepath=os.path.join(self.frame_dir, files[0]),
+    #                 channel=1, frame_start=self.frame_start)
                 
-            # add the rest of the images.
-            files.pop(0)
-            for f in files:
-                seq.elements.append(f)
+    #         # add the rest of the images.
+    #         files.pop(0)
+    #         for f in files:
+    #             seq.elements.append(f)
 
-            # Save those images to a mp4 video (comaptible with all browsers)
-            render = self.scene.render
-            render.resolution_x = self.scene.proteinvr_bake_texture_size
-            render.resolution_y = self.scene.proteinvr_bake_texture_size
+    #         # Save those images to a mp4 video (comaptible with all browsers)
+    #         render = self.scene.render
+    #         render.resolution_x = self.scene.proteinvr_bake_texture_size
+    #         render.resolution_y = self.scene.proteinvr_bake_texture_size
 
-            render.image_settings.file_format = "H264"
-            render.ffmpeg.format = "MPEG4"
-            render.filepath = self.proteinvr_output_dir + "proteinvr_baked.mp4"
-            bpy.ops.render.render(animation=True)
+    #         render.image_settings.file_format = "H264"
+    #         render.ffmpeg.format = "MPEG4"
+    #         render.filepath = self.proteinvr_output_dir + "proteinvr_baked.mp4"
+    #         bpy.ops.render.render(animation=True)
 
-            # Remove rendered frames... keep just the video
-            # for filename in glob.glob(self.proteinvr_output_dir + "proteinvr_baked_texture*.jpg"):
-            #     os.unlink(filename)
-        else:
-            # Debugging, so just copy a pre-compiled video
-            tmp_video_file = self.plugin_asset_dir + "proteinvr_baked.mp4"
-            shutil.copyfile(tmp_video_file, self.proteinvr_output_dir + "proteinvr_baked.mp4")
+    #         # Remove rendered frames... keep just the video
+    #         # for filename in glob.glob(self.proteinvr_output_dir + "proteinvr_baked_texture*.jpg"):
+    #         #     os.unlink(filename)
+    #     else:
+    #         # Debugging, so just copy a pre-compiled video
+    #         tmp_video_file = self.plugin_asset_dir + "proteinvr_baked.mp4"
+    #         shutil.copyfile(tmp_video_file, self.proteinvr_output_dir + "proteinvr_baked.mp4")
 
 
     def _step_5_make_proteinvr_clickable_meshes(self):
@@ -312,7 +312,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                     axis_up="Y",
                     axis_forward="-Z"
                 )
-                self.extra_data["proteinvr_clickableFiles"].append(os.path.basename(filepath))
+                self.extra_data["clickableFiles"].append(os.path.basename(filepath))
             
             # Remove the proteinvr_clickable mesh now that it's saved
             bpy.ops.object.delete()
@@ -362,9 +362,10 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self._step_1_setup()
         self._step_2_get_camerea_positions()
 
-        if not os.path.exists(self.proteinvr_output_dir + "proteinvr_baked.mp4"):
+        # if not os.path.exists(self.proteinvr_output_dir + "proteinvr_baked.mp4"):
+        if len(glob.glob(self.proteinvr_output_dir + "frames/*.jpg")) == 0:
             self._step_3_render_baked_frames(debug)
-            self._step_4_compile_baked_images_into_video(debug)
+            # self._step_4_compile_baked_images_into_video(debug)
         self._step_5_make_proteinvr_clickable_meshes()
         self._step_6_calculate_guide_spheres()
 
@@ -395,11 +396,17 @@ class OBJECT_OT_RenderRemote(ButtonParentClass):
     remote_blender_location_with_proteinvr_installed = "/home/jdurrant/DataB/spinel/programs/blender-2.78c-linux-glibc219-x86_64/blender"
 
     def run_remote(self, cmd):
-        os.system('ssh ' + self.beefy_computer_for_rendering + ' "' + cmd + '"')
+        remote_cmd = 'ssh ' + self.beefy_computer_for_rendering + ' "' + cmd + '"'
+        print()
+        print(remote_cmd)
+        os.system(remote_cmd)
     
     def copy_to_remote(self, file, remote_dir):
         remote_dir = remote_dir if remote_dir.endswith(os.sep) else remote_dir + os.sep
-        os.system('scp ' + file + ' ' + self.beefy_computer_for_rendering + ':' + remote_dir)
+        remote_cmd = 'scp ' + file + ' ' + self.beefy_computer_for_rendering + ':' + remote_dir
+        print()
+        print(remote_cmd)
+        os.system(remote_cmd)
 
     def execute(self, context):
         """
@@ -442,6 +449,16 @@ class OBJECT_OT_RenderRemote(ButtonParentClass):
             self.remote_blender_location_with_proteinvr_installed + ' ' + os.path.basename(blend_file) + ' --background --python runit.py'
         ]
         self.run_remote("; ".join(cmds))
+
+        # Copy files back from remote machine.
+        remote_cmd = "rsync -rv --remove-source-files " + self.beefy_computer_for_rendering + ":" + remote_dir + os.sep + "output" + os.sep + "* " + bpy.context.scene.proteinvr_output_dir + os.sep
+        print(remote_cmd)
+        print()
+        os.system(remote_cmd)
+
+        # Remote remote directory.
+        self.run_remote("rm -r " + remote_dir)
+
         
         
 
