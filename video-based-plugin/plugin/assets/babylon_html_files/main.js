@@ -107,7 +107,7 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
             this._viewerSphere.isPickable = false;
             this._viewerSphere.renderingGroupId = 2;
             // Resize the viewer sphere
-            var radius = this._JSONData["viewer_sphere_size"];
+            var radius = this._JSONData["viewerSphereSize"];
             this._viewerSphere.scaling = new BABYLON.Vector3(radius, radius, radius);
             window.sphere = this._viewerSphere;
             // window.video = this._sphereVideo;
@@ -141,7 +141,7 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
                     This._guideSpheres.push(sphere);
                 }
                 // Set some guide-sphere parameters
-                var viewerSphereSize = data["viewer_sphere_size"];
+                var viewerSphereSize = data["viewerSphereSize"];
                 This._guideSphereHiddenCutoffDist = 0.1 * viewerSphereSize;
                 This._guideSphereShowCutoffDist = 2.0 * viewerSphereSize;
                 This._guideSphereIntermediateFactor = This._guideSphereMaxVisibility / (This._guideSphereShowCutoffDist - This._guideSphereHiddenCutoffDist);
