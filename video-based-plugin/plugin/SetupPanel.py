@@ -69,7 +69,7 @@ class SetupPanel(ParentPanel):
 
 class OBJECT_OT_FixProblems(ButtonParentClass):
     """
-    Button for making sure required objects are present in scene.
+    Make sure required objects are present in the scene.
     """
 
     bl_idname = "proteinvr.fix"

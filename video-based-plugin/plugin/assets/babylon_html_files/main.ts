@@ -45,10 +45,15 @@ export class Game {
 
     private _guideSpheres: any[] = [];
 
+    private _guideSphereHiddenCutoffDist: number;
+    private _guideSphereShowCutoffDist: number;
+    private _guideSphereIntermediateFactor: number;
+    private _guideSphereMaxVisibility: number = 0.25;
+    private _guideSphereSize: number = 0.02;
+
     constructor(params: GameInterface) {
 
         // setInterval(function() {console.log(this.cameraPos);}.bind(this), 100);
-        
         
         if (!BABYLON.Engine.isSupported()) {
             alert("ERROR: Babylon not supported!");
@@ -154,6 +159,7 @@ export class Game {
         
         this._viewerSphere.material = this._shader.material;
         this._viewerSphere.isPickable = false;
+        this._viewerSphere.renderingGroupId = 2;
 
         // Resize the viewer sphere
         let radius = this._JSONData["viewer_sphere_size"];
@@ -190,13 +196,20 @@ export class Game {
 
             for (let i=0; i<data["guideSphereLocations"].length; i++) {
                 let sphereLoc = data["guideSphereLocations"][i];
-                let sphere = new BABYLON.Mesh.CreateSphere("sphere" + i.toString(), 8, 0.1, This.scene);
+                let sphere = new BABYLON.Mesh.CreateSphere("sphere" + i.toString(), 8, This._guideSphereSize, This.scene);
                 sphere.material = sphereMat;
                 sphere.position.x = sphereLoc[0];
                 sphere.position.y = sphereLoc[2];  // note y and z reversed.
                 sphere.position.z = sphereLoc[1];
+                sphere.renderingGroupId = 3;
                 This._guideSpheres.push(sphere);
             }
+
+            // Set some guide-sphere parameters
+            let viewerSphereSize = data["viewer_sphere_size"];
+            This._guideSphereHiddenCutoffDist = 0.1 * viewerSphereSize;
+            This._guideSphereShowCutoffDist = 2.0 * viewerSphereSize;
+            This._guideSphereIntermediateFactor = This._guideSphereMaxVisibility / (This._guideSphereShowCutoffDist - This._guideSphereHiddenCutoffDist);
 
             // Load extra obj files
             var loader = new BABYLON.AssetsManager(This.scene);
@@ -208,7 +221,9 @@ export class Game {
                 meshTask.onSuccess = function (task) {
                     let mesh = task.loadedMeshes[0];  // Why is this necessary?
                     mesh.scaling.z = -1.0;
-                    this._viewerSphere.isPickable = true;
+                    mesh.renderingGroupId = 1;
+                    // this._viewerSphere.isPickable = true;
+                    mesh.isPickable = true;
                 }
             }
             loader.load();
@@ -319,56 +334,27 @@ export class Game {
         let bestPos = distData[0][1];
 
         // Move camera to best frame.
-        // let maxDistAllowed = 0.1 * this._JSONData["viewer_sphere_size"];
-        // if (bestDist > maxDistAllowed) {
-        //     let vec = this.scene.activeCamera.position.subtract(bestPos).normalize().scale(maxDistAllowed);
-        //     // console.log(vec);
-        //     this.scene.activeCamera.position = bestPos.add(vec);
-        // }
-        // this.scene.activeCamera.position = bestPos;
+        this.scene.activeCamera.position = bestPos;
 
-        // Move camera to point on line connecting nearest two positions, that
-        // is nearest current camera. See ****
-        // console.log(distData[1][1], bestPos);
-        let P1 = bestPos;  // [0, 0, 0]
-        let v = distData[1][1].subtract(bestPos);  // [1, 0, 0]
-        let P2 = this.scene.activeCamera.position  // [0.5, 1, 0] 
-        let newPos = P1.add(
-            v.scale(
-                BABYLON.Vector3.Dot(P2.subtract(P1), v)/BABYLON.Vector3.Dot(v,v)
-            )
-        );  // should be [0.5, 0, 0] in this example.
-
-        
-        if (!this.scene.activeCamera.position.equals(newPos)) {
-            console.log("bestDist", bestDist);
-            console.log("bestPos", bestPos);
-            console.log("camera", this.scene.activeCamera.position);
-            console.log("newPos", newPos);
-            console.log("distData[1][1]", distData[1][1]); //debugger;
-            console.log("=======");
-        }
-        
-        this.scene.activeCamera.position = newPos.clone();
+        // this.scene.activeCamera.position = newPos.clone();
         // Move sphere
         this._viewerSphere.position = bestPos;
 
         // Update texture
-        // console.log("bestFrame", bestFrame)
-        // console.log("bestPos", bestPos);
-        // console.log("cameraPos", this.scene.activeCamera.position);
         this._shader.setTextures(tex1); //, tex2, tex3, dist1, dist2, dist3);
         // this._viewerSphere.material.emissiveTexture = bestTexture;
-        // debugger;
 
         // Keep only guide spheres that are not so close
         for (let i=0; i<this._guideSpheres.length; i++) {
             let sphere = this._guideSpheres[i];
             // console.log(sphere);
-            if (BABYLON.Vector3.Distance(sphere.position, bestPos) < 0.5 * this._JSONData["viewer_sphere_size"]) {
+            let distToGuideSphere = BABYLON.Vector3.Distance(sphere.position, bestPos);
+            if (distToGuideSphere < this._guideSphereHiddenCutoffDist) {
                 sphere.visibility = 0.0;
+            } else if (distToGuideSphere < this._guideSphereShowCutoffDist) {
+                sphere.visibility = this._guideSphereIntermediateFactor * (distToGuideSphere - this._guideSphereHiddenCutoffDist);
             } else {
-                sphere.visibility = 1.0;
+                sphere.visibility = this._guideSphereMaxVisibility;
             }
 
         }

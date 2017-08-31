@@ -16,6 +16,8 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
             this._timeOfLastClick = new Date().getTime(); // A refractory period
             this._lastCameraPos = new BABYLON.Vector3(-9999, -9999, -9999);
             this._guideSpheres = [];
+            this._guideSphereMaxVisibility = 0.25;
+            this._guideSphereSize = 0.02;
             if (!BABYLON.Engine.isSupported()) {
                 alert("ERROR: Babylon not supported!");
             }
@@ -103,6 +105,7 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
             // this._shader.material.emissiveTexture = null; // videoTexture;
             this._viewerSphere.material = this._shader.material;
             this._viewerSphere.isPickable = false;
+            this._viewerSphere.renderingGroupId = 2;
             // Resize the viewer sphere
             var radius = this._JSONData["viewer_sphere_size"];
             this._viewerSphere.scaling = new BABYLON.Vector3(radius, radius, radius);
@@ -129,13 +132,19 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
                 sphereMat.emissiveColor = new BABYLON.Color3(0.8, 0.8, 0.8);
                 for (var i = 0; i < data["guideSphereLocations"].length; i++) {
                     var sphereLoc = data["guideSphereLocations"][i];
-                    var sphere = new BABYLON.Mesh.CreateSphere("sphere" + i.toString(), 8, 0.1, This.scene);
+                    var sphere = new BABYLON.Mesh.CreateSphere("sphere" + i.toString(), 8, This._guideSphereSize, This.scene);
                     sphere.material = sphereMat;
                     sphere.position.x = sphereLoc[0];
                     sphere.position.y = sphereLoc[2]; // note y and z reversed.
                     sphere.position.z = sphereLoc[1];
+                    sphere.renderingGroupId = 3;
                     This._guideSpheres.push(sphere);
                 }
+                // Set some guide-sphere parameters
+                var viewerSphereSize = data["viewer_sphere_size"];
+                This._guideSphereHiddenCutoffDist = 0.1 * viewerSphereSize;
+                This._guideSphereShowCutoffDist = 2.0 * viewerSphereSize;
+                This._guideSphereIntermediateFactor = This._guideSphereMaxVisibility / (This._guideSphereShowCutoffDist - This._guideSphereHiddenCutoffDist);
                 // Load extra obj files
                 var loader = new BABYLON.AssetsManager(This.scene);
                 var objFilenames = data["clickableFiles"];
@@ -146,7 +155,9 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
                     meshTask.onSuccess = function (task) {
                         var mesh = task.loadedMeshes[0]; // Why is this necessary?
                         mesh.scaling.z = -1.0;
-                        this._viewerSphere.isPickable = true;
+                        mesh.renderingGroupId = 1;
+                        // this._viewerSphere.isPickable = true;
+                        mesh.isPickable = true;
                     };
                 }
                 loader.load();
@@ -240,47 +251,26 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
             var bestDist = dist1;
             var bestPos = distData[0][1];
             // Move camera to best frame.
-            // let maxDistAllowed = 0.1 * this._JSONData["viewer_sphere_size"];
-            // if (bestDist > maxDistAllowed) {
-            //     let vec = this.scene.activeCamera.position.subtract(bestPos).normalize().scale(maxDistAllowed);
-            //     // console.log(vec);
-            //     this.scene.activeCamera.position = bestPos.add(vec);
-            // }
-            // this.scene.activeCamera.position = bestPos;
-            // Move camera to point on line connecting nearest two positions, that
-            // is nearest current camera. See ****
-            // console.log(distData[1][1], bestPos);
-            var P1 = bestPos; // [0, 0, 0]
-            var v = distData[1][1].subtract(bestPos); // [1, 0, 0]
-            var P2 = this.scene.activeCamera.position; // [0.5, 1, 0] 
-            var newPos = P1.add(v.scale(BABYLON.Vector3.Dot(P2.subtract(P1), v) / BABYLON.Vector3.Dot(v, v))); // should be [0.5, 0, 0] in this example.
-            if (!this.scene.activeCamera.position.equals(newPos)) {
-                console.log("bestDist", bestDist);
-                console.log("bestPos", bestPos);
-                console.log("camera", this.scene.activeCamera.position);
-                console.log("newPos", newPos);
-                console.log("distData[1][1]", distData[1][1]); //debugger;
-                console.log("=======");
-            }
-            this.scene.activeCamera.position = newPos.clone();
+            this.scene.activeCamera.position = bestPos;
+            // this.scene.activeCamera.position = newPos.clone();
             // Move sphere
             this._viewerSphere.position = bestPos;
             // Update texture
-            // console.log("bestFrame", bestFrame)
-            // console.log("bestPos", bestPos);
-            // console.log("cameraPos", this.scene.activeCamera.position);
             this._shader.setTextures(tex1); //, tex2, tex3, dist1, dist2, dist3);
             // this._viewerSphere.material.emissiveTexture = bestTexture;
-            // debugger;
             // Keep only guide spheres that are not so close
             for (var i = 0; i < this._guideSpheres.length; i++) {
                 var sphere = this._guideSpheres[i];
                 // console.log(sphere);
-                if (BABYLON.Vector3.Distance(sphere.position, bestPos) < 0.5 * this._JSONData["viewer_sphere_size"]) {
+                var distToGuideSphere = BABYLON.Vector3.Distance(sphere.position, bestPos);
+                if (distToGuideSphere < this._guideSphereHiddenCutoffDist) {
                     sphere.visibility = 0.0;
                 }
+                else if (distToGuideSphere < this._guideSphereShowCutoffDist) {
+                    sphere.visibility = this._guideSphereIntermediateFactor * (distToGuideSphere - this._guideSphereHiddenCutoffDist);
+                }
                 else {
-                    sphere.visibility = 1.0;
+                    sphere.visibility = this._guideSphereMaxVisibility;
                 }
             }
             this._lastCameraPos = bestPos.clone();
