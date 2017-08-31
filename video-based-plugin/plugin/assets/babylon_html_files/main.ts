@@ -41,6 +41,10 @@ export class Game {
 
     private _shader: any;
 
+    private _lastCameraPos: any = new BABYLON.Vector3(-9999, -9999, -9999);
+
+    private _guideSpheres: any[] = [];
+
     constructor(params: GameInterface) {
 
         // setInterval(function() {console.log(this.cameraPos);}.bind(this), 100);
@@ -174,6 +178,25 @@ export class Game {
             
             This._JSONData = data;
 
+            // Add in guide spheres.
+            let sphereMat = new BABYLON.StandardMaterial("sphereMat", This.scene);
+            sphereMat.backFaceCulling = false;
+            sphereMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
+            sphereMat.specularColor = new BABYLON.Color3(0, 0, 0);
+            sphereMat.diffuseTexture = null;
+            sphereMat.emissiveTexture = null; // videoTexture;
+            sphereMat.emissiveColor = new BABYLON.Color3(0.8, 0.8, 0.8);
+
+            for (let i=0; i<data["guideSphereLocations"].length; i++) {
+                let sphereLoc = data["guideSphereLocations"][i];
+                let sphere = new BABYLON.Mesh.CreateSphere("sphere" + i.toString(), 8, 0.1, This.scene);
+                sphere.material = sphereMat;
+                sphere.position.x = sphereLoc[0];
+                sphere.position.y = sphereLoc[2];  // note y and z reversed.
+                sphere.position.z = sphereLoc[1];
+                This._guideSpheres.push(sphere);
+            }
+
             // Load extra obj files
             var loader = new BABYLON.AssetsManager(This.scene);
             let objFilenames = data["clickableFiles"];
@@ -245,6 +268,12 @@ export class Game {
     }
 
     private _setCamera() {
+        let cameraLoc = this.scene.activeCamera.position;
+        if ((this._lastCameraPos.material !== undefined) && (this._lastCameraPos.equals(cameraLoc))) {
+            // Camera hasn't moved.
+            return;
+        }
+
         // this.scene.activeCamera.position = new BABYLON.Vector3(1.0,1.0,1.0);
         // return;
         
@@ -252,14 +281,19 @@ export class Game {
         // console.clear();
         
         // Calculate distances to all camera positions
-        let cameraLoc = this.scene.activeCamera.position;
         let distData = [];
         for (let i=0; i<this.cameraPositionsAndTextures.length; i++) {
             let cameraPos = this.cameraPositionsAndTextures[i];
             let pos = cameraPos[0].clone();
             let tex = cameraPos[1];
             let dist = pos.subtract(cameraLoc).length();
-            distData.push([dist, pos, tex]);
+            
+            // if (!this._lastCameraPos.equals(pos)) {
+                // Don't include last previous position. So there has to be
+                // movement.
+                distData.push([dist, pos, tex]);
+            // }
+
             // if dist = 0 temrinate early?
         }
 
@@ -278,6 +312,8 @@ export class Game {
         }
         distData.sort(kf);
 
+        // console.log(distData);
+
         let tex1 = distData[0][2];
         // let tex2 = distData[1][1][2];
         // let tex3 = distData[2][1][2];
@@ -288,6 +324,8 @@ export class Game {
 
         let bestDist = dist1;
         let bestPos = distData[0][1];
+
+        // console.log(tex1, dist1, bestDist);
 
         // console.log(tex1, dist1, bestPos);
 
@@ -311,6 +349,19 @@ export class Game {
         // this._viewerSphere.material.emissiveTexture = bestTexture;
         // debugger;
 
+        // Keep only guide spheres that are not so close
+        for (let i=0; i<this._guideSpheres.length; i++) {
+            let sphere = this._guideSpheres[i];
+            // console.log(sphere);
+            if (BABYLON.Vector3.Distance(sphere.position, bestPos) < 0.5 * this._JSONData["viewer_sphere_size"]) {
+                sphere.visibility = 0.0;
+            } else {
+                sphere.visibility = 1.0;
+            }
+
+        }
+
+        this._lastCameraPos = bestPos.clone();
     }
 
     private _resizeWindow() {
@@ -325,7 +376,7 @@ export function start() {
     let game = new Game({
         onJSONLoaded: function() {
             console.log("DONE!!!");
-            let ef = new ExtractFrames("proteinvr_baked.mp4", BABYLON, this, function() {
+            let ef = new ExtractFrames(BABYLON, jQuery, this, function() {
                 callbacksComplete.push(callBacks.VIDEO_FRAMES_LOADED);
                 console.log("done");
             });

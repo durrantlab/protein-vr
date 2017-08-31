@@ -3,6 +3,7 @@ define(["require", "exports"], function (require, exports) {
     exports.__esModule = true;
     var Shader = (function () {
         function Shader(scene, BABYLON) {
+            this.material = undefined;
             this.material = new BABYLON.StandardMaterial("mat", scene);
             this.material.backFaceCulling = false;
             this.material.diffuseColor = new BABYLON.Color3(0, 0, 0);

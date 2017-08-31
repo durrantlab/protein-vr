@@ -14,6 +14,8 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
             // Get the canvas element from our HTML above
             this._canvas = document.getElementById("renderCanvas");
             this._timeOfLastClick = new Date().getTime(); // A refractory period
+            this._lastCameraPos = new BABYLON.Vector3(-9999, -9999, -9999);
+            this._guideSpheres = [];
             if (!BABYLON.Engine.isSupported()) {
                 alert("ERROR: Babylon not supported!");
             }
@@ -116,6 +118,23 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
                 var callBack = this.callBack;
                 var This = this.This;
                 This._JSONData = data;
+                // Add in guide spheres.
+                var sphereMat = new BABYLON.StandardMaterial("sphereMat", This.scene);
+                sphereMat.backFaceCulling = false;
+                sphereMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
+                sphereMat.specularColor = new BABYLON.Color3(0, 0, 0);
+                sphereMat.diffuseTexture = null;
+                sphereMat.emissiveTexture = null; // videoTexture;
+                sphereMat.emissiveColor = new BABYLON.Color3(0.8, 0.8, 0.8);
+                for (var i = 0; i < data["guideSphereLocations"].length; i++) {
+                    var sphereLoc = data["guideSphereLocations"][i];
+                    var sphere = new BABYLON.Mesh.CreateSphere("sphere" + i.toString(), 8, 0.1, This.scene);
+                    sphere.material = sphereMat;
+                    sphere.position.x = sphereLoc[0];
+                    sphere.position.y = sphereLoc[2]; // note y and z reversed.
+                    sphere.position.z = sphereLoc[1];
+                    This._guideSpheres.push(sphere);
+                }
                 // Load extra obj files
                 var loader = new BABYLON.AssetsManager(This.scene);
                 var objFilenames = data["clickableFiles"];
@@ -177,19 +196,27 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
             }.bind(this));
         };
         Game.prototype._setCamera = function () {
+            var cameraLoc = this.scene.activeCamera.position;
+            if ((this._lastCameraPos.material !== undefined) && (this._lastCameraPos.equals(cameraLoc))) {
+                // Camera hasn't moved.
+                return;
+            }
             // this.scene.activeCamera.position = new BABYLON.Vector3(1.0,1.0,1.0);
             // return;
             // console.log("=====");
             // console.clear();
             // Calculate distances to all camera positions
-            var cameraLoc = this.scene.activeCamera.position;
             var distData = [];
             for (var i = 0; i < this.cameraPositionsAndTextures.length; i++) {
                 var cameraPos = this.cameraPositionsAndTextures[i];
                 var pos = cameraPos[0].clone();
                 var tex = cameraPos[1];
                 var dist = pos.subtract(cameraLoc).length();
+                // if (!this._lastCameraPos.equals(pos)) {
+                // Don't include last previous position. So there has to be
+                // movement.
                 distData.push([dist, pos, tex]);
+                // }
                 // if dist = 0 temrinate early?
             }
             // Sort by distance
@@ -207,6 +234,7 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
                 }
             };
             distData.sort(kf);
+            // console.log(distData);
             var tex1 = distData[0][2];
             // let tex2 = distData[1][1][2];
             // let tex3 = distData[2][1][2];
@@ -215,6 +243,7 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
             // let dist3 = distData[2][0];
             var bestDist = dist1;
             var bestPos = distData[0][1];
+            // console.log(tex1, dist1, bestDist);
             // console.log(tex1, dist1, bestPos);
             // Move camera to best frame.
             // let maxDistAllowed = 0.1 * this._JSONData["viewer_sphere_size"];
@@ -233,6 +262,18 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
             this._shader.setTextures(tex1); //, tex2, tex3, dist1, dist2, dist3);
             // this._viewerSphere.material.emissiveTexture = bestTexture;
             // debugger;
+            // Keep only guide spheres that are not so close
+            for (var i = 0; i < this._guideSpheres.length; i++) {
+                var sphere = this._guideSpheres[i];
+                // console.log(sphere);
+                if (BABYLON.Vector3.Distance(sphere.position, bestPos) < 0.5 * this._JSONData["viewer_sphere_size"]) {
+                    sphere.visibility = 0.0;
+                }
+                else {
+                    sphere.visibility = 1.0;
+                }
+            }
+            this._lastCameraPos = bestPos.clone();
         };
         Game.prototype._resizeWindow = function () {
             // Watch for browser/canvas resize events
@@ -247,7 +288,7 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
         var game = new Game({
             onJSONLoaded: function () {
                 console.log("DONE!!!");
-                var ef = new VideoFrames_1.ExtractFrames("proteinvr_baked.mp4", BABYLON, this, function () {
+                var ef = new VideoFrames_1.ExtractFrames(BABYLON, jQuery, this, function () {
                     callbacksComplete.push(callBacks.VIDEO_FRAMES_LOADED);
                     console.log("done");
                 });

@@ -1,6 +1,6 @@
 export class Shader {
     private _scene: any;
-    public material: any;
+    public material: any = undefined;
 
     constructor(scene, BABYLON) {
         this.material = new BABYLON.StandardMaterial("mat", scene);

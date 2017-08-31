@@ -24,6 +24,29 @@ class SetupPanel(ParentPanel):
         # Is it in cycles render?
         if bpy.context.scene.render.engine != "CYCLES":
             msgs["Render Settings:"].append("Not CYCLES")
+        
+        if bpy.context.scene.cycles.min_bounces != 0:
+            msgs["Render Settings:"].append("Min bounces > 0")
+
+        if bpy.context.scene.cycles.max_bounces > 4:
+            msgs["Render Settings:"].append("Max bounces > 4")
+
+        if bpy.context.scene.cycles.caustics_reflective:
+            msgs["Render Settings:"].append("Reflective caustics on")
+
+        if bpy.context.scene.cycles.caustics_refractive:
+            msgs["Render Settings:"].append("Refractive caustics on")
+
+        if bpy.context.scene.cycles.sample_clamp_direct != 2.5:
+            msgs["Render Settings:"].append("Clamp direct != 2.5")
+
+        if bpy.context.scene.cycles.sample_clamp_indirect != 2.5:
+            msgs["Render Settings:"].append("Clamp indirect != 2.5")
+        
+        if bpy.context.scene.cycles.blur_glossy < 2.0:
+            msgs["Render Settings:"].append("Blur glossy < 2")
+
+        # 2.79 has denoising option in Render Layers tab. Look into that...
 
         # Show messages
         if sum([len(msgs[k]) for k in msgs.keys()]) > 0:
@@ -44,7 +67,7 @@ class SetupPanel(ParentPanel):
         else:
             return False
 
-class OBJECT_OT_AddRequiredObjects(ButtonParentClass):
+class OBJECT_OT_FixProblems(ButtonParentClass):
     """
     Button for making sure required objects are present in scene.
     """
@@ -88,8 +111,17 @@ class OBJECT_OT_AddRequiredObjects(ButtonParentClass):
 
         global obj_names
 
-        # Make sure cycles mode
+        # Make sure cycles mode, other settings
         bpy.context.scene.render.engine = "CYCLES"
+        bpy.context.scene.cycles.min_bounces = 0
+        if bpy.context.scene.cycles.max_bounces > 4:
+            bpy.context.scene.cycles.max_bounces = 4
+        bpy.context.scene.cycles.caustics_reflective = False
+        bpy.context.scene.cycles.caustics_refractive = False
+        bpy.context.scene.cycles.sample_clamp_direct = 2.5
+        bpy.context.scene.cycles.sample_clamp_indirect = 2.5
+        if bpy.context.scene.cycles.blur_glossy < 2.0:
+            bpy.context.scene.cycles.blur_glossy = 2.0
 
         # Go into Object mode
         Utils.switch_mode("OBJECT")

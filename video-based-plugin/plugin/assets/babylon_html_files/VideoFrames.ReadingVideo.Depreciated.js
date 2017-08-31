@@ -2,38 +2,48 @@ define(["require", "exports"], function (require, exports) {
     "use strict";
     exports.__esModule = true;
     var ExtractFrames = (function () {
-        function ExtractFrames(BABYLON, jQuery, game, callBack) {
+        function ExtractFrames(videoUrl, BABYLON, game, callBack) {
             if (callBack === void 0) { callBack = function () { }; }
             this._lastCurrentTime = 0;
             // Create storage elements and variables
-            // this._video = document.createElement('video');
-            // this._canvas = document.createElement('canvas');
-            // this._sampledFrames = [];
-            // this._ctx = this._canvas.getContext('2d');
+            this._video = document.createElement('video');
+            this._canvas = document.createElement('canvas');
+            this._sampledFrames = [];
+            this._ctx = this._canvas.getContext('2d');
             this._callBack = callBack;
             this._game = game;
             this.BABYLON = BABYLON;
-            jQuery.get("./frames/filenames.json", function (data) {
-                for (var i = 0; i < data.length; i++) {
-                    var filename = "./frames/" + data[i];
-                    var tex = new this.BABYLON.Texture(filename, this._game.scene);
-                    this._game.cameraPositionsAndTextures[i][1] = tex;
-                }
-                // Fire the callback.
-                this._callBack();
-            }.bind(this));
-            return;
             // Start loading video
-            // this._video.autoplay = true;
-            // this._video.muted = true;
-            // let initCanvas = this._initCanvas.bind(this);
-            // let drawFrame = this._drawFrame.bind(this);
-            // let onend = this._onend.bind(this);
-            // this._video.addEventListener('loadedmetadata', initCanvas, false);
-            // this._video.addEventListener('timeupdate', drawFrame, false);
-            // this._video.addEventListener('ended', onend, false);
-            // this._video.src = videoUrl;
+            this._video.autoplay = true;
+            this._video.muted = true;
+            var initCanvas = this._initCanvas.bind(this);
+            var drawFrame = this._drawFrame.bind(this);
+            var onend = this._onend.bind(this);
+            this._video.addEventListener('loadedmetadata', initCanvas, false);
+            this._video.addEventListener('timeupdate', drawFrame, false);
+            this._video.addEventListener('ended', onend, false);
+            this._video.src = videoUrl;
         }
+        ExtractFrames.prototype._initCanvas = function (e) {
+            this._canvas.width = this._video.videoWidth;
+            this._canvas.height = this._video.videoHeight;
+        };
+        ExtractFrames.prototype._drawFrame = function (e) {
+            this._video.pause();
+            if (this._video.currentTime - this._lastCurrentTime > 1 / 36.0) {
+                this._ctx.drawImage(this._video, 0, 0);
+                /*
+                Blob would be better than toDataURL, but I don't think babylon can easily work with blobs...
+                */
+                var dataUrl = this._canvas.toDataURL('image/jpeg', 1.0); // full quality needed?
+                this._sampledFrames.push(dataUrl);
+                // console.log(((this._video.currentTime / this._video.duration) * 100).toFixed(2) + ' %');
+                this._lastCurrentTime = this._video.currentTime;
+            }
+            if (this._video.currentTime < this._video.duration) {
+                this._video.play();
+            }
+        };
         ExtractFrames.prototype._onend = function (e) {
             // keep only every-so-few frames (to match framerate)
             var indeciesToKeep = [];

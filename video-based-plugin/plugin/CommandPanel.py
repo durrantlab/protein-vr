@@ -36,15 +36,16 @@ class CommandPanel(ParentPanel):
 
         # self.ui.use_box_row("Options")
         self.ui.scene_property("output_dir")
-        self.ui.scene_property("use_existing_video")
-        Messages.display_message("VIDEO_EXISTS", self)
+        self.ui.scene_property("use_existing_frames")
+        Messages.display_message("FRAMES_EXIST", self)
 
-        if bpy.context.scene.use_existing_video == False:
+        if bpy.context.scene.use_existing_frames == False:
             self.ui.scene_property("bake_texture_size")
             self.ui.scene_property("num_cycles")
         
         # self.ui.use_layout_row()
         self.ui.scene_property("viewer_sphere_size")
+        self.ui.scene_property("min_guide_sphere_spread")
         self.ui.ops_button(rel_data_path="proteinvr.create_scene", button_label="Create Scene")
         
 class OBJECT_OT_CreateScene(ButtonParentClass):
@@ -73,18 +74,18 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             self.output_dir = self.output_dir + os.sep
             self.scene.output_dir = self.output_dir
 
-        if self.scene.use_existing_video == False and os.path.exists(self.output_dir + "proteinvr_baked.mp4"):
+        if self.scene.use_existing_frames == False and os.path.exists(self.output_dir + "frames"):
             Messages.send_message(
-                "VIDEO_EXISTS", 
-                "Video already exists!",
+                "FRAMES_EXIST", 
+                "Frames already exist!",
                 operator=self
             )
             return False
 
-        if self.scene.use_existing_video == True and not os.path.exists(self.output_dir + "proteinvr_baked.mp4"):
+        if self.scene.use_existing_frames == True and not os.path.exists(self.output_dir + "frames"):
             Messages.send_message(
-                "VIDEO_EXISTS", 
-                "Video does not exist!",
+                "FRAMES_EXIST", 
+                "Frames do not exist!",
                 operator=self
             )
             return False
@@ -94,7 +95,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             os.mkdir(self.output_dir)
         
         # Make sure scratch exists... delete if already existing
-        self.scratch_dir = self.output_dir + ".tmp" + os.sep
+        self.scratch_dir = self.output_dir + "frames" + os.sep
         if os.path.exists(self.scratch_dir):
             shutil.rmtree(self.scratch_dir)
         os.mkdir(self.scratch_dir)
@@ -132,7 +133,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.extra_data = {
             "cameraPositionsAndTextures": [],
             "clickableFiles": [],
-            "viewer_sphere_size": self.scene.viewer_sphere_size
+            "viewer_sphere_size": self.scene.viewer_sphere_size,
+            "guideSphereLocations": None
         }
 
     def _step_2_get_camerea_positions(self):
@@ -148,6 +150,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.scene.cycles.samples = self.scene.num_cycles
         self.scene.cycles.preview_samples = self.scene.num_cycles
         
+        frame_file_names = []
+
         for this_frame in range(self.frame_start, self.frame_end + 1):
             print("Frame", this_frame)
 
@@ -158,33 +162,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             if not debug:
                 self.view_sphere.location = this_camera_pos
 
-                # position forward sphere
-                # self.forward_sphere.hide = True
-                # for future_frame in range(this_frame + 1, self.frame_end + 1):
-                #     self.set_frame(future_frame)
-                #     future_camera_pos = self.camera.location.copy()
-                #     if future_camera_pos != this_camera_pos:
-                #         # print(this_frame, this_camera_pos, future_camera_pos)
-                #         direc = future_camera_pos - this_camera_pos
-                #         direc.normalize()
-                #         direc = 5 * direc
-                #         self.forward_sphere.location = this_camera_pos + direc
-                #         self.forward_sphere.hide = False
-                #         break
-                
-                # position the backwards sphere
-                # self.backwards_sphere.hide = True
-                # for past_frame in range(this_frame - 1, self.frame_start, -1):
-                #     self.set_frame(past_frame)
-                #     past_camera_pos = self.camera.location.copy()
-                #     if past_camera_pos != this_camera_pos:
-                #         direc = past_camera_pos - this_camera_pos
-                #         direc.normalize()
-                #         direc = 5 * direc
-                #         self.backwards_sphere.location = this_camera_pos + direc
-                #         self.backwards_sphere.hide = False
-                #         break
-                
                 # Bake the view-sphere image
                 # See https://blender.stackexchange.com/questions/10860/baking-textures-on-headless-machine-batch-baking
                 # Utils.select_and_active(self.view_sphere)
@@ -196,8 +173,11 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 # Create the image
                 size = self.scene.bake_texture_size
                 image = bpy.data.images.new("ProteinVRImage" + str(this_frame), size, size)
-                image.file_format = 'PNG'
-                image.filepath_raw = self.scratch_dir + "proteinvr_baked_texture" + str(this_frame) + ".png"
+                image.file_format = 'JPEG'
+                self.scene.render.image_settings.quality = 50
+               
+                image.filepath_raw = self.scratch_dir + "proteinvr_baked_texture" + str(this_frame) + ".jpg"
+                frame_file_names.append("proteinvr_baked_texture" + str(this_frame) + ".jpg")
 
                 # Select which texture you want to bake to. Find the node of
                 # the texture, select it. Set its image.
@@ -219,7 +199,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
                         # Save the image
                         # image = bpy.data.images[tex_node_name]
-                        image.save()
+                        # image.save()
+                        image.save_render(filepath = image.filepath, scene=self.scene)
 
                         break
 
@@ -232,13 +213,20 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             if not img.users:
                 if img.name.startswith("ProteinVRImage"):
                     bpy.data.images.remove(img)
+        
+        # Save list of all rendered frames
+        json.dump(frame_file_names, open(self.scratch_dir + "filenames.json",'w'))
 
     def _step_4_compile_baked_images_into_video(self, debug=False):
+        # I've decided this is no good. I don't think I can reliably pull data
+        # from the video on mobile. So we'll do it based on images instead.
+        return
+
         if not debug:
             # Having rendered all the images, load them into the video sequencer.
             # see https://blender.stackexchange.com/questions/8107/how-to-automate-blender-video-sequencer
-            files = [os.path.basename(f) for f in glob.glob(self.scratch_dir + "proteinvr_baked_texture*.png")]
-            def get_key(a): return int(a.replace("proteinvr_baked_texture", "").replace(".png", ""))
+            files = [os.path.basename(f) for f in glob.glob(self.scratch_dir + "proteinvr_baked_texture*.jpg")]
+            def get_key(a): return int(a.replace("proteinvr_baked_texture", "").replace(".jpg", ""))
             files.sort(key=get_key)
 
             bpy.context.scene.sequence_editor_create()
@@ -263,7 +251,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             bpy.ops.render.render(animation=True)
 
             # Remove rendered frames... keep just the video
-            # for filename in glob.glob(self.output_dir + "proteinvr_baked_texture*.png"):
+            # for filename in glob.glob(self.output_dir + "proteinvr_baked_texture*.jpg"):
             #     os.unlink(filename)
         else:
             # Debugging, so just copy a pre-compiled video
@@ -327,7 +315,31 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             # Remove the clickable mesh now that it's saved
             bpy.ops.object.delete()
 
-    def _step_6_cleanup(self):
+    def _step_6_calculate_guide_spheres(self):
+        # First, get all the camera locations
+        camera_positions = []
+        for this_frame in range(self.frame_start, self.frame_end + 1):
+            self.set_frame(this_frame)
+            camera_positions.append(self.camera.location.copy())
+        
+        # Keep ones that are far enough away from others
+        guide_sphere_locations = [camera_positions[0]]
+
+        for camera_position in camera_positions[1:]:
+            keep_it = True
+            for guide_sphere_location in guide_sphere_locations:
+                dist = (camera_position - guide_sphere_location).length
+                if (dist < bpy.context.scene.min_guide_sphere_spread):
+                    keep_it = False
+                    break
+            if keep_it:
+                guide_sphere_locations.append(camera_position)
+        
+        self.extra_data["guideSphereLocations"] = []
+        for v in guide_sphere_locations:
+            self.extra_data["guideSphereLocations"].append([round(v.x, 3), round(v.y, 3), round(v.z, 3)])
+
+    def _step_7_cleanup(self):
         # Hide some spheres... cleaning up.
         # self.forward_sphere.hide = True
         # self.backwards_sphere.hide = True
@@ -355,13 +367,14 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             self._step_3_render_baked_frames(debug)
             self._step_4_compile_baked_images_into_video(debug)
         self._step_5_make_clickable_meshes()
+        self._step_6_calculate_guide_spheres()
 
         json.dump(
             self.extra_data, 
             open(self.output_dir + "data.json", 'w')
         )
 
-        self._step_6_cleanup()
+        self._step_7_cleanup()
         print(self.extra_data)
 
         return {'FINISHED'}
