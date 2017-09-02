@@ -19,8 +19,8 @@ interface userVarsInterface {
     // animations?: animations,
     visibility?: number,
     scenePath?: string,
-    moving?: moving,
-    looking?: looking
+    // moving?: moving,
+    // looking?: looking
 }
 
 // Setting up user parameters
@@ -105,24 +105,24 @@ paramDefaults["desktop"]["device"] = devices["Desktop"];
 // paramDefaults["laptop"]["display"] = displays["FullScreen"];
 // paramDefaults["desktop"]["display"] = displays["FullScreen"];
 
-export enum moving {
-    Advance,
-    Jump,
-    Teleport
-}
-paramNames["moving"] = ["Advance", "Jump", "Teleport"];
-paramDefaults["mobile"]["moving"] = moving["Advance"];
-paramDefaults["laptop"]["moving"] = moving["Advance"];
-paramDefaults["desktop"]["moving"] = moving["Advance"];
+// export enum moving {
+//     Advance,
+//     Jump,
+//     Teleport
+// }
+// paramNames["moving"] = ["Advance", "Jump", "Teleport"];
+// paramDefaults["mobile"]["moving"] = moving["Advance"];
+// paramDefaults["laptop"]["moving"] = moving["Advance"];
+// paramDefaults["desktop"]["moving"] = moving["Advance"];
 
-export enum looking {
-    MouseMove,
-    Click
-}
-paramNames["looking"] = ["Mouse Move", "Click"];
-paramDefaults["mobile"]["looking"] = looking["Click"];
-paramDefaults["laptop"]["looking"] = looking["MouseMove"];
-paramDefaults["desktop"]["looking"] = looking["MouseMove"];
+// export enum looking {
+//     MouseMove,
+//     Click
+// }
+// paramNames["looking"] = ["Mouse Move", "Click"];
+// paramDefaults["mobile"]["looking"] = looking["Click"];
+// paramDefaults["laptop"]["looking"] = looking["MouseMove"];
+// paramDefaults["desktop"]["looking"] = looking["MouseMove"];
 
 // export enum animations {
 //     Moving,

@@ -43,60 +43,6 @@ define(["require", "exports", "./SettingsPanel"], function (require, exports, Se
     exports.paramDefaults["mobile"]["device"] = devices["Mobile"];
     exports.paramDefaults["laptop"]["device"] = devices["Laptop"];
     exports.paramDefaults["desktop"]["device"] = devices["Desktop"];
-    // export enum textures {
-    //     Sharp,  // no modification
-    //     Medium,  // 512
-    //     Grainy  // 256
-    // }
-    // paramNames["textures"] = ["Sharp", "Medium", "Grainy"];
-    // paramDefaults["mobile"]["textures"] = textures["Medium"];
-    // paramDefaults["laptop"]["textures"] = textures["Sharp"];
-    // paramDefaults["desktop"]["textures"] = textures["Sharp"];
-    // export enum fog {
-    //     Clear,
-    //     Thin,
-    //     Thick
-    // }
-    // paramNames["fog"] = ["Clear", "Thin", "Thick"];
-    // paramDefaults["mobile"]["fog"] = fog["Clear"];
-    // paramDefaults["laptop"]["fog"] = fog["Thin"];
-    // paramDefaults["desktop"]["fog"] = fog["Thick"];
-    // export enum objects {  // actually LOD settings
-    //     Detailed,
-    //     Normal,
-    //     Simple
-    // }
-    // paramNames["objects"] = ["Detailed", "Normal", "Simple"];
-    // paramDefaults["mobile"]["objects"] = objects["Normal"];
-    // paramDefaults["laptop"]["objects"] = objects["Detailed"];
-    // paramDefaults["desktop"]["objects"] = objects["Detailed"];
-    // export enum displays {
-    //     FullScreen,
-    //     Windowed
-    // }
-    // paramNames["display"] = ["Full Screen", "Windowed"];
-    // paramDefaults["mobile"]["display"] = displays["FullScreen"];
-    // paramDefaults["laptop"]["display"] = displays["FullScreen"];
-    // paramDefaults["desktop"]["display"] = displays["FullScreen"];
-    var moving;
-    (function (moving) {
-        moving[moving["Advance"] = 0] = "Advance";
-        moving[moving["Jump"] = 1] = "Jump";
-        moving[moving["Teleport"] = 2] = "Teleport";
-    })(moving = exports.moving || (exports.moving = {}));
-    exports.paramNames["moving"] = ["Advance", "Jump", "Teleport"];
-    exports.paramDefaults["mobile"]["moving"] = moving["Advance"];
-    exports.paramDefaults["laptop"]["moving"] = moving["Advance"];
-    exports.paramDefaults["desktop"]["moving"] = moving["Advance"];
-    var looking;
-    (function (looking) {
-        looking[looking["MouseMove"] = 0] = "MouseMove";
-        looking[looking["Click"] = 1] = "Click";
-    })(looking = exports.looking || (exports.looking = {}));
-    exports.paramNames["looking"] = ["Mouse Move", "Click"];
-    exports.paramDefaults["mobile"]["looking"] = looking["Click"];
-    exports.paramDefaults["laptop"]["looking"] = looking["MouseMove"];
-    exports.paramDefaults["desktop"]["looking"] = looking["MouseMove"];
     /**
      * This function will assign values to the system variables based on user input.
      */

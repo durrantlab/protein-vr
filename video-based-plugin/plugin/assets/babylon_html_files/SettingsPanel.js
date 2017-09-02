@@ -35,12 +35,18 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
             )) +
                 row_even_split(radioBoxes("Device", UserVars.paramNames["device"], ['<i class="icon-iphone"></i>', '<i class="icon-laptop"></i>', '<i class="icon-connectedpc"></i>']
                 // [100, 100, 100]
-                ), radioBoxes("Moving", UserVars.paramNames["moving"], ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
-                // [100, 100, 100]
-                ) + "<!--" + radioBoxes(// commented out because of simplified UI
-                "Looking", UserVars.paramNames["looking"], ['<i class="icon-mouse"></i>', '<i class="icon-hand-up"></i>'] //, '<i class="icon-connectedpc"></i>']
-                // [100, 100, 100]
-                ) + "-->")) /* +
+                ), "" /*,
+                radioBoxes(
+                    "Moving",
+                    UserVars.paramNames["moving"],
+                    ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
+                    // [100, 100, 100]
+                )  + radioBoxes(  // commented out because of simplified UI
+                    "Looking",
+                    UserVars.paramNames["looking"],
+                    ['<i class="icon-mouse"></i>', '<i class="icon-hand-up"></i>'] //, '<i class="icon-connectedpc"></i>']
+                    // [100, 100, 100]
+                ) */)) /* +
         panelCollapsible(
             "Initial Performance Settings",
             `<div id="settings-msg" class="alert alert-info">
@@ -178,21 +184,20 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
             }
         }
         // Always set looking to MouseMove. This because simplifying UI.
-        varsToUse["looking"] = UserVars.looking["MouseMove"];
+        // varsToUse["looking"] = UserVars.looking["MouseMove"]
         // Control moving button visibiliy depending on other issues.
-        var buttonbarMoving = jQuery(".buttonbar-moving");
-        var buttonbarLooking = jQuery(".buttonbar-looking");
-        if ((varsToUse["viewer"] == UserVars.viewers["VRHeadset"]) || (varsToUse["device"] == UserVars.devices["Mobile"])) {
-            buttonbarMoving.show();
-            buttonbarLooking.hide();
-            // make sure no pointerlock used in this scenario.
-            varsToUse["looking"] = UserVars.looking["Click"];
-            UserVars.saveLocalStorageParams(varsToUse);
-        }
-        else {
-            buttonbarMoving.hide();
-            buttonbarLooking.show();
-        }
+        // let buttonbarMoving = jQuery(".buttonbar-moving");
+        // let buttonbarLooking = jQuery(".buttonbar-looking");
+        // if ((varsToUse["viewer"] == UserVars.viewers["VRHeadset"]) || (varsToUse["device"] == UserVars.devices["Mobile"])) {
+        // buttonbarMoving.show();
+        // buttonbarLooking.hide();
+        // make sure no pointerlock used in this scenario.
+        // varsToUse["looking"] = UserVars.looking["Click"];
+        // UserVars.saveLocalStorageParams(varsToUse);
+        // } else {
+        // buttonbarMoving.hide();
+        // buttonbarLooking.show();
+        // }
     }
     exports.setGUIState = setGUIState;
     function addJavaScript(onSettingsPanelClosed, engine, jQuery) {
@@ -245,7 +250,6 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
         jQuery("#start_game_button").click(function () {
             jQuery("#settings_panel").fadeOut(1000);
             this.onSettingsPanelClosed();
-            console.log(UserVars.getParam("viewer") == UserVars.viewers["Screen"]);
             this.engine.switchFullscreen(UserVars.getParam("viewer") == UserVars.viewers["Screen"]);
             // // if ((UserVars.getParam("display") === UserVars.displays["FullScreen"]) && (screenfull.enabled)) {
             // if (screenfull.enabled) {

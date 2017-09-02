@@ -66,18 +66,18 @@ export function show(params: ShowInterface) {
                     UserVars.paramNames["device"],
                     ['<i class="icon-iphone"></i>', '<i class="icon-laptop"></i>', '<i class="icon-connectedpc"></i>']
                     // [100, 100, 100]
-                ),
+                ), "" /*,
                 radioBoxes(
                     "Moving",
                     UserVars.paramNames["moving"],
                     ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
                     // [100, 100, 100]
-                ) + "<!--" + radioBoxes(  // commented out because of simplified UI
+                )  + radioBoxes(  // commented out because of simplified UI
                     "Looking",
                     UserVars.paramNames["looking"],
                     ['<i class="icon-mouse"></i>', '<i class="icon-hand-up"></i>'] //, '<i class="icon-connectedpc"></i>']
                     // [100, 100, 100]
-                ) + "-->",
+                ) */,
             )
         ) /* + 
         panelCollapsible(
@@ -279,23 +279,23 @@ export function setGUIState(jQuery) {
     }
 
     // Always set looking to MouseMove. This because simplifying UI.
-    varsToUse["looking"] = UserVars.looking["MouseMove"]
+    // varsToUse["looking"] = UserVars.looking["MouseMove"]
 
     // Control moving button visibiliy depending on other issues.
-    let buttonbarMoving = jQuery(".buttonbar-moving");
-    let buttonbarLooking = jQuery(".buttonbar-looking");
+    // let buttonbarMoving = jQuery(".buttonbar-moving");
+    // let buttonbarLooking = jQuery(".buttonbar-looking");
 
-    if ((varsToUse["viewer"] == UserVars.viewers["VRHeadset"]) || (varsToUse["device"] == UserVars.devices["Mobile"])) {
-        buttonbarMoving.show();
-        buttonbarLooking.hide();
+    // if ((varsToUse["viewer"] == UserVars.viewers["VRHeadset"]) || (varsToUse["device"] == UserVars.devices["Mobile"])) {
+        // buttonbarMoving.show();
+        // buttonbarLooking.hide();
 
         // make sure no pointerlock used in this scenario.
-        varsToUse["looking"] = UserVars.looking["Click"];
-        UserVars.saveLocalStorageParams(varsToUse);
-    } else {
-        buttonbarMoving.hide();
-        buttonbarLooking.show();
-    }
+        // varsToUse["looking"] = UserVars.looking["Click"];
+        // UserVars.saveLocalStorageParams(varsToUse);
+    // } else {
+        // buttonbarMoving.hide();
+        // buttonbarLooking.show();
+    // }
 }
 
 function addJavaScript(onSettingsPanelClosed, engine, jQuery) {
@@ -356,7 +356,6 @@ function addJavaScript(onSettingsPanelClosed, engine, jQuery) {
             jQuery("#settings_panel").fadeOut(1000);
             this.onSettingsPanelClosed();
 
-            console.log(UserVars.getParam("viewer") == UserVars.viewers["Screen"]);
             this.engine.switchFullscreen(
                 UserVars.getParam("viewer") == UserVars.viewers["Screen"]
             )

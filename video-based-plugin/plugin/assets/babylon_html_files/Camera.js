@@ -3,6 +3,7 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
     exports.__esModule = true;
     var Camera = (function () {
         function Camera(parentObj, BABYLON) {
+            this._mouseDown = false;
             this._parentObj = parentObj;
             this.BABYLON = BABYLON;
         }
@@ -14,18 +15,14 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
             else {
                 this._setupVRCamera();
             }
-            // Click always advances
-            this._parentObj.scene.onPointerDown = function (evt, pickResult) {
-                this.scene.activeCamera.position = this.scene.activeCamera.getFrontPosition(0.01 * this.scene.getAnimationRatio());
-            }.bind({
-                scene: this._parentObj.scene
-            });
+            this._setupMouse();
             // Add extra keys
             // Additional control keys.
             this._parentObj.scene.activeCamera.keysUp.push(87); // W
             this._parentObj.scene.activeCamera.keysLeft.push(65); // A
             this._parentObj.scene.activeCamera.keysDown.push(83); // S
             this._parentObj.scene.activeCamera.keysRight.push(68); // D
+            this._lastCameraLoc = new this.BABYLON.Vector3(-9999, -9999, -9999);
             // this.scene.activeCamera.inertia = 0.0;
         };
         Camera.prototype._setupVRCamera = function () {
@@ -61,66 +58,100 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
             // Attach that camera to the canvas.
             scene.activeCamera.attachControl(canvas);
         };
-        Camera.prototype.update = function () {
-            var cameraLoc = this._parentObj.scene.activeCamera.position;
-            // Calculate distances to all camera positions
-            var distData = [];
-            for (var i = 0; i < this._parentObj.cameraPositionsAndTextures.length; i++) {
-                var cameraPos = this._parentObj.cameraPositionsAndTextures[i];
-                var pos = cameraPos[0].clone();
-                var tex = cameraPos[1];
-                var dist = pos.subtract(cameraLoc).length();
-                // if (!this._lastCameraPos.equals(pos)) {
-                // Don't include last previous position. So there has to be
-                // movement.
-                distData.push([dist, pos, tex]);
-                // }
-                // if dist = 0 temrinate early?
+        Camera.prototype._setupMouse = function () {
+            var scene = this._parentObj.scene;
+            scene.onPointerDown = function (evt, pickResult) {
+                this._mouseDown = true;
+            }.bind(this);
+            scene.onPointerUp = function (evt, pickResult) {
+                this._mouseDown = false;
+            }.bind(this);
+        };
+        Camera.prototype._vectorsEqualTolerance = function (vec1, vec2, tol) {
+            if (tol === void 0) { tol = 0.2; }
+            if (Math.abs(vec1.x - vec2.x) > tol) {
+                return false;
             }
-            // Sort by distance
-            var kf = function (a, b) {
-                a = a[0];
-                b = b[0];
-                if (a < b) {
-                    return -1;
+            if (Math.abs(vec1.y - vec2.y) > tol) {
+                return false;
+            }
+            if (Math.abs(vec1.z - vec2.z) > tol) {
+                return false;
+            }
+            return true;
+        };
+        Camera.prototype.update = function () {
+            var scene = this._parentObj.scene;
+            var camera = scene.activeCamera;
+            var cameraLoc = camera.position;
+            // If the mouse is done, advance camera forward
+            if (this._mouseDown) {
+                cameraLoc = camera.getFrontPosition(0.5 * camera.speed * scene.getAnimationRatio());
+            }
+            // Continue only if camera position has changed.
+            if (!this._vectorsEqualTolerance(cameraLoc, this._lastCameraLoc)) {
+                // console.log("Camera pos changed", cameraLoc, this._lastCameraLoc);
+                // Calculate distances to all camera positions
+                var distData = [];
+                for (var i = 0; i < this._parentObj.cameraPositionsAndTextures.length; i++) {
+                    var cameraPos = this._parentObj.cameraPositionsAndTextures[i];
+                    var pos = cameraPos[0].clone();
+                    var tex = cameraPos[1];
+                    var dist = pos.subtract(cameraLoc).length();
+                    // if (!this._lastCameraPos.equals(pos)) {
+                    // Don't include last previous position. So there has to be
+                    // movement.
+                    distData.push([dist, pos, tex]);
+                    // }
+                    // if dist = 0 temrinate early?
                 }
-                else if (a > b) {
-                    return 1;
+                // Sort by distance
+                var kf = function (a, b) {
+                    a = a[0];
+                    b = b[0];
+                    if (a < b) {
+                        return -1;
+                    }
+                    else if (a > b) {
+                        return 1;
+                    }
+                    else {
+                        return 0;
+                    }
+                };
+                distData.sort(kf);
+                // Remove first one (closest). To make sure always going somewhere...
+                distData.shift();
+                var tex1 = distData[0][2];
+                // let tex2 = distData[1][1][2];
+                // let tex3 = distData[2][1][2];
+                var dist1 = distData[0][0];
+                // let dist2 = distData[1][0];
+                // let dist3 = distData[2][0];
+                var bestDist = dist1;
+                var bestPos = distData[0][1];
+                // Move camera to best frame.
+                camera.position = bestPos;
+                // Move sphere
+                this._parentObj._viewerSphere.position = bestPos;
+                // Update texture
+                this._parentObj._shader.setTextures(tex1); //, tex2, tex3, dist1, dist2, dist3);
+                // this._viewerSphere.material.emissiveTexture = bestTexture;
+                // Keep only guide spheres that are not so close
+                for (var i = 0; i < this._parentObj._guideSpheres.length; i++) {
+                    var sphere = this._parentObj._guideSpheres[i];
+                    var distToGuideSphere = this.BABYLON.Vector3.Distance(sphere.position, bestPos);
+                    if (distToGuideSphere < this._parentObj._guideSphereHiddenCutoffDist) {
+                        sphere.visibility = 0.0;
+                    }
+                    else if (distToGuideSphere < this._parentObj._guideSphereShowCutoffDist) {
+                        sphere.visibility = this._parentObj._guideSphereIntermediateFactor * (distToGuideSphere - this._parentObj._guideSphereHiddenCutoffDist);
+                    }
+                    else {
+                        sphere.visibility = this._parentObj._guideSphereMaxVisibility;
+                    }
                 }
-                else {
-                    return 0;
-                }
-            };
-            distData.sort(kf);
-            var tex1 = distData[0][2];
-            // let tex2 = distData[1][1][2];
-            // let tex3 = distData[2][1][2];
-            var dist1 = distData[0][0];
-            // let dist2 = distData[1][0];
-            // let dist3 = distData[2][0];
-            var bestDist = dist1;
-            var bestPos = distData[0][1];
-            // Move camera to best frame.
-            this._parentObj.scene.activeCamera.position = bestPos;
-            // this.scene.activeCamera.position = newPos.clone();
-            // Move sphere
-            this._parentObj._viewerSphere.position = bestPos;
-            // Update texture
-            this._parentObj._shader.setTextures(tex1); //, tex2, tex3, dist1, dist2, dist3);
-            // this._viewerSphere.material.emissiveTexture = bestTexture;
-            // Keep only guide spheres that are not so close
-            for (var i = 0; i < this._parentObj._guideSpheres.length; i++) {
-                var sphere = this._parentObj._guideSpheres[i];
-                var distToGuideSphere = this.BABYLON.Vector3.Distance(sphere.position, bestPos);
-                if (distToGuideSphere < this._parentObj._guideSphereHiddenCutoffDist) {
-                    sphere.visibility = 0.0;
-                }
-                else if (distToGuideSphere < this._parentObj._guideSphereShowCutoffDist) {
-                    sphere.visibility = this._parentObj._guideSphereIntermediateFactor * (distToGuideSphere - this._parentObj._guideSphereHiddenCutoffDist);
-                }
-                else {
-                    sphere.visibility = this._parentObj._guideSphereMaxVisibility;
-                }
+                this._lastCameraLoc = camera.position.clone();
             }
         };
         return Camera;
