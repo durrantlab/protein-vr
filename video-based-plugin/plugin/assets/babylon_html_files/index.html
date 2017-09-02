@@ -4,8 +4,16 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <title>Babylon - Basic scene</title>
+        <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=no">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        
+        <link rel="manifest" href="/manifest.json">
+        <link rel="stylesheet" href="./js/bootstrap-3.3.7/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="./js/whhg-font/css/whhg.css">
+                
         <style>
-            html, body {
+            html, body, #renderCanvas {
                 overflow: hidden;
                 width: 100%;
                 height: 100%;
@@ -14,23 +22,28 @@
             }
 
             #renderCanvas {
-                width: 100%;
-                height: 100%;
+                /* width: 100%;
+                height: 100%; */
                 touch-action: none;
             }
         </style>
+    </head>
+    
+    <body>
+        <div id="settings_panel"></div>
+        <canvas id="renderCanvas"></canvas>
+        
+        <!-- <script data-main="RequireConfig" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.js"></script> -->
         <!-- <script src="https://code.jquery.com/jquery-3.2.1.js"></script> -->
         <script src="js/babylon.max.js"></script>
         <script src="js/babylon.objFileLoader.js"></script>
-    </head>
 
-    <body>
-        <canvas id="renderCanvas"></canvas>
+        <script src="js/jquery-3.2.1.js"></script>
 
-        <!-- <script data-main="RequireConfig" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.js"></script> -->
+        <script src="js/bootstrap-3.3.7/dist/js/bootstrap.min.js"></script>
         <script data-main="RequireConfig" src="js/require.min.js"></script>
         
-        <!-- <script src="main.js"></script>     -->
+        <!-- <script src="main.js"></script> -->
     </body>
 
 </html>

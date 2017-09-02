@@ -1,4 +1,4 @@
-define(["require", "exports", "./VideoFrames", "./StandardShader"], function (require, exports, VideoFrames_1, StandardShader_1) {
+define(["require", "exports", "./VideoFrames", "./StandardShader", "./Camera", "./UserVars"], function (require, exports, VideoFrames_1, StandardShader_1, Camera_1, UserVars) {
     "use strict";
     exports.__esModule = true;
     var callbacksComplete = [];
@@ -14,7 +14,6 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
             // Get the canvas element from our HTML above
             this._canvas = document.getElementById("renderCanvas");
             this._timeOfLastClick = new Date().getTime(); // A refractory period
-            this._lastCameraPos = new BABYLON.Vector3(-9999, -9999, -9999);
             this._guideSpheres = [];
             this._guideSphereMaxVisibility = 0.25;
             this._guideSphereSize = 0.02;
@@ -24,33 +23,42 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
             else {
                 // Set the engine
                 this._params = params;
-                this._engine = new BABYLON.Engine(this._canvas, true);
+                this.engine = new BABYLON.Engine(this._canvas, true);
                 this._loadScene();
             }
         }
         Game.prototype._loadScene = function () {
-            BABYLON.SceneLoader.Load("", "babylon.babylon", this._engine, function (scene) {
-                this.scene = scene;
-                // Wait for textures and shaders to be ready
-                this.scene.executeWhenReady(function () {
-                    this._setupCamera();
-                    this._setupFromJSON(function () {
-                        this._setupVideoSphere();
-                        this._startRenderLoop();
-                    }.bind(this));
-                    this._resizeWindow();
-                    this._params.onDone();
-                    callbacksComplete.push(callBacks.SCENE_READY);
-                    this.scene.debugLayer.show();
-                }.bind(this));
-            }.bind(this), function (progress) {
-                // To do: give progress feedback to user
+            UserVars.setup({
+                onSettingsPanelShown: function () {
+                    BABYLON.SceneLoader.Load("", "babylon.babylon", this.engine, function (scene) {
+                        this.scene = scene;
+                        window.scrollTo(0, 1); // supposed to autohide scroll bar.
+                        // this._canvas.addEventListener("click", function() {
+                        //     this.engine.switchFullscreen(true);
+                        // }.bind(this));
+                        // Wait for textures and shaders to be ready
+                        this.scene.executeWhenReady(function () {
+                            this._camera = new Camera_1.Camera(this, BABYLON);
+                            // this._camera.setup();
+                            this._setupFromJSON(function () {
+                                this._setupVideoSphere();
+                            }.bind(this));
+                            this._resizeWindow();
+                            this._params.onDone();
+                            callbacksComplete.push(callBacks.SCENE_READY);
+                            // this.scene.debugLayer.show();
+                        }.bind(this));
+                    }.bind(this), function (progress) {
+                        // To do: give progress feedback to user
+                    });
+                }.bind(this),
+                onSettingsPanelClosed: function () {
+                    this._camera.setup();
+                    this._startRenderLoop();
+                }.bind(this),
+                engine: this.engine,
+                jQuery: jQuery
             });
-        };
-        Game.prototype._setupCamera = function () {
-            // Attach camera to canvas inputs
-            this.scene.activeCamera.attachControl(this._canvas);
-            // this.scene.activeCamera.inertia = 0.0;
         };
         Game.prototype._setupVideoSphere = function () {
             // HTML5 video controls are inconsistent, but you want to take
@@ -197,88 +205,20 @@ define(["require", "exports", "./VideoFrames", "./StandardShader"], function (re
         };
         Game.prototype._startRenderLoop = function () {
             // Once the scene is loaded, just register a render loop to render it
-            this._engine.runRenderLoop(function () {
+            this.engine.runRenderLoop(function () {
                 // let x = Math.round(this.scene.activeCamera.position.x * 100) / 100;
                 // let y = Math.round(this.scene.activeCamera.position.y * 100) / 100;
                 // let z = Math.round(this.scene.activeCamera.position.z * 100) / 100;
                 // console.log(bestFrame, x, y, z);
                 // console.log(x, y, z);
-                this._setCamera();
+                this._camera.update();
                 this.scene.render();
             }.bind(this));
-        };
-        Game.prototype._setCamera = function () {
-            var cameraLoc = this.scene.activeCamera.position;
-            if ((this._lastCameraPos.material !== undefined) && (this._lastCameraPos.equals(cameraLoc))) {
-                // Camera hasn't moved.
-                return;
-            }
-            // Calculate distances to all camera positions
-            var distData = [];
-            for (var i = 0; i < this.cameraPositionsAndTextures.length; i++) {
-                var cameraPos = this.cameraPositionsAndTextures[i];
-                var pos = cameraPos[0].clone();
-                var tex = cameraPos[1];
-                var dist = pos.subtract(cameraLoc).length();
-                // if (!this._lastCameraPos.equals(pos)) {
-                // Don't include last previous position. So there has to be
-                // movement.
-                distData.push([dist, pos, tex]);
-                // }
-                // if dist = 0 temrinate early?
-            }
-            // Sort by distance
-            var kf = function (a, b) {
-                a = a[0];
-                b = b[0];
-                if (a < b) {
-                    return -1;
-                }
-                else if (a > b) {
-                    return 1;
-                }
-                else {
-                    return 0;
-                }
-            };
-            distData.sort(kf);
-            var tex1 = distData[0][2];
-            // let tex2 = distData[1][1][2];
-            // let tex3 = distData[2][1][2];
-            var dist1 = distData[0][0];
-            // let dist2 = distData[1][0];
-            // let dist3 = distData[2][0];
-            var bestDist = dist1;
-            var bestPos = distData[0][1];
-            // Move camera to best frame.
-            this.scene.activeCamera.position = bestPos;
-            // this.scene.activeCamera.position = newPos.clone();
-            // Move sphere
-            this._viewerSphere.position = bestPos;
-            // Update texture
-            this._shader.setTextures(tex1); //, tex2, tex3, dist1, dist2, dist3);
-            // this._viewerSphere.material.emissiveTexture = bestTexture;
-            // Keep only guide spheres that are not so close
-            for (var i = 0; i < this._guideSpheres.length; i++) {
-                var sphere = this._guideSpheres[i];
-                // console.log(sphere);
-                var distToGuideSphere = BABYLON.Vector3.Distance(sphere.position, bestPos);
-                if (distToGuideSphere < this._guideSphereHiddenCutoffDist) {
-                    sphere.visibility = 0.0;
-                }
-                else if (distToGuideSphere < this._guideSphereShowCutoffDist) {
-                    sphere.visibility = this._guideSphereIntermediateFactor * (distToGuideSphere - this._guideSphereHiddenCutoffDist);
-                }
-                else {
-                    sphere.visibility = this._guideSphereMaxVisibility;
-                }
-            }
-            this._lastCameraPos = bestPos.clone();
         };
         Game.prototype._resizeWindow = function () {
             // Watch for browser/canvas resize events
             window.addEventListener("resize", function () {
-                this._engine.resize();
+                this.engine.resize();
             }.bind(this));
         };
         return Game;

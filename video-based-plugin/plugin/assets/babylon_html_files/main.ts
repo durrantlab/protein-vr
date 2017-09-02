@@ -1,5 +1,8 @@
 import { ExtractFrames } from "./VideoFrames";
 import { Shader } from "./StandardShader";
+import { Camera } from "./Camera";
+// import * as SettingsPanel from "./SettingsPanel";
+import * as UserVars from "./UserVars";
 
 declare var BABYLON;
 declare var jQuery;
@@ -23,7 +26,7 @@ export class Game {
 
     // Load the BABYLON 3D engine. Variable here because defined within
     // isSupported below.
-    private _engine: any;
+    public engine: any;
 
     public scene: any;
 
@@ -41,9 +44,9 @@ export class Game {
 
     private _shader: any;
 
-    private _lastCameraPos: any = new BABYLON.Vector3(-9999, -9999, -9999);
-
     private _guideSpheres: any[] = [];
+
+    private _camera: Camera;
 
     private _guideSphereHiddenCutoffDist: number;
     private _guideSphereShowCutoffDist: number;
@@ -60,40 +63,50 @@ export class Game {
         } else {  // Babylon is supported
             // Set the engine
             this._params = params;
-            this._engine = new BABYLON.Engine(this._canvas, true);
+            this.engine = new BABYLON.Engine(this._canvas, true);
             this._loadScene();
         }
     }
 
     private _loadScene() {
-        BABYLON.SceneLoader.Load("", "babylon.babylon", this._engine, function (scene) {
-            this.scene = scene;
-
-            // Wait for textures and shaders to be ready
-            this.scene.executeWhenReady(function () {
-                this._setupCamera();
-                this._setupFromJSON(function() {
-                    this._setupVideoSphere();
-                    this._startRenderLoop();
-                }.bind(this))
-                this._resizeWindow();
-                this._params.onDone();
-                callbacksComplete.push(callBacks.SCENE_READY);
-
-                this.scene.debugLayer.show();
-            }.bind(this))
-        }.bind(this),
-        function (progress) {
-            // To do: give progress feedback to user
+        UserVars.setup({
+            onSettingsPanelShown: function() {
+                BABYLON.SceneLoader.Load("", "babylon.babylon", this.engine, function (scene) {
+                    this.scene = scene;
+        
+                    window.scrollTo(0,1);  // supposed to autohide scroll bar.
+        
+                    // this._canvas.addEventListener("click", function() {
+                    //     this.engine.switchFullscreen(true);
+                    // }.bind(this));
+        
+                    // Wait for textures and shaders to be ready
+                    this.scene.executeWhenReady(function () {
+                        this._camera = new Camera(this, BABYLON);
+                        // this._camera.setup();
+                        this._setupFromJSON(function() {
+                            this._setupVideoSphere();
+                        }.bind(this))
+                        this._resizeWindow();
+                        this._params.onDone();
+                        callbacksComplete.push(callBacks.SCENE_READY);
+        
+                        // this.scene.debugLayer.show();
+                    }.bind(this))
+                }.bind(this),
+                function (progress) {
+                    // To do: give progress feedback to user
+                });
+            }.bind(this),
+            onSettingsPanelClosed: function() {
+                this._camera.setup();
+                this._startRenderLoop();
+            }.bind(this),
+            engine: this.engine,
+            jQuery: jQuery
         });
     }
     
-    private _setupCamera() {
-        // Attach camera to canvas inputs
-        this.scene.activeCamera.attachControl(this._canvas);
-        // this.scene.activeCamera.inertia = 0.0;
-    }
-
     private _setupVideoSphere() {
         // HTML5 video controls are inconsistent, but you want to take
         // advantage of the compression video provides. It's much better than
@@ -271,101 +284,24 @@ export class Game {
 
     private _startRenderLoop() {
         // Once the scene is loaded, just register a render loop to render it
-        this._engine.runRenderLoop(function() {
+        this.engine.runRenderLoop(function() {
             // let x = Math.round(this.scene.activeCamera.position.x * 100) / 100;
             // let y = Math.round(this.scene.activeCamera.position.y * 100) / 100;
             // let z = Math.round(this.scene.activeCamera.position.z * 100) / 100;
             // console.log(bestFrame, x, y, z);
             // console.log(x, y, z);
 
-            this._setCamera();
+            this._camera.update();
             this.scene.render();
         }.bind(this));
     }
 
-    private _setCamera() {
-        let cameraLoc = this.scene.activeCamera.position;
-        if ((this._lastCameraPos.material !== undefined) && (this._lastCameraPos.equals(cameraLoc))) {
-            // Camera hasn't moved.
-            return;
-        }
 
-        // Calculate distances to all camera positions
-        let distData = [];
-        for (let i=0; i<this.cameraPositionsAndTextures.length; i++) {
-            let cameraPos = this.cameraPositionsAndTextures[i];
-            let pos = cameraPos[0].clone();
-            let tex = cameraPos[1];
-            let dist = pos.subtract(cameraLoc).length();
-            
-            // if (!this._lastCameraPos.equals(pos)) {
-                // Don't include last previous position. So there has to be
-                // movement.
-                distData.push([dist, pos, tex]);
-            // }
-
-            // if dist = 0 temrinate early?
-        }
-
-        // Sort by distance
-        let kf = function(a, b) {
-            a = a[0];
-            b = b[0];
-
-            if (a < b) {
-                return -1;
-            } else if (a > b) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-        distData.sort(kf);
-
-        let tex1 = distData[0][2];
-        // let tex2 = distData[1][1][2];
-        // let tex3 = distData[2][1][2];
-
-        let dist1 = distData[0][0];
-        // let dist2 = distData[1][0];
-        // let dist3 = distData[2][0];
-
-        let bestDist = dist1;
-        let bestPos = distData[0][1];
-
-        // Move camera to best frame.
-        this.scene.activeCamera.position = bestPos;
-
-        // this.scene.activeCamera.position = newPos.clone();
-        // Move sphere
-        this._viewerSphere.position = bestPos;
-
-        // Update texture
-        this._shader.setTextures(tex1); //, tex2, tex3, dist1, dist2, dist3);
-        // this._viewerSphere.material.emissiveTexture = bestTexture;
-
-        // Keep only guide spheres that are not so close
-        for (let i=0; i<this._guideSpheres.length; i++) {
-            let sphere = this._guideSpheres[i];
-            // console.log(sphere);
-            let distToGuideSphere = BABYLON.Vector3.Distance(sphere.position, bestPos);
-            if (distToGuideSphere < this._guideSphereHiddenCutoffDist) {
-                sphere.visibility = 0.0;
-            } else if (distToGuideSphere < this._guideSphereShowCutoffDist) {
-                sphere.visibility = this._guideSphereIntermediateFactor * (distToGuideSphere - this._guideSphereHiddenCutoffDist);
-            } else {
-                sphere.visibility = this._guideSphereMaxVisibility;
-            }
-
-        }
-
-        this._lastCameraPos = bestPos.clone();
-    }
 
     private _resizeWindow() {
         // Watch for browser/canvas resize events
         window.addEventListener("resize", function () {
-            this._engine.resize();
+            this.engine.resize();
         }.bind(this));
     }
 }        

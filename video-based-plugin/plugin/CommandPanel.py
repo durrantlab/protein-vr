@@ -204,6 +204,9 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                         # image.save()
                         image.save_render(filepath = image.filepath, scene=self.scene)
 
+                        image.scale(int(size / 4), int(size / 4))
+                        image.save_render(filepath = image.filepath + ".test.jpg", scene=self.scene)
+
                         break
 
         # Delete the image.

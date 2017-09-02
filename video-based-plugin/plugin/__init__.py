@@ -74,7 +74,7 @@ class ProteinVR(PanelParentClass):
         # Set up scene and object properties.
         bpy.types.Scene.proteinvr_output_dir = self.prop_funcs.strProp("Output directory", "/tmp/proteinvr/", 'DIR_PATH', description="The output directory where the ProteinVR scene will be saved.")
         bpy.types.Scene.proteinvr_use_existing_frames = self.prop_funcs.boolProp("Existing frames", False, description="Whether to use a previously rendered (existing) frames.")
-        bpy.types.Scene.proteinvr_bake_texture_size = self.prop_funcs.intProp("Texture Size", min=128, max=8192, default=256, description="The size of the square texture to render. Higher means higher resolution.")
+        bpy.types.Scene.proteinvr_bake_texture_size = self.prop_funcs.intProp("Texture Size", min=128, max=8192, default=256, description="The size of the square texture to render. Higher means higher resolution. Good to use power of 2. Minimum of 4096 for final render.")
         bpy.types.Scene.proteinvr_num_cycles = self.prop_funcs.intProp("Number of Cycles", min=4, max=10000, default=16, description="The number of rendering cycles. Higher means better quality.")
         bpy.types.Scene.proteinvr_viewer_sphere_size = self.prop_funcs.floatProp("Viewer Sphere Size", min=0.5, max=5.0, default=5.0, description="The size of the viewer sphere. Larger means close objects not allowed, but user can deviate further from set path.")
         bpy.types.Scene.proteinvr_min_guide_sphere_spread = self.prop_funcs.floatProp("Min Guide-Sphere Spread", min=0.0, max=50.0, default=1.0, description="The minimum distance between adjacent guide spheres.")
