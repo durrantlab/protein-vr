@@ -45,7 +45,7 @@ class CommandPanel(ParentPanel):
             self.ui.scene_property("proteinvr_num_cycles")
         
         # self.ui.use_layout_row()
-        self.ui.scene_property("proteinvr_viewer_sphere_size")
+        # self.ui.scene_property("proteinvr_viewer_sphere_size")
         self.ui.scene_property("proteinvr_min_guide_sphere_spread")
         self.ui.ops_button(rel_data_path="proteinvr.create_scene", button_label="Create Scene")
         self.ui.ops_button(rel_data_path="proteinvr.render_scene_remotely", button_label="Render Scene Remotely")        
@@ -120,13 +120,13 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # Variables for the spheres
         # self.forward_sphere = bpy.data.objects["ProteinVR_ForwardSphere"]
         # self.backwards_sphere = bpy.data.objects["ProteinVR_BackwardsSphere"]
-        self.view_sphere = bpy.data.objects["ProteinVR_ViewerSphere"]
+        # self.view_sphere = bpy.data.objects["ProteinVR_ViewerSphere"]
 
         # Make sure viewer sphere appropriate size
-        self.view_sphere.scale = Vector([self.scene.proteinvr_viewer_sphere_size, self.scene.proteinvr_viewer_sphere_size, self.scene.proteinvr_viewer_sphere_size])
+        # self.view_sphere.scale = Vector([self.scene.proteinvr_viewer_sphere_size, self.scene.proteinvr_viewer_sphere_size, self.scene.proteinvr_viewer_sphere_size])
 
         # Make the view sphere visible
-        self.view_sphere.hide = False
+        # self.view_sphere.hide = False
 
         self.camera = bpy.data.objects["Camera"]
         self.frame_start = self.scene.frame_start
@@ -135,7 +135,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.extra_data = {
             "cameraPositionsAndTextures": [],
             "clickableFiles": [],
-            "viewerSphereSize": self.scene.proteinvr_viewer_sphere_size,
+            # "viewerSphereSize": self.scene.proteinvr_viewer_sphere_size,
             "guideSphereLocations": None
         }
 
@@ -147,80 +147,116 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             self.extra_data["cameraPositionsAndTextures"].append([round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)])
 
     def _step_3_render_baked_frames(self, debug=False):
+        print("This def currently does a lot more than bake frames... separate it out...")
+        # Get all the objects that are currently visible, but have animations.
+        objs_that_move = []
+        animation_data = {}
+        for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
+            if obj.hide == False and obj.hide_render == False:
+                pos_loc_data = []
+                for f in range(self.frame_start, self.frame_end + 1):
+                    self.set_frame(f)
+                    loc = obj.location
+                    rot = obj.rotation_euler
+                    # pos_loc_data.append(str(loc.x) + "_" + str(loc.y) + "_" + str(loc.z) + "_" + str(rot.x) + "_" + str(rot.y) + "_" + str(rot.z))
+                    pos_loc_data.append((round(loc.x, 2), round(loc.y, 2), round(loc.z, 2), round(rot.x, 2), round(rot.y, 2), round(rot.z, 2)))
+                
+                keys = ["_".join([str(i) for i in l]) for l in pos_loc_data]
+
+                keys = set(keys)
+                num_keyframes = len(keys)
+                if num_keyframes > 1:
+                    objs_that_move.append(obj)
+                    animation_data[obj.name] = pos_loc_data
+        
+        # Hide the moving objects (not rendered to sphere)
+        for obj in objs_that_move:
+            obj.hide = True
+            obj.hide_render = True
+        
         # Setup cycles samples
         self.scene.render.resolution_percentage = 100.0
         self.scene.cycles.samples = self.scene.proteinvr_num_cycles
         self.scene.cycles.preview_samples = self.scene.proteinvr_num_cycles
-        
+
         frame_file_names = []
+
+        self.camera.rotation_mode = 'XYZ'
 
         for this_frame in range(self.frame_start, self.frame_end + 1):
             print("Frame", this_frame)
 
             self.set_frame(this_frame)
             this_camera_pos = self.camera.location.copy()
-            # self.extra_data["cameraPos"][this_frame] = [round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)]
+            self.camera.rotation_euler.x = 1.5707963267948966
+            self.camera.rotation_euler.y = 0.0
+            self.camera.rotation_euler.z = 0.0
+            self.camera.keyframe_insert(data_path="rotation_euler", frame=this_frame) #20.0, index=2)
 
             if not debug:
-                self.view_sphere.location = this_camera_pos
-
-                # Bake the view-sphere image
-                # See https://blender.stackexchange.com/questions/10860/baking-textures-on-headless-machine-batch-baking
-                # Utils.select_and_active(self.view_sphere)
-                bpy.ops.object.select_all(action='DESELECT')
-                self.view_sphere.select = True
-
-                bpy.context.scene.objects.active = self.view_sphere
-                
                 # Create the image
-                size = self.scene.proteinvr_bake_texture_size
-                image = bpy.data.images.new("ProteinVRImage" + str(this_frame), size, size)
-                image.file_format = 'JPEG'
+                self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".jpg"
+                self.scene.render.image_settings.file_format = 'JPEG'
                 self.scene.render.image_settings.quality = 50
+                self.scene.render.resolution_x = self.scene.proteinvr_bake_texture_size
+                self.scene.render.resolution_y = self.scene.proteinvr_bake_texture_size
+                self.scene.render.resolution_percentage = 100
+                bpy.ops.render.render(write_still=True)
+
+                # size = self.scene.proteinvr_bake_texture_size
+                # image = bpy.data.images.new("ProteinVRImage" + str(this_frame), size, size)
                
-                image.filepath_raw = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".jpg"
                 frame_file_names.append("proteinvr_baked_texture" + str(this_frame) + ".jpg")
 
-                # Select which texture you want to bake to. Find the node of
-                # the texture, select it. Set its image.
-                material = bpy.data.objects["ProteinVR_ViewerSphere"].material_slots[0].material
-                node_tree = material.node_tree
-                for node in node_tree.nodes:
-                    node.select = False
-                for tex_node in node_tree.nodes:
-                    if tex_node.type == "TEX_IMAGE":
-                        # Select/active node
-                        tex_node.select = True
-                        node_tree.nodes.active = tex_node
-
-                        # Set image
-                        tex_node.image = image
-
-                        # Bake to that image
-                        bpy.ops.object.bake(type='COMBINED')
-
-                        # Save the image
-                        # image = bpy.data.images[tex_node_name]
-                        # image.save()
-                        image.save_render(filepath = image.filepath, scene=self.scene)
-
-                        image.scale(int(size / 4), int(size / 4))
-                        image.save_render(filepath = image.filepath + ".test.jpg", scene=self.scene)
-
-                        break
-
-        # Delete the image.
-        # See https://blender.stackexchange.com/questions/32301/how-can-i-unlink-all-images-from-a-project
-        for img in bpy.data.images:
-            if img.name.startswith("ProteinVRImage"):
-                img.user_clear()
-        for img in bpy.data.images:
-            if not img.users:
-                if img.name.startswith("ProteinVRImage"):
-                    bpy.data.images.remove(img)
-        
+                # Now render at 1/4 size. But note that I'm rerendering here,
+                # not resizing. So can be computationally intensive. I chose
+                # this because I believe it gives better results, but I'm not
+                # sure.
+                self.scene.render.resolution_percentage = 25
+                self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".jpg.small.jpg"
+                bpy.ops.render.render(write_still=True)
+                
         # Save list of all rendered frames
         json.dump(frame_file_names, open(self.frame_dir + "filenames.json",'w'))
+
+        # Reshow moving objects
+        for obj in objs_that_move:
+            obj.hide = False
+            obj.hide_render = False
+
+        # Save the animations
+        # json.dump(animation_data, open(self.proteinvr_output_dir + "animations.json", 'w'))
+        self.extra_data["animations"] = animation_data
+        for obj_name in animation_data.keys():
+            obj = bpy.data.objects[obj_name]
+
+            # Save the obj file.
+            filepath = self.proteinvr_output_dir + obj.name + "_animated.obj"
+            bpy.ops.export_scene.obj(
+                filepath=filepath,
+                check_existing=False,
+                use_selection=True,
+                use_mesh_modifiers=True,
+                use_normals=True,
+                use_materials=False,
+                global_scale=1.0,
+                axis_up="Y",
+                axis_forward="-Z"
+            )
+
+            # Search the node tree to find a texture
+            texture_images = [n.image for n in bpy.data.objects["Cube"].active_material.node_tree.nodes if n.type == "TEX_IMAGE"]
+            if len(texture_images) > 0:
+                print("=" * 15)
+                print("WARNING! More than one image node found in material for " + obj_name + ". Using " + str(texture_images[0]))
+                print("=" * 15)
+
+            # Save that texture
+            image = texture_images[0]
+            image.alpha_mode = 'STRAIGHT'
+            image.filepath_raw = self.proteinvr_output_dir + obj.name + "_animated.png"
+            image.file_format = 'PNG'
+            image.save()
 
     # def _step_4_compile_baked_images_into_video(self, debug=False):
     #     # I've decided this is no good. I don't think I can reliably pull data
@@ -345,10 +381,11 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             self.extra_data["guideSphereLocations"].append([round(v.x, 3), round(v.y, 3), round(v.z, 3)])
 
     def _step_7_cleanup(self):
+        pass
         # Hide some spheres... cleaning up.
         # self.forward_sphere.hide = True
         # self.backwards_sphere.hide = True
-        self.view_sphere.hide = True
+        # self.view_sphere.hide = True
 
     def execute(self, context):
         """
@@ -461,11 +498,6 @@ class OBJECT_OT_RenderRemote(ButtonParentClass):
 
         # Remote remote directory.
         self.run_remote("rm -r " + remote_dir)
-
-        
-        
-
-
 
         print()
         # print(bpy.path.abspath("//"))

@@ -1,9 +1,8 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
-    exports.__esModule = true;
-    var ExtractFrames = (function () {
-        function ExtractFrames(videoUrl, BABYLON, game, callBack) {
-            if (callBack === void 0) { callBack = function () { }; }
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class ExtractFrames {
+        constructor(videoUrl, BABYLON, game, callBack = function () { }) {
             this._lastCurrentTime = 0;
             // Create storage elements and variables
             this._video = document.createElement('video');
@@ -16,26 +15,26 @@ define(["require", "exports"], function (require, exports) {
             // Start loading video
             this._video.autoplay = true;
             this._video.muted = true;
-            var initCanvas = this._initCanvas.bind(this);
-            var drawFrame = this._drawFrame.bind(this);
-            var onend = this._onend.bind(this);
+            let initCanvas = this._initCanvas.bind(this);
+            let drawFrame = this._drawFrame.bind(this);
+            let onend = this._onend.bind(this);
             this._video.addEventListener('loadedmetadata', initCanvas, false);
             this._video.addEventListener('timeupdate', drawFrame, false);
             this._video.addEventListener('ended', onend, false);
             this._video.src = videoUrl;
         }
-        ExtractFrames.prototype._initCanvas = function (e) {
+        _initCanvas(e) {
             this._canvas.width = this._video.videoWidth;
             this._canvas.height = this._video.videoHeight;
-        };
-        ExtractFrames.prototype._drawFrame = function (e) {
+        }
+        _drawFrame(e) {
             this._video.pause();
             if (this._video.currentTime - this._lastCurrentTime > 1 / 36.0) {
                 this._ctx.drawImage(this._video, 0, 0);
                 /*
                 Blob would be better than toDataURL, but I don't think babylon can easily work with blobs...
                 */
-                var dataUrl = this._canvas.toDataURL('image/jpeg', 1.0); // full quality needed?
+                let dataUrl = this._canvas.toDataURL('image/jpeg', 1.0); // full quality needed?
                 this._sampledFrames.push(dataUrl);
                 // console.log(((this._video.currentTime / this._video.duration) * 100).toFixed(2) + ' %');
                 this._lastCurrentTime = this._video.currentTime;
@@ -43,18 +42,18 @@ define(["require", "exports"], function (require, exports) {
             if (this._video.currentTime < this._video.duration) {
                 this._video.play();
             }
-        };
-        ExtractFrames.prototype._onend = function (e) {
+        }
+        _onend(e) {
             // keep only every-so-few frames (to match framerate)
-            var indeciesToKeep = [];
-            var deltaIndex = (this._sampledFrames.length - 1) / (this._game.cameraPositionsAndTextures.length - 1);
-            for (var i = 0; i < this._game.cameraPositionsAndTextures.length; i++) {
+            let indeciesToKeep = [];
+            let deltaIndex = (this._sampledFrames.length - 1) / (this._game.cameraPositionsAndTextures.length - 1);
+            for (let i = 0; i < this._game.cameraPositionsAndTextures.length; i++) {
                 indeciesToKeep.push(Math.floor(i * deltaIndex));
             }
-            var textures = [];
-            for (var i = 0; i < indeciesToKeep.length; i++) {
-                var indexToKeep = indeciesToKeep[i];
-                var dataUrl = this._sampledFrames[indexToKeep];
+            let textures = [];
+            for (let i = 0; i < indeciesToKeep.length; i++) {
+                let indexToKeep = indeciesToKeep[i];
+                let dataUrl = this._sampledFrames[indexToKeep];
                 if (dataUrl === undefined) {
                     // console.log("YYY", dataUrl, indexToKeep, this._sampledFrames.length);
                     debugger;
@@ -86,8 +85,8 @@ define(["require", "exports"], function (require, exports) {
             // }
             // console.log(textures.length, this._game.cameraPos.length, "HEHEEHE");
             // Update list in game
-            for (var i = 0; i < this._game.cameraPositionsAndTextures.length; i++) {
-                var tex = textures[i];
+            for (let i = 0; i < this._game.cameraPositionsAndTextures.length; i++) {
+                let tex = textures[i];
                 // let tex = new this.BABYLON.Texture("./.tmp/proteinvr_baked_texture34.png", this._game.scene);
                 this._game.cameraPositionsAndTextures[i][1] = tex;
                 // debugger;
@@ -100,9 +99,8 @@ define(["require", "exports"], function (require, exports) {
             URL.revokeObjectURL(this._video.src);
             // Fire the callback.
             this._callBack();
-        };
-        return ExtractFrames;
-    }());
+        }
+    }
     exports.ExtractFrames = ExtractFrames;
 });
 // let ef = new extractFrames("proteinvr_baked.mp4", function() {

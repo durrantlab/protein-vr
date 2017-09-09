@@ -1,4 +1,4 @@
-define(["require", "exports", "./UserVars"], function (require, exports, UserVars) {
+define(["require", "exports", "./config/UserVars"], function (require, exports, UserVars) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class CameraPoints {
@@ -116,7 +116,7 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
             }
             this._setupMouseAndKeyboard();
             // Move camera to first position.
-            this._parentObj.scene.activeCamera.position = this._parentObj.cameraPositionsAndTextures[5][0];
+            this._parentObj.scene.activeCamera.position = exports.cameraPositionsAndTextures[5][0];
             // Add extra keys
             // Additional control keys.
             // this._parentObj.scene.activeCamera.keysUp.push(87);  // W. 38 is up arrow.
@@ -232,8 +232,8 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
             // console.log("Camera pos changed", cameraLoc, this._lastCameraLoc);
             // Calculate distances to all camera positions
             let cameraPoints = new CameraPoints(this.BABYLON);
-            for (let i = 0; i < this._parentObj.cameraPositionsAndTextures.length; i++) {
-                let cameraPos = this._parentObj.cameraPositionsAndTextures[i];
+            for (let i = 0; i < exports.cameraPositionsAndTextures.length; i++) {
+                let cameraPos = exports.cameraPositionsAndTextures[i];
                 let pos = cameraPos[0].clone();
                 let tex = cameraPos[1];
                 let dist = pos.subtract(cameraLoc).length();

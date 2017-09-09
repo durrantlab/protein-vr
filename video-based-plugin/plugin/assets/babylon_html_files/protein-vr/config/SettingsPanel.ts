@@ -1,4 +1,5 @@
 import * as UserVars from "./UserVars";
+import * as Globals from "./Globals";
 // import * as PointerLock from "./PointerLock";
 // import * as Setup from "../Core/Setup";
 // import * as Core from "../Core/Core";
@@ -8,123 +9,123 @@ var jQuery;
 // declare var screenfull;
 declare var PVRGlobals;
 
-export interface ShowInterface {
-    onSettingsPanelClosed: any;
-    engine: any;
-    jQuery: any;
-}
+export function allowUserToModifySettings() {
 
-export function show(params: ShowInterface) {
-
-    let jQuery = params.jQuery;
-
-    // Add div 
-    // jQuery = PVRGlobals.jQuery;
-    jQuery("body").append(`<div id="settings_panel"></div>`)
-    let settingsPanel = jQuery("#settings_panel");
-
-    // Styleize div
-    settingsPanel.css("position", "absolute");
-    settingsPanel.css("left", "0");
-    settingsPanel.css("top", "0");
-    settingsPanel.css("width", "100%");
-    settingsPanel.css("height", "100%");
-    settingsPanel.css("background-color", "Gainsboro");
-    settingsPanel.css("z-index", "1000");
-    settingsPanel.css("padding", "15px");
-    settingsPanel.css("overflow-y", "scroll");
-
-    // Make it fluid with bootstrap
-    settingsPanel.addClass("container-fluid");
-
-    // Add in html
-    let html = panel(
-        'ProteinVR 1.0', 
-        `<div id="hardware-msg" class="alert alert-info">
-            Select your hardware setup:
-        </div>` + 
-        panel(
-            "Hardware", 
-            row_even_split(
-                // [3,4,5],
-                radioBoxes(
-                    "Viewer",
-                    UserVars.paramNames["viewer"],
-                    ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>']
-                    // [85, 115]
-                ),
-                radioBoxes(
-                    "Audio",
-                    UserVars.paramNames["audio"],
-                    ['<i class="icon-speaker"></i>', '<i class="icon-headphones"></i>', '<span class="glyphicon glyphicon-volume-off" aria-hidden=true></span>']
-                    // [100, 120, 75]
+    return new Promise((resolve) => {
+        let jQuery = Globals.get("jQuery");
+    
+        // Add div 
+        // jQuery = PVRGlobals.jQuery;
+        jQuery("body").append(`<div id="settings_panel"></div>`)
+        let settingsPanel = jQuery("#settings_panel");
+    
+        // Styleize div
+        settingsPanel.css("position", "absolute");
+        settingsPanel.css("left", "0");
+        settingsPanel.css("top", "0");
+        settingsPanel.css("width", "100%");
+        settingsPanel.css("height", "100%");
+        settingsPanel.css("background-color", "Gainsboro");
+        settingsPanel.css("z-index", "1000");
+        settingsPanel.css("padding", "15px");
+        settingsPanel.css("overflow-y", "scroll");
+    
+        // Make it fluid with bootstrap
+        settingsPanel.addClass("container-fluid");
+    
+        // Add in html
+        let html = panel(
+            'ProteinVR 1.0', 
+            `<div id="hardware-msg" class="alert alert-info">
+                Select your hardware setup:
+            </div>` + 
+            panel(
+                "Hardware", 
+                //row_even_split(
+                    // [3,4,5],
+                    radioBoxes(
+                        "Viewer",
+                        UserVars.paramNames["viewer"],
+                        ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>']
+                        // [85, 115]
+                    )
+                    /* radioBoxes(
+                        "Audio",
+                        UserVars.paramNames["audio"],
+                        ['<i class="icon-speaker"></i>', '<i class="icon-headphones"></i>', '<span class="glyphicon glyphicon-volume-off" aria-hidden=true></span>']
+                        // [100, 120, 75]
+                    )*/
+                /*) +
+                row_even_split(
+                    radioBoxes(
+                        "Device",
+                        UserVars.paramNames["device"],
+                        ['<i class="icon-iphone"></i>', '<i class="icon-laptop"></i>', '<i class="icon-connectedpc"></i>']
+                        // [100, 100, 100]
+                    ), "" */ /*,
+                    radioBoxes(
+                        "Moving",
+                        UserVars.paramNames["moving"],
+                        ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
+                        // [100, 100, 100]
+                    )  + radioBoxes(  // commented out because of simplified UI
+                        "Looking",
+                        UserVars.paramNames["looking"],
+                        ['<i class="icon-mouse"></i>', '<i class="icon-hand-up"></i>'] //, '<i class="icon-connectedpc"></i>']
+                        // [100, 100, 100]
+                    ) */ /*,
+                )*/
+            ) /* + 
+            panelCollapsible(
+                "Initial Performance Settings",
+                `<div id="settings-msg" class="alert alert-info">
+                    Initial performance settings. ProteinVR will adjust in game to maintain 30 frames per second.
+                </div>` +
+                row_thirds_split(
+                    [4, 4, 4],
+                    radioBoxes(
+                        "Textures",
+                        UserVars.paramNames["textures"],
+                        // [70, 85, 80]
+                    ),
+                    radioBoxes(
+                        "Objects",
+                        UserVars.paramNames["objects"],
+                        // [90, 85, 85]
+                    ),
+                    radioBoxes(
+                        "Fog",
+                        UserVars.paramNames["fog"],
+                        // [60, 55, 55]
+                    )
+                ) + 
+                row_thirds_split(
+                    [4, 4, 4],
+                    radioBoxes(
+                        "Display",
+                        UserVars.paramNames["display"],
+                        // [70, 85, 80]
+                    ),
+                    radioBoxes(
+                        "Animations",
+                        UserVars.paramNames["animations"],
+                        // [70, 85, 80]
+                    ),
+                    ""
                 )
-            ) +
-            row_even_split(
-                radioBoxes(
-                    "Device",
-                    UserVars.paramNames["device"],
-                    ['<i class="icon-iphone"></i>', '<i class="icon-laptop"></i>', '<i class="icon-connectedpc"></i>']
-                    // [100, 100, 100]
-                ), "" /*,
-                radioBoxes(
-                    "Moving",
-                    UserVars.paramNames["moving"],
-                    ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
-                    // [100, 100, 100]
-                )  + radioBoxes(  // commented out because of simplified UI
-                    "Looking",
-                    UserVars.paramNames["looking"],
-                    ['<i class="icon-mouse"></i>', '<i class="icon-hand-up"></i>'] //, '<i class="icon-connectedpc"></i>']
-                    // [100, 100, 100]
-                ) */,
-            )
-        ) /* + 
-        panelCollapsible(
-            "Initial Performance Settings",
-            `<div id="settings-msg" class="alert alert-info">
-                Initial performance settings. ProteinVR will adjust in game to maintain 30 frames per second.
-            </div>` +
-            row_thirds_split(
-                [4, 4, 4],
-                radioBoxes(
-                    "Textures",
-                    UserVars.paramNames["textures"],
-                    // [70, 85, 80]
-                ),
-                radioBoxes(
-                    "Objects",
-                    UserVars.paramNames["objects"],
-                    // [90, 85, 85]
-                ),
-                radioBoxes(
-                    "Fog",
-                    UserVars.paramNames["fog"],
-                    // [60, 55, 55]
-                )
-            ) + 
-            row_thirds_split(
-                [4, 4, 4],
-                radioBoxes(
-                    "Display",
-                    UserVars.paramNames["display"],
-                    // [70, 85, 80]
-                ),
-                radioBoxes(
-                    "Animations",
-                    UserVars.paramNames["animations"],
-                    // [70, 85, 80]
-                ),
-                ""
-            )
-        ) */ + 
-        `<button id="start_game_button" type="button" class="btn btn-primary">Start</button>`
-        // <button id="broadcast_game_button" style="display: none;" type="button" class="btn btn-primary">Broadcast</button>`
-    );
+            ) */ + 
+            `<button id="start_game_button" type="button" class="btn btn-primary">Start</button>`
+            // <button id="broadcast_game_button" style="display: none;" type="button" class="btn btn-primary">Broadcast</button>`
+        );
+    
+        settingsPanel.html(html);
+    
+        addJavaScript(() => {resolve({msg: "USER MODIFIED SETTINGS"})});
+    
+        // Set the values on the GUI.
+        this.setGUIState();
+    });
 
-    settingsPanel.html(html);
-
-    addJavaScript(params.onSettingsPanelClosed, params.engine, jQuery);
 }
 
 function panel(title, html) {
@@ -246,10 +247,10 @@ function radioBoxes(label, values: any, icons_if_phone = undefined) {
 //     return html;
 // }
 
-function setRadioState(id, varsToUse, jQuery) {
-    setTimeout(function() {
+function setRadioState(id, varsToUse) {
+    setTimeout(() => {
         // Get all the labels and make them default colored, no checkboxes.
-        let labels = jQuery(`.${id}-labels`);
+        let labels = Globals.get("jQuery")(`.${id}-labels`);
         labels.removeClass("btn-primary");
         labels.addClass("btn-default");
         // labels.find(".glyphicon-ok").hide();
@@ -268,13 +269,14 @@ function setRadioState(id, varsToUse, jQuery) {
     }, 0);
 }
 
-export function setGUIState(jQuery) {
+export function setGUIState() {
+    let jQuery = Globals.get("jQuery");
     let varsToUse = jQuery.parseJSON(localStorage.getItem("proteinvr_params"));
     // Set the various radio states
     for (var key in UserVars.paramNames) {
         if (UserVars.paramNames.hasOwnProperty(key)) {
             let key2 = key.toLowerCase();
-            setRadioState(key2, varsToUse, jQuery);
+            setRadioState(key2, varsToUse);
         }
     }
 
@@ -298,7 +300,10 @@ export function setGUIState(jQuery) {
     // }
 }
 
-function addJavaScript(onSettingsPanelClosed, engine, jQuery) {
+function addJavaScript(onSettingsPanelClosed) {
+    let jQuery = Globals.get("jQuery");
+    let engine = Globals.get("engine");
+
     // Make toggle boxes clickable.
     jQuery(".toggle_box").mouseup(function() {
         setTimeout(function() {
@@ -317,7 +322,7 @@ function addJavaScript(onSettingsPanelClosed, engine, jQuery) {
             let val = associatedInput.val();
             let valNum = UserVars.stringToEnumVal(val);
             UserVars.updateLocalStorageParams(key, valNum);
-            setGUIState(jQuery);
+            setGUIState();
 
             let description = This.data("description");
             jQuery("#hardware-msg").html(description);

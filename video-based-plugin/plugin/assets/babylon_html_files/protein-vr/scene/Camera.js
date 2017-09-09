@@ -1,10 +1,10 @@
-define(["require", "exports", "./UserVars"], function (require, exports, UserVars) {
+define(["require", "exports", "../config/UserVars", "./PVRJsonSetup", "../config/Globals", "./ViewerSphere"], function (require, exports, UserVars, PVRJsonSetup_1, Globals, ViewerSphere) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    // export var cameraPositionsAndTextures: any;
     class CameraPoints {
-        constructor(BABYLON) {
+        constructor() {
             this.data = [];
-            this.BABYLON = BABYLON;
         }
         push(d) {
             this.data.push(d);
@@ -47,7 +47,7 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
             return this.data[0];
         }
         firstFewPoints(num) {
-            let newCameraPoints = new CameraPoints(this.BABYLON);
+            let newCameraPoints = new CameraPoints();
             for (let i = 0; i < num; i++) {
                 newCameraPoints.push(this.data[i]);
             }
@@ -60,7 +60,7 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
             return this.data[index];
         }
         lessThanCutoff(cutoff, criteria = "distance") {
-            let newCameraPoints = new CameraPoints(this.BABYLON);
+            let newCameraPoints = new CameraPoints();
             for (let dIndex = 0; dIndex < this.data.length; dIndex++) {
                 let d = this.data[dIndex];
                 let val = this._getValBasedOnCriteria(d, criteria);
@@ -75,10 +75,11 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
             return newCameraPoints;
         }
         addAnglesInPlace(pivotPoint, vec1) {
+            let BABYLON = Globals.get("BABYLON");
             for (let i = 0; i < this.data.length; i++) {
                 let d = this.data[i];
                 let vec2 = d.position.subtract(pivotPoint).normalize();
-                let angle = Math.acos(this.BABYLON.Vector3.Dot(vec1, vec2));
+                let angle = Math.acos(BABYLON.Vector3.Dot(vec1, vec2));
                 this.data[i].angle = angle;
             }
         }
@@ -94,8 +95,7 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
         }
     }
     class Camera {
-        // private _lastCameraLoc: any;
-        constructor(parentObj, BABYLON) {
+        constructor() {
             this._mouseDownState = false;
             this._keyPressedState = undefined;
             this._firstRender = true;
@@ -103,37 +103,43 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
             this._maxMovementsAllowedPerSec = 30;
             // private _maxDistToJumpPt = 1.0;
             this._jumpPointDetectionResolution = 0.1;
-            this._parentObj = parentObj;
-            this.BABYLON = BABYLON;
         }
+        // private _lastCameraLoc: any;
         setup() {
-            // Attach camera to canvas inputs
-            if (UserVars.getParam("viewer") == UserVars.viewers["Screen"]) {
-                this._parentObj.scene.activeCamera.attachControl(this._parentObj._canvas);
-            }
-            else {
-                this._setupVRCamera();
-            }
-            this._setupMouseAndKeyboard();
-            // Move camera to first position.
-            this._parentObj.scene.activeCamera.position = this._parentObj.cameraPositionsAndTextures[5][0];
-            // Add extra keys
-            // Additional control keys.
-            // this._parentObj.scene.activeCamera.keysUp.push(87);  // W. 38 is up arrow.
-            // this._parentObj.scene.activeCamera.keysLeft.push(65);  // A. 37 if left arrow.
-            // this._parentObj.scene.activeCamera.keysDown.push(83);  // S. 40 is down arrow.
-            // this._parentObj.scene.activeCamera.keysRight.push(68);  // D. 39 is right arrow.
-            // this._lastCameraLoc = new this.BABYLON.Vector3(-9999, -9999, -9999);
-            // this.scene.activeCamera.inertia = 0.0;
+            return new Promise((resolve) => {
+                let scene = Globals.get("scene");
+                let canvas = Globals.get("canvas");
+                // Attach camera to canvas inputs
+                if (UserVars.getParam("viewer") == UserVars.viewers["Screen"]) {
+                    scene.activeCamera.attachControl(canvas);
+                }
+                else {
+                    this._setupVRCamera();
+                }
+                this._setupMouseAndKeyboard();
+                // Move camera to first position.
+                scene.activeCamera.position = Globals.get("cameraPositionsAndTextures")[5][0];
+                // Add extra keys
+                // Additional control keys.
+                // this._parentObj.scene.activeCamera.keysUp.push(87);  // W. 38 is up arrow.
+                // this._parentObj.scene.activeCamera.keysLeft.push(65);  // A. 37 if left arrow.
+                // this._parentObj.scene.activeCamera.keysDown.push(83);  // S. 40 is down arrow.
+                // this._parentObj.scene.activeCamera.keysRight.push(68);  // D. 39 is right arrow.
+                // this._lastCameraLoc = new this.BABYLON.Vector3(-9999, -9999, -9999);
+                // this.scene.activeCamera.inertia = 0.0;
+                resolve({ msg: "CAMERA SETUP" });
+            });
         }
         _setupVRCamera() {
+            let scene = Globals.get("scene");
+            let canvas = Globals.get("canvas");
+            let BABYLON = Globals.get("BABYLON");
+            let jQuery = Globals.get("jQuery");
             // I feel like I should have to do the below... Why don't the defaults work?
-            var metrics = this.BABYLON.VRCameraMetrics.GetDefault();
+            var metrics = BABYLON.VRCameraMetrics.GetDefault();
             //metrics.interpupillaryDistance = 0.5;
-            let scene = this._parentObj.scene;
-            let canvas = this._parentObj._canvas;
             // Add VR camera here (Oculus Rift, HTC Vive, etc.)
-            let camera = new this.BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", scene.activeCamera.position, scene, false, // compensate distortion
+            let camera = new BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", scene.activeCamera.position, scene, false, // compensate distortion
             metrics);
             // Make VR camera match existing camera in scene
             // See http://www.babylonjs.com/js/loader.js
@@ -158,9 +164,64 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
             scene.activeCamera = camera;
             // Attach that camera to the canvas.
             scene.activeCamera.attachControl(canvas);
+            // Add a guide line
+            jQuery("head").append(`
+        <style>
+            .vr_overlay {
+                position: absolute;
+                bottom: 0;
+                width: 50%;
+                height: 20%;
+                z-index: 10000000000;
+            }
+
+            .vr_overlay_left {
+                left: 0;
+                border-right: 2px solid black;
+            }
+
+            .vr_overlay_right {
+                right: 0;
+                border-left: 2px solid black;
+            }            
+        </style>
+        `);
+            jQuery("body").append('<div id="vr_overlay1" class="vr_overlay vr_overlay_left"></div>');
+            jQuery("body").append('<div id="vr_overlay2" class="vr_overlay vr_overlay_right"></div>');
+            // let vrOverlay1 = jQuery("#vr_overlay1");
+            // vrOverlay1.css("position", "absolute");
+            // vrOverlay1.css("bottom", "0");
+            // vrOverlay1.css("left", "0");
+            // vrOverlay1.css("border-right", "2px solid black");
+            // vrOverlay1.css("width", "50%");
+            // vrOverlay1.css("height", "20%");
+            // vrOverlay1.css("z-index", "10000000000");
+            // setInterval(function() {
+            //     let zIndex = this.renderCanvas.css("z-index");
+            //     if (zIndex !== "auto") {
+            //         this.vrOverlay.css("z_index", zIndex + 1);
+            //     }
+            //     // debugger;
+            // }.bind({
+            //     renderCanvas: jQuery("#renderCanvas"),
+            //     vrOverlay: vrOverlay
+            // }), 1000);
+            // jQuery.getScript("js/babylon.gui.js", () => {
+            //     let advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
+            //     var line = new BABYLON.GUI.Line();
+            //     let width = jQuery(window).width();
+            //     line.x1 = width;
+            //     line.y1 = 10;
+            //     line.x2 = width;
+            //     line.y2 = 500;
+            //     line.lineWidth = 5;
+            //     line.dash = [5, 10];
+            //     line.color = "black";
+            //     advancedTexture.addControl(line);
+            // });
         }
         _setupMouseAndKeyboard() {
-            let scene = this._parentObj.scene;
+            let scene = Globals.get("scene");
             // First, setup mouse.
             scene.onPointerDown = function (evt, pickResult) {
                 this._mouseDownState = true;
@@ -170,10 +231,10 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
             }.bind(this);
             // Now keyboard
             // No arrow navigation on camera. You'll redo custom.
-            this._parentObj.scene.activeCamera.keysUp = [];
-            this._parentObj.scene.activeCamera.keysLeft = [];
-            this._parentObj.scene.activeCamera.keysDown = [];
-            this._parentObj.scene.activeCamera.keysRight = [];
+            scene.activeCamera.keysUp = [];
+            scene.activeCamera.keysLeft = [];
+            scene.activeCamera.keysDown = [];
+            scene.activeCamera.keysRight = [];
             window.addEventListener("keydown", function (evt) {
                 this._keyPressedState = evt.keyCode;
             }.bind(this));
@@ -210,12 +271,22 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
                 // console.log("toosoon");
                 return;
             }
-            let scene = this._parentObj.scene;
+            let scene = Globals.get("scene");
+            let BABYLON = Globals.get("BABYLON");
             let camera = scene.activeCamera;
             let cameraLoc = camera.position;
-            console.log("revert here");
-            // if ((this._mouseDownState === false) && (this._keyPressedState === undefined) && (this._firstRender === false)) {
-            if ((this._keyPressedState === undefined) && (this._firstRender === false)) {
+            // console.log("revert here");
+            let result;
+            if (Globals.get("mouseDownAdvances") === true) {
+                result = (this._mouseDownState === false) && (this._keyPressedState === undefined) && (this._firstRender === false);
+            }
+            else {
+                result = (this._keyPressedState === undefined) && (this._firstRender === false);
+            }
+            if (result) {
+                // if (((Globals.get("mouseDownAdvances")) && (this._mouseDownState === false)) && (this._keyPressedState === undefined) && (this._firstRender === false)) {
+                // if ((this._mouseDownState === false) && (this._keyPressedState === undefined) && (this._firstRender === false)) {
+                // if ((this._keyPressedState === undefined) && (this._firstRender === false)) {
                 // Only update things if user trying to move.
                 return;
             }
@@ -231,9 +302,10 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
             // if (!this._vectorsEqualTolerance(cameraLoc, this._lastCameraLoc)) {
             // console.log("Camera pos changed", cameraLoc, this._lastCameraLoc);
             // Calculate distances to all camera positions
-            let cameraPoints = new CameraPoints(this.BABYLON);
-            for (let i = 0; i < this._parentObj.cameraPositionsAndTextures.length; i++) {
-                let cameraPos = this._parentObj.cameraPositionsAndTextures[i];
+            let cameraPoints = new CameraPoints();
+            let cameraPositionsAndTextures = Globals.get("cameraPositionsAndTextures");
+            for (let i = 0; i < cameraPositionsAndTextures.length; i++) {
+                let cameraPos = cameraPositionsAndTextures[i];
                 let pos = cameraPos[0].clone();
                 let tex = cameraPos[1];
                 let dist = pos.subtract(cameraLoc).length();
@@ -287,26 +359,8 @@ define(["require", "exports", "./UserVars"], function (require, exports, UserVar
             // let bestPos = distData[0][1];
             // Move camera to best frame.
             camera.position = newCameraData.position;
-            // Move sphere
-            this._parentObj._viewerSphere.hide = true;
-            this._parentObj._viewerSphere.position = newCameraData.position;
-            // Update texture
-            this._parentObj._shader.setTextures(newCameraData.texture); //, tex2, tex3, dist1, dist2, dist3);
-            // this._viewerSphere.material.emissiveTexture = bestTexture;
-            // Keep only guide spheres that are not so close
-            for (let i = 0; i < this._parentObj._guideSpheres.length; i++) {
-                let sphere = this._parentObj._guideSpheres[i];
-                let distToGuideSphere = this.BABYLON.Vector3.Distance(sphere.position, newCameraData.position);
-                if (distToGuideSphere < this._parentObj._guideSphereHiddenCutoffDist) {
-                    sphere.visibility = 0.0;
-                }
-                else if (distToGuideSphere < this._parentObj._guideSphereShowCutoffDist) {
-                    sphere.visibility = this._parentObj._guideSphereIntermediateFactor * (distToGuideSphere - this._parentObj._guideSphereHiddenCutoffDist);
-                }
-                else {
-                    sphere.visibility = this._parentObj._guideSphereMaxVisibility;
-                }
-            }
+            ViewerSphere.update(newCameraData);
+            PVRJsonSetup_1.updateGuideSpheres(newCameraData);
             this._lastMovementTime = (new Date).getTime();
             // this._lastCameraLoc = camera.position.clone();
             // }

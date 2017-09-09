@@ -1,9 +1,8 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
-    exports.__esModule = true;
-    var ExtractFrames = (function () {
-        function ExtractFrames(BABYLON, jQuery, game, callBack) {
-            if (callBack === void 0) { callBack = function () { }; }
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class ExtractFrames {
+        constructor(BABYLON, jQuery, game, callBack = function () { }) {
             this._lastCurrentTime = 0;
             // Create storage elements and variables
             // this._video = document.createElement('video');
@@ -14,9 +13,10 @@ define(["require", "exports"], function (require, exports) {
             this._game = game;
             this.BABYLON = BABYLON;
             jQuery.get("./frames/filenames.json", function (data) {
-                for (var i = 0; i < data.length; i++) {
-                    var filename = "./frames/" + data[i];
-                    var tex = new this.BABYLON.Texture(filename, this._game.scene);
+                for (let i = 0; i < data.length; i++) {
+                    console.log("DEBUGGING CODE HERE...");
+                    let filename = "./frames/" + data[i] + "?" + Math.random().toString(); // Note no caching, for debugging.
+                    let tex = new this.BABYLON.Texture(filename, this._game.scene);
                     this._game.cameraPositionsAndTextures[i][1] = tex;
                 }
                 // Fire the callback.
@@ -34,65 +34,7 @@ define(["require", "exports"], function (require, exports) {
             // this._video.addEventListener('ended', onend, false);
             // this._video.src = videoUrl;
         }
-        ExtractFrames.prototype._onend = function (e) {
-            // keep only every-so-few frames (to match framerate)
-            var indeciesToKeep = [];
-            var deltaIndex = (this._sampledFrames.length - 1) / (this._game.cameraPositionsAndTextures.length - 1);
-            for (var i = 0; i < this._game.cameraPositionsAndTextures.length; i++) {
-                indeciesToKeep.push(Math.floor(i * deltaIndex));
-            }
-            var textures = [];
-            for (var i = 0; i < indeciesToKeep.length; i++) {
-                var indexToKeep = indeciesToKeep[i];
-                var dataUrl = this._sampledFrames[indexToKeep];
-                if (dataUrl === undefined) {
-                    // console.log("YYY", dataUrl, indexToKeep, this._sampledFrames.length);
-                    debugger;
-                }
-                textures.push(this.BABYLON.Texture.CreateFromBase64String(dataUrl, 'mytex' + Math.random().toString(), this._game.scene));
-                this._sampledFrames[indexToKeep] = null; // free for garbage collection
-            }
-            // let keepEvery = this._sampledFrames.length / (this._game.cameraPos.length - 1);
-            // let currentIndex = 0.0;
-            // while (currentIndex <= this._sampledFrames.length) {
-            //     let indexToUse = Math.round(currentIndex);
-            //     let dataUrl = this._sampledFrames[indexToUse];
-            //     console.log("YYY", dataUrl, indexToUse, this._sampledFrames.length);
-            //     textures.push(
-            //         this.BABYLON.Texture.CreateFromBase64String(dataUrl, 'mytex' + Math.random().toString(), this._game.scene)
-            //     );
-            //     currentIndex = currentIndex + keepEvery;
-            //     this._sampledFrames[indexToUse] = null;  // free for garbage collection
-            // }
-            // // debugger;
-            // // get last one if missing (rounding error, so it varies...)
-            // if (textures.length < this._game.cameraPos.length) {
-            //     let dataUrl = this._sampledFrames[this._sampledFrames.length - 1];
-            //     console.log("YYY2", dataUrl, "D", this._sampledFrames.length);
-            //     textures.push(
-            //         this.BABYLON.Texture.CreateFromBase64String(dataUrl, 'mytex' + Math.random().toString(), this._game.scene)
-            //     );
-            //     this._sampledFrames[this._sampledFrames.length - 1] = null;  // free for garbage collection
-            // }
-            // console.log(textures.length, this._game.cameraPos.length, "HEHEEHE");
-            // Update list in game
-            for (var i = 0; i < this._game.cameraPositionsAndTextures.length; i++) {
-                var tex = textures[i];
-                // let tex = new this.BABYLON.Texture("./.tmp/proteinvr_baked_texture34.png", this._game.scene);
-                this._game.cameraPositionsAndTextures[i][1] = tex;
-                // debugger;
-                // textures[i] = null;  // Help with memory (garbage collection)
-            }
-            // free for garbage collection.
-            this._sampledFrames = null;
-            // textures = null;
-            // Don't retain the video's objectURL
-            URL.revokeObjectURL(this._video.src);
-            // Fire the callback.
-            this._callBack();
-        };
-        return ExtractFrames;
-    }());
+    }
     exports.ExtractFrames = ExtractFrames;
 });
 // let ef = new extractFrames("proteinvr_baked.mp4", function() {

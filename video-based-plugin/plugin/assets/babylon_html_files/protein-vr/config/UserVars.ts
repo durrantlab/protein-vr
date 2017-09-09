@@ -4,8 +4,9 @@
 
 // import * as Core from "../Core/Core";
 import * as SettingsPanel from "./SettingsPanel";
-declare var jQuery;
-// declare var PVRGlobals;
+import * as Globals from "./Globals";
+
+// declare var jQuery;
 
 // The interface
 interface userVarsInterface {
@@ -133,38 +134,22 @@ paramDefaults["desktop"]["device"] = devices["Desktop"];
 // paramDefaults["laptop"]["animations"] = animations["Moving"];
 // paramDefaults["desktop"]["animations"] = animations["Moving"];
 
-export interface SetupInterface {
-    onSettingsPanelShown: any;
-    onSettingsPanelClosed: any;
-    engine: any;
-    jQuery: any;
-}
-
 /**
  * This function will assign values to the system variables based on user input.
  */
-export function setup(params: SetupInterface): void {
+export function setup(): Promise<any> {
 
-    //callBackFunc: any, jQuery: any) :void {
-
-    // Load values from params.json
-    // let jsonPath = window.location.pathname + "/params.json";
-    // jsonPath = jsonPath.replace(/\/\//g, "/");
-    // jQuery = PVRGlobals.jQuery;
-    // jQuery.ajax({
-        // url: jsonPath,
-        // dataType: "json",
-        // cache: false
-    // }).done(function(user_vars) {
+    return new Promise((resolve) => {
         // Default values before anything. For now just use laptop defaults,
         // but in future would be good to detect device...
         var userVars: userVarsInterface;
-        // if(PVRGlobals.mobileDetect.mobile()){
-        //     userVars = paramDefaults["mobile"];
-        // } else {
+        let isMobile = Globals.get("mobileDetect").mobile();  // null if its not a phone at all.
+        
+        if (isMobile){
+            userVars = paramDefaults["mobile"];
+        } else {
             userVars = paramDefaults["laptop"];
-            // debugger;
-        // }
+        }
 
         // Here you overwrite with values from params.json. At this point,
         // this is just the proteinvr scene to use.
@@ -189,21 +174,8 @@ export function setup(params: SetupInterface): void {
         // Save to local storage what you've got so far.
         saveLocalStorageParams(userVars);
 
-        // Show the settings panel
-        SettingsPanel.show({
-            onSettingsPanelClosed: params.onSettingsPanelClosed,
-            engine: params.engine,
-            jQuery: params.jQuery
-        });
-
-        // Set the values on the GUI.
-        SettingsPanel.setGUIState(params.jQuery);
-
-        // this.callBackFunc();
-        params.onSettingsPanelShown();
-    // }.bind({
-        // callBackFunc: callBackFunc
-    // }));
+        resolve({msg: "USERVARS SET UP"});
+    });
 }
 
 export function getLocalStorageParams() {
@@ -211,7 +183,7 @@ export function getLocalStorageParams() {
     let localStorageParamsStr = localStorage.getItem("proteinvr_params");
     let localStorageParams;
     if (localStorageParamsStr !== null) {
-        localStorageParams = jQuery.parseJSON(localStorageParamsStr);
+        localStorageParams = Globals.get("jQuery").parseJSON(localStorageParamsStr);
     } else {
         localStorageParams = {};
     }

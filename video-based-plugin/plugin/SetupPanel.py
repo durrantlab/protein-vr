@@ -15,9 +15,11 @@ class SetupPanel(ParentPanel):
         msgs = OrderedDict()
         msgs["Missing Objects:"] = []
         msgs["Render Settings:"] = []
+        msgs["3D Settings:"] = []
+        # msgs["Missing UV Maps:"] = []
 
         # Are there missing objects?
-        for name in ["Camera", "ProteinVR_ViewerSphere"]:  # "ProteinVR_ForwardSphere", "ProteinVR_BackwardsSphere"
+        for name in ["Camera"]:  # "ProteinVR_ViewerSphere" "ProteinVR_ForwardSphere", "ProteinVR_BackwardsSphere"
             if not name in obj_names.obj_names():
                 msgs["Missing Objects:"].append(name)
 
@@ -45,8 +47,21 @@ class SetupPanel(ParentPanel):
         
         if bpy.context.scene.cycles.blur_glossy < 2.0:
             msgs["Render Settings:"].append("Blur glossy < 2")
+        
+        if len(bpy.data.cameras.keys()) > 0:
+            camera_key = bpy.data.cameras.keys()[0]
+            if bpy.data.cameras[camera_key].type != "PANO":
+                msgs["3D Settings:"].append("Camera not Panoramic")
+
+            if bpy.data.cameras[camera_key].cycles.panorama_type != "EQUIRECTANGULAR":
+                msgs["3D Settings:"].append("Camera not Equirectangular")
 
         # 2.79 has denoising option in Render Layers tab. Look into that...
+
+        # Make sure everything is UV unwrapped
+        # for obj in bpy.data.objects:
+        #     if "uv_textures" in dir(obj.data) and len(obj.data.uv_textures) == 0:
+        #         msgs["Missing UV Maps:"].append(obj.name)
 
         # Show messages
         if sum([len(msgs[k]) for k in msgs.keys()]) > 0:
@@ -80,7 +95,7 @@ class OBJECT_OT_FixProblems(ButtonParentClass):
 
         # Get the sphere from the template blend file.
         obj_names.save_object_names()
-        blendfile = os.path.dirname(os.path.realpath(__file__)) + os.sep + "assets" + os.sep + "template.blend"
+        blendfile = os.path.dirname(os.path.realpath(__file__)) + os.sep + "assets" + os.sep + "babylon.blend"
         section = "\\Object\\"
         object = obj_name
 
@@ -128,17 +143,21 @@ class OBJECT_OT_FixProblems(ButtonParentClass):
 
         if not "Camera" in obj_names.obj_names():
             bpy.ops.object.camera_add()
+        
+        for camera in bpy.data.cameras:
+            camera.type = "PANO"
+            camera.cycles.panorama_type = "EQUIRECTANGULAR"
 
-        for name in ["ProteinVR_ViewerSphere"]:  # "ProteinVR_ForwardSphere", "ProteinVR_BackwardsSphere"
-            if not name in obj_names.obj_names():
-                obj = self.append_from_template_file(name)
+        # for name in ["ProteinVR_ViewerSphere"]:  # "ProteinVR_ForwardSphere", "ProteinVR_BackwardsSphere"
+        #     if not name in obj_names.obj_names():
+        #         obj = self.append_from_template_file(name)
 
-                # Move obj to camera location
-                camera = bpy.data.objects["Camera"]
-                obj.location = camera.location
+        #         # Move obj to camera location
+        #         camera = bpy.data.objects["Camera"]
+        #         obj.location = camera.location
 
-                # Hide obj for now
-                obj.hide = True
+        #         # Hide obj for now
+        #         obj.hide = True
 
         return {'FINISHED'}
 

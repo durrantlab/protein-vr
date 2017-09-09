@@ -1,4 +1,4 @@
-///<reference path="Definitions/require.d.ts" />
+///<reference path="../../Definitions/require.d.ts" />
 // require.config({
 //     paths: {
 //         // jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min',
@@ -17,7 +17,7 @@
 // });
 // This require function starts the app
 // require(['jquery', './main', "bootstrap", /*'babylon',*/ /* 'babylonObjLoader', */ ], (jQuery, main /*BABYLON,*/ ) => {
-require(['./main'], (main) => {
+require(['../main'], (main) => {
     // console.log(jQuery);
     // console.log(BABYLON);
     // console.log(main);

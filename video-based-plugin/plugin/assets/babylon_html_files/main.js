@@ -1,6 +1,6 @@
-define(["require", "exports", "./VideoFrames", "./StandardShader", "./Camera", "./UserVars"], function (require, exports, VideoFrames_1, StandardShader_1, Camera_1, UserVars) {
+define(["require", "exports", "./VideoFrames", "./StandardShader", "./UserVars", "./SettingsPanel"], function (require, exports, VideoFrames_1, StandardShader_1, UserVars, SettingsPanel) {
     "use strict";
-    exports.__esModule = true;
+    Object.defineProperty(exports, "__esModule", { value: true });
     var callbacksComplete = [];
     var callBacks;
     (function (callBacks) {
@@ -8,8 +8,8 @@ define(["require", "exports", "./VideoFrames", "./StandardShader", "./Camera", "
         callBacks[callBacks["VIDEO_FRAMES_LOADED"] = 1] = "VIDEO_FRAMES_LOADED";
         callBacks[callBacks["JSON_LOADED"] = 2] = "JSON_LOADED";
     })(callBacks || (callBacks = {}));
-    var Game = (function () {
-        function Game(params) {
+    class Game {
+        constructor(params) {
             // setInterval(function() {console.log(this.cameraPos);}.bind(this), 100);
             // Get the canvas element from our HTML above
             this._canvas = document.getElementById("renderCanvas");
@@ -27,40 +27,24 @@ define(["require", "exports", "./VideoFrames", "./StandardShader", "./Camera", "
                 this._loadScene();
             }
         }
-        Game.prototype._loadScene = function () {
-            UserVars.setup({
-                onSettingsPanelShown: function () {
-                    BABYLON.SceneLoader.Load("", "babylon.babylon", this.engine, function (scene) {
-                        this.scene = scene;
-                        window.scrollTo(0, 1); // supposed to autohide scroll bar.
-                        // this._canvas.addEventListener("click", function() {
-                        //     this.engine.switchFullscreen(true);
-                        // }.bind(this));
-                        // Wait for textures and shaders to be ready
-                        this.scene.executeWhenReady(function () {
-                            this._camera = new Camera_1.Camera(this, BABYLON);
-                            // this._camera.setup();
-                            this._setupFromJSON(function () {
-                                this._setupVideoSphere();
-                            }.bind(this));
-                            this._resizeWindow();
-                            this._params.onDone();
-                            callbacksComplete.push(callBacks.SCENE_READY);
-                            // this.scene.debugLayer.show();
-                        }.bind(this));
-                    }.bind(this), function (progress) {
-                        // To do: give progress feedback to user
-                    });
-                }.bind(this),
-                onSettingsPanelClosed: function () {
-                    this._camera.setup();
-                    this._startRenderLoop();
-                }.bind(this),
+        _loadScene() {
+            let userVarsSetupPromise = UserVars.setup({
                 engine: this.engine,
                 jQuery: jQuery
             });
-        };
-        Game.prototype._setupVideoSphere = function () {
+            userVarsSetupPromise.then((fulfilled) => {
+                console.log(fulfilled);
+                var allowUerModifySettingsPromise = SettingsPanel.allowUserToModifySettings({
+                    engine: this.engine,
+                    jQuery: jQuery
+                });
+                return allowUerModifySettingsPromise;
+            }).then((fulfilled) => {
+                console.log(fulfilled);
+            });
+            // UserVars.setup();
+        }
+        _setupVideoSphere() {
             // HTML5 video controls are inconsistent, but you want to take
             // advantage of the compression video provides. It's much better than
             // loading the frames separately. So basically, load the video and
@@ -115,53 +99,59 @@ define(["require", "exports", "./VideoFrames", "./StandardShader", "./Camera", "
             this._viewerSphere.isPickable = false;
             this._viewerSphere.renderingGroupId = 2;
             // Resize the viewer sphere
-            var radius = this._JSONData["viewerSphereSize"];
-            this._viewerSphere.scaling = new BABYLON.Vector3(radius, radius, radius);
+            let radius = 12; // When using VR, this needs to be farther away that what it was rendered at. this._JSONData["viewerSphereSize"];
+            this._viewerSphere.scaling = new BABYLON.Vector3(radius, radius, -radius);
+            this._viewerSphere.rotation.y = 1.5 * Math.PI; // To align export with scene.
+            // alert("hi");
+            // Flip normals
+            // this._viewerSphere
             window.sphere = this._viewerSphere;
             // window.video = this._sphereVideo;
             // console.log(this._sphereVideo);
             // // var s1 = BABYLON.Mesh.CreateSphere("sphere1", 16, 2, this.scene);
             // // s1.position = new BABYLON.Vector3(-3.2301483, 2.9906759, 3.6123595);
             // // s1.position = new BABYLON.Vector3(-3.2301483, 2.9906759, -3.6123595);
-        };
-        Game.prototype._setupFromJSON = function (callBack) {
-            if (callBack === void 0) { callBack = function () { }; }
+        }
+        _setupFromJSON(callBack = function () { }) {
             jQuery.get("data.json", function (data) {
-                var callBack = this.callBack;
-                var This = this.This;
+                let callBack = this.callBack;
+                let This = this.This;
                 This._JSONData = data;
                 // Add in guide spheres.
-                var sphereMat = new BABYLON.StandardMaterial("sphereMat", This.scene);
-                sphereMat.backFaceCulling = false;
+                let sphereMat = new BABYLON.StandardMaterial("sphereMat", This.scene);
+                // sphereMat.backFaceCulling = false;
                 sphereMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
                 sphereMat.specularColor = new BABYLON.Color3(0, 0, 0);
                 sphereMat.diffuseTexture = null;
-                sphereMat.emissiveTexture = null; // videoTexture;
+                sphereMat.emissiveTexture = null; //new BABYLON.Texture("dot.png", This.scene);
+                // sphereMat.emissiveTexture.hasAlpha = true;
                 sphereMat.emissiveColor = new BABYLON.Color3(0.8, 0.8, 0.8);
-                for (var i = 0; i < data["guideSphereLocations"].length; i++) {
-                    var sphereLoc = data["guideSphereLocations"][i];
-                    var sphere = new BABYLON.Mesh.CreateSphere("sphere" + i.toString(), 8, This._guideSphereSize, This.scene);
+                for (let i = 0; i < data["guideSphereLocations"].length; i++) {
+                    let sphereLoc = data["guideSphereLocations"][i];
+                    let sphere = BABYLON.Mesh.CreateDisc("sphere" + i.toString(), 0.05, 12, This.scene, false, BABYLON.Mesh.DEFAULTSIDE); //BABYLON.Mesh.CreatePlane("sphere" + i.toString(), 1.0, This.scene, false, BABYLON.Mesh.DOUBLESIDE); // new BABYLON.Mesh.CreateSphere("sphere" + i.toString(), 8, This._guideSphereSize, This.scene);
                     sphere.material = sphereMat;
                     sphere.position.x = sphereLoc[0];
                     sphere.position.y = sphereLoc[2]; // note y and z reversed.
                     sphere.position.z = sphereLoc[1];
                     sphere.renderingGroupId = 3;
+                    sphere.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+                    // sphere.alpha = 1.0;
                     This._guideSpheres.push(sphere);
                 }
                 // Set some guide-sphere parameters
-                var viewerSphereSize = data["viewerSphereSize"];
+                let viewerSphereSize = data["viewerSphereSize"];
                 This._guideSphereHiddenCutoffDist = 0.1 * viewerSphereSize;
                 This._guideSphereShowCutoffDist = 2.0 * viewerSphereSize;
                 This._guideSphereIntermediateFactor = This._guideSphereMaxVisibility / (This._guideSphereShowCutoffDist - This._guideSphereHiddenCutoffDist);
                 // Load extra obj files
                 var loader = new BABYLON.AssetsManager(This.scene);
-                var objFilenames = data["clickableFiles"];
-                for (var i = 0; i < objFilenames.length; i++) {
-                    var objFilename = objFilenames[i];
+                let objFilenames = data["clickableFiles"];
+                for (let i = 0; i < objFilenames.length; i++) {
+                    let objFilename = objFilenames[i];
                     // console.log(objFilename);
-                    var meshTask = loader.addMeshTask(objFilename + "_name", "", "", objFilename);
+                    let meshTask = loader.addMeshTask(objFilename + "_name", "", "", objFilename);
                     meshTask.onSuccess = function (task) {
-                        var mesh = task.loadedMeshes[0]; // Why is this necessary?
+                        let mesh = task.loadedMeshes[0]; // Why is this necessary?
                         mesh.scaling.z = -1.0;
                         mesh.renderingGroupId = 1;
                         // this._viewerSphere.isPickable = true;
@@ -173,14 +163,14 @@ define(["require", "exports", "./VideoFrames", "./StandardShader", "./Camera", "
                 This._makeSomeMeshesClickable();
                 // Load camera tracks
                 This.cameraPositionsAndTextures = [];
-                for (var i = 0; i < data["cameraPositionsAndTextures"].length; i++) {
-                    var pt = data["cameraPositionsAndTextures"][i];
+                for (let i = 0; i < data["cameraPositionsAndTextures"].length; i++) {
+                    let pt = data["cameraPositionsAndTextures"][i];
                     // let frame = pt[0];
-                    var v = new BABYLON.Vector3(pt[0], pt[2], pt[1]); // note that Y and Z axes are switched on purpose.
+                    let v = new BABYLON.Vector3(pt[0], pt[2], pt[1]); // note that Y and Z axes are switched on purpose.
                     This.cameraPositionsAndTextures.push([v, null]); // null is texture, populated later.
                 }
                 callbacksComplete.push(callBacks.JSON_LOADED);
-                var func = This._params.onJSONLoaded.bind(This);
+                let func = This._params.onJSONLoaded.bind(This);
                 func();
                 func = callBack.bind(This);
                 func();
@@ -188,11 +178,11 @@ define(["require", "exports", "./VideoFrames", "./StandardShader", "./Camera", "
                 This: this,
                 callBack: callBack
             }));
-        };
-        Game.prototype._makeSomeMeshesClickable = function () {
+        }
+        _makeSomeMeshesClickable() {
             //When click event is raised
             window.addEventListener("click", function (evt) {
-                var now = new Date().getTime();
+                let now = new Date().getTime();
                 if (now - this._timeOfLastClick > 500) {
                     this._timeOfLastClick = now;
                     // We try to pick an object
@@ -202,8 +192,8 @@ define(["require", "exports", "./VideoFrames", "./StandardShader", "./Camera", "
                     }
                 }
             }.bind(this));
-        };
-        Game.prototype._startRenderLoop = function () {
+        }
+        _startRenderLoop() {
             // Once the scene is loaded, just register a render loop to render it
             this.engine.runRenderLoop(function () {
                 // let x = Math.round(this.scene.activeCamera.position.x * 100) / 100;
@@ -214,21 +204,20 @@ define(["require", "exports", "./VideoFrames", "./StandardShader", "./Camera", "
                 this._camera.update();
                 this.scene.render();
             }.bind(this));
-        };
-        Game.prototype._resizeWindow = function () {
+        }
+        _resizeWindow() {
             // Watch for browser/canvas resize events
             window.addEventListener("resize", function () {
                 this.engine.resize();
             }.bind(this));
-        };
-        return Game;
-    }());
+        }
+    }
     exports.Game = Game;
     function start() {
-        var game = new Game({
+        let game = new Game({
             onJSONLoaded: function () {
                 console.log("DONE!!!");
-                var ef = new VideoFrames_1.ExtractFrames(BABYLON, jQuery, this, function () {
+                let ef = new VideoFrames_1.ExtractFrames(BABYLON, jQuery, this, function () {
                     callbacksComplete.push(callBacks.VIDEO_FRAMES_LOADED);
                     console.log("done");
                 });

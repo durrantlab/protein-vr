@@ -8,14 +8,15 @@
 	Python World class constructor completed
 	processing begun of camera (FreeCamera):  Camera
 	processing begun of mesh:  ProteinVR_ViewerSphere
-		processing begun of Standard material:  material
-		num positions      :  59
-		num normals        :  59
-		num uvs            :  118
+		processing begun of Standard material:  Material
+		num positions      :  536
+		num normals        :  536
+		num uvs            :  1072
 		num uvs2           :  0
 		num colors         :  0
-		num indices        :  240
+		num indices        :  2394
+		WARNING: # of 0 area faces found:  37
 ========= Writing of scene file started =========
 ========= Writing of scene file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 0.0074 secs
+elapsed time:  0 min, 0.0324 secs

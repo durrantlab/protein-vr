@@ -1,7 +1,7 @@
 /**
  * module to create/store/maintain system variables
  */
-define(["require", "exports"], function (require, exports) {
+define(["require", "exports", "./Globals"], function (require, exports, Globals) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     // Setting up user parameters
@@ -43,20 +43,81 @@ define(["require", "exports"], function (require, exports) {
     exports.paramDefaults["mobile"]["device"] = devices["Mobile"];
     exports.paramDefaults["laptop"]["device"] = devices["Laptop"];
     exports.paramDefaults["desktop"]["device"] = devices["Desktop"];
+    // export enum textures {
+    //     Sharp,  // no modification
+    //     Medium,  // 512
+    //     Grainy  // 256
+    // }
+    // paramNames["textures"] = ["Sharp", "Medium", "Grainy"];
+    // paramDefaults["mobile"]["textures"] = textures["Medium"];
+    // paramDefaults["laptop"]["textures"] = textures["Sharp"];
+    // paramDefaults["desktop"]["textures"] = textures["Sharp"];
+    // export enum fog {
+    //     Clear,
+    //     Thin,
+    //     Thick
+    // }
+    // paramNames["fog"] = ["Clear", "Thin", "Thick"];
+    // paramDefaults["mobile"]["fog"] = fog["Clear"];
+    // paramDefaults["laptop"]["fog"] = fog["Thin"];
+    // paramDefaults["desktop"]["fog"] = fog["Thick"];
+    // export enum objects {  // actually LOD settings
+    //     Detailed,
+    //     Normal,
+    //     Simple
+    // }
+    // paramNames["objects"] = ["Detailed", "Normal", "Simple"];
+    // paramDefaults["mobile"]["objects"] = objects["Normal"];
+    // paramDefaults["laptop"]["objects"] = objects["Detailed"];
+    // paramDefaults["desktop"]["objects"] = objects["Detailed"];
+    // export enum displays {
+    //     FullScreen,
+    //     Windowed
+    // }
+    // paramNames["display"] = ["Full Screen", "Windowed"];
+    // paramDefaults["mobile"]["display"] = displays["FullScreen"];
+    // paramDefaults["laptop"]["display"] = displays["FullScreen"];
+    // paramDefaults["desktop"]["display"] = displays["FullScreen"];
+    // export enum moving {
+    //     Advance,
+    //     Jump,
+    //     Teleport
+    // }
+    // paramNames["moving"] = ["Advance", "Jump", "Teleport"];
+    // paramDefaults["mobile"]["moving"] = moving["Advance"];
+    // paramDefaults["laptop"]["moving"] = moving["Advance"];
+    // paramDefaults["desktop"]["moving"] = moving["Advance"];
+    // export enum looking {
+    //     MouseMove,
+    //     Click
+    // }
+    // paramNames["looking"] = ["Mouse Move", "Click"];
+    // paramDefaults["mobile"]["looking"] = looking["Click"];
+    // paramDefaults["laptop"]["looking"] = looking["MouseMove"];
+    // paramDefaults["desktop"]["looking"] = looking["MouseMove"];
+    // export enum animations {
+    //     Moving,
+    //     Fixed
+    // }
+    // paramNames["animations"] = ["Moving", "Fixed"];
+    // paramDefaults["mobile"]["animations"] = animations["Fixed"];
+    // paramDefaults["laptop"]["animations"] = animations["Moving"];
+    // paramDefaults["desktop"]["animations"] = animations["Moving"];
     /**
      * This function will assign values to the system variables based on user input.
      */
-    function setup(params) {
+    function setup() {
         return new Promise((resolve) => {
             // Default values before anything. For now just use laptop defaults,
             // but in future would be good to detect device...
             var userVars;
-            // if(PVRGlobals.mobileDetect.mobile()){
-            //     userVars = paramDefaults["mobile"];
-            // } else {
-            userVars = exports.paramDefaults["laptop"];
-            // debugger;
-            // }
+            let isMobile = Globals.get("mobileDetect").mobile(); // null if its not a phone at all.
+            if (isMobile) {
+                userVars = exports.paramDefaults["mobile"];
+            }
+            else {
+                userVars = exports.paramDefaults["laptop"];
+            }
             // Here you overwrite with values from params.json. At this point,
             // this is just the proteinvr scene to use.
             let keys = Object.keys(userVars);
@@ -77,7 +138,7 @@ define(["require", "exports"], function (require, exports) {
             }
             // Save to local storage what you've got so far.
             saveLocalStorageParams(userVars);
-            resolve("USERVARS SET UP");
+            resolve({ msg: "USERVARS SET UP" });
         });
     }
     exports.setup = setup;
@@ -86,7 +147,7 @@ define(["require", "exports"], function (require, exports) {
         let localStorageParamsStr = localStorage.getItem("proteinvr_params");
         let localStorageParams;
         if (localStorageParamsStr !== null) {
-            localStorageParams = jQuery.parseJSON(localStorageParamsStr);
+            localStorageParams = Globals.get("jQuery").parseJSON(localStorageParamsStr);
         }
         else {
             localStorageParams = {};
