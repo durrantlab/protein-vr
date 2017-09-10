@@ -151,7 +151,9 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             self.extra_data["cameraPositionsAndTextures"].append([round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)])
 
     def _compress_png(self, filename):
-        os.system(self.scene.pngquant_path + ' --strip --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png')
+        cmd = self.scene.pngquant_path + ' --strip --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'
+        print("RUN: " + cmd)
+        os.system(cmd)
         os.rename(filename + '.tmp.png', filename)
 
     def _step_3_render_baked_frames(self, debug=False):
