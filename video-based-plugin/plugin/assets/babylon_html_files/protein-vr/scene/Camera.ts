@@ -134,6 +134,7 @@ export class Camera {
         return new Promise((resolve) => {
             let scene = Globals.get("scene");
             let canvas = Globals.get("canvas");
+            let BABYLON = Globals.get("BABYLON");
     
             // Attach camera to canvas inputs
             if (UserVars.getParam("viewer") == UserVars.viewers["Screen"]) {
@@ -145,7 +146,7 @@ export class Camera {
             this._setupMouseAndKeyboard();
     
             // Move camera to first position.
-            scene.activeCamera.position = Globals.get("cameraPositionsAndTextures")[5][0];
+            scene.activeCamera.position = Globals.get("cameraPositionsAndTextures")[0][0];
     
             // Add extra keys
             // Additional control keys.
@@ -157,6 +158,20 @@ export class Camera {
             // this._lastCameraLoc = new this.BABYLON.Vector3(-9999, -9999, -9999);
     
             // this.scene.activeCamera.inertia = 0.0;
+
+            // Add anti-aliasing to this camera.
+            // This works but darkens the scene.
+            // var pipeline = new BABYLON.DefaultRenderingPipeline(
+            //     "default", // The name of the pipeline
+            //     false, // Do you want HDR textures ?
+            //     scene, // The scene instance
+            //     scene.activeCamera // The list of cameras to be attached to
+            // );
+            // pipeline.fxaaEnabled = true;
+            // pipeline.bloomEnabled = false;
+            // pipeline.imageProcessingEnabled = false;
+
+            console.log("See texture delaying here: http://www.html5gamedevs.com/topic/20452-material-swapping-disappearing-issue/");
 
             resolve({msg: "CAMERA SETUP"})
         });

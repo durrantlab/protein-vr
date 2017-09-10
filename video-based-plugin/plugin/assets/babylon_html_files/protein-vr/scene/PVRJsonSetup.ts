@@ -1,5 +1,6 @@
 import * as Globals from "../config/Globals";
 import * as Camera from "./Camera";
+import { RenderingGroups } from "../config/Globals";
 
 var data;
 export function loadJSON() {
@@ -55,7 +56,7 @@ var _guideSpheres = [];
 var _guideSphereHiddenCutoffDist;
 var _guideSphereShowCutoffDist;
 var _guideSphereIntermediateFactor;
-var _guideSphereMaxVisibility: number = 0.25;
+var _guideSphereMaxVisibility: number = 1.0; //0.25;
 var _guideSphereSize: number = 0.02;
 function _addGuideSpheres() {
     let BABYLON = Globals.get("BABYLON");
@@ -78,7 +79,7 @@ function _addGuideSpheres() {
         sphere.position.x = sphereLoc[0];
         sphere.position.y = sphereLoc[2];  // note y and z reversed.
         sphere.position.z = sphereLoc[1];
-        sphere.renderingGroupId = 3;
+        sphere.renderingGroupId = RenderingGroups.VisibleObjects;
         sphere.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
         // sphere.alpha = 1.0;
         _guideSpheres.push(sphere);
@@ -122,7 +123,7 @@ function _loadClickableFiles() {
         meshTask.onSuccess = function (task) {
             let mesh = task.loadedMeshes[0];  // Why is this necessary?
             mesh.scaling.z = -1.0;
-            mesh.renderingGroupId = 1;
+            mesh.renderingGroupId = RenderingGroups.ClickableObjects;
             // this._viewerSphere.isPickable = true;
             mesh.isPickable = true;
         }
@@ -146,7 +147,7 @@ function _loadAnimatedObjects() {
                 mesh.scaling.z = -1.0;
 
                 console.log(mesh);
-                mesh.renderingGroupId = 3;  // In front of viewer sphere.
+                mesh.renderingGroupId = RenderingGroups.VisibleObjects;  // In front of viewer sphere.
                 // this._viewerSphere.isPickable = true;
                 mesh.isPickable = false;
 

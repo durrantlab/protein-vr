@@ -8,6 +8,7 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         "BABYLON": undefined,
         "cameraPositionsAndTextures": undefined,
         "viewerSphere": undefined,
+        "backgroundSphere": undefined,
         "debug": false,
         "mouseDownAdvances": true,
         "mobileDetect": undefined,
@@ -26,4 +27,11 @@ export function set(key: string, val: any) {
 
 export function setArrayEntry(key: string, index: number, val: any) {
     (<any>window)._proteinvrGlobals[key][index] = val;
+}
+
+export enum RenderingGroups {
+    VisibleObjects = 3,
+    ViewerSphere = 2,
+    EnvironmentalSphere = 1,
+    ClickableObjects = 0
 }

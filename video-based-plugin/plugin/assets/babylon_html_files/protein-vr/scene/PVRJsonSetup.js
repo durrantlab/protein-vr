@@ -1,4 +1,4 @@
-define(["require", "exports", "../config/Globals"], function (require, exports, Globals) {
+define(["require", "exports", "../config/Globals", "../config/Globals"], function (require, exports, Globals, Globals_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var data;
@@ -47,7 +47,7 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
     var _guideSphereHiddenCutoffDist;
     var _guideSphereShowCutoffDist;
     var _guideSphereIntermediateFactor;
-    var _guideSphereMaxVisibility = 0.25;
+    var _guideSphereMaxVisibility = 1.0; //0.25;
     var _guideSphereSize = 0.02;
     function _addGuideSpheres() {
         let BABYLON = Globals.get("BABYLON");
@@ -68,7 +68,7 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
             sphere.position.x = sphereLoc[0];
             sphere.position.y = sphereLoc[2]; // note y and z reversed.
             sphere.position.z = sphereLoc[1];
-            sphere.renderingGroupId = 3;
+            sphere.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects;
             sphere.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
             // sphere.alpha = 1.0;
             _guideSpheres.push(sphere);
@@ -110,7 +110,7 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
             meshTask.onSuccess = function (task) {
                 let mesh = task.loadedMeshes[0]; // Why is this necessary?
                 mesh.scaling.z = -1.0;
-                mesh.renderingGroupId = 1;
+                mesh.renderingGroupId = Globals_1.RenderingGroups.ClickableObjects;
                 // this._viewerSphere.isPickable = true;
                 mesh.isPickable = true;
             };
@@ -131,7 +131,7 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
                     let mesh = task.loadedMeshes[0]; // Why is this necessary?
                     mesh.scaling.z = -1.0;
                     console.log(mesh);
-                    mesh.renderingGroupId = 3; // In front of viewer sphere.
+                    mesh.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects; // In front of viewer sphere.
                     // this._viewerSphere.isPickable = true;
                     mesh.isPickable = false;
                     // Load texture here.

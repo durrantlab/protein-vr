@@ -11,7 +11,9 @@ define(["require", "exports", "./Camera", "../config/Globals", "./ViewerSphere"]
                 // }.bind(this));
                 // Wait for textures and shaders to be ready
                 newScene.executeWhenReady(() => {
-                    Globals.set("camera", new Camera_1.Camera());
+                    let camera = new Camera_1.Camera();
+                    Globals.set("camera", camera);
+                    // Setup viewer sphere
                     ViewerSphere.setup();
                     if (Globals.get("debug")) {
                         newScene.debugLayer.show();

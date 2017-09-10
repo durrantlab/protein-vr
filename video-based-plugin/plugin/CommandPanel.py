@@ -44,6 +44,7 @@ class CommandPanel(ParentPanel):
             self.ui.scene_property("proteinvr_bake_texture_size")
             self.ui.scene_property("proteinvr_mobile_bake_texture_size")
             self.ui.scene_property("proteinvr_num_cycles")
+            self.ui.scene_property("background_environment_image")
             self.ui.scene_property("pngquant_path")
             # self.ui.scene_property("jpeg_quality")
         
@@ -185,11 +186,34 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             obj.hide = True
             obj.hide_render = True
         
+        # Get the environment texture and save that.
+        # print(self.scene.background_environment_image, "FFF")
+        # import pdb; pdb.set_trace()
+        src_background_environment_image = bpy.path.abspath(self.scene.background_environment_image)
+        if os.path.exists(src_background_environment_image):
+            shutil.copyfile(src_background_environment_image, self.proteinvr_output_dir + "environment.png")
+        else:
+            print("WARNING: Environmental texture file does not exist!")
+
+        # world = bpy.data.worlds['World']
+        # world.use_nodes = True
+        # environmental_textures = [node for node in world.node_tree.nodes if node.type == "TEX_ENVIRONMENT"]
+        # if len(environmental_textures) > 1:
+        #     print("WARNING: More than one environmental texture. Using the first one...")
+        # environmental_image = environmental_textures[0].image
+        # import pdb; pdb.set_trace()
+        # # environmental_image.alpha_mode = 'STRAIGHT'
+        # environmental_image.filepath_raw = self.proteinvr_output_dir + "environment.png"
+        # # environmental_image.file_format = 'PNG'
+        # environmental_image.save()
+        # # environmental_image.save_render(self.proteinvr_output_dir + "environment.png")
+        # import pdb; pdb.set_trace();
+
         # Setup cycles samples
         self.scene.render.resolution_percentage = 100.0
         self.scene.cycles.samples = self.scene.proteinvr_num_cycles
         self.scene.cycles.preview_samples = self.scene.proteinvr_num_cycles
-        self.scene.cycles.film_transparent = True
+        self.scene.cycles.film_transparent = True  # Because you're saving the background separately.
 
         frame_file_names = []
 
@@ -275,6 +299,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             image.filepath_raw = self.proteinvr_output_dir + obj.name + "_animated.png"
             image.file_format = 'PNG'
             image.save()
+        
+        self.scene.cycles.film_transparent = False  # Time to restore the environment lighting
 
     # def _step_4_compile_baked_images_into_video(self, debug=False):
     #     # I've decided this is no good. I don't think I can reliably pull data

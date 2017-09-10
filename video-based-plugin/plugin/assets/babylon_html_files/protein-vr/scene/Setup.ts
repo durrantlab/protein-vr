@@ -19,7 +19,10 @@ export function loadBabylonFile(): Promise<any> {
     
             // Wait for textures and shaders to be ready
             newScene.executeWhenReady(() => {
-                Globals.set("camera", new Camera());
+                let camera = new Camera();
+                Globals.set("camera", camera);
+                                
+                // Setup viewer sphere
                 ViewerSphere.setup();
                 if (Globals.get("debug")) { newScene.debugLayer.show(); }
                 resolve({msg: "BABYLON.BABYLON LOADED"});

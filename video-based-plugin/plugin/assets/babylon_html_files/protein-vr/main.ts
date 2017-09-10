@@ -65,6 +65,14 @@ export class Game {
                     UserVars.getParam("viewer") == UserVars.viewers["Screen"]
                 )
                 
+                // Anti alias everything?
+                // var postProcess = new BABYLON.FxaaPostProcess("fxaa", 1.0, camera);
+                // let postProcess = new BABYLON.FxaaPostProcess("fxaa", 1.0, camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, engine, false);
+                // let engine = Globals.get("engine");
+                // let camera = Globals.get("camera");
+                // let pp = new BABYLON.BlackAndWhitePostProcess("bandw", 1.0, camera);
+                // camera.__fxaa_cookie = new BABYLON.FxaaPostProcess("fxaa", 1, camera, 2, BABYLON.Texture.TRILINEAR_SAMPLINGMODE, engine, false);
+                
                 this._startRenderLoop();
                 engine.resize();
                 // });
@@ -77,12 +85,23 @@ export class Game {
         } else {  // Babylon is supported
             // Get the canvas element from our HTML above
             Globals.set("canvas", document.getElementById("renderCanvas"));
-            Globals.set("mobileDetect", new MobileDetect(window.navigator.userAgent));
+
+            // Deal with mobile vs. not mobile.
+            let isMobile = new MobileDetect(window.navigator.userAgent);
+            Globals.set("mobileDetect", isMobile);
+            let cssToAdd = '<style>';
+            if (isMobile.mobile()) {
+                cssToAdd = cssToAdd + `.show-if-mobile { display: inline-block; } .show-if-not-mobile { display: none; }`;
+            } else {
+                cssToAdd = cssToAdd + `.show-if-mobile { display: none; } .show-if-not-mobile { display: inline-block; }`;
+            }
+            cssToAdd = cssToAdd + '</style>';
+            jQuery("head").append(cssToAdd);                
 
             // Set the engine
             this._resizeWindow();
             this._params = params;
-            Globals.set("engine", new BABYLON.Engine(Globals.get("canvas"), true));
+            Globals.set("engine", new BABYLON.Engine(Globals.get("canvas"), true));  // second boolean is whether built-in smoothing will be used.
 
             // Use promise to load user variables (both from json and
             // specified via panel.)

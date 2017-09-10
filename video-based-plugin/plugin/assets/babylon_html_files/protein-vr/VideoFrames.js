@@ -24,7 +24,7 @@ define(["require", "exports", "./config/Globals"], function (require, exports, G
                         // console.log("DEBUGGING CODE HERE...");
                         let filename;
                         // alert(isMobile);
-                        isMobile = true; // for debugging.
+                        // isMobile = true; // for debugging.
                         if (isMobile) {
                             // Some kind of phone... use low-res images
                             filename = "./frames/" + data[i] + ".small.png?" + Math.random().toString(); // Note no caching, for debugging.
@@ -45,9 +45,14 @@ define(["require", "exports", "./config/Globals"], function (require, exports, G
                                 // This is running at time of execution, not OfflineAudioCompletionEvent.apply.apply. need to figure outerHeight.
                                 if (progressVal >= 100) {
                                     jQuery("#start-game").prop("disabled", false);
+                                    jQuery("#loading-progress-bar").slideUp(); /* () => {
+                                        jQuery("#loading-progress-bar").hide();
+                                    }); */
                                 }
                             });
                         });
+                        // tex.hasAlpha = true;
+                        // console.log(tex);
                         Globals.get("cameraPositionsAndTextures")[i][1] = tex;
                     });
                     // );

@@ -11,6 +11,7 @@ define(["require", "exports"], function (require, exports) {
             "BABYLON": undefined,
             "cameraPositionsAndTextures": undefined,
             "viewerSphere": undefined,
+            "backgroundSphere": undefined,
             "debug": false,
             "mouseDownAdvances": true,
             "mobileDetect": undefined,
@@ -30,4 +31,11 @@ define(["require", "exports"], function (require, exports) {
         window._proteinvrGlobals[key][index] = val;
     }
     exports.setArrayEntry = setArrayEntry;
+    var RenderingGroups;
+    (function (RenderingGroups) {
+        RenderingGroups[RenderingGroups["VisibleObjects"] = 3] = "VisibleObjects";
+        RenderingGroups[RenderingGroups["ViewerSphere"] = 2] = "ViewerSphere";
+        RenderingGroups[RenderingGroups["EnvironmentalSphere"] = 1] = "EnvironmentalSphere";
+        RenderingGroups[RenderingGroups["ClickableObjects"] = 0] = "ClickableObjects";
+    })(RenderingGroups = exports.RenderingGroups || (exports.RenderingGroups = {}));
 });
