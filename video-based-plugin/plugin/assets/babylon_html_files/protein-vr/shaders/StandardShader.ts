@@ -5,16 +5,23 @@ export class Shader {
     public material: any = undefined;
     private _transparency: boolean = false;
 
-    constructor(transparency: boolean = false) {
+    constructor(textureFilename, transparency: boolean = false, callBack = function() {}) {
         let scene = Globals.get("scene");
         let BABYLON = Globals.get("BABYLON");
         this._transparency = transparency;
 
-        this.material = new BABYLON.StandardMaterial("mat", scene);
+        let texture = new BABYLON.Texture(textureFilename, scene, false, true, BABYLON.Texture.TRILINEAR_SAMPLINGMODE, () => {
+            callBack();
+        });
+
+        this.material = new BABYLON.StandardMaterial("mat" + Math.random().toString(), scene);
         this.material.diffuseColor = new BABYLON.Color3(0, 0, 0);
         this.material.specularColor = new BABYLON.Color3(0, 0, 0);
         this.material.diffuseTexture = null;
-        this.material.emissiveTexture = null; // videoTexture;
+        this.material.emissiveTexture = texture; // videoTexture;
+        if (this._transparency) {
+            this.material.opacityTexture = texture;
+        }
         
         // switch (transparency) {
         //     case true:
@@ -26,17 +33,17 @@ export class Shader {
         // }
     }
 
-    public setTextures(texture) {
-        // if (this._transparency == true) {
-            // texture.hasAlpha = true;
-        // }
+    // public setTextures(texture) {
+    //     // if (this._transparency == true) {
+    //         // texture.hasAlpha = true;
+    //     // }
 
-        this.material.emissiveTexture = texture;
+    //     this.material.emissiveTexture = texture;
 
-        if (this._transparency) {
-            this.material.opacityTexture = texture;
-        }
-        // this.material.diffuseTexture = texture;
-        // this.material.linkEmissiveWithDiffuse = true;
-    }
+    //     if (this._transparency) {
+    //         this.material.opacityTexture = texture;
+    //     }
+    //     // this.material.diffuseTexture = texture;
+    //     // this.material.linkEmissiveWithDiffuse = true;
+    // }
 }

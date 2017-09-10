@@ -1,5 +1,6 @@
 import { Game } from "./main";
 import * as Globals from "./config/Globals";
+import { Shader } from "./shaders/StandardShader";
 
 export function getFramePromises() {
 
@@ -36,7 +37,7 @@ export function getFramePromises() {
                             // desktop and laptops ... full res images
                             filename = "./frames/" + data[i] + "?" + Math.random().toString();  // Note no caching, for debugging.
                         }
-                        let tex = new BABYLON.Texture(filename, scene, false, true, BABYLON.Texture.TRILINEAR_SAMPLINGMODE, () => {
+                        let shader = new Shader(filename, true, () => {
                             setTimeout(() => {  // kind of like doEvents from VB days.
                                 let numTextures = Globals.get("numFrameTexturesLoaded") + 1;
                                 Globals.set("numFrameTexturesLoaded", numTextures);
@@ -55,7 +56,7 @@ export function getFramePromises() {
                         });
                         // tex.hasAlpha = true;
                         // console.log(tex);
-                        Globals.get("cameraPositionsAndTextures")[i][1] = tex;
+                        Globals.get("cameraPositionsAndTextures")[i][1] = shader;
                     });
 
                     

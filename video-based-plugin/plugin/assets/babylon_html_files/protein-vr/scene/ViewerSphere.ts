@@ -13,11 +13,11 @@ export function setup() {
     scene.activeCamera.position = viewerSphere.position;
     
     // Set the material
-    shader = new Shader(true);
+    // shader = new Shader(true);
     // shader.material.alpha = 0.1;
     // shader.material.hasAlpha = true;  // on texture, not material
     // shader.material.linkEmissiveWithDiffuse = true;
-    viewerSphere.material = shader.material;
+    // viewerSphere.material = shader.material;
     viewerSphere.isPickable = false;
     viewerSphere.renderingGroupId = RenderingGroups.ViewerSphere;
     // console.log(Globals.get("cameraPositionsAndTextures"))
@@ -42,27 +42,34 @@ export function setup() {
     backgroundSphere.renderingGroupId = RenderingGroups.EnvironmentalSphere;
     
     // Set the background sphere's appreance
-    let shader2 = new Shader();
+    // debugger;
+    let shader2 = new Shader('environment.png', false);
     backgroundSphere.material = shader2.material;
-    let tex = new BABYLON.Texture("environment.png", scene);
-    shader2.setTextures(tex);
+    // backgroundSphere.material = shader2.material;
+    // let tex = new BABYLON.Texture("environment.png", scene);
+    // shader2.setTextures(tex);
     // console.log(backgroundSphere);
     Globals.set("backgroundSphere", backgroundSphere);
+    // backgroundSphere.parent = viewerSphere;
+    
     window.backgroundSphere =backgroundSphere;
-    backgroundSphere.parent = viewerSphere;
-    // You need to move this with camera, or parent it (even better)
+    window.viewerSphere =backgroundSphere;
 }
 
 export function update(newCameraData) {
     // Move sphere
     let viewerSphere = Globals.get("viewerSphere");
+    let backgroundSphere = Globals.get("backgroundSphere");
     viewerSphere.hide = true;
     viewerSphere.position = newCameraData.position;
+    backgroundSphere.position = newCameraData.position;
 
     // console.log(newCameraData.texture);
 
     // Update texture
-    shader.setTextures(newCameraData.texture); //, tex2, tex3, dist1, dist2, dist3);
+    // debugger;
+    viewerSphere.material = newCameraData.texture.material;
+    // shader.setTextures(newCameraData.texture); //, tex2, tex3, dist1, dist2, dist3);
     // this._viewerSphere.material.emissiveTexture = bestTexture;
 
 }

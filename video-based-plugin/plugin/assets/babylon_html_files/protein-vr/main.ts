@@ -131,7 +131,7 @@ export class Game {
                 // Start loading the frames here... no need to resolve it
                 VideoFrames.getFramePromises()
                 .then((fulfilled) => {
-                    console.log(fulfilled, "MOO");  // add promise here?
+                    // console.log(fulfilled, "MOO");  // add promise here?
                 })
                 
                 // In parallel, continue the JSON sestup now that the scene is

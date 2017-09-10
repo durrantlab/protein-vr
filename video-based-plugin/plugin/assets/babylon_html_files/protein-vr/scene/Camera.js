@@ -139,7 +139,6 @@ define(["require", "exports", "../config/UserVars", "./PVRJsonSetup", "../config
                 // pipeline.fxaaEnabled = true;
                 // pipeline.bloomEnabled = false;
                 // pipeline.imageProcessingEnabled = false;
-                console.log("See texture delaying here: http://www.html5gamedevs.com/topic/20452-material-swapping-disappearing-issue/");
                 resolve({ msg: "CAMERA SETUP" });
             });
         }

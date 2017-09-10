@@ -21,6 +21,9 @@ export function loadBabylonFile(): Promise<any> {
             newScene.executeWhenReady(() => {
                 let camera = new Camera();
                 Globals.set("camera", camera);
+
+                // Delay textures until needed. Cool, but too slow for our purposes here...
+                // newScene.useDelayedTextureLoading = true
                                 
                 // Setup viewer sphere
                 ViewerSphere.setup();

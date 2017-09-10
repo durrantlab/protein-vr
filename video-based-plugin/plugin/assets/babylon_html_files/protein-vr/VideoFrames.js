@@ -1,4 +1,4 @@
-define(["require", "exports", "./config/Globals"], function (require, exports, Globals) {
+define(["require", "exports", "./config/Globals", "./shaders/StandardShader"], function (require, exports, Globals, StandardShader_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function getFramePromises() {
@@ -34,7 +34,7 @@ define(["require", "exports", "./config/Globals"], function (require, exports, G
                             // desktop and laptops ... full res images
                             filename = "./frames/" + data[i] + "?" + Math.random().toString(); // Note no caching, for debugging.
                         }
-                        let tex = new BABYLON.Texture(filename, scene, false, true, BABYLON.Texture.TRILINEAR_SAMPLINGMODE, () => {
+                        let shader = new StandardShader_1.Shader(filename, true, () => {
                             setTimeout(() => {
                                 let numTextures = Globals.get("numFrameTexturesLoaded") + 1;
                                 Globals.set("numFrameTexturesLoaded", numTextures);
@@ -53,7 +53,7 @@ define(["require", "exports", "./config/Globals"], function (require, exports, G
                         });
                         // tex.hasAlpha = true;
                         // console.log(tex);
-                        Globals.get("cameraPositionsAndTextures")[i][1] = tex;
+                        Globals.get("cameraPositionsAndTextures")[i][1] = shader;
                     });
                     // );
                 }

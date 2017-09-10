@@ -13,6 +13,8 @@ define(["require", "exports", "./Camera", "../config/Globals", "./ViewerSphere"]
                 newScene.executeWhenReady(() => {
                     let camera = new Camera_1.Camera();
                     Globals.set("camera", camera);
+                    // Delay textures until needed. Cool, but too slow for our purposes here...
+                    // newScene.useDelayedTextureLoading = true
                     // Setup viewer sphere
                     ViewerSphere.setup();
                     if (Globals.get("debug")) {
