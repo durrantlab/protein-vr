@@ -210,31 +210,6 @@ export class Camera {
         // Attach that camera to the canvas.
         scene.activeCamera.attachControl(canvas);
 
-        // Add a guide line
-        jQuery("head").append(`
-        <style>
-            .vr_overlay {
-                position: absolute;
-                bottom: 0;
-                width: 50%;
-                height: 20%;
-                z-index: 10000000000;
-            }
-
-            .vr_overlay_left {
-                left: 0;
-                border-right: 2px solid black;
-            }
-
-            .vr_overlay_right {
-                right: 0;
-                border-left: 2px solid black;
-            }            
-        </style>
-        `);
-
-        jQuery("body").append('<div id="vr_overlay1" class="vr_overlay vr_overlay_left"></div>')
-        jQuery("body").append('<div id="vr_overlay2" class="vr_overlay vr_overlay_right"></div>')
         // let vrOverlay1 = jQuery("#vr_overlay1");
         // vrOverlay1.css("position", "absolute");
         // vrOverlay1.css("bottom", "0");

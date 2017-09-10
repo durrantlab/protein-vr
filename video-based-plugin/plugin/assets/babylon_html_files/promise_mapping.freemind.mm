@@ -15,7 +15,7 @@
     </p>
   </body>
 </html></richcontent>
-<node CREATED="1504668019469" HGAP="14" ID="ID_1965710874" MODIFIED="1504669252271" VSHIFT="118">
+<node CREATED="1504668019469" HGAP="14" ID="ID_1965710874" MODIFIED="1504996437753" VSHIFT="118">
 <richcontent TYPE="NODE"><html>
   <head>
     
@@ -29,9 +29,10 @@
     </p>
   </body>
 </html></richcontent>
-<node CREATED="1504669014466" HGAP="15" ID="ID_108490188" MODIFIED="1504669337426" TEXT="Camera.setup" VSHIFT="130">
-<arrowlink COLOR="#b0b0b0" DESTINATION="ID_273882872" ENDARROW="None" ENDINCLINATION="270;135;" ID="Arrow_ID_129228375" STARTARROW="Default" STARTINCLINATION="-200;178;"/>
+<node CREATED="1504669014466" HGAP="15" ID="ID_108490188" MODIFIED="1504996444660" TEXT="Camera.setup" VSHIFT="130">
+<arrowlink COLOR="#b0b0b0" DESTINATION="ID_273882872" ENDARROW="None" ENDINCLINATION="270;135;" ID="Arrow_ID_129228375" STARTARROW="Default" STARTINCLINATION="-223;207;"/>
 </node>
+<node CREATED="1504996440007" HGAP="213" ID="ID_237529592" MODIFIED="1504996458592" TEXT="Loading Panel while Video frames finish" VSHIFT="-42"/>
 </node>
 </node>
 <node CREATED="1504668040068" ID="ID_628519935" MODIFIED="1504672533458" POSITION="left">
@@ -48,7 +49,7 @@
     </p>
   </body>
 </html></richcontent>
-<node CREATED="1504668141830" HGAP="279" ID="ID_273882872" MODIFIED="1504846403350" VSHIFT="145">
+<node CREATED="1504668141830" HGAP="279" ID="ID_273882872" MODIFIED="1504996444660" VSHIFT="145">
 <richcontent TYPE="NODE"><html>
   <head>
     
@@ -64,12 +65,29 @@
       <font size="1">(Guide spheres, clickable files). This should be fast.</font>
     </p>
   </body>
-</html>
-</richcontent>
-<linktarget COLOR="#b0b0b0" DESTINATION="ID_273882872" ENDARROW="None" ENDINCLINATION="270;135;" ID="Arrow_ID_129228375" SOURCE="ID_108490188" STARTARROW="Default" STARTINCLINATION="-200;178;"/>
+</html></richcontent>
+<linktarget COLOR="#b0b0b0" DESTINATION="ID_273882872" ENDARROW="None" ENDINCLINATION="270;135;" ID="Arrow_ID_129228375" SOURCE="ID_108490188" STARTARROW="Default" STARTINCLINATION="-223;207;"/>
 <linktarget COLOR="#b0b0b0" DESTINATION="ID_273882872" ENDARROW="None" ENDINCLINATION="-55;80;" ID="Arrow_ID_893832478" SOURCE="ID_1251581907" STARTARROW="None" STARTINCLINATION="54;-26;"/>
 </node>
-<node CREATED="1504672615584" HGAP="27" ID="ID_1167622801" MODIFIED="1504672654574" TEXT="VideoFrames.getFramePromises" VSHIFT="-3"/>
+<node CREATED="1504672615584" HGAP="27" ID="ID_1167622801" MODIFIED="1504970905933" VSHIFT="-3">
+<richcontent TYPE="NODE"><html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      VideoFrames.getFramePromises
+    </p>
+    <p>
+      <font size="1">The scene needs to be loaded, and </font>
+    </p>
+    <p>
+      <font size="1">cameraPositionsAndTextures needs to be defined.</font>
+    </p>
+  </body>
+</html>
+</richcontent>
+</node>
 </node>
 <node CREATED="1504668110762" HGAP="24" ID="ID_1251581907" MODIFIED="1504668689582" POSITION="left" VSHIFT="35">
 <richcontent TYPE="NODE"><html>

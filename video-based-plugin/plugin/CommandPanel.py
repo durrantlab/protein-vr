@@ -42,11 +42,15 @@ class CommandPanel(ParentPanel):
 
         if bpy.context.scene.proteinvr_use_existing_frames == False:
             self.ui.scene_property("proteinvr_bake_texture_size")
+            self.ui.scene_property("proteinvr_mobile_bake_texture_size")
             self.ui.scene_property("proteinvr_num_cycles")
+            self.ui.scene_property("pngquant_path")
+            # self.ui.scene_property("jpeg_quality")
         
         # self.ui.use_layout_row()
         # self.ui.scene_property("proteinvr_viewer_sphere_size")
         self.ui.scene_property("proteinvr_min_guide_sphere_spread")
+        
         self.ui.ops_button(rel_data_path="proteinvr.create_scene", button_label="Create Scene")
         self.ui.ops_button(rel_data_path="proteinvr.render_scene_remotely", button_label="Render Scene Remotely")        
         
@@ -146,6 +150,10 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             # self.extra_data["cameraPos"].append([this_frame, round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)])
             self.extra_data["cameraPositionsAndTextures"].append([round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)])
 
+    def _compress_png(self, filename):
+        os.system(self.scene.pngquant_path + ' --strip --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png')
+        os.rename(filename + '.tmp.png', filename)
+
     def _step_3_render_baked_frames(self, debug=False):
         print("This def currently does a lot more than bake frames... separate it out...")
         # Get all the objects that are currently visible, but have animations.
@@ -178,6 +186,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.scene.render.resolution_percentage = 100.0
         self.scene.cycles.samples = self.scene.proteinvr_num_cycles
         self.scene.cycles.preview_samples = self.scene.proteinvr_num_cycles
+        self.scene.cycles.film_transparent = True
 
         frame_file_names = []
 
@@ -195,26 +204,32 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
             if not debug:
                 # Create the image
-                self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".jpg"
-                self.scene.render.image_settings.file_format = 'JPEG'
-                self.scene.render.image_settings.quality = 50
+                self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png"
+                # self.scene.render.image_settings.file_format = 'JPEG'
+                self.scene.render.image_settings.file_format = 'PNG'
+                self.scene.render.image_settings.color_mode = "RGBA"
+                self.scene.render.image_settings.compression = 100
+                self.scene.render.image_settings.quality = self.scene.jpeg_quality
                 self.scene.render.resolution_x = self.scene.proteinvr_bake_texture_size
                 self.scene.render.resolution_y = self.scene.proteinvr_bake_texture_size
                 self.scene.render.resolution_percentage = 100
                 bpy.ops.render.render(write_still=True)
+                self._compress_png(self.scene.render.filepath)
 
                 # size = self.scene.proteinvr_bake_texture_size
                 # image = bpy.data.images.new("ProteinVRImage" + str(this_frame), size, size)
                
-                frame_file_names.append("proteinvr_baked_texture" + str(this_frame) + ".jpg")
+                frame_file_names.append("proteinvr_baked_texture" + str(this_frame) + ".png")
 
                 # Now render at 1/4 size. But note that I'm rerendering here,
                 # not resizing. So can be computationally intensive. I chose
                 # this because I believe it gives better results, but I'm not
                 # sure.
-                self.scene.render.resolution_percentage = 25
-                self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".jpg.small.jpg"
+                
+                self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
+                self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png.small.png"
                 bpy.ops.render.render(write_still=True)
+                self._compress_png(self.scene.render.filepath)
                 
         # Save list of all rendered frames
         json.dump(frame_file_names, open(self.frame_dir + "filenames.json",'w'))
@@ -403,7 +418,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self._step_2_get_camerea_positions()
 
         # if not os.path.exists(self.proteinvr_output_dir + "proteinvr_baked.mp4"):
-        if len(glob.glob(self.proteinvr_output_dir + "frames/*.jpg")) == 0:
+        if len(glob.glob(self.proteinvr_output_dir + "frames/*.png")) == 0:
             self._step_3_render_baked_frames(debug)
             # self._step_4_compile_baked_images_into_video(debug)
         self._step_5_make_proteinvr_clickable_meshes()

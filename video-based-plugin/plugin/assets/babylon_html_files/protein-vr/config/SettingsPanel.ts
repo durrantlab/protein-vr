@@ -20,15 +20,15 @@ export function allowUserToModifySettings() {
         let settingsPanel = jQuery("#settings_panel");
     
         // Styleize div
-        settingsPanel.css("position", "absolute");
-        settingsPanel.css("left", "0");
-        settingsPanel.css("top", "0");
-        settingsPanel.css("width", "100%");
-        settingsPanel.css("height", "100%");
-        settingsPanel.css("background-color", "Gainsboro");
-        settingsPanel.css("z-index", "1000");
-        settingsPanel.css("padding", "15px");
-        settingsPanel.css("overflow-y", "scroll");
+        // settingsPanel.css("position", "absolute");
+        // settingsPanel.css("left", "0");
+        // settingsPanel.css("top", "0");
+        // settingsPanel.css("width", "100%");
+        // settingsPanel.css("height", "100%");
+        // settingsPanel.css("background-color", "Gainsboro");
+        // settingsPanel.css("z-index", "1000");
+        // settingsPanel.css("padding", "15px");
+        // settingsPanel.css("overflow-y", "scroll");
     
         // Make it fluid with bootstrap
         settingsPanel.addClass("container-fluid");
@@ -114,7 +114,7 @@ export function allowUserToModifySettings() {
                     ""
                 )
             ) */ + 
-            `<button id="start_game_button" type="button" class="btn btn-primary">Start</button>`
+            `<button id="user_settings_done_button" type="button" class="btn btn-primary">Start</button>`
             // <button id="broadcast_game_button" style="display: none;" type="button" class="btn btn-primary">Broadcast</button>`
         );
     
@@ -357,39 +357,36 @@ function addJavaScript(onSettingsPanelClosed) {
         // This does need to be registered on the window. If you do it
         // through a click in babylonjs, browsers will reject the
         // full-screen request.
-        jQuery("#start_game_button").click(function() {
-            jQuery("#settings_panel").fadeOut(1000);
+        jQuery("#user_settings_done_button").click(function() {
+            jQuery("#settings_panel").fadeOut(() => {
+                jQuery("#loading_panel").fadeIn();
+            });
             this.onSettingsPanelClosed();
 
-            this.engine.switchFullscreen(
-                UserVars.getParam("viewer") == UserVars.viewers["Screen"]
-            )
-
-
-            // // if ((UserVars.getParam("display") === UserVars.displays["FullScreen"]) && (screenfull.enabled)) {
-            // if (screenfull.enabled) {
-            //     jQuery("body").on('click', function(e) {
-            //         // If you're using VR and the user clicks, make sure you're full screen.
-            //         // This is because the browser automatically goes windowed when you
-            //         // Note that all clicks will now call this function... could
-            //         // effect performance.
-            //         if (screenfull.isFullscreen === false) {
-            //             screenfull.request();
-            //         }
-            //     });
-
-            //     screenfull.request();
-            // }
             
-            // if (UserVars.getParam("looking") == UserVars.looking["MouseMove"]) {
-            //     // console.log("Usingp ointerlock...");
-            //     PointerLock.pointerLock();
-            // }
-
-            jQuery("canvas").focus();  // to make sure keypresses work.
+            // // if ((UserVars.getParam("display") === UserVars.displays["FullScreen"]) && (screenfull.enabled)) {
+                // if (screenfull.enabled) {
+                    //     jQuery("body").on('click', function(e) {
+                        //         // If you're using VR and the user clicks, make sure you're full screen.
+                        //         // This is because the browser automatically goes windowed when you
+                        //         // Note that all clicks will now call this function... could
+                        //         // effect performance.
+                        //         if (screenfull.isFullscreen === false) {
+                            //             screenfull.request();
+                            //         }
+                            //     });
+                            
+                            //     screenfull.request();
+                            // }
+                            
+                            // if (UserVars.getParam("looking") == UserVars.looking["MouseMove"]) {
+                                //     // console.log("Usingp ointerlock...");
+                                //     PointerLock.pointerLock();
+                                // }
+                                
         }.bind({
             onSettingsPanelClosed: onSettingsPanelClosed,
-            engine: engine
+            // engine: engine
         }));
 
         // Broadcast button
@@ -438,7 +435,7 @@ function addBroadcastModal() {
     jQuery("#start_game_from_modal").click(function() {
         jQuery('#broadcast_modal').modal('hide');
         PVRGlobals.teacherBroadcasting = true;
-        jQuery("#start_game_button").click();
+        jQuery("#user_settings_done_button").click();
     });
 
     jQuery('#broadcast_modal').on('shown.bs.modal', function () {

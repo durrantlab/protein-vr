@@ -13,7 +13,8 @@ define(["require", "exports"], function (require, exports) {
             "viewerSphere": undefined,
             "debug": false,
             "mouseDownAdvances": true,
-            "mobileDetect": undefined
+            "mobileDetect": undefined,
+            "numFrameTexturesLoaded": 0
         };
     }
     function get(key) {

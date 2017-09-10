@@ -25,6 +25,5 @@ require(['../main'], (main) => {
         // console.log(jQuery);
     // console.log(BABYLON);
     // console.log(main);
-
     main.start();
 });

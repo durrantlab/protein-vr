@@ -10,7 +10,8 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         "viewerSphere": undefined,
         "debug": false,
         "mouseDownAdvances": true,
-        "mobileDetect": undefined
+        "mobileDetect": undefined,
+        "numFrameTexturesLoaded": 0
     }
 }
 

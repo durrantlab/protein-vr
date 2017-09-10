@@ -1,0 +1,58 @@
+<link rel="stylesheet" href="./js/bootstrap-3.3.7/dist/css/bootstrap.min.css">
+
+<style>
+    .vr_overlay {
+        position: absolute;
+        bottom: 0;
+        width: 50%;
+        height: 20%;
+        z-index: 10000000000;
+    }
+
+    .vr-alignment-line {
+        right: 0;
+        border-left: 3px solid black;
+        width: 50%;
+        position: absolute;
+        height: 20%;
+        bottom : 0;
+    }
+    
+</style>
+
+<div class="container-fluid">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                Loading Game...
+            </h3>
+        </div>
+        <div class="panel-body" style="position: relative;">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="loading-progress-bar" class="progress" style="height: 25px;">
+                        <div class="progress-bar progress-success progress-bar-striped active" role="progressbar"  style="width: 0%; height: 25px; line-height: 25px;">
+                            Loading...
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="instructions-left" class="col-xs-6">
+                            Instructions on how to use
+                        </div>
+                        <div id="instructions-right" class="col-xs-6">
+                            More stuff here.
+                        </div>
+                    </div><br />
+                    <button id="start-game" type="button" class="btn btn-primary" disabled="disabled">
+                        Start
+                    </button>
+                </div>
+            </div>
+            <!-- <div id="mid-line-overlay"> -->
+                <!-- <div id="vr_overlay1" class="vr_overlay vr_overlay_left"></div> -->
+                <div id="vr_overlay2" class="vr-alignment-line"></div>
+            <!-- </div> -->
+        </div>
+    </div>
+
+</div>

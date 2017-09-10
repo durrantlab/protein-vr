@@ -22,7 +22,6 @@ export function loadJSON() {
                 cameraPositionsAndTextures.push([v, null]);  // null is texture, populated later.
             }
             Globals.set("cameraPositionsAndTextures", cameraPositionsAndTextures);
-
             resolve({msg: "LOADED PROTIENVR JSON"});
     
             // callbacksComplete.push(callBacks.JSON_LOADED);

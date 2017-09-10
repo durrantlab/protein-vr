@@ -14,15 +14,15 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
             jQuery("body").append(`<div id="settings_panel"></div>`);
             let settingsPanel = jQuery("#settings_panel");
             // Styleize div
-            settingsPanel.css("position", "absolute");
-            settingsPanel.css("left", "0");
-            settingsPanel.css("top", "0");
-            settingsPanel.css("width", "100%");
-            settingsPanel.css("height", "100%");
-            settingsPanel.css("background-color", "Gainsboro");
-            settingsPanel.css("z-index", "1000");
-            settingsPanel.css("padding", "15px");
-            settingsPanel.css("overflow-y", "scroll");
+            // settingsPanel.css("position", "absolute");
+            // settingsPanel.css("left", "0");
+            // settingsPanel.css("top", "0");
+            // settingsPanel.css("width", "100%");
+            // settingsPanel.css("height", "100%");
+            // settingsPanel.css("background-color", "Gainsboro");
+            // settingsPanel.css("z-index", "1000");
+            // settingsPanel.css("padding", "15px");
+            // settingsPanel.css("overflow-y", "scroll");
             // Make it fluid with bootstrap
             settingsPanel.addClass("container-fluid");
             // Add in html
@@ -101,7 +101,7 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
                 )
             ) */
                 +
-                    `<button id="start_game_button" type="button" class="btn btn-primary">Start</button>`
+                    `<button id="user_settings_done_button" type="button" class="btn btn-primary">Start</button>`
             // <button id="broadcast_game_button" style="display: none;" type="button" class="btn btn-primary">Broadcast</button>`
             );
             settingsPanel.html(html);
@@ -314,10 +314,11 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
         // This does need to be registered on the window. If you do it
         // through a click in babylonjs, browsers will reject the
         // full-screen request.
-        jQuery("#start_game_button").click(function () {
-            jQuery("#settings_panel").fadeOut(1000);
+        jQuery("#user_settings_done_button").click(function () {
+            jQuery("#settings_panel").fadeOut(() => {
+                jQuery("#loading_panel").fadeIn();
+            });
             this.onSettingsPanelClosed();
-            this.engine.switchFullscreen(UserVars.getParam("viewer") == UserVars.viewers["Screen"]);
             // // if ((UserVars.getParam("display") === UserVars.displays["FullScreen"]) && (screenfull.enabled)) {
             // if (screenfull.enabled) {
             //     jQuery("body").on('click', function(e) {
@@ -335,10 +336,8 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
             //     // console.log("Usingp ointerlock...");
             //     PointerLock.pointerLock();
             // }
-            jQuery("canvas").focus(); // to make sure keypresses work.
         }.bind({
             onSettingsPanelClosed: onSettingsPanelClosed,
-            engine: engine
         }));
         // Broadcast button
         // PVRGlobals.broadcastID = Math.floor(100000000 * Math.random()).toString();
@@ -381,7 +380,7 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
         jQuery("#start_game_from_modal").click(function () {
             jQuery('#broadcast_modal').modal('hide');
             PVRGlobals.teacherBroadcasting = true;
-            jQuery("#start_game_button").click();
+            jQuery("#user_settings_done_button").click();
         });
         jQuery('#broadcast_modal').on('shown.bs.modal', function () {
             jQuery('#broadcast-url').focus();

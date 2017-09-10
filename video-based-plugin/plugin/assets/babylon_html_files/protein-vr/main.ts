@@ -51,6 +51,26 @@ export class Game {
 
     constructor(params: GameInterface) {
         // setInterval(function() {console.log(this.cameraPos);}.bind(this), 100);
+
+        // Bring in the loading panel...
+        jQuery("#loading_panel").load("./_loading.html", () => {
+            jQuery("#start-game").click(() => {
+                let engine = Globals.get("engine");
+                let canvas = jQuery("canvas");
+                jQuery("#loading_panel").hide(); // fadeOut(() => {
+                canvas.show();
+                canvas.focus();  // to make sure keypresses work.
+
+                engine.switchFullscreen(
+                    UserVars.getParam("viewer") == UserVars.viewers["Screen"]
+                )
+                
+                this._startRenderLoop();
+                engine.resize();
+                // });
+
+            })
+        });
         
         if (!BABYLON.Engine.isSupported()) {
             alert("ERROR: Babylon not supported!");
@@ -77,15 +97,7 @@ export class Game {
             // Load babylon file and set up scene.
             // SceneSetup.loadBabylonFile
             let sceneCreated = SceneSetup.loadBabylonFile()
-            .then((fulfilled) => {
-                // Start loading the frames here... no need to resolve it
-                VideoFrames.getFramePromises()
-                .then((fulfilled) => {
-                    console.log(fulfilled, "MOO");
-                })
-
-                return Promise.resolve("DONE: Scene created, babylon file loaded")
-            });
+            .then((fulfilled) => Promise.resolve("DONE: Scene created, babylon file loaded"));
 
             // Load proteinVR-specific json file
             // PVRJsonSetup.loadJSON
@@ -96,12 +108,21 @@ export class Game {
             // make some meshes clickable.
             // SceneSetup.loadBabylonFile + PVRJsonSetup.loadJSON => PVRJsonSetup.afterSceneLoaded
             let proteinVRJsonDone = Promise.all([sceneCreated, PVRJsonLoadingStarted])
-            .then((fulfilled) => PVRJsonSetup.afterSceneLoaded())
-            .then((fulfilled) => Promise.resolve("DONE: PVR Json loading finished (after scene)"));
+            .then((fulfilled) => {
+                // Start loading the frames here... no need to resolve it
+                VideoFrames.getFramePromises()
+                .then((fulfilled) => {
+                    console.log(fulfilled, "MOO");  // add promise here?
+                })
+                
+                // In parallel, continue the JSON sestup now that the scene is
+                // loaded.
+                return PVRJsonSetup.afterSceneLoaded();
+            }).then((fulfilled) => Promise.resolve("DONE: PVR Json loading finished (after scene)"));
 
             Promise.all([proteinVRJsonDone, allUserVarsAvailable])
             .then((fulfilled) => Globals.get("camera").setup())
-            .then((fulfilled) => this._startRenderLoop());
+            // .then((fulfilled) => this._startRenderLoop());
 
             // loadBabylonFilePromiseDone.then((f) => {
             //     console.log(f)
