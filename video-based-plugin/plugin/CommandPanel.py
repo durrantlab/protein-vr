@@ -151,8 +151,9 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             self.extra_data["cameraPositionsAndTextures"].append([round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)])
 
     def _compress_png(self, filename):
-        cmd = self.scene.pngquant_path + ' --strip --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'
-        print("RUN: " + cmd)
+        cmd = self.scene.pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
+        # print("RUN: " + cmd)
+        
         os.system(cmd)
         os.rename(filename + '.tmp.png', filename)
 
