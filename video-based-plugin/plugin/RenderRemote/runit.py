@@ -18,7 +18,6 @@ bpy.context.scene.proteinvr_mobile_bake_texture_size = 0
 
 bpy.ops.proteinvr.create_scene()
 
-os.system("pkill -9 blender")
 
 open("runit.sh", 'w').write("\n".join([
     "echo Creating mobile version of " + png_filename + "; /usr/bin/convert " + png_filename + " -resize " + str(mobile_res) + "x" + str(mobile_res) + " " + png_filename + ".small.png" 
@@ -34,3 +33,5 @@ os.system("mkdir /tmp/ttt/; cp -r * /tmp/ttt/")
 # for png_filename in glob.glob("./output/*.png"):
 #     print("Creating mobile version of " + png_filename)
 #     os.system("/usr/bin/convert " + png_filename + " -resize " + str(mobile_res) + "x" + str(mobile_res) + " " + png_filename + ".small.png")
+
+os.system("pkill -9 blender")
