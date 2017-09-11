@@ -539,14 +539,14 @@ class OBJECT_OT_RenderRemote(ButtonParentClass):
         ]
         self.run_remote("; ".join(cmds))
 
-        # Copy files back from remote machine.
-        remote_cmd = "rsync -rv --remove-source-files " + self.beefy_computer_for_rendering + ":" + remote_dir + os.sep + "output" + os.sep + "* " + bpy.context.scene.proteinvr_output_dir + os.sep
+        # Copy files back from remote machine. --remove-source-files 
+        remote_cmd = "rsync -rv " + self.beefy_computer_for_rendering + ":" + remote_dir + os.sep + "output" + os.sep + "* " + bpy.context.scene.proteinvr_output_dir + os.sep
         print(remote_cmd)
         print()
         os.system(remote_cmd)
 
         # Remote remote directory.
-        self.run_remote("rm -r " + remote_dir)
+        # self.run_remote("rm -r " + remote_dir)
 
         print()
         # print(bpy.path.abspath("//"))
