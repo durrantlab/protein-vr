@@ -16,16 +16,27 @@ bpy.context.scene.pngquant_path = "" # "/usr/bin/pngquant"
 mobile_res = bpy.context.scene.proteinvr_mobile_bake_texture_size
 bpy.context.scene.proteinvr_mobile_bake_texture_size = 0
 
+# Render the full-images
 bpy.ops.proteinvr.create_scene()
 
-
+# Now make the mobile versions.
 open("runit.sh", 'w').write("\n".join([
     "echo Creating mobile version of " + png_filename + "; /usr/bin/convert " + png_filename + " -resize " + str(mobile_res) + "x" + str(mobile_res) + " " + png_filename + ".small.png" 
     for png_filename in glob.glob("./output/frames/*.png")
 ]))
-
 os.system("cat runit.sh | /usr/bin/parallel")
-os.system("mkdir /tmp/ttt/; cp -r * /tmp/ttt/")
+
+# Now compress everything
+open("runit.sh", 'w').write("\n".join([
+    "echo Compressing " + png_filename + '; /usr/bin/pngquant --speed 1 --quality="0-50" ' + png_filename + ' -o ' + png_filename + ".tmp.png; mv " + png_filename + ".tmp.png " + png_filename
+    for png_filename in glob.glob("./output/frames/*.png")
+]))
+os.system("cat runit.sh | /usr/bin/parallel")
+
+# self.scene.pngquant_path + ' ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
+
+
+# os.system("mkdir /tmp/ttt/; cp -r * /tmp/ttt/")
 
 # for png_filename in glob.glob("./output/*.png"):
 #     os.system("echo Creating mobile version of " + png_filename + "; /usr/bin/convert " + png_filename + " -resize " + str(mobile_res) + "x" + str(mobile_res) + " " + png_filename + ".small.png")
