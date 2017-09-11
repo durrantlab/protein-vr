@@ -26,6 +26,7 @@ open("runit.sh", 'w').write("\n".join([
 ]))
 
 os.system("cat runit.sh | /usr/bin/parallel")
+os.system("mkdir /tmp/ttt/; cp -r * /tmp/ttt/")
 
 # for png_filename in glob.glob("./output/*.png"):
 #     os.system("echo Creating mobile version of " + png_filename + "; /usr/bin/convert " + png_filename + " -resize " + str(mobile_res) + "x" + str(mobile_res) + " " + png_filename + ".small.png")

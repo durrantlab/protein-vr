@@ -546,7 +546,7 @@ class OBJECT_OT_RenderRemote(ButtonParentClass):
         os.system(remote_cmd)
 
         # Remote remote directory.
-        # self.run_remote("rm -r " + remote_dir)
+        self.run_remote("rm -r " + remote_dir)
 
         print()
         # print(bpy.path.abspath("//"))
