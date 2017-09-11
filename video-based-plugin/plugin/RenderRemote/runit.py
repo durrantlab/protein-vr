@@ -33,16 +33,5 @@ open("runit.sh", 'w').write("\n".join([
 ]))
 os.system("cat runit.sh | /usr/bin/parallel")
 
-# self.scene.pngquant_path + ' ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
-
-
-# os.system("mkdir /tmp/ttt/; cp -r * /tmp/ttt/")
-
-# for png_filename in glob.glob("./output/*.png"):
-#     os.system("echo Creating mobile version of " + png_filename + "; /usr/bin/convert " + png_filename + " -resize " + str(mobile_res) + "x" + str(mobile_res) + " " + png_filename + ".small.png")
-
-# for png_filename in glob.glob("./output/*.png"):
-#     print("Creating mobile version of " + png_filename)
-#     os.system("/usr/bin/convert " + png_filename + " -resize " + str(mobile_res) + "x" + str(mobile_res) + " " + png_filename + ".small.png")
-
+# Kill all blenders
 os.system("pkill -9 blender")
