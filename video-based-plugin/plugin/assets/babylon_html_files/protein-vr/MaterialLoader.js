@@ -16,13 +16,10 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
                     console.log("ERROR! The number of camera positions and the number of png frames to now match!");
                     debugger;
                 }
-                // let promises = [];
                 let progressBarObj = jQuery("#loading-progress-bar .progress-bar");
                 for (let i = 0; i < data.length; i++) {
                     new Promise((resolve) => {
-                        // console.log("DEBUGGING CODE HERE...");
                         let filename;
-                        // alert(isMobile);
                         isMobile = true; // for debugging.
                         if (isMobile) {
                             // Some kind of phone... use low-res images
@@ -45,14 +42,10 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
                                 }
                             });
                         });
-                        // tex.hasAlpha = true;
-                        // console.log(tex);
                         Globals.get("sphereShaders")[i] = shader;
                     });
                 }
                 resolve({ msg: "List of get-texture promises" }); //, promises: promises})
-                // Fire the callback.
-                // this._callBack();
             });
         });
     }

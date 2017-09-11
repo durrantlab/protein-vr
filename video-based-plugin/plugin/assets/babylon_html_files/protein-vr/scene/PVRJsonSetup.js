@@ -26,7 +26,6 @@ define(["require", "exports", "../config/Globals", "../config/Globals"], functio
     exports.loadJSON = loadJSON;
     function afterSceneLoaded() {
         return new Promise((resolve) => {
-            // This._JSONData = data;
             if (Globals.get("debug")) {
                 _addGuideSpheres();
             }
@@ -37,22 +36,16 @@ define(["require", "exports", "../config/Globals", "../config/Globals"], functio
     }
     exports.afterSceneLoaded = afterSceneLoaded;
     var _guideSpheres = [];
-    // var _guideSphereHiddenCutoffDist;
-    // var _guideSphereShowCutoffDist;
-    // var _guideSphereIntermediateFactor;
-    // var _guideSphereMaxVisibility: number = 1.0; //0.25;
     var _guideSphereSize = 0.02;
     function _addGuideSpheres() {
         let BABYLON = Globals.get("BABYLON");
         let scene = Globals.get("scene");
         // Add in guide spheres.
         let sphereMat = new BABYLON.StandardMaterial("sphereMat", scene);
-        // sphereMat.backFaceCulling = false;
         sphereMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
         sphereMat.specularColor = new BABYLON.Color3(0, 0, 0);
         sphereMat.diffuseTexture = null;
         sphereMat.emissiveTexture = null; //new BABYLON.Texture("dot.png", scene);
-        // sphereMat.emissiveTexture.hasAlpha = true;
         sphereMat.emissiveColor = new BABYLON.Color3(0.8, 0.8, 0.8);
         for (let i = 0; i < data["cameraPositions"].length; i++) {
             let sphereLoc = data["cameraPositions"][i];
@@ -63,30 +56,9 @@ define(["require", "exports", "../config/Globals", "../config/Globals"], functio
             sphere.position.z = sphereLoc[1];
             sphere.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects;
             sphere.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
-            // sphere.alpha = 1.0;
             _guideSpheres.push(sphere);
         }
-        // Set some guide-sphere parameters
-        // let viewerSphereSize = 5.0; // data["viewerSphereSize"];
-        // _guideSphereHiddenCutoffDist = 0.1 * viewerSphereSize;
-        // _guideSphereShowCutoffDist = 2.0 * viewerSphereSize;
-        // _guideSphereIntermediateFactor = _guideSphereMaxVisibility / (_guideSphereShowCutoffDist - _guideSphereHiddenCutoffDist);
     }
-    // export function updateGuideSpheres(newCameraData) {
-    //     let BABYLON = Globals.get("BABYLON");
-    //     // Keep only guide spheres that are not so close
-    //     for (let i=0; i<_guideSpheres.length; i++) {
-    //         let sphere = _guideSpheres[i];
-    //         let distToGuideSphere = BABYLON.Vector3.Distance(sphere.position, newCameraData.position);
-    //         if (distToGuideSphere < _guideSphereHiddenCutoffDist) {
-    //             sphere.visibility = 0.0;
-    //         } else if (distToGuideSphere < _guideSphereShowCutoffDist) {
-    //             sphere.visibility = _guideSphereIntermediateFactor * (distToGuideSphere - _guideSphereHiddenCutoffDist);
-    //         } else {
-    //             sphere.visibility = _guideSphereMaxVisibility;
-    //         }
-    //     }
-    // }
     function _loadClickableFiles() {
         let BABYLON = Globals.get("BABYLON");
         let scene = Globals.get("scene");
@@ -95,13 +67,11 @@ define(["require", "exports", "../config/Globals", "../config/Globals"], functio
         let objFilenames = data["clickableFiles"];
         for (let i = 0; i < objFilenames.length; i++) {
             let objFilename = objFilenames[i];
-            // console.log(objFilename);
             let meshTask = loader.addMeshTask(objFilename + "_name", "", "", objFilename);
             meshTask.onSuccess = function (task) {
                 let mesh = task.loadedMeshes[0]; // Why is this necessary?
                 mesh.scaling.z = -1.0;
                 mesh.renderingGroupId = Globals_1.RenderingGroups.ClickableObjects;
-                // this._viewerSphere.isPickable = true;
                 mesh.isPickable = true;
             };
         }
@@ -122,7 +92,6 @@ define(["require", "exports", "../config/Globals", "../config/Globals"], functio
                     mesh.scaling.z = -1.0;
                     console.log(mesh);
                     mesh.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects; // In front of viewer sphere.
-                    // this._viewerSphere.isPickable = true;
                     mesh.isPickable = false;
                     // Load texture here.
                     let mat = new BABYLON.StandardMaterial(mesh.name + "_material", scene);

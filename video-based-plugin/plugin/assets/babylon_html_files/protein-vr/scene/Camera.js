@@ -1,7 +1,6 @@
 define(["require", "exports", "../config/UserVars", "../config/Globals", "./ViewerSphere", "./Arrows"], function (require, exports, UserVars, Globals, ViewerSphere, Arrows) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    // export var cameraPositions: any;
     class CameraPoints {
         constructor() {
             this.data = [];
@@ -64,10 +63,6 @@ define(["require", "exports", "../config/UserVars", "../config/Globals", "./View
             for (let dIndex = 0; dIndex < this.data.length; dIndex++) {
                 let d = this.data[dIndex];
                 let val = this._getValBasedOnCriteria(d, criteria);
-                // if (val > cutoff) {
-                //     // Don't look beyond maxDistToJumpPt away
-                //     break;
-                // }
                 if (val <= cutoff) {
                     newCameraPoints.push(d);
                 }
@@ -140,15 +135,11 @@ define(["require", "exports", "../config/UserVars", "../config/Globals", "./View
             this._mouseDownState = false;
             this._keyPressedState = undefined;
             this._firstRender = true;
-            this._maxMovementsAllowedPerSec = 30;
-            // private _maxDistToJumpPt = 1.0;
-            this._jumpPointDetectionResolution = 0.1;
             this._speedInUnitsPerSecond = 1;
             this._lastMovementTime = (new Date).getTime();
             this._msUntilNextMoveAllowed = 0;
             this._cameraCurrentlyAutoMoving = false;
         }
-        // private _lastCameraLoc: any;
         setup() {
             return new Promise((resolve) => {
                 let scene = Globals.get("scene");
@@ -172,7 +163,6 @@ define(["require", "exports", "../config/UserVars", "../config/Globals", "./View
                 // this._parentObj.scene.activeCamera.keysLeft.push(65);  // A. 37 if left arrow.
                 // this._parentObj.scene.activeCamera.keysDown.push(83);  // S. 40 is down arrow.
                 // this._parentObj.scene.activeCamera.keysRight.push(68);  // D. 39 is right arrow.
-                // this._lastCameraLoc = new this.BABYLON.Vector3(-9999, -9999, -9999);
                 // this.scene.activeCamera.inertia = 0.0;
                 // Add anti-aliasing to this camera.
                 // This works but darkens the scene.
@@ -222,37 +212,6 @@ define(["require", "exports", "../config/UserVars", "../config/Globals", "./View
             scene.activeCamera = camera;
             // Attach that camera to the canvas.
             scene.activeCamera.attachControl(canvas);
-            // let vrOverlay1 = jQuery("#vr_overlay1");
-            // vrOverlay1.css("position", "absolute");
-            // vrOverlay1.css("bottom", "0");
-            // vrOverlay1.css("left", "0");
-            // vrOverlay1.css("border-right", "2px solid black");
-            // vrOverlay1.css("width", "50%");
-            // vrOverlay1.css("height", "20%");
-            // vrOverlay1.css("z-index", "10000000000");
-            // setInterval(function() {
-            //     let zIndex = this.renderCanvas.css("z-index");
-            //     if (zIndex !== "auto") {
-            //         this.vrOverlay.css("z_index", zIndex + 1);
-            //     }
-            //     // debugger;
-            // }.bind({
-            //     renderCanvas: jQuery("#renderCanvas"),
-            //     vrOverlay: vrOverlay
-            // }), 1000);
-            // jQuery.getScript("js/babylon.gui.js", () => {
-            //     let advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
-            //     var line = new BABYLON.GUI.Line();
-            //     let width = jQuery(window).width();
-            //     line.x1 = width;
-            //     line.y1 = 10;
-            //     line.x2 = width;
-            //     line.y2 = 500;
-            //     line.lineWidth = 5;
-            //     line.dash = [5, 10];
-            //     line.color = "black";
-            //     advancedTexture.addControl(line);
-            // });
         }
         _setupMouseAndKeyboard() {
             let scene = Globals.get("scene");
@@ -276,18 +235,6 @@ define(["require", "exports", "../config/UserVars", "../config/Globals", "./View
                 this._keyPressedState = undefined;
             }.bind(this));
         }
-        // private _vectorsEqualTolerance(vec1, vec2, tol=0.2) {
-        //     if (Math.abs(vec1.x - vec2.x) > tol) {
-        //         return false;
-        //     }
-        //     if (Math.abs(vec1.y - vec2.y) > tol) {
-        //         return false;
-        //     }
-        //     if (Math.abs(vec1.z - vec2.z) > tol) {
-        //         return false;
-        //     }
-        //     return true;
-        // }
         _keepDataWithinDist(data, cutoffDist) {
             let toKeep = [];
             for (let i = 0; i < data.length; i++) {
@@ -309,7 +256,6 @@ define(["require", "exports", "../config/UserVars", "../config/Globals", "./View
             let BABYLON = Globals.get("BABYLON");
             let camera = scene.activeCamera;
             let deltaTime = (new Date).getTime() - this._lastMovementTime;
-            // if (deltaTime < 1000/(this._maxMovementsAllowedPerSec)) {  // 1000 becaue ms
             if (deltaTime < this._msUntilNextMoveAllowed) {
                 this._cameraCurrentlyAutoMoving = true;
                 this._whileCameraAutoMoving(deltaTime, camera);
@@ -336,11 +282,6 @@ define(["require", "exports", "../config/UserVars", "../config/Globals", "./View
         }
         _onStartMove(camera) {
             // console.log("_onStartMove");
-            // Move camera to best frame.
-            // camera.position = newCameraData.position;
-            // console.log("DELETE BELOW LINE EVENTUALLY...");
-            // ViewerSphere.update(newCameraData);
-            // updateGuideSpheres(newCameraData)
             // Make sure everything hidden but present sphere.
             console.log("NEEDED?");
             ViewerSphere.hideAll();
@@ -358,13 +299,8 @@ define(["require", "exports", "../config/UserVars", "../config/Globals", "./View
         _onDoneCameraAutoMoving(camera) {
             // console.log("_onDoneCameraAutoMoving");
             // Make sure completed transition to full visibility.
-            // if (this._nextViewerSphere.visibility !== 1.0) {
             this._updatePos(1.0, camera);
-            // this._nextViewerSphere.visibility = 1.0;
-            // camera.position = this._prevCameraPos.add(this._nextMovementVec);
-            // }
             // Determine where you can move from here.
-            // this._getNextMoveLocations(camera);
             this._setCloseCameraDataAndArrows(camera);
         }
         _setCloseCameraDataAndArrows(camera) {
@@ -437,7 +373,6 @@ define(["require", "exports", "../config/UserVars", "../config/Globals", "./View
             this._nextViewerSphere = newCameraData.associatedViewerSphere;
             this._msUntilNextMoveAllowed = 1000 * newCameraData.distance / this._speedInUnitsPerSecond;
             this._lastMovementTime = (new Date).getTime();
-            // this._lastCameraLoc = camera.position.clone();
         }
     }
     exports.Camera = Camera;

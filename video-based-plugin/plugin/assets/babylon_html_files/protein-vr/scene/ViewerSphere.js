@@ -9,7 +9,7 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
         let viewerSphereTemplate = Globals.get("viewerSphereTemplate");
         // Go through and clone the viewer sphere for each of the locations.
         let sphereShaders = Globals.get("sphereShaders");
-        let viewerSpheres = []; //Globals.get("viewerSpheres");
+        let viewerSpheres = [];
         let cameraPositions = Globals.get("cameraPositions");
         let cameraObj = Globals.get("camera");
         for (let i = 0; i < sphereShaders.length; i++) {
@@ -40,11 +40,6 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
         for (let i = 0; i < viewerSpheres.length; i++) {
             let viewerSphere = viewerSpheres[i];
             viewerSphere.visibility = 0;
-            // if (viewerSphere.uniqueId === newCameraData.associatedViewerSphere.uniqueId) {
-            //     viewerSphere.visibility = 1;
-            // } else {
-            //     viewerSphere.visibility = 0;
-            // }
         }
     }
     exports.hideAll = hideAll;
@@ -52,18 +47,9 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
         // First, make sure only the new viewer sphere is visible.
         this.hideAll();
         newCameraData.associatedViewerSphere.visibility = 1;
-        //     // Move sphere
-        //     let viewerSphereTemplate = Globals.get("viewerSphereTemplate");
-        //     let backgroundSphere = Globals.get("backgroundSphere");
-        //     viewerSphereTemplate.hide = true;
-        //     viewerSphereTemplate.position = newCameraData.position;
-        //     backgroundSphere.position = newCameraData.position;
-        //     // console.log(newCameraData.texture);
-        //     // Update texture
-        //     // debugger;
-        //     viewerSphereTemplate.material = newCameraData.texture.material;
-        //     // shader.setTextures(newCameraData.texture); //, tex2, tex3, dist1, dist2, dist3);
-        //     // this._viewerSphere.material.emissiveTexture = bestTexture;
+        // Move background sphere too.
+        let backgroundSphere = Globals.get("backgroundSphere");
+        backgroundSphere.position = newCameraData.position;
     }
     exports.update = update;
 });

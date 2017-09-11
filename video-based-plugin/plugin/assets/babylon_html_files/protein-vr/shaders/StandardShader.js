@@ -19,14 +19,7 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
             if (this._transparency) {
                 this.material.opacityTexture = texture;
             }
-            // switch (transparency) {
-            //     case true:
-            //         this.material.backFaceCulling = true;
-            //         break;
-            //     case false:
             this.material.backFaceCulling = false;
-            //         break;
-            // }
         }
     }
     exports.Shader = Shader;

@@ -22,7 +22,6 @@ define(["require", "exports"], function (require, exports) {
         };
     }
     function get(key) {
-        // debugger;
         return window._proteinvrGlobals[key];
     }
     exports.get = get;
