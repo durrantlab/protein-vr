@@ -152,11 +152,14 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             self.extra_data["cameraPositions"].append([round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)])
 
     def _compress_png(self, filename):
-        cmd = self.scene.pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
-        # print("RUN: " + cmd)
-        
-        os.system(cmd)
-        os.rename(filename + '.tmp.png', filename)
+        if os.path.exists(self.scene.pngquant_path):
+            cmd = self.scene.pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
+            # print("RUN: " + cmd)
+            
+            os.system(cmd)
+            os.rename(filename + '.tmp.png', filename)
+        else:
+            print("WARNING: pngquant path not valid: " + self.scene.pngquant_path)
 
     def _step_3_render_baked_frames(self, debug=False):
         print("This def currently does a lot more than bake frames... separate it out...")
@@ -252,11 +255,13 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 # not resizing. So can be computationally intensive. I chose
                 # this because I believe it gives better results, but I'm not
                 # sure.
-                
-                self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
-                self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png.small.png"
-                bpy.ops.render.render(write_still=True)
-                self._compress_png(self.scene.render.filepath)
+                if self.scene.proteinvr_mobile_bake_texture_size != 0:
+                    self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
+                    self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png.small.png"
+                    bpy.ops.render.render(write_still=True)
+                    self._compress_png(self.scene.render.filepath)
+                else:
+                    print("WARNING: Skipping the mobile textures...")
                 
         # Save list of all rendered frames
         json.dump(frame_file_names, open(self.frame_dir + "filenames.json",'w'))

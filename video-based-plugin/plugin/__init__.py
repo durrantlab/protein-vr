@@ -78,7 +78,7 @@ class ProteinVR(PanelParentClass):
 
         bpy.types.Scene.proteinvr_use_existing_frames = self.prop_funcs.boolProp("Existing frames", False, description="Whether to use a previously rendered (existing) frames.")
         bpy.types.Scene.proteinvr_bake_texture_size = self.prop_funcs.intProp("Texture Size", min=128, max=8192, default=4096, description="The size of the square texture to render. Higher means higher resolution. Good to use power of 2. Recommended: 4096 for final render.")
-        bpy.types.Scene.proteinvr_mobile_bake_texture_size = self.prop_funcs.intProp("Mobile Texture Size", min=128, max=8192, default=1024, description="The size of the square texture to render fore use on mobile. Higher means higher resolution. Good to use power of 2. Recommended: 1024 for final render.")
+        bpy.types.Scene.proteinvr_mobile_bake_texture_size = self.prop_funcs.intProp("Mobile Texture Size", min=0, max=8192, default=1024, description="The size of the square texture to render fore use on mobile. Higher means higher resolution. Good to use power of 2. Recommended: 1024 for final render.")
 
         bpy.types.Scene.proteinvr_num_cycles = self.prop_funcs.intProp("Number of Cycles", min=1, max=10000, default=16, description="The number of rendering cycles. Higher means better quality.")
         # bpy.types.Scene.proteinvr_viewer_sphere_size = self.prop_funcs.floatProp("Viewer Sphere Size", min=0.5, max=5.0, default=5.0, description="The size of the viewer sphere. Larger means close objects not allowed, but user can deviate further from set path.")
