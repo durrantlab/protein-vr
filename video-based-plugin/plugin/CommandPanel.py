@@ -154,8 +154,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
     def _compress_png(self, filename):
         if os.path.exists(self.scene.pngquant_path):
             cmd = self.scene.pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
-            # print("RUN: " + cmd)
-            
+            # print("RUN: " + cmd)          
             os.system(cmd)
             os.rename(filename + '.tmp.png', filename)
         else:
