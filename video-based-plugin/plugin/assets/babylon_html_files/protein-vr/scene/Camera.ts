@@ -6,12 +6,13 @@ import * as ViewerSphere from "./ViewerSphere";
 interface CameraPointData {
     distance: number;
     position: any;
-    texture: any;
+    // texture: any;
+    associatedViewerSphere: any;
     angle?: number;
     score?: number;
 }
 
-// export var cameraPositionsAndTextures: any;
+// export var cameraPositions: any;
 
 class CameraPoints {
     public data: CameraPointData[] = [];
@@ -121,7 +122,6 @@ export class Camera {
     private _keyPressedState: number = undefined;
     private _firstRender: boolean = true;
 
-    private _lastMovementTime: number = (new Date).getTime();
     private _maxMovementsAllowedPerSec = 30;
 
     // private _maxDistToJumpPt = 1.0;
@@ -146,7 +146,7 @@ export class Camera {
             this._setupMouseAndKeyboard();
     
             // Move camera to first position.
-            scene.activeCamera.position = Globals.get("cameraPositionsAndTextures")[0][0];
+            scene.activeCamera.position = Globals.get("cameraPositions")[0]; // MOO
     
             // Add extra keys
             // Additional control keys.
@@ -310,144 +310,154 @@ export class Camera {
         }
         return toKeep;
     }
+    
+    private _speedInUnitsPerSecond = 1;    
+    private _lastMovementTime: number = (new Date).getTime();
+    private _msUntilNextMoveAllowed: number = 0;
+    public _prevCameraPos: any;
+    public _nextMovementVec: any;
+    public _prevViewerSphere: any;
+    public _nextViewerSphere: any;
+
+    private _updatePos(timeRatio, camera) {
+        this._prevViewerSphere.visibility = 1.0 - timeRatio;
+        this._nextViewerSphere.visibility = timeRatio;
+        camera.position = this._prevCameraPos.add(this._nextMovementVec.scale(timeRatio));
+    }
 
     public update() {
-        let deltaTime = (new Date).getTime() - this._lastMovementTime;
-        if (deltaTime < 1000/(this._maxMovementsAllowedPerSec)) {  // 1000 becaue ms
-            // Require a wait time before user can move to next position.
-            // console.log("toosoon");
-            return;
-        }
+        // This is run from the render loop
 
         let scene = Globals.get("scene");
         let BABYLON = Globals.get("BABYLON");
         let camera = scene.activeCamera;
-        let cameraLoc = camera.position;
 
-        // console.log("revert here");
+        let deltaTime = (new Date).getTime() - this._lastMovementTime;
+        // if (deltaTime < 1000/(this._maxMovementsAllowedPerSec)) {  // 1000 becaue ms
+        if (deltaTime < this._msUntilNextMoveAllowed) {
+            // Still in auto-moving phase. So auto-move here.
+            let timeRatio = deltaTime / this._msUntilNextMoveAllowed;
+            // let sigmoidalVal = 1.0/(1.0 + Math.exp(-(20 * timeRatio - 10)))
+            // let sinVal = 0.5 + 0.5 * Math.sin(Math.PI * (timeRatio - 0.5));
+            this._updatePos(timeRatio, camera);
+            return;
+        } else {
+            // Make sure completed transition to full visibility.
+            if (this._nextViewerSphere.visibility !== 1.0) {
+                this._updatePos(1.0, camera);
+                // this._nextViewerSphere.visibility = 1.0;
+                // camera.position = this._prevCameraPos.add(this._nextMovementVec);
+            }
+        }
+        
+        // So it's time to pick a new destination.
+        // Only update things if user trying to move.
         let result;
         if (Globals.get("mouseDownAdvances") === true) {
             result = (this._mouseDownState === false) && (this._keyPressedState === undefined) && (this._firstRender === false);
         } else {
             result = (this._keyPressedState === undefined) && (this._firstRender === false);
         }
+        if (result) { return; }
 
-        if (result) {
-        // if (((Globals.get("mouseDownAdvances")) && (this._mouseDownState === false)) && (this._keyPressedState === undefined) && (this._firstRender === false)) {
-        // if ((this._mouseDownState === false) && (this._keyPressedState === undefined) && (this._firstRender === false)) {
-        // if ((this._keyPressedState === undefined) && (this._firstRender === false)) {
-            // Only update things if user trying to move.
-            return;
+        // Let's pick the next destination...
+        let cameraLoc = camera.position;
+
+        this._firstRender = false;  // It's no longer the first time rendering.
+
+        // Calculate distances to all camera positions
+        let cameraPoints = new CameraPoints();
+        let cameraPositions = Globals.get("cameraPositions");
+        let viewerSpheres = Globals.get("viewerSpheres");
+        for (let i=0; i<cameraPositions.length; i++) {
+            let cameraPos = cameraPositions[i];
+            let pos = cameraPos.clone();
+            let dist = pos.subtract(cameraLoc).length();
+            
+            cameraPoints.push({distance: dist, position: pos, associatedViewerSphere: viewerSpheres[i]});
+        }
+        
+        // Sort by distance
+        cameraPoints.sort();
+        
+        // Remove first one (closest). To make sure you're not staying
+        // where you are.
+        cameraPoints.removeFirst();
+
+        // Start by assuming new camera point should be the closest point.
+        let newCameraData: CameraPointData = cameraPoints.firstPoint();
+
+        // Keep only four points. So I guess paths can't be too bifurcated.
+        let closeCameraData = cameraPoints.firstFewPoints(4);  // choose four close points
+        let maxDist = closeCameraData.data[3].distance;
+
+        // Assign angles
+        let lookingVec = camera.getTarget().subtract(camera.position);
+        switch (this._keyPressedState) {
+            case 83:
+                lookingVec = lookingVec.scale(-1);
+                break;
+            case 40:
+                lookingVec = lookingVec.scale(-1);
+                break;
+
+            // Could't reliably distinguish between right and left...
+            // case 65:
+            //     lookingVec = new this.BABYLON.Vector3(lookingVec.z, 0, lookingVec.x)
+            //     break;
+            // case 37:
+            //     lookingVec = new this.BABYLON.Vector3(lookingVec.z, 0, lookingVec.x)
+            //     break
+            // case 68:
+            //     lookingVec = new this.BABYLON.Vector3(-lookingVec.z, 0, -lookingVec.x)
+            //     break;
+            // case 39:
+            //     lookingVec = new this.BABYLON.Vector3(-lookingVec.z, 0, -lookingVec.x)
+            //     break;
         }
 
-        this._firstRender = false;
+        closeCameraData.addAnglesInPlace(camera.position, lookingVec);
 
-        // console.log(this._keyPressedState);
+        // Throw out ones that aren't even in the general direction as the
+        // lookingVec
+        let goodAngleCameraPoints = closeCameraData.lessThanCutoff(1.9198621771937625, "angle");  // 110 degrees
 
-        // If the mouse is done, advance camera forward
-        // if (this._mouseDownState) {
-        //     cameraLoc = camera.getFrontPosition(
-        //         // 0.5 * camera.speed * scene.getAnimationRatio()
+        switch(goodAngleCameraPoints.length()) {
+            case 0:
+                // You must be at the end of a path. Keep previous newCameraData;
+                break;
+            case 1:
+                // Only one left, so it must be the one to keep.
+                newCameraData = goodAngleCameraPoints.firstPoint();
+                break;
+            default:
+                // assign scores to camera data, keep one with best score.
+                goodAngleCameraPoints.addScoresInPlace(1.57, maxDist);  // 1.57 = 90 degrees
+                goodAngleCameraPoints.sort("score");
+                newCameraData = goodAngleCameraPoints.firstPoint();
+                break;
+        }
 
-        //     );
-        // }    
         
-        // Continue only if camera position has changed.
-        // if (!this._vectorsEqualTolerance(cameraLoc, this._lastCameraLoc)) {
-            // console.log("Camera pos changed", cameraLoc, this._lastCameraLoc);
-
-            // Calculate distances to all camera positions
-            let cameraPoints = new CameraPoints();
-            let cameraPositionsAndTextures = Globals.get("cameraPositionsAndTextures");
-            for (let i=0; i<cameraPositionsAndTextures.length; i++) {
-                let cameraPos = cameraPositionsAndTextures[i];
-                let pos = cameraPos[0].clone();
-                let tex = cameraPos[1];
-                let dist = pos.subtract(cameraLoc).length();
-                
-                cameraPoints.push({distance: dist, position: pos, texture: tex});
-            }
-            
-            // Sort by distance
-            cameraPoints.sort();
-            
-            // Remove first one (closest). To make sure you're not staying
-            // where you are.
-            cameraPoints.removeFirst();
-
-            // Start by assuming new camera point should be the closest point.
-            let newCameraData: CameraPointData = cameraPoints.firstPoint();
-
-            // Keep only four points. So I guess paths can't be too bifurcated.
-            let closeCameraData = cameraPoints.firstFewPoints(4);  // choose four close points
-            let maxDist = closeCameraData.data[3].distance;
-
-            // Assign angles
-            let lookingVec = camera.getTarget().subtract(camera.position);
-            switch (this._keyPressedState) {
-                case 83:
-                    lookingVec = lookingVec.scale(-1);
-                    break;
-                case 40:
-                    lookingVec = lookingVec.scale(-1);
-                    break;
-
-                // Could't reliably distinguish between right and left...
-                // case 65:
-                //     lookingVec = new this.BABYLON.Vector3(lookingVec.z, 0, lookingVec.x)
-                //     break;
-                // case 37:
-                //     lookingVec = new this.BABYLON.Vector3(lookingVec.z, 0, lookingVec.x)
-                //     break
-                // case 68:
-                //     lookingVec = new this.BABYLON.Vector3(-lookingVec.z, 0, -lookingVec.x)
-                //     break;
-                // case 39:
-                //     lookingVec = new this.BABYLON.Vector3(-lookingVec.z, 0, -lookingVec.x)
-                //     break;
-            }
-
-            closeCameraData.addAnglesInPlace(camera.position, lookingVec);
-
-            // Throw out ones that are even in the general direction as the lookingVec
-            let goodAngleCameraPoints = closeCameraData.lessThanCutoff(1.9198621771937625, "angle");  // 110 degrees
-
-            switch(goodAngleCameraPoints.length()) {
-                case 0:
-                    // You must be at the end of a path. Keep previous newCameraData;
-                    break;
-                case 1:
-                    // Only one left, so it must be the one to keep.
-                    newCameraData = goodAngleCameraPoints.firstPoint();
-                    break;
-                default:
-                    // assign scores to camera data, keep one with best score.
-                    goodAngleCameraPoints.addScoresInPlace(1.57, maxDist);  // 1.57 = 90 degrees
-                    goodAngleCameraPoints.sort("score");
-                    newCameraData = goodAngleCameraPoints.firstPoint();
-                    break;
-            }
-
-            // let tex1 = closestCameraPtFound.pt[2];
-            // let tex2 = distData[1][1][2];
-            // let tex3 = distData[2][1][2];
+        // Move camera to best frame.
+        // camera.position = newCameraData.position;
         
-            // let dist1 = closestPtFound.dist;
-            // let dist2 = distData[1][0];
-            // let dist3 = distData[2][0];
+        // console.log("DELETE BELOW LINE EVENTUALLY...");
+        // ViewerSphere.update(newCameraData);
+        updateGuideSpheres(newCameraData)
+
+        // Make sure everything hidden but present sphere.
+        ViewerSphere.hideAll();
+        this._nextViewerSphere.visibility = true;
         
-            // let bestDist = dist1;
-            // let bestPos = distData[0][1];
+        // Set values to govern auto movement.
+        this._prevCameraPos = camera.position.clone();
+        this._nextMovementVec = newCameraData.position.subtract(this._prevCameraPos);
+        this._prevViewerSphere = this._nextViewerSphere;
+        this._nextViewerSphere = newCameraData.associatedViewerSphere;
+        this._msUntilNextMoveAllowed = 1000 * newCameraData.distance / this._speedInUnitsPerSecond;
+        this._lastMovementTime = (new Date).getTime()
+        // this._lastCameraLoc = camera.position.clone();
         
-            // Move camera to best frame.
-            camera.position = newCameraData.position;
-        
-            ViewerSphere.update(newCameraData);
-            updateGuideSpheres(newCameraData)
-    
-            this._lastMovementTime = (new Date).getTime()
-            // this._lastCameraLoc = camera.position.clone();
-        // }
-    
     }
 }

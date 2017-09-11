@@ -8,29 +8,20 @@ define(["require", "exports", "../config/Globals", "../config/Globals"], functio
         return new Promise((resolve) => {
             jQuery.get("data.json", (_data) => {
                 data = _data;
-                // let callBack = this.callBack;
-                // let This = this.This;
                 // Load camera tracks data
-                let cameraPositionsAndTextures = [];
-                for (let i = 0; i < data["cameraPositionsAndTextures"].length; i++) {
-                    let pt = data["cameraPositionsAndTextures"][i];
-                    // let frame = pt[0];
+                let cameraPositions = [];
+                let sphereShaders = []; // For storage now.
+                for (let i = 0; i < data["cameraPositions"].length; i++) {
+                    let pt = data["cameraPositions"][i];
                     let v = new BABYLON.Vector3(pt[0], pt[2], pt[1]); // note that Y and Z axes are switched on purpose.
-                    cameraPositionsAndTextures.push([v, null]); // null is texture, populated later.
+                    cameraPositions.push(v);
+                    sphereShaders.push(null);
                 }
-                Globals.set("cameraPositionsAndTextures", cameraPositionsAndTextures);
+                Globals.set("cameraPositions", cameraPositions);
+                Globals.set("sphereShaders", sphereShaders);
                 resolve({ msg: "LOADED PROTIENVR JSON" });
-                // callbacksComplete.push(callBacks.JSON_LOADED);
-                // let func = This._params.onJSONLoaded.bind(This);
-                // func();
-                // func = callBack.bind(This);
-                // func();
             });
         });
-        // .bind({
-        //     This: this,
-        //     callBack: callBack
-        // }));
     }
     exports.loadJSON = loadJSON;
     function afterSceneLoaded() {
@@ -63,7 +54,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals"], functio
         sphereMat.emissiveColor = new BABYLON.Color3(0.8, 0.8, 0.8);
         for (let i = 0; i < data["guideSphereLocations"].length; i++) {
             let sphereLoc = data["guideSphereLocations"][i];
-            let sphere = BABYLON.Mesh.CreateDisc("sphere" + i.toString(), 0.05, 12, scene, false, BABYLON.Mesh.DEFAULTSIDE); //BABYLON.Mesh.CreatePlane("sphere" + i.toString(), 1.0, This.scene, false, BABYLON.Mesh.DOUBLESIDE); // new BABYLON.Mesh.CreateSphere("sphere" + i.toString(), 8, This._guideSphereSize, This.scene);
+            let sphere = BABYLON.Mesh.CreateDisc("guide_sphere" + i.toString(), 0.05, 12, scene, false, BABYLON.Mesh.DEFAULTSIDE);
             sphere.material = sphereMat;
             sphere.position.x = sphereLoc[0];
             sphere.position.y = sphereLoc[2]; // note y and z reversed.

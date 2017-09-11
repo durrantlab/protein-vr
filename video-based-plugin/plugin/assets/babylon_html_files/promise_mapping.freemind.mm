@@ -32,7 +32,9 @@
 <node CREATED="1504669014466" HGAP="15" ID="ID_108490188" MODIFIED="1504996444660" TEXT="Camera.setup" VSHIFT="130">
 <arrowlink COLOR="#b0b0b0" DESTINATION="ID_273882872" ENDARROW="None" ENDINCLINATION="270;135;" ID="Arrow_ID_129228375" STARTARROW="Default" STARTINCLINATION="-223;207;"/>
 </node>
-<node CREATED="1504996440007" HGAP="213" ID="ID_237529592" MODIFIED="1504996458592" TEXT="Loading Panel while Video frames finish" VSHIFT="-42"/>
+<node CREATED="1504996440007" HGAP="213" ID="ID_237529592" MODIFIED="1504996458592" TEXT="Loading Panel while Video frames finish" VSHIFT="-42">
+<node CREATED="1505091289762" HGAP="32" ID="ID_185312058" MODIFIED="1505091296525" TEXT="Make child spheres, using shaders from before" VSHIFT="42"/>
+</node>
 </node>
 </node>
 <node CREATED="1504668040068" ID="ID_628519935" MODIFIED="1504672533458" POSITION="left">
@@ -76,7 +78,7 @@
   </head>
   <body>
     <p>
-      VideoFrames.getFramePromises
+      MaterialLoader.getFramePromises
     </p>
     <p>
       <font size="1">The scene needs to be loaded, and </font>
@@ -85,8 +87,7 @@
       <font size="1">cameraPositionsAndTextures needs to be defined.</font>
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 </node>
 </node>
 <node CREATED="1504668110762" HGAP="24" ID="ID_1251581907" MODIFIED="1504668689582" POSITION="left" VSHIFT="35">

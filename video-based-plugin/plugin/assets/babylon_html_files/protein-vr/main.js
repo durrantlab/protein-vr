@@ -1,4 +1,4 @@
-define(["require", "exports", "./VideoFrames", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup"], function (require, exports, VideoFrames, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup) {
+define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup"], function (require, exports, MaterialLoader, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Globals.set("jQuery", jQuery);
@@ -82,7 +82,7 @@ define(["require", "exports", "./VideoFrames", "./config/UserVars", "./config/Se
                 let proteinVRJsonDone = Promise.all([sceneCreated, PVRJsonLoadingStarted])
                     .then((fulfilled) => {
                     // Start loading the frames here... no need to resolve it
-                    VideoFrames.getFramePromises()
+                    MaterialLoader.getFramePromises()
                         .then((fulfilled) => {
                         // console.log(fulfilled, "MOO");  // add promise here?
                     });

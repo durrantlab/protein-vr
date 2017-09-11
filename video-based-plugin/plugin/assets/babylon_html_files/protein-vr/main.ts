@@ -1,4 +1,4 @@
-import * as VideoFrames from "./VideoFrames";
+import * as MaterialLoader from "./MaterialLoader";
 // import * as SettingsPanel from "./SettingsPanel";
 import * as UserVars from "./config/UserVars";
 import * as SettingsPanel from "./config/SettingsPanel";
@@ -33,9 +33,9 @@ export class Game {
 
     // public scene: any;
 
-    // public cameraPositionsAndTextures: any;
+    // public cameraPositions: any;
 
-    // private _viewerSphere: any;
+    // private _viewerSphereTemplate: any;
 
     // private _sphereVideo: any;
 
@@ -129,7 +129,7 @@ export class Game {
             let proteinVRJsonDone = Promise.all([sceneCreated, PVRJsonLoadingStarted])
             .then((fulfilled) => {
                 // Start loading the frames here... no need to resolve it
-                VideoFrames.getFramePromises()
+                MaterialLoader.getFramePromises()
                 .then((fulfilled) => {
                     // console.log(fulfilled, "MOO");  // add promise here?
                 })

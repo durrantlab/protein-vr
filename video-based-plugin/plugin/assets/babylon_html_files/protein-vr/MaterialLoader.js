@@ -19,12 +19,11 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
                 // let promises = [];
                 let progressBarObj = jQuery("#loading-progress-bar .progress-bar");
                 for (let i = 0; i < data.length; i++) {
-                    // promises.push(
                     new Promise((resolve) => {
                         // console.log("DEBUGGING CODE HERE...");
                         let filename;
                         // alert(isMobile);
-                        isMobile = true; // for debugging.
+                        // isMobile = true; // for debugging.
                         if (isMobile) {
                             // Some kind of phone... use low-res images
                             filename = "./frames/" + data[i] + ".small.png?" + Math.random().toString(); // Note no caching, for debugging.
@@ -42,10 +41,7 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
                                 progressBarObj.css("width", progressVal.toString() + "%");
                                 // This is running at time of execution, not OfflineAudioCompletionEvent.apply.apply. need to figure outerHeight.
                                 if (progressVal >= 100) {
-                                    jQuery("#start-game").prop("disabled", false);
-                                    jQuery("#loading-progress-bar").slideUp();
-                                    // Setup viewer sphere
-                                    ViewerSphere.setup();
+                                    _afterMaterialsLoaded();
                                 }
                             });
                         });
@@ -53,7 +49,6 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
                         // console.log(tex);
                         Globals.get("sphereShaders")[i] = shader;
                     });
-                    // );
                 }
                 resolve({ msg: "List of get-texture promises" }); //, promises: promises})
                 // Fire the callback.
@@ -62,4 +57,21 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
         });
     }
     exports.getFramePromises = getFramePromises;
+    var _afterMaterialsLoadedAlreadyExec = false;
+    function _afterMaterialsLoaded() {
+        // Make sure this functiononly fires once...
+        if (_afterMaterialsLoadedAlreadyExec) {
+            return;
+        }
+        else {
+            _afterMaterialsLoadedAlreadyExec = true;
+        }
+        let jQuery = Globals.get("jQuery");
+        // Start game button now enabled.
+        jQuery("#start-game").prop("disabled", false);
+        // Hide material-load progress bar.
+        jQuery("#loading-progress-bar").slideUp();
+        // Setup viewer sphere
+        ViewerSphere.setup();
+    }
 });

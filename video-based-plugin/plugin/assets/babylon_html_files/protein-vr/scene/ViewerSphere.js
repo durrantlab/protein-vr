@@ -1,66 +1,69 @@
-define(["require", "exports", "../config/Globals", "../shaders/StandardShader", "../config/Globals"], function (require, exports, Globals, StandardShader_1, Globals_1) {
+define(["require", "exports", "../config/Globals"], function (require, exports, Globals) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var shader;
     function setup() {
-        // // Start rendering video texture
         let scene = Globals.get("scene");
         let BABYLON = Globals.get("BABYLON");
-        let viewerSphere = scene.meshes[0]; // Because sphere is only thing in scene.
-        Globals.set("viewerSphere", viewerSphere);
-        scene.activeCamera.position = viewerSphere.position;
-        // Set the material
-        // shader = new Shader(true);
-        // shader.material.alpha = 0.1;
-        // shader.material.hasAlpha = true;  // on texture, not material
-        // shader.material.linkEmissiveWithDiffuse = true;
-        // viewerSphere.material = shader.material;
-        viewerSphere.isPickable = false;
-        viewerSphere.renderingGroupId = Globals_1.RenderingGroups.ViewerSphere;
-        // console.log(Globals.get("cameraPositionsAndTextures"))
-        // Resize the viewer sphere
-        let radius = 12; // When using VR, this needs to be farther away that what it was rendered at. this._JSONData["viewerSphereSize"];
-        viewerSphere.scaling = new BABYLON.Vector3(radius, radius, -radius);
-        viewerSphere.rotation.y = 4.908738521234052; // To align export with scene. 281.25 degrees = 25/32*360
-        // viewerSphere.scaling = new BABYLON.Vector3(radius, radius, radius);
-        // viewerSphere.rotation.y = 1.0 * Math.PI;  // To align export with scene.
-        // window.sphere = viewerSphere;
-        // window.camera = Globals.get("camera");
-        // viewerSphere.visibility = 0;
-        // Now make the background sphere
-        let backgroundSphere = viewerSphere.clone("backgroundSphere");
-        let slightlyBiggerRadius = radius * 1.05;
-        backgroundSphere.scaling = new BABYLON.Vector3(slightlyBiggerRadius, slightlyBiggerRadius, -slightlyBiggerRadius);
-        backgroundSphere.rotation.y = 4.908738521234052; // To align export with scene. 281.25 degrees = 25/32*360
-        backgroundSphere.isPickable = false;
-        backgroundSphere.renderingGroupId = Globals_1.RenderingGroups.EnvironmentalSphere;
-        // Set the background sphere's appreance
-        // debugger;
-        let shader2 = new StandardShader_1.Shader('environment.png', false);
-        backgroundSphere.material = shader2.material;
-        // backgroundSphere.material = shader2.material;
-        // let tex = new BABYLON.Texture("environment.png", scene);
-        // shader2.setTextures(tex);
-        // console.log(backgroundSphere);
-        Globals.set("backgroundSphere", backgroundSphere);
-        // backgroundSphere.parent = viewerSphere;
-        window.backgroundSphere = backgroundSphere;
-        window.viewerSphere = backgroundSphere;
+        // Get the template sphere
+        let viewerSphereTemplate = Globals.get("viewerSphereTemplate");
+        // Go through and clone the viewer sphere for each of the locations.
+        let sphereShaders = Globals.get("sphereShaders");
+        let viewerSpheres = []; //Globals.get("viewerSpheres");
+        let cameraPositions = Globals.get("cameraPositions");
+        let cameraObj = Globals.get("camera");
+        for (let i = 0; i < sphereShaders.length; i++) {
+            let aViewerSphere = viewerSphereTemplate.clone("viewer_sphere" + i.toString());
+            aViewerSphere.position = cameraPositions[i];
+            aViewerSphere.material = sphereShaders[i].material;
+            if (i === 0) {
+                aViewerSphere.visibility = 1;
+                scene.activeCamera.position = aViewerSphere.position;
+                cameraObj._prevCameraPos = aViewerSphere.position.clone();
+                cameraObj._nextMovementVec = new BABYLON.Vector3(0, 0, 0);
+                cameraObj._prevViewerSphere = aViewerSphere;
+                cameraObj._nextViewerSphere = aViewerSphere;
+            }
+            else {
+                aViewerSphere.visibility = 0;
+            }
+            viewerSpheres.push(aViewerSphere);
+        }
+        Globals.set("viewerSpheres", viewerSpheres);
+        viewerSphereTemplate.visibility = 0;
+        // window.backgroundSphere = backgroundSphere;
+        window.viewerSphereTemplate = viewerSphereTemplate;
     }
     exports.setup = setup;
+    function hideAll() {
+        let viewerSpheres = Globals.get("viewerSpheres");
+        for (let i = 0; i < viewerSpheres.length; i++) {
+            let viewerSphere = viewerSpheres[i];
+            viewerSphere.visibility = 0;
+            // if (viewerSphere.uniqueId === newCameraData.associatedViewerSphere.uniqueId) {
+            //     viewerSphere.visibility = 1;
+            // } else {
+            //     viewerSphere.visibility = 0;
+            // }
+        }
+    }
+    exports.hideAll = hideAll;
     function update(newCameraData) {
-        // Move sphere
-        let viewerSphere = Globals.get("viewerSphere");
-        let backgroundSphere = Globals.get("backgroundSphere");
-        viewerSphere.hide = true;
-        viewerSphere.position = newCameraData.position;
-        backgroundSphere.position = newCameraData.position;
-        // console.log(newCameraData.texture);
-        // Update texture
-        // debugger;
-        viewerSphere.material = newCameraData.texture.material;
-        // shader.setTextures(newCameraData.texture); //, tex2, tex3, dist1, dist2, dist3);
-        // this._viewerSphere.material.emissiveTexture = bestTexture;
+        // First, make sure only the new viewer sphere is visible.
+        this.hideAll();
+        newCameraData.associatedViewerSphere.visibility = 1;
+        //     // Move sphere
+        //     let viewerSphereTemplate = Globals.get("viewerSphereTemplate");
+        //     let backgroundSphere = Globals.get("backgroundSphere");
+        //     viewerSphereTemplate.hide = true;
+        //     viewerSphereTemplate.position = newCameraData.position;
+        //     backgroundSphere.position = newCameraData.position;
+        //     // console.log(newCameraData.texture);
+        //     // Update texture
+        //     // debugger;
+        //     viewerSphereTemplate.material = newCameraData.texture.material;
+        //     // shader.setTextures(newCameraData.texture); //, tex2, tex3, dist1, dist2, dist3);
+        //     // this._viewerSphere.material.emissiveTexture = bestTexture;
     }
     exports.update = update;
 });
