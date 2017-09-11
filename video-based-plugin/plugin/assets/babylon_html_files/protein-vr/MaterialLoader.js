@@ -23,7 +23,7 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
                         // console.log("DEBUGGING CODE HERE...");
                         let filename;
                         // alert(isMobile);
-                        // isMobile = true; // for debugging.
+                        isMobile = true; // for debugging.
                         if (isMobile) {
                             // Some kind of phone... use low-res images
                             filename = "./frames/" + data[i] + ".small.png?" + Math.random().toString(); // Note no caching, for debugging.
@@ -71,6 +71,8 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
         jQuery("#start-game").prop("disabled", false);
         // Hide material-load progress bar.
         jQuery("#loading-progress-bar").slideUp();
+        // Change the loading-panel title
+        jQuery("#loading-title").html("Game Loaded");
         // Setup viewer sphere
         ViewerSphere.setup();
     }

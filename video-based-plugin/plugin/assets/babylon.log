@@ -6,9 +6,17 @@
 		inline textures:  false
 		texture directory:  /Users/jdurrant/Documents/Work/durrant_git/protein-vr/video-based-plugin/plugin/assets/
 	Python World class constructor completed
+	processing begun of mesh:  ProteinVR_Arrow
+		processing begun of Standard material:  arrow_mat
+		num positions      :  12
+		num normals        :  12
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  60
 	processing begun of camera (FreeCamera):  Camera
 	processing begun of mesh:  ProteinVR_ViewerSphere
-		processing begun of Standard material:  Material
+		processing begun of Standard material:  sphere_mat
 		num positions      :  536
 		num normals        :  536
 		num uvs            :  1072
@@ -19,4 +27,4 @@
 ========= Writing of scene file started =========
 ========= Writing of scene file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 0.0324 secs
+elapsed time:  0 min, 0.0209 secs

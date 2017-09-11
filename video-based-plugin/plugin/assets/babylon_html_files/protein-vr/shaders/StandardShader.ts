@@ -23,27 +23,6 @@ export class Shader {
             this.material.opacityTexture = texture;
         }
         
-        // switch (transparency) {
-        //     case true:
-        //         this.material.backFaceCulling = true;
-        //         break;
-        //     case false:
-                this.material.backFaceCulling = false;
-        //         break;
-        // }
+        this.material.backFaceCulling = false;
     }
-
-    // public setTextures(texture) {
-    //     // if (this._transparency == true) {
-    //         // texture.hasAlpha = true;
-    //     // }
-
-    //     this.material.emissiveTexture = texture;
-
-    //     if (this._transparency) {
-    //         this.material.opacityTexture = texture;
-    //     }
-    //     // this.material.diffuseTexture = texture;
-    //     // this.material.linkEmissiveWithDiffuse = true;
-    // }
 }

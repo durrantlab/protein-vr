@@ -29,29 +29,8 @@ interface GameInterface {
 export class Game {
     // Load the BABYLON 3D engine. Variable here because defined within
     // isSupported below.
-    // public engine: any;
-
-    // public scene: any;
-
-    // public cameraPositions: any;
-
-    // private _viewerSphereTemplate: any;
-
-    // private _sphereVideo: any;
-
     private _params: GameInterface;
-
-    // private _JSONData: any;
-
-    // private _shader: any;
-
-    // private _guideSpheres: any[] = [];
-
-    // private _camera: Camera;
-
     constructor(params: GameInterface) {
-        // setInterval(function() {console.log(this.cameraPos);}.bind(this), 100);
-
         // Bring in the loading panel...
         jQuery("#loading_panel").load("./_loading.html", () => {
             jQuery("#start-game").click(() => {
@@ -65,18 +44,8 @@ export class Game {
                     UserVars.getParam("viewer") == UserVars.viewers["Screen"]
                 )
                 
-                // Anti alias everything?
-                // var postProcess = new BABYLON.FxaaPostProcess("fxaa", 1.0, camera);
-                // let postProcess = new BABYLON.FxaaPostProcess("fxaa", 1.0, camera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, engine, false);
-                // let engine = Globals.get("engine");
-                // let camera = Globals.get("camera");
-                // let pp = new BABYLON.BlackAndWhitePostProcess("bandw", 1.0, camera);
-                // camera.__fxaa_cookie = new BABYLON.FxaaPostProcess("fxaa", 1, camera, 2, BABYLON.Texture.TRILINEAR_SAMPLINGMODE, engine, false);
-                
                 this._startRenderLoop();
                 engine.resize();
-                // });
-
             })
         });
         
@@ -149,62 +118,12 @@ export class Game {
         }
     }
 
-    private _loadScene() {
-
-        /* { 
-            onSettingsPanelShown: () => {
-                BABYLON.SceneLoader.Load("", "babylon.babylon", this.engine, (scene) => {
-                    this.scene = scene;
-        
-                    window.scrollTo(0,1);  // supposed to autohide scroll bar.
-        
-                    // this._canvas.addEventListener("click", function() {
-                    //     this.engine.switchFullscreen(true);
-                    // }.bind(this));
-        
-                    // Wait for textures and shaders to be ready
-                    this.scene.executeWhenReady(() => {
-                        * this._camera = new Camera(this, BABYLON);
-                        // this._camera.setup();
-                        * this._setupFromJSON(function() {
-                        *    this._setupVideoSphere();
-                        *}.bind(this))
-                        ? this._params.onDone();
-                        ? callbacksComplete.push(callBacks.SCENE_READY);
-        
-                        // this.scene.debugLayer.show();
-                    })
-                },
-                function (progress) {
-                    // To do: give progress feedback to user
-                });
-            },
-            onSettingsPanelClosed: () => {
-                * this._camera.setup();
-                this._startRenderLoop();
-            }, 
-            engine: this.engine,
-            jQuery: jQuery
-        }); */
-
-
-
-
-        // UserVars.setup();
-    }
-    
     private _startRenderLoop() {
         // Once the scene is loaded, just register a render loop to render it
         let camera = Globals.get("camera");
         let scene = Globals.get("scene");
 
         Globals.get("engine").runRenderLoop(() => {
-            // let x = Math.round(this.scene.activeCamera.position.x * 100) / 100;
-            // let y = Math.round(this.scene.activeCamera.position.y * 100) / 100;
-            // let z = Math.round(this.scene.activeCamera.position.z * 100) / 100;
-            // console.log(bestFrame, x, y, z);
-            // console.log(x, y, z);
-
             camera.update();
             scene.render();
         });
@@ -222,10 +141,6 @@ export function start() {
     let game = new Game({
         onJSONLoaded: function() {
             console.log("DONE!!!");
-            // let ef = new ExtractFrames(() => {
-            //     callbacksComplete.push(callBacks.VIDEO_FRAMES_LOADED);
-            //     console.log("done");
-            // });
         },
         onDone: function() {}
     });

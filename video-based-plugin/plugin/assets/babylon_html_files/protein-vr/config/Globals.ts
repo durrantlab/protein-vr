@@ -11,15 +11,15 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         "viewerSpheres": undefined,
         "sphereShaders": undefined,
         "backgroundSphere": undefined,
-        "debug": false,
+        "debug": true,
         "mouseDownAdvances": true,
         "mobileDetect": undefined,
-        "numFrameTexturesLoaded": 0
+        "numFrameTexturesLoaded": 0,
+        "numNeighboringCameraPosForNavigation": 4
     }
 }
 
 export function get(key: string) {
-    // debugger;
     return (<any>window)._proteinvrGlobals[key];
 }
 

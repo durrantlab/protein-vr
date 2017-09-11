@@ -1,4 +1,4 @@
-define(["require", "exports", "./Camera", "../config/Globals", "../config/Globals", "../shaders/StandardShader"], function (require, exports, Camera_1, Globals, Globals_1, StandardShader_1) {
+define(["require", "exports", "./Camera", "../config/Globals", "../config/Globals", "../shaders/StandardShader", "./Arrows"], function (require, exports, Camera_1, Globals, Globals_1, StandardShader_1, Arrows) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function loadBabylonFile() {
@@ -13,11 +13,13 @@ define(["require", "exports", "./Camera", "../config/Globals", "../config/Global
                 newScene.executeWhenReady(() => {
                     let camera = new Camera_1.Camera();
                     Globals.set("camera", camera);
-                    let radius = 12; // When using VR, this needs to be farther away that what it was rendered at. this._JSONData["viewerSphereSize"];
                     // Setup viewer sphere template
+                    let radius = 12; // When using VR, this needs to be farther away that what it was rendered at. this._JSONData["viewerSphereSize"];
                     _setupViewerSphereTemplate(newScene, radius);
                     // Set up environmental (background) sphere
                     _setupEnvironmentalSphere(newScene, radius);
+                    // Setup arrows
+                    Arrows.setup();
                     // Delay textures until needed. Cool, but too slow for our purposes here...
                     // newScene.useDelayedTextureLoading = true
                     if (Globals.get("debug")) {
@@ -29,14 +31,21 @@ define(["require", "exports", "./Camera", "../config/Globals", "../config/Global
         });
     }
     exports.loadBabylonFile = loadBabylonFile;
-    function _setupViewerSphereTemplate(newScene, radius) {
+    function getMeshThatContainsStr(str, scene) {
         // Identify viewer sphere template
-        let viewerSphereTemplate;
-        for (let t = 0; t < newScene.meshes.length; t++) {
-            if (newScene.meshes[t].name.indexOf("ProteinVR_ViewerSphere") !== -1) {
-                viewerSphereTemplate = newScene.meshes[t];
+        let theMesh;
+        for (let t = 0; t < scene.meshes.length; t++) {
+            if (scene.meshes[t].name.indexOf(str) !== -1) {
+                theMesh = scene.meshes[t];
+                break;
             }
         }
+        return theMesh;
+    }
+    exports.getMeshThatContainsStr = getMeshThatContainsStr;
+    function _setupViewerSphereTemplate(newScene, radius) {
+        // Identify viewer sphere template
+        let viewerSphereTemplate = getMeshThatContainsStr("ProteinVR_ViewerSphere", newScene);
         viewerSphereTemplate.scaling = new BABYLON.Vector3(radius, radius, -radius);
         viewerSphereTemplate.isPickable = false;
         viewerSphereTemplate.renderingGroupId = Globals_1.RenderingGroups.ViewerSphere;

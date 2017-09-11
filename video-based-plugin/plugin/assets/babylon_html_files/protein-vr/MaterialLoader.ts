@@ -21,14 +21,11 @@ export function getFramePromises() {
                 debugger;
             }
 
-            // let promises = [];
             let progressBarObj = jQuery("#loading-progress-bar .progress-bar");
             for (let i=0; i<data.length; i++) {
                 new Promise((resolve) => {
-                    // console.log("DEBUGGING CODE HERE...");
                     let filename: string;
-                    // alert(isMobile);
-                    // isMobile = true; // for debugging.
+                    isMobile = true; // for debugging.
                     if (isMobile) {
                         // Some kind of phone... use low-res images
                         filename = "./frames/" + data[i] + ".small.png?" + Math.random().toString();  // Note no caching, for debugging.
@@ -49,16 +46,11 @@ export function getFramePromises() {
                             }
                         });
                     });
-                    // tex.hasAlpha = true;
-                    // console.log(tex);
                     Globals.get("sphereShaders")[i] = shader;
                 });
             }
 
             resolve({msg: "List of get-texture promises"}); //, promises: promises})
-
-            // Fire the callback.
-            // this._callBack();
         });
     })
 }
@@ -79,6 +71,9 @@ function _afterMaterialsLoaded() {
 
     // Hide material-load progress bar.
     jQuery("#loading-progress-bar").slideUp();
+
+    // Change the loading-panel title
+    jQuery("#loading-title").html("Game Loaded");
 
     // Setup viewer sphere
     ViewerSphere.setup();

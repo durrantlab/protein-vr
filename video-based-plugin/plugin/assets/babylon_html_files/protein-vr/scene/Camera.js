@@ -1,4 +1,4 @@
-define(["require", "exports", "../config/UserVars", "./PVRJsonSetup", "../config/Globals", "./ViewerSphere"], function (require, exports, UserVars, PVRJsonSetup_1, Globals, ViewerSphere) {
+define(["require", "exports", "../config/UserVars", "../config/Globals", "./ViewerSphere", "./Arrows"], function (require, exports, UserVars, Globals, ViewerSphere, Arrows) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     // export var cameraPositions: any;
@@ -93,6 +93,47 @@ define(["require", "exports", "../config/UserVars", "./PVRJsonSetup", "../config
                 this.data[i].score = score;
             }
         }
+        removePointsInSameGeneralDirection(pivotPt) {
+            // This removes any points in the same general direction, keeping the
+            // one that is closest.
+            let BABYLON = Globals.get("BABYLON");
+            for (let dIndex1 = 0; dIndex1 < this.data.length - 1; dIndex1++) {
+                if (this.data[dIndex1] !== null) {
+                    let pt1 = this.data[dIndex1].position;
+                    let vec1 = pt1.subtract(pivotPt).normalize();
+                    for (let dIndex2 = dIndex1 + 1; dIndex2 < this.data.length; dIndex2++) {
+                        if (this.data[dIndex2] !== null) {
+                            let pt2 = this.data[dIndex2].position;
+                            let vec2 = pt2.subtract(pivotPt).normalize();
+                            let angleBetweenVecs = Math.acos(BABYLON.Vector3.Dot(vec1, vec2));
+                            if (angleBetweenVecs < 0.349066) {
+                                let dist1 = this.data[dIndex1].distance;
+                                let dist2 = this.data[dIndex2].distance;
+                                // Note that the below alters the data in the source list.
+                                // So don't use that list anymore. (Just use what this
+                                // function returns...)
+                                if (dist1 <= dist2) {
+                                    this.data[dIndex2] = null;
+                                }
+                                else {
+                                    this.data[dIndex1] = null;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // Now keep only ones that are not null
+            let newCameraPoints = new CameraPoints();
+            for (let dIndex = 0; dIndex < this.data.length - 1; dIndex++) {
+                let d = this.data[dIndex];
+                if (d !== null) {
+                    newCameraPoints.push(d);
+                }
+            }
+            // Return the kept ones.
+            return newCameraPoints;
+        }
     }
     class Camera {
         constructor() {
@@ -105,6 +146,7 @@ define(["require", "exports", "../config/UserVars", "./PVRJsonSetup", "../config
             this._speedInUnitsPerSecond = 1;
             this._lastMovementTime = (new Date).getTime();
             this._msUntilNextMoveAllowed = 0;
+            this._cameraCurrentlyAutoMoving = false;
         }
         // private _lastCameraLoc: any;
         setup() {
@@ -121,7 +163,9 @@ define(["require", "exports", "../config/UserVars", "./PVRJsonSetup", "../config
                 }
                 this._setupMouseAndKeyboard();
                 // Move camera to first position.
-                scene.activeCamera.position = Globals.get("cameraPositions")[0]; // MOO
+                scene.activeCamera.position = Globals.get("cameraPositions")[0];
+                // Setup first steps forward
+                this._onDoneCameraAutoMoving(scene.activeCamera);
                 // Add extra keys
                 // Additional control keys.
                 // this._parentObj.scene.activeCamera.keysUp.push(87);  // W. 38 is up arrow.
@@ -267,20 +311,13 @@ define(["require", "exports", "../config/UserVars", "./PVRJsonSetup", "../config
             let deltaTime = (new Date).getTime() - this._lastMovementTime;
             // if (deltaTime < 1000/(this._maxMovementsAllowedPerSec)) {  // 1000 becaue ms
             if (deltaTime < this._msUntilNextMoveAllowed) {
-                // Still in auto-moving phase. So auto-move here.
-                let timeRatio = deltaTime / this._msUntilNextMoveAllowed;
-                // let sigmoidalVal = 1.0/(1.0 + Math.exp(-(20 * timeRatio - 10)))
-                // let sinVal = 0.5 + 0.5 * Math.sin(Math.PI * (timeRatio - 0.5));
-                this._updatePos(timeRatio, camera);
+                this._cameraCurrentlyAutoMoving = true;
+                this._whileCameraAutoMoving(deltaTime, camera);
                 return;
             }
-            else {
-                // Make sure completed transition to full visibility.
-                if (this._nextViewerSphere.visibility !== 1.0) {
-                    this._updatePos(1.0, camera);
-                    // this._nextViewerSphere.visibility = 1.0;
-                    // camera.position = this._prevCameraPos.add(this._nextMovementVec);
-                }
+            if (this._cameraCurrentlyAutoMoving) {
+                this._cameraCurrentlyAutoMoving = false;
+                this._onDoneCameraAutoMoving(camera);
             }
             // So it's time to pick a new destination.
             // Only update things if user trying to move.
@@ -294,9 +331,48 @@ define(["require", "exports", "../config/UserVars", "./PVRJsonSetup", "../config
             if (result) {
                 return;
             }
-            // Let's pick the next destination...
+            this._firstRender = false; // It's no longer the first time rendering.        
+            this._onStartMove(camera);
+        }
+        _onStartMove(camera) {
+            // console.log("_onStartMove");
+            // Move camera to best frame.
+            // camera.position = newCameraData.position;
+            // console.log("DELETE BELOW LINE EVENTUALLY...");
+            // ViewerSphere.update(newCameraData);
+            // updateGuideSpheres(newCameraData)
+            // Make sure everything hidden but present sphere.
+            console.log("NEEDED?");
+            ViewerSphere.hideAll();
+            this._nextViewerSphere.visibility = 1.0;
+            this._pickDirectionAndStartMoving(camera);
+        }
+        _whileCameraAutoMoving(deltaTime, camera) {
+            // console.log("_whileCameraAutoMoving");
+            // Still in auto-moving phase. So auto-move here.
+            let timeRatio = deltaTime / this._msUntilNextMoveAllowed;
+            // let sigmoidalVal = 1.0/(1.0 + Math.exp(-(20 * timeRatio - 10)))
+            // let sinVal = 0.5 + 0.5 * Math.sin(Math.PI * (timeRatio - 0.5));
+            this._updatePos(timeRatio, camera);
+        }
+        _onDoneCameraAutoMoving(camera) {
+            // console.log("_onDoneCameraAutoMoving");
+            // Make sure completed transition to full visibility.
+            // if (this._nextViewerSphere.visibility !== 1.0) {
+            this._updatePos(1.0, camera);
+            // this._nextViewerSphere.visibility = 1.0;
+            // camera.position = this._prevCameraPos.add(this._nextMovementVec);
+            // }
+            // Determine where you can move from here.
+            // this._getNextMoveLocations(camera);
+            this._setCloseCameraDataAndArrows(camera);
+        }
+        _setCloseCameraDataAndArrows(camera) {
+            // console.log("_setCloseCameraData");
+            // This filters the camera points, keeping only those that are
+            // uniqueish and close to the camera.
+            // Let's get the points close to the camera.
             let cameraLoc = camera.position;
-            this._firstRender = false; // It's no longer the first time rendering.
             // Calculate distances to all camera positions
             let cameraPoints = new CameraPoints();
             let cameraPositions = Globals.get("cameraPositions");
@@ -312,11 +388,19 @@ define(["require", "exports", "../config/UserVars", "./PVRJsonSetup", "../config
             // Remove first one (closest). To make sure you're not staying
             // where you are.
             cameraPoints.removeFirst();
-            // Start by assuming new camera point should be the closest point.
-            let newCameraData = cameraPoints.firstPoint();
             // Keep only four points. So I guess paths can't be too bifurcated.
-            let closeCameraData = cameraPoints.firstFewPoints(4); // choose four close points
-            let maxDist = closeCameraData.data[3].distance;
+            let closeCameraData = cameraPoints.firstFewPoints(Globals.get("numNeighboringCameraPosForNavigation")); // choose four close points
+            // Remove the points that are off in the same general direction
+            closeCameraData = closeCameraData.removePointsInSameGeneralDirection(camera.position);
+            // Position the arrows.
+            Arrows.update(closeCameraData);
+            this._closeCameraData = closeCameraData;
+        }
+        _pickDirectionAndStartMoving(camera) {
+            // console.log("_startMoving");
+            // Start by assuming new camera point should be the closest point.
+            let newCameraData = this._closeCameraData.firstPoint();
+            let maxDist = this._closeCameraData.data[this._closeCameraData.data.length - 1].distance;
             // Assign angles
             let lookingVec = camera.getTarget().subtract(camera.position);
             switch (this._keyPressedState) {
@@ -327,10 +411,10 @@ define(["require", "exports", "../config/UserVars", "./PVRJsonSetup", "../config
                     lookingVec = lookingVec.scale(-1);
                     break;
             }
-            closeCameraData.addAnglesInPlace(camera.position, lookingVec);
+            this._closeCameraData.addAnglesInPlace(camera.position, lookingVec);
             // Throw out ones that aren't even in the general direction as the
             // lookingVec
-            let goodAngleCameraPoints = closeCameraData.lessThanCutoff(1.9198621771937625, "angle"); // 110 degrees
+            let goodAngleCameraPoints = this._closeCameraData.lessThanCutoff(1.9198621771937625, "angle"); // 110 degrees
             switch (goodAngleCameraPoints.length()) {
                 case 0:
                     // You must be at the end of a path. Keep previous newCameraData;
@@ -346,15 +430,7 @@ define(["require", "exports", "../config/UserVars", "./PVRJsonSetup", "../config
                     newCameraData = goodAngleCameraPoints.firstPoint();
                     break;
             }
-            // Move camera to best frame.
-            // camera.position = newCameraData.position;
-            // console.log("DELETE BELOW LINE EVENTUALLY...");
-            // ViewerSphere.update(newCameraData);
-            PVRJsonSetup_1.updateGuideSpheres(newCameraData);
-            // Make sure everything hidden but present sphere.
-            ViewerSphere.hideAll();
-            this._nextViewerSphere.visibility = true;
-            // Set values to govern auto movement.
+            // Set values to govern next auto movement.
             this._prevCameraPos = camera.position.clone();
             this._nextMovementVec = newCameraData.position.subtract(this._prevCameraPos);
             this._prevViewerSphere = this._nextViewerSphere;

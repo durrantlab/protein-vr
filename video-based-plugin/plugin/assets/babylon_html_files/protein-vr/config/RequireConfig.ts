@@ -20,10 +20,6 @@ declare var jQuery;
 // });
 
 // This require function starts the app
-// require(['jquery', './main', "bootstrap", /*'babylon',*/ /* 'babylonObjLoader', */ ], (jQuery, main /*BABYLON,*/ ) => {
 require(['../main'], (main) => {
-        // console.log(jQuery);
-    // console.log(BABYLON);
-    // console.log(main);
     main.start();
 });

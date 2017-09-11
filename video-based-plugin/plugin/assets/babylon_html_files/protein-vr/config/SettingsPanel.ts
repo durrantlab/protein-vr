@@ -1,9 +1,5 @@
 import * as UserVars from "./UserVars";
 import * as Globals from "./Globals";
-// import * as PointerLock from "./PointerLock";
-// import * as Setup from "../Core/Setup";
-// import * as Core from "../Core/Core";
-// import { PointerLock } from "../Environment";
 
 var jQuery;
 // declare var screenfull;
@@ -18,17 +14,6 @@ export function allowUserToModifySettings() {
         // jQuery = PVRGlobals.jQuery;
         jQuery("body").append(`<div id="settings_panel"></div>`)
         let settingsPanel = jQuery("#settings_panel");
-    
-        // Styleize div
-        // settingsPanel.css("position", "absolute");
-        // settingsPanel.css("left", "0");
-        // settingsPanel.css("top", "0");
-        // settingsPanel.css("width", "100%");
-        // settingsPanel.css("height", "100%");
-        // settingsPanel.css("background-color", "Gainsboro");
-        // settingsPanel.css("z-index", "1000");
-        // settingsPanel.css("padding", "15px");
-        // settingsPanel.css("overflow-y", "scroll");
     
         // Make it fluid with bootstrap
         settingsPanel.addClass("container-fluid");
@@ -191,18 +176,6 @@ function row_thirds_split(widths, html1, html2, html3) {
     `;
 }
 
-// function formGroup(label, html) {
-//     return `
-//     <div class="input-group">
-//         <div class="form-group">
-//             <!-- <label class="col-xs-2">${label}:</label> -->
-//             <!-- <div class="col-xs-10">${html}</div> -->
-//             ${html}
-//         </div>
-//     </div>
-//     `;
-// }
-
 function radioBoxes(label, values: any, icons_if_phone = undefined) {
     let id = label.toLowerCase().replace(/ /g, '');
     let html = `<div class="form-group buttonbar-${id}">
@@ -229,31 +202,12 @@ function radioBoxes(label, values: any, icons_if_phone = undefined) {
     return html;
 }
 
-// function toggle(text: string, checked: boolean, width_in_pixels: number = 41) {
-//     let doCheck = "";
-//     let styles = "display: none;";
-//     if (checked) {
-//         doCheck = " checked";
-//         styles = "display: inline-block;";
-//     }
-
-//     let html =`
-//         <div class="btn-group" data-toggle="buttons">
-//             <label class="btn btn-primary active toggle_box" style="width:${width_in_pixels}px;"> <!-- style="padding-left: 35px; padding-right: 35px;"> -->
-//                 <input type="checkbox" autocomplete="off"${doCheck}><div class="glyphicon glyphicon-ok" style="${styles}" aria-hidden=true></div> &nbsp;${text}
-//             </label>
-//         </div>
-//     `;
-//     return html;
-// }
-
 function setRadioState(id, varsToUse) {
     setTimeout(() => {
         // Get all the labels and make them default colored, no checkboxes.
         let labels = Globals.get("jQuery")(`.${id}-labels`);
         labels.removeClass("btn-primary");
         labels.addClass("btn-default");
-        // labels.find(".glyphicon-ok").hide();
         labels.removeClass("active");  // these don't look so great IMHO
         labels.removeClass("focus");
 
@@ -261,7 +215,6 @@ function setRadioState(id, varsToUse) {
         let labelToUse = labels.find(`#${id}${varsToUse[id]}`).closest("label");
         labelToUse.removeClass('btn-default');
         labelToUse.addClass("btn-primary");
-        // labelToUse.find(".glyphicon-ok").show();
 
         // Also make sure associated radio input is checked.
         let inputToUse = labelToUse.find('input');
@@ -279,25 +232,6 @@ export function setGUIState() {
             setRadioState(key2, varsToUse);
         }
     }
-
-    // Always set looking to MouseMove. This because simplifying UI.
-    // varsToUse["looking"] = UserVars.looking["MouseMove"]
-
-    // Control moving button visibiliy depending on other issues.
-    // let buttonbarMoving = jQuery(".buttonbar-moving");
-    // let buttonbarLooking = jQuery(".buttonbar-looking");
-
-    // if ((varsToUse["viewer"] == UserVars.viewers["VRHeadset"]) || (varsToUse["device"] == UserVars.devices["Mobile"])) {
-        // buttonbarMoving.show();
-        // buttonbarLooking.hide();
-
-        // make sure no pointerlock used in this scenario.
-        // varsToUse["looking"] = UserVars.looking["Click"];
-        // UserVars.saveLocalStorageParams(varsToUse);
-    // } else {
-        // buttonbarMoving.hide();
-        // buttonbarLooking.show();
-    // }
 }
 
 function addJavaScript(onSettingsPanelClosed) {
@@ -353,7 +287,6 @@ function addJavaScript(onSettingsPanelClosed) {
 
     // start button. Wrapped in screenful in case you want to go full screen
     // when you press the start button.
-    // jQuery.getScript( "js/screenfull.min.js" ).done(function( script, textStatus ) {
         // This does need to be registered on the window. If you do it
         // through a click in babylonjs, browsers will reject the
         // full-screen request.
@@ -361,46 +294,11 @@ function addJavaScript(onSettingsPanelClosed) {
             jQuery("#settings_panel").fadeOut(() => {
                 jQuery("#loading_panel").fadeIn();
             });
-            this.onSettingsPanelClosed();
-
-            
-            // // if ((UserVars.getParam("display") === UserVars.displays["FullScreen"]) && (screenfull.enabled)) {
-                // if (screenfull.enabled) {
-                    //     jQuery("body").on('click', function(e) {
-                        //         // If you're using VR and the user clicks, make sure you're full screen.
-                        //         // This is because the browser automatically goes windowed when you
-                        //         // Note that all clicks will now call this function... could
-                        //         // effect performance.
-                        //         if (screenfull.isFullscreen === false) {
-                            //             screenfull.request();
-                            //         }
-                            //     });
-                            
-                            //     screenfull.request();
-                            // }
-                            
-                            // if (UserVars.getParam("looking") == UserVars.looking["MouseMove"]) {
-                                //     // console.log("Usingp ointerlock...");
-                                //     PointerLock.pointerLock();
-                                // }
-                                
+            this.onSettingsPanelClosed();            
         }.bind({
             onSettingsPanelClosed: onSettingsPanelClosed,
             // engine: engine
         }));
-
-        // Broadcast button
-        // PVRGlobals.broadcastID = Math.floor(100000000 * Math.random()).toString();
-        // addBroadcastModal();
-        // jQuery("#broadcast_game_button").click(function() {
-        //     jQuery('#broadcast_modal').modal('show');
-        // });
-
-        // Show the broadcast button if "?id=" is not in the url.
-        // if (window.location.href.indexOf("?id=") === -1) {
-        //     jQuery("#broadcast_game_button").show();
-        // }
-    // });
 }
 
 function addBroadcastModal() {

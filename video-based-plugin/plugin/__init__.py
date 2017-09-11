@@ -81,8 +81,6 @@ class ProteinVR(PanelParentClass):
         bpy.types.Scene.proteinvr_mobile_bake_texture_size = self.prop_funcs.intProp("Mobile Texture Size", min=0, max=8192, default=1024, description="The size of the square texture to render fore use on mobile. Higher means higher resolution. Good to use power of 2. Recommended: 1024 for final render.")
 
         bpy.types.Scene.proteinvr_num_cycles = self.prop_funcs.intProp("Number of Cycles", min=1, max=10000, default=16, description="The number of rendering cycles. Higher means better quality.")
-        # bpy.types.Scene.proteinvr_viewer_sphere_size = self.prop_funcs.floatProp("Viewer Sphere Size", min=0.5, max=5.0, default=5.0, description="The size of the viewer sphere. Larger means close objects not allowed, but user can deviate further from set path.")
-        bpy.types.Scene.proteinvr_min_guide_sphere_spread = self.prop_funcs.floatProp("Min Guide-Sphere Spread", min=0.0, max=50.0, default=1.0, description="The minimum distance between adjacent guide spheres.")
 
         bpy.types.Scene.jpeg_quality = self.prop_funcs.intProp("JPEG Quality", min=0, max=100, default=50, description="JPEG quality.")
 
@@ -122,27 +120,6 @@ def menu_func(self, context):
 
 # Store keymaps here to access after registration.
 addon_keymaps = []
-# classes_used.extend([
-#     OBJECT_OT_LoadTrajButton,
-#     OBJECT_OT_AddSphereButton,
-#     OBJECT_OT_DefaultLocRotScaleButton,
-#     OBJECT_OT_SphereDoneButton,
-#     OBJECT_OT_SelectExistingSphereButton0,
-#     OBJECT_OT_SelectExistingSphereButton1,
-#     OBJECT_OT_SelectExistingSphereButton2,
-#     OBJECT_OT_SelectExistingSphereButton3,
-#     OBJECT_OT_SelectExistingSphereButton4,
-#     OBJECT_OT_SelectExistingSphereButton5,
-#     OBJECT_OT_SelectExistingSphereButton6,
-#     OBJECT_OT_SelectExistingSphereButton7,
-#     OBJECT_OT_SelectExistingSphereButton8,
-#     OBJECT_OT_SelectExistingSphereButton9,
-#     OBJECT_OT_DeleteSphereButton,
-#     OBJECT_OT_StartOver,
-#     OBJECT_OT_RemoveAnimations,
-#     # ProcessTrajectory,
-#     OBJECT_OT_MainMenuButton
-# ])
 
 ##### Registration functions #####
 def register():

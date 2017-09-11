@@ -14,10 +14,11 @@ define(["require", "exports"], function (require, exports) {
             "viewerSpheres": undefined,
             "sphereShaders": undefined,
             "backgroundSphere": undefined,
-            "debug": false,
+            "debug": true,
             "mouseDownAdvances": true,
             "mobileDetect": undefined,
-            "numFrameTexturesLoaded": 0
+            "numFrameTexturesLoaded": 0,
+            "numNeighboringCameraPosForNavigation": 4
         };
     }
     function get(key) {

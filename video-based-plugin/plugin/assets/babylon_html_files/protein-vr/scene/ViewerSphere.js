@@ -32,7 +32,7 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
         Globals.set("viewerSpheres", viewerSpheres);
         viewerSphereTemplate.visibility = 0;
         // window.backgroundSphere = backgroundSphere;
-        window.viewerSphereTemplate = viewerSphereTemplate;
+        // window.viewerSphereTemplate = viewerSphereTemplate;
     }
     exports.setup = setup;
     function hideAll() {

@@ -1,18 +1,15 @@
 import * as UserVars from "../config/UserVars";
-import { updateGuideSpheres } from "./PVRJsonSetup";
 import * as Globals from "../config/Globals";
 import * as ViewerSphere from "./ViewerSphere";
+import * as Arrows from "./Arrows";
 
 interface CameraPointData {
     distance: number;
     position: any;
-    // texture: any;
     associatedViewerSphere: any;
     angle?: number;
     score?: number;
 }
-
-// export var cameraPositions: any;
 
 class CameraPoints {
     public data: CameraPointData[] = [];
@@ -79,10 +76,6 @@ class CameraPoints {
         for (let dIndex=0; dIndex<this.data.length; dIndex++) {
             let d = this.data[dIndex];
             let val: number = this._getValBasedOnCriteria(d, criteria);
-            // if (val > cutoff) {
-            //     // Don't look beyond maxDistToJumpPt away
-            //     break;
-            // }
             if (val <= cutoff) {
                 newCameraPoints.push(d);
             }
@@ -113,6 +106,52 @@ class CameraPoints {
             this.data[i].score = score;
         }        
     }
+
+    public removePointsInSameGeneralDirection(pivotPt) {  // pivotPt is probably the camera location
+        // This removes any points in the same general direction, keeping the
+        // one that is closest.
+        let BABYLON = Globals.get("BABYLON");
+        for (let dIndex1=0; dIndex1<this.data.length - 1; dIndex1++) {
+            if (this.data[dIndex1] !== null) {
+                let pt1 = this.data[dIndex1].position;
+                let vec1 = pt1.subtract(pivotPt).normalize();
+    
+                for (let dIndex2=dIndex1+1; dIndex2<this.data.length; dIndex2++) {
+                    if (this.data[dIndex2] !== null) {
+                        let pt2 = this.data[dIndex2].position;
+                        let vec2 = pt2.subtract(pivotPt).normalize();
+        
+                        let angleBetweenVecs = Math.acos(BABYLON.Vector3.Dot(vec1, vec2));
+                        if (angleBetweenVecs < 0.349066) {  // 20 degrees
+                            let dist1 = this.data[dIndex1].distance;
+                            let dist2 = this.data[dIndex2].distance;
+        
+                            // Note that the below alters the data in the source list.
+                            // So don't use that list anymore. (Just use what this
+                            // function returns...)
+                            if (dist1 <= dist2) {
+                                this.data[dIndex2] = null;
+                            } else {
+                                this.data[dIndex1] = null;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Now keep only ones that are not null
+        let newCameraPoints = new CameraPoints();
+        for (let dIndex=0; dIndex<this.data.length - 1; dIndex++) {
+            let d = this.data[dIndex];
+            if (d !== null) {
+                newCameraPoints.push(d);
+            }
+        }
+
+        // Return the kept ones.
+        return newCameraPoints;
+    }
 }
 
 export class Camera {
@@ -121,13 +160,6 @@ export class Camera {
     private _mouseDownState: boolean = false;
     private _keyPressedState: number = undefined;
     private _firstRender: boolean = true;
-
-    private _maxMovementsAllowedPerSec = 30;
-
-    // private _maxDistToJumpPt = 1.0;
-    private _jumpPointDetectionResolution = 0.1;
-
-    // private _lastCameraLoc: any;
 
     public setup() {
 
@@ -146,16 +178,17 @@ export class Camera {
             this._setupMouseAndKeyboard();
     
             // Move camera to first position.
-            scene.activeCamera.position = Globals.get("cameraPositions")[0]; // MOO
+            scene.activeCamera.position = Globals.get("cameraPositions")[0];
     
+            // Setup first steps forward
+            this._onDoneCameraAutoMoving(scene.activeCamera);
+
             // Add extra keys
             // Additional control keys.
             // this._parentObj.scene.activeCamera.keysUp.push(87);  // W. 38 is up arrow.
             // this._parentObj.scene.activeCamera.keysLeft.push(65);  // A. 37 if left arrow.
             // this._parentObj.scene.activeCamera.keysDown.push(83);  // S. 40 is down arrow.
             // this._parentObj.scene.activeCamera.keysRight.push(68);  // D. 39 is right arrow.
-    
-            // this._lastCameraLoc = new this.BABYLON.Vector3(-9999, -9999, -9999);
     
             // this.scene.activeCamera.inertia = 0.0;
 
@@ -222,41 +255,6 @@ export class Camera {
     
         // Attach that camera to the canvas.
         scene.activeCamera.attachControl(canvas);
-
-        // let vrOverlay1 = jQuery("#vr_overlay1");
-        // vrOverlay1.css("position", "absolute");
-        // vrOverlay1.css("bottom", "0");
-        // vrOverlay1.css("left", "0");
-        // vrOverlay1.css("border-right", "2px solid black");
-        // vrOverlay1.css("width", "50%");
-        // vrOverlay1.css("height", "20%");
-        // vrOverlay1.css("z-index", "10000000000");
-
-        // setInterval(function() {
-        //     let zIndex = this.renderCanvas.css("z-index");
-        //     if (zIndex !== "auto") {
-        //         this.vrOverlay.css("z_index", zIndex + 1);
-        //     }
-        //     // debugger;
-        // }.bind({
-        //     renderCanvas: jQuery("#renderCanvas"),
-        //     vrOverlay: vrOverlay
-        // }), 1000);
-
-        // jQuery.getScript("js/babylon.gui.js", () => {
-        //     let advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI", true, scene);
-        //     var line = new BABYLON.GUI.Line();
-        //     let width = jQuery(window).width();
-        //     line.x1 = width;
-        //     line.y1 = 10;
-        //     line.x2 = width;
-        //     line.y2 = 500;
-        //     line.lineWidth = 5;
-        //     line.dash = [5, 10];
-        //     line.color = "black";
-        //     advancedTexture.addControl(line);
-        // });
-        
     }
 
     private _setupMouseAndKeyboard() {
@@ -287,19 +285,6 @@ export class Camera {
         }.bind(this));
     }
     
-    // private _vectorsEqualTolerance(vec1, vec2, tol=0.2) {
-    //     if (Math.abs(vec1.x - vec2.x) > tol) {
-    //         return false;
-    //     }
-    //     if (Math.abs(vec1.y - vec2.y) > tol) {
-    //         return false;
-    //     }
-    //     if (Math.abs(vec1.z - vec2.z) > tol) {
-    //         return false;
-    //     }
-    //     return true;
-    // }
-
     private _keepDataWithinDist(data: CameraPointData[], cutoffDist: number): CameraPointData[] {
         let toKeep: CameraPointData[] = [];
         for (let i=0; i<data.length; i++) {
@@ -318,6 +303,7 @@ export class Camera {
     public _nextMovementVec: any;
     public _prevViewerSphere: any;
     public _nextViewerSphere: any;
+    public _cameraCurrentlyAutoMoving: boolean = false;
 
     private _updatePos(timeRatio, camera) {
         this._prevViewerSphere.visibility = 1.0 - timeRatio;
@@ -333,21 +319,15 @@ export class Camera {
         let camera = scene.activeCamera;
 
         let deltaTime = (new Date).getTime() - this._lastMovementTime;
-        // if (deltaTime < 1000/(this._maxMovementsAllowedPerSec)) {  // 1000 becaue ms
         if (deltaTime < this._msUntilNextMoveAllowed) {
-            // Still in auto-moving phase. So auto-move here.
-            let timeRatio = deltaTime / this._msUntilNextMoveAllowed;
-            // let sigmoidalVal = 1.0/(1.0 + Math.exp(-(20 * timeRatio - 10)))
-            // let sinVal = 0.5 + 0.5 * Math.sin(Math.PI * (timeRatio - 0.5));
-            this._updatePos(timeRatio, camera);
+            this._cameraCurrentlyAutoMoving = true;
+            this._whileCameraAutoMoving(deltaTime, camera);
             return;
-        } else {
-            // Make sure completed transition to full visibility.
-            if (this._nextViewerSphere.visibility !== 1.0) {
-                this._updatePos(1.0, camera);
-                // this._nextViewerSphere.visibility = 1.0;
-                // camera.position = this._prevCameraPos.add(this._nextMovementVec);
-            }
+        }
+
+        if (this._cameraCurrentlyAutoMoving) {
+            this._cameraCurrentlyAutoMoving = false;
+            this._onDoneCameraAutoMoving(camera);
         }
         
         // So it's time to pick a new destination.
@@ -360,11 +340,51 @@ export class Camera {
         }
         if (result) { return; }
 
-        // Let's pick the next destination...
+        this._firstRender = false;  // It's no longer the first time rendering.        
+        
+        this._onStartMove(camera);
+    }
+
+    private _onStartMove(camera) {
+        // console.log("_onStartMove");
+        
+        // Make sure everything hidden but present sphere.
+        console.log("NEEDED?");
+        ViewerSphere.hideAll();
+        this._nextViewerSphere.visibility = 1.0;
+        
+        this._pickDirectionAndStartMoving(camera);
+    }
+
+    private _whileCameraAutoMoving(deltaTime, camera) {
+        // console.log("_whileCameraAutoMoving");
+        // Still in auto-moving phase. So auto-move here.
+        let timeRatio = deltaTime / this._msUntilNextMoveAllowed;
+        // let sigmoidalVal = 1.0/(1.0 + Math.exp(-(20 * timeRatio - 10)))
+        // let sinVal = 0.5 + 0.5 * Math.sin(Math.PI * (timeRatio - 0.5));
+        this._updatePos(timeRatio, camera);
+    }
+
+    private _onDoneCameraAutoMoving(camera) {
+        // console.log("_onDoneCameraAutoMoving");
+        // Make sure completed transition to full visibility.
+        this._updatePos(1.0, camera);
+
+        // Determine where you can move from here.
+        this._setCloseCameraDataAndArrows(camera);
+
+    }
+
+    private _closeCameraData;
+    private _setCloseCameraDataAndArrows(camera) {
+        // console.log("_setCloseCameraData");
+
+        // This filters the camera points, keeping only those that are
+        // uniqueish and close to the camera.
+
+        // Let's get the points close to the camera.
         let cameraLoc = camera.position;
-
-        this._firstRender = false;  // It's no longer the first time rendering.
-
+        
         // Calculate distances to all camera positions
         let cameraPoints = new CameraPoints();
         let cameraPositions = Globals.get("cameraPositions");
@@ -373,7 +393,6 @@ export class Camera {
             let cameraPos = cameraPositions[i];
             let pos = cameraPos.clone();
             let dist = pos.subtract(cameraLoc).length();
-            
             cameraPoints.push({distance: dist, position: pos, associatedViewerSphere: viewerSpheres[i]});
         }
         
@@ -384,12 +403,24 @@ export class Camera {
         // where you are.
         cameraPoints.removeFirst();
 
-        // Start by assuming new camera point should be the closest point.
-        let newCameraData: CameraPointData = cameraPoints.firstPoint();
-
         // Keep only four points. So I guess paths can't be too bifurcated.
-        let closeCameraData = cameraPoints.firstFewPoints(4);  // choose four close points
-        let maxDist = closeCameraData.data[3].distance;
+        let closeCameraData = cameraPoints.firstFewPoints(Globals.get("numNeighboringCameraPosForNavigation"));  // choose four close points
+                
+        // Remove the points that are off in the same general direction
+        closeCameraData = closeCameraData.removePointsInSameGeneralDirection(camera.position);
+
+        // Position the arrows.
+        Arrows.update(closeCameraData);
+                
+        this._closeCameraData = closeCameraData;
+    }
+
+    private _pickDirectionAndStartMoving(camera) {
+        // console.log("_startMoving");
+
+        // Start by assuming new camera point should be the closest point.
+        let newCameraData: CameraPointData = this._closeCameraData.firstPoint();
+        let maxDist = this._closeCameraData.data[this._closeCameraData.data.length-1].distance;
 
         // Assign angles
         let lookingVec = camera.getTarget().subtract(camera.position);
@@ -416,11 +447,11 @@ export class Camera {
             //     break;
         }
 
-        closeCameraData.addAnglesInPlace(camera.position, lookingVec);
+        this._closeCameraData.addAnglesInPlace(camera.position, lookingVec);
 
         // Throw out ones that aren't even in the general direction as the
         // lookingVec
-        let goodAngleCameraPoints = closeCameraData.lessThanCutoff(1.9198621771937625, "angle");  // 110 degrees
+        let goodAngleCameraPoints = this._closeCameraData.lessThanCutoff(1.9198621771937625, "angle");  // 110 degrees
 
         switch(goodAngleCameraPoints.length()) {
             case 0:
@@ -438,26 +469,12 @@ export class Camera {
                 break;
         }
 
-        
-        // Move camera to best frame.
-        // camera.position = newCameraData.position;
-        
-        // console.log("DELETE BELOW LINE EVENTUALLY...");
-        // ViewerSphere.update(newCameraData);
-        updateGuideSpheres(newCameraData)
-
-        // Make sure everything hidden but present sphere.
-        ViewerSphere.hideAll();
-        this._nextViewerSphere.visibility = true;
-        
-        // Set values to govern auto movement.
+        // Set values to govern next auto movement.
         this._prevCameraPos = camera.position.clone();
         this._nextMovementVec = newCameraData.position.subtract(this._prevCameraPos);
         this._prevViewerSphere = this._nextViewerSphere;
         this._nextViewerSphere = newCameraData.associatedViewerSphere;
         this._msUntilNextMoveAllowed = 1000 * newCameraData.distance / this._speedInUnitsPerSecond;
         this._lastMovementTime = (new Date).getTime()
-        // this._lastCameraLoc = camera.position.clone();
-        
     }
 }

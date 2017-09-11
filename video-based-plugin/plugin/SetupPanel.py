@@ -148,16 +148,5 @@ class OBJECT_OT_FixProblems(ButtonParentClass):
             camera.type = "PANO"
             camera.cycles.panorama_type = "EQUIRECTANGULAR"
 
-        # for name in ["ProteinVR_ViewerSphere"]:  # "ProteinVR_ForwardSphere", "ProteinVR_BackwardsSphere"
-        #     if not name in obj_names.obj_names():
-        #         obj = self.append_from_template_file(name)
-
-        #         # Move obj to camera location
-        #         camera = bpy.data.objects["Camera"]
-        #         obj.location = camera.location
-
-        #         # Hide obj for now
-        #         obj.hide = True
-
         return {'FINISHED'}
 
