@@ -20,7 +20,9 @@ export function loadBabylonFile(): Promise<any> {
                 let camera = new Camera();
                 Globals.set("camera", camera);
 
-                
+                // Delay textures until needed. Cool, but too slow for our purposes here...
+                // newScene.useDelayedTextureLoading = true
+                                
                 // Setup viewer sphere template
                 let radius = 12; // When using VR, this needs to be farther away that what it was rendered at. this._JSONData["viewerSphereSize"];
                 _setupViewerSphereTemplate(newScene, radius);
@@ -31,9 +33,6 @@ export function loadBabylonFile(): Promise<any> {
                 // Setup arrows
                 Arrows.setup();
 
-                // Delay textures until needed. Cool, but too slow for our purposes here...
-                newScene.useDelayedTextureLoading = true
-                                
                 if (Globals.get("debug")) { newScene.debugLayer.show(); }
                 resolve({msg: "BABYLON.BABYLON LOADED"});
             });

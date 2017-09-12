@@ -10,6 +10,8 @@ define(["require", "exports", "./Camera", "../config/Globals", "../config/Global
                 newScene.executeWhenReady(() => {
                     let camera = new Camera_1.Camera();
                     Globals.set("camera", camera);
+                    // Delay textures until needed. Cool, but too slow for our purposes here...
+                    // newScene.useDelayedTextureLoading = true
                     // Setup viewer sphere template
                     let radius = 12; // When using VR, this needs to be farther away that what it was rendered at. this._JSONData["viewerSphereSize"];
                     _setupViewerSphereTemplate(newScene, radius);
@@ -17,8 +19,6 @@ define(["require", "exports", "./Camera", "../config/Globals", "../config/Global
                     _setupEnvironmentalSphere(newScene, radius);
                     // Setup arrows
                     Arrows.setup();
-                    // Delay textures until needed. Cool, but too slow for our purposes here...
-                    // newScene.useDelayedTextureLoading = true
                     if (Globals.get("debug")) {
                         newScene.debugLayer.show();
                     }

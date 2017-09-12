@@ -12,6 +12,35 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
     })(callBacks || (callBacks = {}));
     class Game {
         constructor(params) {
+            this._params = params;
+            let isMobile = new MobileDetect(window.navigator.userAgent).mobile();
+            if (Globals.get("debug")) {
+                isMobile = true;
+            }
+            Globals.set("mobileDetect", isMobile);
+            // Bring in mobile_data_warning_panel
+            if (isMobile) {
+                jQuery("#mobile_data_warning_panel").load("./_filesize_warning.html", () => {
+                    // Hide the settings panel for now
+                    jQuery("#settings_panel").hide();
+                    // Get the size of all the mobile-compatible png files.
+                    jQuery.get("./frames/filesizes.json", (filesizes) => {
+                        jQuery("#filesize-total").html((filesizes["small"] / 1000000).toFixed(1));
+                    });
+                    // Make the ok-to-proceed button work.
+                    jQuery("#filesize-warning-button").click(() => {
+                        jQuery("#mobile_data_warning_panel").fadeOut(() => {
+                            jQuery("#settings_panel").fadeIn();
+                            this._loadGame(isMobile);
+                        });
+                    });
+                });
+            }
+            else {
+                this._loadGame(isMobile);
+            }
+        }
+        _loadGame(isMobile) {
             // Bring in the loading panel...
             jQuery("#loading_panel").load("./_loading.html", () => {
                 jQuery("#start-game").click(() => {
@@ -32,10 +61,8 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
                 // Get the canvas element from our HTML above
                 Globals.set("canvas", document.getElementById("renderCanvas"));
                 // Deal with mobile vs. not mobile.
-                let isMobile = new MobileDetect(window.navigator.userAgent);
-                Globals.set("mobileDetect", isMobile);
                 let cssToAdd = '<style>';
-                if (isMobile.mobile()) {
+                if (isMobile) {
                     cssToAdd = cssToAdd + `.show-if-mobile { display: inline-block; } .show-if-not-mobile { display: none; }`;
                 }
                 else {
@@ -45,7 +72,6 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
                 jQuery("head").append(cssToAdd);
                 // Set the engine
                 this._resizeWindow();
-                this._params = params;
                 Globals.set("engine", new BABYLON.Engine(Globals.get("canvas"), true)); // second boolean is whether built-in smoothing will be used.
                 // Use promise to load user variables (both from json and
                 // specified via panel.)

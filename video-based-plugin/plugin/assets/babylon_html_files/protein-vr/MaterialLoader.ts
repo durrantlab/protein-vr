@@ -8,41 +8,41 @@ export function getFramePromises() {
     let BABYLON = Globals.get("BABYLON");
     let scene = Globals.get("scene");
     let jQuery = Globals.get("jQuery");
-    let isMobile = Globals.get("mobileDetect").mobile();
+    let isMobile = Globals.get("mobileDetect");
 
     // Need to return an array of promises (one for each texture)
     return new Promise((resolve) => {
-        jQuery.get("./frames/filenames.json", (data) => {
+        jQuery.get("./frames/filenames.json", (filenames) => {
             // Do a check to make sure the number of png files matches the
             // number of camera positions.
             let cameraPositions = Globals.get("cameraPositions");
-            if (cameraPositions.length != data.length) {
+            if (cameraPositions.length != filenames.length) {
                 console.log("ERROR! The number of camera positions and the number of png frames to now match!");
                 debugger;
             }
 
             let progressBarObj = jQuery("#loading-progress-bar .progress-bar");
-            for (let i=0; i<data.length; i++) {
+            for (let i=0; i<filenames.length; i++) {
                 new Promise((resolve) => {
                     let filename: string;
 
-                    if (Globals.get("debug")) {
-                        isMobile = true; // for debugging.
-                    }
-                    
+                    // if (Globals.get("debug")) {
+                    //     isMobile = true; // for debugging.
+                    // }
+
                     if (isMobile) {
                         // Some kind of phone... use low-res images
-                        filename = "./frames/" + data[i] + ".small.png?" + Math.random().toString();  // Note no caching, for debugging.
+                        filename = "./frames/" + filenames[i] + ".small.png?" + Math.random().toString();  // Note no caching, for debugging.
                         // alert(filename);
                     } else {
                         // desktop and laptops ... full res images
-                        filename = "./frames/" + data[i] + "?" + Math.random().toString();  // Note no caching, for debugging.
+                        filename = "./frames/" + filenames[i] + "?" + Math.random().toString();  // Note no caching, for debugging.
                     }
                     let shader = new Shader(filename, true, () => {
                         setTimeout(() => {  // kind of like doEvents from VB days.
                             let numTextures = Globals.get("numFrameTexturesLoaded") + 1;
                             Globals.set("numFrameTexturesLoaded", numTextures);
-                            let progressVal = Math.round(100 * numTextures / data.length);
+                            let progressVal = Math.round(100 * numTextures / filenames.length);
                             progressBarObj.css("width", progressVal.toString() + "%");
                             // This is running at time of execution, not OfflineAudioCompletionEvent.apply.apply. need to figure outerHeight.
                             if (progressVal >= 100) {

@@ -276,16 +276,25 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
     def _step_6_save_filenames(self):
         # Save list of all rendered frames
-        # frame_file_names.append("proteinvr_baked_texture" + str(this_frame) + ".png")
-        # json.dump(frame_file_names, open(self.frame_dir + "filenames.json",'w'))
-        # 
         frame_file_names = [os.path.basename(f) for f in glob.glob(self.frame_dir + "proteinvr_baked_texture*.png") if not ".small.png" in f]
-
-        def key(a):
-            return int(a.replace("proteinvr_baked_texture", "").replace(".png", ""))
-        
+        def key(a): return int(a.replace("proteinvr_baked_texture", "").replace(".png", ""))
         frame_file_names.sort(key=key)
+
+        # Also get the total size of the files.
+        reg_file_size = 0
+        small_file_size = 0
+        for filename in glob.glob(self.frame_dir + "proteinvr_baked_texture*.png"):
+            filesize = os.path.getsize(filename)
+            if ".small.png" in filename:
+                small_file_size = small_file_size + filesize
+            else:
+                reg_file_size = reg_file_size + filesize
+            
         json.dump(frame_file_names, open(self.frame_dir + "filenames.json",'w'))
+        json.dump({
+            "regular": reg_file_size,
+            "small": small_file_size
+        }, open(self.frame_dir + "filesizes.json",'w'))
 
     def _step_7_make_proteinvr_clickable_meshes(self):
         # Now go through visible objects and get encompassing spheres

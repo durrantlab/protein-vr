@@ -31,6 +31,37 @@ export class Game {
     // isSupported below.
     private _params: GameInterface;
     constructor(params: GameInterface) {
+        this._params = params;
+
+        let isMobile = new MobileDetect(window.navigator.userAgent).mobile();
+        if (Globals.get("debug")) { isMobile = true; }
+        Globals.set("mobileDetect", isMobile);
+
+        // Bring in mobile_data_warning_panel
+        if (isMobile) {
+            jQuery("#mobile_data_warning_panel").load("./_filesize_warning.html", () => {
+                // Hide the settings panel for now
+                jQuery("#settings_panel").hide();
+
+                // Get the size of all the mobile-compatible png files.
+                jQuery.get("./frames/filesizes.json", (filesizes) => {
+                    jQuery("#filesize-total").html((filesizes["small"] / 1000000).toFixed(1));
+                });
+
+                // Make the ok-to-proceed button work.
+                jQuery("#filesize-warning-button").click(() => {
+                    jQuery("#mobile_data_warning_panel").fadeOut(() => {
+                        jQuery("#settings_panel").fadeIn();
+                        this._loadGame(isMobile);
+                    })
+                });
+            });
+        } else {
+            this._loadGame(isMobile);
+        }
+    }
+    
+    private _loadGame(isMobile) {
         // Bring in the loading panel...
         jQuery("#loading_panel").load("./_loading.html", () => {
             jQuery("#start-game").click(() => {
@@ -39,7 +70,7 @@ export class Game {
                 jQuery("#loading_panel").hide(); // fadeOut(() => {
                 canvas.show();
                 canvas.focus();  // to make sure keypresses work.
-
+    
                 engine.switchFullscreen(
                     UserVars.getParam("viewer") == UserVars.viewers["Screen"]
                 )
@@ -48,7 +79,7 @@ export class Game {
                 engine.resize();
             })
         });
-        
+
         if (!BABYLON.Engine.isSupported()) {
             alert("ERROR: Babylon not supported!");
         } else {  // Babylon is supported
@@ -56,10 +87,8 @@ export class Game {
             Globals.set("canvas", document.getElementById("renderCanvas"));
 
             // Deal with mobile vs. not mobile.
-            let isMobile = new MobileDetect(window.navigator.userAgent);
-            Globals.set("mobileDetect", isMobile);
             let cssToAdd = '<style>';
-            if (isMobile.mobile()) {
+            if (isMobile) {
                 cssToAdd = cssToAdd + `.show-if-mobile { display: inline-block; } .show-if-not-mobile { display: none; }`;
             } else {
                 cssToAdd = cssToAdd + `.show-if-mobile { display: none; } .show-if-not-mobile { display: inline-block; }`;
@@ -69,7 +98,6 @@ export class Game {
 
             // Set the engine
             this._resizeWindow();
-            this._params = params;
             Globals.set("engine", new BABYLON.Engine(Globals.get("canvas"), true));  // second boolean is whether built-in smoothing will be used.
 
             // Use promise to load user variables (both from json and
