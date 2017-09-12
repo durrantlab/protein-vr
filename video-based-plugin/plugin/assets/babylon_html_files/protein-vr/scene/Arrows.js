@@ -34,6 +34,16 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Setup
         }
     }
     exports.setup = setup;
+    function fadeDownAll(val) {
+        // fade all arrows that are visible down.
+        for (let i = 0; i < _arrowMeshes.length; i++) {
+            let arrow = _arrowMeshes[i];
+            if (arrow.visibility > 0) {
+                arrow.visibility = val;
+            }
+        }
+    }
+    exports.fadeDownAll = fadeDownAll;
     function update(cameraPoints) {
         let scene = Globals.get("scene");
         // All arrows are initially hidden

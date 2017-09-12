@@ -30,6 +30,8 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
             viewerSpheres.push(aViewerSphere);
         }
         Globals.set("viewerSpheres", viewerSpheres);
+        // Setup first steps forward
+        cameraObj._onDoneCameraAutoMoving(scene.activeCamera);
         viewerSphereTemplate.visibility = 0;
         // window.backgroundSphere = backgroundSphere;
         // window.viewerSphereTemplate = viewerSphereTemplate;
@@ -43,13 +45,4 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
         }
     }
     exports.hideAll = hideAll;
-    function update(newCameraData) {
-        // First, make sure only the new viewer sphere is visible.
-        this.hideAll();
-        newCameraData.associatedViewerSphere.visibility = 1;
-        // Move background sphere too.
-        let backgroundSphere = Globals.get("backgroundSphere");
-        backgroundSphere.position = newCameraData.position;
-    }
-    exports.update = update;
 });

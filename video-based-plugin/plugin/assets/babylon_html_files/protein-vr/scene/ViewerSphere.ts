@@ -34,7 +34,10 @@ export function setup() {
         viewerSpheres.push(aViewerSphere);
     }
     Globals.set("viewerSpheres", viewerSpheres);
-    
+
+    // Setup first steps forward
+    cameraObj._onDoneCameraAutoMoving(scene.activeCamera);
+                
     viewerSphereTemplate.visibility = 0;
     
     // window.backgroundSphere = backgroundSphere;
@@ -47,13 +50,4 @@ export function hideAll() {
         let viewerSphere = viewerSpheres[i];
         viewerSphere.visibility = 0;
     }
-}
-export function update(newCameraData) {
-    // First, make sure only the new viewer sphere is visible.
-    this.hideAll();
-    newCameraData.associatedViewerSphere.visibility = 1;
-
-    // Move background sphere too.
-    let backgroundSphere = Globals.get("backgroundSphere");
-    backgroundSphere.position = newCameraData.position;
 }

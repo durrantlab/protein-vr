@@ -40,6 +40,15 @@ export function setup() {
     }
 }
 
+export function fadeDownAll(val) {
+    // fade all arrows that are visible down.
+    for (let i=0; i<_arrowMeshes.length; i++) {
+        let arrow = _arrowMeshes[i];
+        if (arrow.visibility > 0) {
+            arrow.visibility = val;
+        }
+    }
+}
 export function update(cameraPoints) {
     let scene = Globals.get("scene");
 

@@ -19,6 +19,10 @@ bpy.context.scene.proteinvr_mobile_bake_texture_size = 0
 # Render the full-images
 bpy.ops.proteinvr.create_scene()
 
+# Copy those (original versions)
+os.system("mkdir ./output/frames/orig/")
+os.system("cp ./output/frames/*png ./output/frames/orig/")
+
 # Now make the mobile versions.
 open("runit.sh", 'w').write("\n".join([
     "echo Creating mobile version of " + png_filename + "; /usr/bin/convert " + png_filename + " -resize " + str(mobile_res) + "x" + str(mobile_res) + " " + png_filename + ".small.png" 

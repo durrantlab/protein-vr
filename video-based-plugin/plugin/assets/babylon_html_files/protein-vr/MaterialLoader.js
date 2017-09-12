@@ -20,7 +20,9 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
                 for (let i = 0; i < data.length; i++) {
                     new Promise((resolve) => {
                         let filename;
-                        isMobile = true; // for debugging.
+                        if (Globals.get("debug")) {
+                            isMobile = true; // for debugging.
+                        }
                         if (isMobile) {
                             // Some kind of phone... use low-res images
                             filename = "./frames/" + data[i] + ".small.png?" + Math.random().toString(); // Note no caching, for debugging.

@@ -14,7 +14,7 @@ define(["require", "exports"], function (require, exports) {
             "viewerSpheres": undefined,
             "sphereShaders": undefined,
             "backgroundSphere": undefined,
-            "debug": true,
+            "debug": false,
             "mouseDownAdvances": true,
             "mobileDetect": undefined,
             "numFrameTexturesLoaded": 0,

@@ -101,7 +101,7 @@ define(["require", "exports", "../config/UserVars", "../config/Globals", "./View
                             let pt2 = this.data[dIndex2].position;
                             let vec2 = pt2.subtract(pivotPt).normalize();
                             let angleBetweenVecs = Math.acos(BABYLON.Vector3.Dot(vec1, vec2));
-                            if (angleBetweenVecs < 0.349066) {
+                            if (angleBetweenVecs < 0.785398) {
                                 let dist1 = this.data[dIndex1].distance;
                                 let dist2 = this.data[dIndex2].distance;
                                 // Note that the below alters the data in the source list.
@@ -155,8 +155,6 @@ define(["require", "exports", "../config/UserVars", "../config/Globals", "./View
                 this._setupMouseAndKeyboard();
                 // Move camera to first position.
                 scene.activeCamera.position = Globals.get("cameraPositions")[0];
-                // Setup first steps forward
-                this._onDoneCameraAutoMoving(scene.activeCamera);
                 // Add extra keys
                 // Additional control keys.
                 // this._parentObj.scene.activeCamera.keysUp.push(87);  // W. 38 is up arrow.
@@ -252,6 +250,10 @@ define(["require", "exports", "../config/UserVars", "../config/Globals", "./View
         }
         update() {
             // This is run from the render loop
+            if (this._prevViewerSphere === undefined) {
+                // Not ready yet...
+                return;
+            }
             let scene = Globals.get("scene");
             let BABYLON = Globals.get("BABYLON");
             let camera = scene.activeCamera;
@@ -283,7 +285,6 @@ define(["require", "exports", "../config/UserVars", "../config/Globals", "./View
         _onStartMove(camera) {
             // console.log("_onStartMove");
             // Make sure everything hidden but present sphere.
-            console.log("NEEDED?");
             ViewerSphere.hideAll();
             this._nextViewerSphere.visibility = 1.0;
             this._pickDirectionAndStartMoving(camera);
@@ -295,6 +296,11 @@ define(["require", "exports", "../config/UserVars", "../config/Globals", "./View
             // let sigmoidalVal = 1.0/(1.0 + Math.exp(-(20 * timeRatio - 10)))
             // let sinVal = 0.5 + 0.5 * Math.sin(Math.PI * (timeRatio - 0.5));
             this._updatePos(timeRatio, camera);
+            // fade out arrows with each move... looks good.
+            Arrows.fadeDownAll(1.0 - timeRatio);
+            // Move background sphere too.
+            let backgroundSphere = Globals.get("backgroundSphere");
+            backgroundSphere.position = camera.position;
         }
         _onDoneCameraAutoMoving(camera) {
             // console.log("_onDoneCameraAutoMoving");
