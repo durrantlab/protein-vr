@@ -140,9 +140,11 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         else:
             print("WARNING: pngquant path not valid: " + self.scene.pngquant_path)
 
-    def _step_3_render_baked_frames(self, debug=False):
-        print("This def currently does a lot more than bake frames... separate it out...")
+    def _get_visible_objects_with_animations(self):
         # Get all the objects that are currently visible, but have animations.
+        # Note that this also saves the animation data. This isn't necessary
+        # for identifying the object, but we have to get it anyway, so why not
+        # save it?
         objs_that_move = []
         animation_data = {}
         for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
@@ -161,26 +163,25 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 if num_keyframes > 1:
                     objs_that_move.append(obj)
                     animation_data[obj.name] = pos_loc_data
+        return objs_that_move, animation_data
+        
+    def _step_3_render_baked_frames(self, debug=False):
+        print("This def currently does a lot more than bake frames... separate it out...")
+        # Get all the objects that are currently visible, but have animations.
+        objs_that_move, _ = self._get_visible_objects_with_animations()
         
         # Hide the moving objects (not rendered to sphere)
         for obj in objs_that_move:
             obj.hide = True
             obj.hide_render = True
         
-        # Get the environment texture and save that.
-        src_background_environment_image = bpy.path.abspath(self.scene.background_environment_image)
-        if os.path.exists(src_background_environment_image):
-            shutil.copyfile(src_background_environment_image, self.proteinvr_output_dir + "environment.png")
-        else:
-            print("WARNING: Environmental texture file does not exist!")
-
         # Setup cycles samples
         self.scene.render.resolution_percentage = 100.0
         self.scene.cycles.samples = self.scene.proteinvr_num_cycles
         self.scene.cycles.preview_samples = self.scene.proteinvr_num_cycles
         self.scene.cycles.film_transparent = True  # Because you're saving the background separately.
 
-        frame_file_names = []
+        # frame_file_names = []
 
         self.camera.rotation_mode = 'XYZ'
 
@@ -192,7 +193,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             self.camera.rotation_euler.x = 1.5707963267948966
             self.camera.rotation_euler.y = 0.0
             self.camera.rotation_euler.z = 0.0
-            self.camera.keyframe_insert(data_path="rotation_euler", frame=this_frame) #20.0, index=2)
+            self.camera.keyframe_insert(data_path="rotation_euler", frame=this_frame)
 
             if not debug:
                 # Create the image
@@ -207,7 +208,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 bpy.ops.render.render(write_still=True)
                 self._compress_png(self.scene.render.filepath)
 
-                frame_file_names.append("proteinvr_baked_texture" + str(this_frame) + ".png")
+                # frame_file_names.append("proteinvr_baked_texture" + str(this_frame) + ".png")
 
                 # Now render at 1/4 size. But note that I'm rerendering here,
                 # not resizing. So can be computationally intensive. I chose
@@ -221,13 +222,24 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 else:
                     print("WARNING: Skipping the mobile textures...")
                 
-        # Save list of all rendered frames
-        json.dump(frame_file_names, open(self.frame_dir + "filenames.json",'w'))
-
         # Reshow moving objects
         for obj in objs_that_move:
             obj.hide = False
             obj.hide_render = False
+
+        self.scene.cycles.film_transparent = False  # Time to restore the environment lighting
+
+    def _step_4_save_environmental_image(self):
+        # Get the environment texture and save that.
+        src_background_environment_image = bpy.path.abspath(self.scene.background_environment_image)
+        if os.path.exists(src_background_environment_image):
+            shutil.copyfile(src_background_environment_image, self.proteinvr_output_dir + "environment.png")
+        else:
+            print("WARNING: Environmental texture file does not exist!")
+
+    def _step_5_save_animation_data(self):
+        # Get all the objects that are currently visible, but have animations.
+        objs_that_move, animation_data = self._get_visible_objects_with_animations()
 
         # Save the animations
         self.extra_data["animations"] = animation_data
@@ -261,10 +273,21 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             image.filepath_raw = self.proteinvr_output_dir + obj.name + "_animated.png"
             image.file_format = 'PNG'
             image.save()
-        
-        self.scene.cycles.film_transparent = False  # Time to restore the environment lighting
 
-    def _step_5_make_proteinvr_clickable_meshes(self):
+    def _step_6_save_filenames(self):
+        # Save list of all rendered frames
+        # frame_file_names.append("proteinvr_baked_texture" + str(this_frame) + ".png")
+        # json.dump(frame_file_names, open(self.frame_dir + "filenames.json",'w'))
+        # 
+        frame_file_names = [os.path.basename(f) for f in glob.glob(self.frame_dir + "proteinvr_baked_texture*.png") if not ".small.png" in f]
+
+        def key(a):
+            return int(a.replace("proteinvr_baked_texture", "").replace(".png", ""))
+        
+        frame_file_names.sort(key=key)
+        json.dump(frame_file_names, open(self.frame_dir + "filenames.json",'w'))
+
+    def _step_7_make_proteinvr_clickable_meshes(self):
         # Now go through visible objects and get encompassing spheres
         for obj in bpy.data.objects:
             if object_is_proteinvr_clickable(obj) and obj.proteinvr_clickable == True:
@@ -336,7 +359,10 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         if len(glob.glob(self.proteinvr_output_dir + "frames/*.png")) == 0:
             self._step_3_render_baked_frames(debug)
-        self._step_5_make_proteinvr_clickable_meshes()
+        self._step_4_save_environmental_image()
+        self._step_5_save_animation_data()
+        self._step_6_save_filenames()
+        self._step_7_make_proteinvr_clickable_meshes()
 
         json.dump(
             self.extra_data, 

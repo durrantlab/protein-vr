@@ -32,7 +32,7 @@ export function loadBabylonFile(): Promise<any> {
                 Arrows.setup();
 
                 // Delay textures until needed. Cool, but too slow for our purposes here...
-                // newScene.useDelayedTextureLoading = true
+                newScene.useDelayedTextureLoading = true
                                 
                 if (Globals.get("debug")) { newScene.debugLayer.show(); }
                 resolve({msg: "BABYLON.BABYLON LOADED"});
