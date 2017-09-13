@@ -111,7 +111,7 @@ define(["require", "exports", "./Globals"], function (require, exports, Globals)
             // Default values before anything. For now just use laptop defaults,
             // but in future would be good to detect device...
             var userVars;
-            let isMobile = Globals.get("mobileDetect"); // null if its not a phone at all.
+            let isMobile = Globals.get("isMobile"); // null if its not a phone at all.
             if (isMobile) {
                 userVars = exports.paramDefaults["mobile"];
             }

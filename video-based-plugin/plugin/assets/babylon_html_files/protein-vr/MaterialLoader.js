@@ -5,7 +5,7 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
         let BABYLON = Globals.get("BABYLON");
         let scene = Globals.get("scene");
         let jQuery = Globals.get("jQuery");
-        let isMobile = Globals.get("mobileDetect");
+        let isMobile = Globals.get("isMobile");
         // Need to return an array of promises (one for each texture)
         return new Promise((resolve) => {
             jQuery.get("./frames/filenames.json", (filenames) => {

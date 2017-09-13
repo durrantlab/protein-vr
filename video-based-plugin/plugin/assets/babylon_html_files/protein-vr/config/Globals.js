@@ -16,9 +16,10 @@ define(["require", "exports"], function (require, exports) {
             "backgroundSphere": undefined,
             "debug": false,
             "mouseDownAdvances": true,
-            "mobileDetect": undefined,
+            "isMobile": undefined,
             "numFrameTexturesLoaded": 0,
-            "numNeighboringCameraPosForNavigation": 4
+            "numNeighboringCameraPosForNavigation": 4,
+            "cameraTypeToUse": "show-desktop-screen" // default
         };
     }
     function get(key) {

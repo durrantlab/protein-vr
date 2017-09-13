@@ -14,10 +14,13 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
         constructor(params) {
             this._params = params;
             let isMobile = new MobileDetect(window.navigator.userAgent).mobile();
+            if (isMobile === null) {
+                isMobile = false;
+            } // keep it boolean
             if (Globals.get("debug")) {
                 isMobile = true;
             }
-            Globals.set("mobileDetect", isMobile);
+            Globals.set("isMobile", isMobile);
             // Bring in mobile_data_warning_panel
             if (isMobile) {
                 jQuery("#mobile_data_warning_panel").load("./_filesize_warning.html", () => {
@@ -60,16 +63,6 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
             else {
                 // Get the canvas element from our HTML above
                 Globals.set("canvas", document.getElementById("renderCanvas"));
-                // Deal with mobile vs. not mobile.
-                let cssToAdd = '<style>';
-                if (isMobile) {
-                    cssToAdd = cssToAdd + `.show-if-mobile { display: inline-block; } .show-if-not-mobile { display: none; }`;
-                }
-                else {
-                    cssToAdd = cssToAdd + `.show-if-mobile { display: none; } .show-if-not-mobile { display: inline-block; }`;
-                }
-                cssToAdd = cssToAdd + '</style>';
-                jQuery("head").append(cssToAdd);
                 // Set the engine
                 this._resizeWindow();
                 Globals.set("engine", new BABYLON.Engine(Globals.get("canvas"), true)); // second boolean is whether built-in smoothing will be used.

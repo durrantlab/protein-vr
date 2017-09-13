@@ -21,7 +21,7 @@
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h3 id="loading-title" class="panel-title">
-                Loading Game...
+                Loading Scene...
             </h3>
         </div>
         <div class="panel-body" style="position: relative;">
@@ -32,7 +32,18 @@
                             Loading...
                         </div>
                     </div>
-                    <div class="row show-if-mobile">
+                    <div class="row show-mobile-virtual-joystick">
+                        <div class="instructions-left col-xs-6">
+                            After the scene has loaded, click the Start button
+                            below! Once in the virtual-reality world, look for
+                            arrows that show the paths to follow.
+                        </div>
+                        <div class="instructions-right col-xs-6">
+                            Press the screen to advance along those paths.
+                            Drag to look around. Good luck!
+                        </div>
+                    </div>
+                    <div class="row show-mobile-vr">
                         <div class="instructions-left col-xs-6">
                             Position your phone within the 3D viewer, aligning
                             the middle-point guide lines on the viewer and the
@@ -40,21 +51,31 @@
                             button below!
                         </div>
                         <div class="instructions-right col-xs-6">
-                            Once in the virtual-reality world, look for guide
-                            spheres that show the paths to follow. Click the
-                            viewer button to advance along those paths. Good
-                            luck!
+                            Once in the virtual-reality world, look for arrows
+                            that show the paths to follow. Click the viewer
+                            button to advance along those paths. Good luck!
                         </div>
                     </div>
-                    <div class="row show-if-not-mobile">
+                    <div class="row show-desktop-screen">
                         <div class="instructions-left col-xs-6">
                             After the scene has loaded, click the Start button
                             below! Once in the virtual-reality world, look for
-                            guide spheres that show the paths to follow.
+                            arrows that show the paths to follow.
                         </div>
                         <div class="instructions-right col-xs-6">
                             Click the mouse or press the up/down arrow keys to
                             move along those paths. Good luck!
+                        </div>
+                    </div>                    
+                    <div class="row show-desktop-vr">
+                        <div class="instructions-left col-xs-6">
+                            After the scene has loaded, click the Start button
+                            below! Once in the virtual-reality world, look for
+                            arrows that show the paths to follow.
+                        </div>
+                        <div class="instructions-right col-xs-6">
+                            {I HAVE NO IDEA HOW TO NAVEGATE WITH VR HEADSETS}
+                            to move along those paths. Good luck!
                         </div>
                     </div><br /><br />
                     <button id="start-game" type="button" class="btn btn-primary" disabled="disabled">
@@ -64,7 +85,7 @@
             </div>
             <!-- <div id="mid-line-overlay"> -->
                 <!-- <div id="vr_overlay1" class="vr_overlay vr_overlay_left"></div> -->
-                <div id="vr_overlay2" class="vr-alignment-line show-if-mobile"></div>
+                <div id="vr_overlay2" style="display: none;" class="vr-alignment-line show-if-mobile"></div>
             <!-- </div> -->
         </div>
     </div>

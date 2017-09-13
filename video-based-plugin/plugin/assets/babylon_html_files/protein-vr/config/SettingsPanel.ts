@@ -1,7 +1,7 @@
 import * as UserVars from "./UserVars";
 import * as Globals from "./Globals";
 
-var jQuery;
+// var jQuery;
 // declare var screenfull;
 declare var PVRGlobals;
 
@@ -291,6 +291,7 @@ function addJavaScript(onSettingsPanelClosed) {
         // through a click in babylonjs, browsers will reject the
         // full-screen request.
         jQuery("#user_settings_done_button").click(function() {
+            figureOutWhichCameraToUse();
             jQuery("#settings_panel").fadeOut(() => {
                 jQuery("#loading_panel").fadeIn();
             });
@@ -301,7 +302,63 @@ function addJavaScript(onSettingsPanelClosed) {
         }));
 }
 
+function figureOutWhichCameraToUse() {
+    let isMobile = Globals.get("isMobile");
+    let jQuery = Globals.get("jQuery");
+
+    // Figure out which kind of camera to use.
+    let cameraTypeToUse = "";
+    switch (UserVars.getParam("viewer")) {
+        case UserVars.viewers["Screen"]:
+            // On a screen (not VR headset)
+            switch (isMobile) {
+                case true:
+                    // VR joy camera
+                    cameraTypeToUse = "show-mobile-virtual-joystick";
+                    break;
+                case false:
+                    // For example, laptop screns.
+                    cameraTypeToUse = "show-desktop-screen";
+                    break;
+            }
+            break;
+        case UserVars.viewers["VRHeadset"]:
+            // On a VR headset
+            switch (isMobile) {
+                case true:
+                    // google cardboard, for example.
+                    cameraTypeToUse = "show-mobile-vr";
+                    break;
+                case false:
+                    // Oculus rift or HTC vive.
+                    cameraTypeToUse = "show-desktop-vr";
+                    break;
+            }
+    }
+
+    // Show the instructions relevant to that camera.
+    jQuery("head").append(`
+        <style>
+            .show-mobile-virtual-joystick, .show-mobile-vr, .show-desktop-screen, .show-desktop-vr {
+                display: none;
+            }
+            .${cameraTypeToUse} {
+                display: inline-block; 
+            }
+        </style>
+    `);
+
+    if (cameraTypeToUse === "show-mobile-vr") {
+        // Make sure no guide line shown.
+        jQuery("#vr_overlay2").show();
+    }
+                        
+    Globals.set("cameraTypeToUse", cameraTypeToUse);
+}
+
 function addBroadcastModal() {
+    let jQuery = Globals.get("jQuery");
+    
     let broadcastURL: string = window.location.href + '?id=' + PVRGlobals.broadcastID;
 
     jQuery("body").append(`

@@ -167,12 +167,24 @@ export class Camera {
             let scene = Globals.get("scene");
             let canvas = Globals.get("canvas");
             let BABYLON = Globals.get("BABYLON");
-    
-            // Attach camera to canvas inputs
-            if (UserVars.getParam("viewer") == UserVars.viewers["Screen"]) {
-                scene.activeCamera.attachControl(canvas);
-            } else {
-                this._setupVRCamera();
+            let isMobile = Globals.get("isMobile");
+            let jQuery = Globals.get("jQuery");
+            
+
+            // Load the appropriate camera.
+            switch (Globals.get("cameraTypeToUse")) {
+                case "show-mobile-virtual-joystick":
+                    this._setupVirtualJoystick();
+                    break;
+                case "show-desktop-screen":
+                    scene.activeCamera.attachControl(canvas);
+                    break;
+                case "show-mobile-vr":
+                    this._setupVRCamera();
+                    break;
+                case "show-desktop-vr":
+                    // not sure what to do...
+                    break;
             }
     
             this._setupMouseAndKeyboard();
@@ -203,6 +215,21 @@ export class Camera {
 
             resolve({msg: "CAMERA SETUP"})
         });
+    }
+
+    private _setupVirtualJoystick() {
+        let scene = Globals.get("scene");
+        let BABYLON = Globals.get("BABYLON");
+        let canvas = Globals.get("canvas");
+
+        var VJC = new BABYLON.VirtualJoysticksCamera("VJC", scene.activeCamera.position, scene);
+        VJC.rotation = scene.activeCamera.rotation;
+        // VJC.checkCollisions = scene.activeCamera.checkCollisions;
+        // VJC.applyGravity = scene.activeCamera.applyGravity;
+        scene.activeCamera = VJC;
+        
+        // Attach camera to canvas inputs
+        scene.activeCamera.attachControl(canvas);
     }
 
     private _setupVRCamera() {
@@ -303,8 +330,17 @@ export class Camera {
     public _cameraCurrentlyAutoMoving: boolean = false;
 
     private _updatePos(timeRatio, camera) {
-        this._prevViewerSphere.visibility = 1.0 - timeRatio;
-        this._nextViewerSphere.visibility = timeRatio;
+        if (timeRatio < 0.5) {
+            // First half of time ratio, next sphere is fading in.
+            this._prevViewerSphere.visibility = 1.0;
+            this._nextViewerSphere.visibility = 2 * timeRatio;
+        } else {
+            // Second half, previous one fades out.
+            this._prevViewerSphere.visibility = 2.0 - 2 * timeRatio;
+            this._nextViewerSphere.visibility = 1.0;
+        }
+        // this._prevViewerSphere.visibility = 1.0 - timeRatio;
+        // this._nextViewerSphere.visibility = timeRatio;
         camera.position = this._prevCameraPos.add(this._nextMovementVec.scale(timeRatio));
     }
 
