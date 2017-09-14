@@ -41,7 +41,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals"], functio
         let BABYLON = Globals.get("BABYLON");
         let scene = Globals.get("scene");
         // Add in guide spheres.
-        let sphereMat = new BABYLON.StandardMaterial("sphereMat", scene);
+        let sphereMat = new BABYLON.StandardMaterial("sphereMat" + Math.random().toString(), scene);
         sphereMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
         sphereMat.specularColor = new BABYLON.Color3(0, 0, 0);
         sphereMat.diffuseTexture = null;
@@ -90,11 +90,11 @@ define(["require", "exports", "../config/Globals", "../config/Globals"], functio
                 meshTask.onSuccess = function (task) {
                     let mesh = task.loadedMeshes[0]; // Why is this necessary?
                     mesh.scaling.z = -1.0;
-                    console.log(mesh);
+                    // console.log(mesh);
                     mesh.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects; // In front of viewer sphere.
                     mesh.isPickable = false;
                     // Load texture here.
-                    let mat = new BABYLON.StandardMaterial(mesh.name + "_material", scene);
+                    let mat = new BABYLON.StandardMaterial(mesh.name + "_material" + Math.random().toString(), scene);
                     mat.diffuseColor = new BABYLON.Color3(0, 0, 0);
                     mat.specularColor = new BABYLON.Color3(0, 0, 0);
                     mat.emissiveTexture = new BABYLON.Texture(mesh.name + "_animated.png", scene);

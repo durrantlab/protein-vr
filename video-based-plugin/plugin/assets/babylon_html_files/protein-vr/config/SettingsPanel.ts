@@ -358,7 +358,7 @@ function figureOutWhichCameraToUse() {
 
 function addBroadcastModal() {
     let jQuery = Globals.get("jQuery");
-    
+
     let broadcastURL: string = window.location.href + '?id=' + PVRGlobals.broadcastID;
 
     jQuery("body").append(`

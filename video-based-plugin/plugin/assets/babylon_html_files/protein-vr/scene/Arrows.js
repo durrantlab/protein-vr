@@ -53,7 +53,6 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Setup
         // Get the camera position
         let cameraPos = scene.activeCamera.position;
         // Go through each of the cameraPoints and position an arrow there.
-        console.log(cameraPoints);
         for (let i = 0; i < cameraPoints.length(); i++) {
             let arrowToUse = _arrowMeshes[i];
             arrowToUse.visibility = 1.0;

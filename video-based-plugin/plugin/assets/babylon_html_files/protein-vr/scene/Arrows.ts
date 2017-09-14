@@ -16,6 +16,7 @@ export function setup() {
     for (let i = 1; i < Globals.get("numNeighboringCameraPosForNavigation"); i++) {
         _arrowMeshes.push(arrowMesh.clone("ProteinVR_Arrow_clone" + i.toString()));
     }
+    
     // Update all arrows
     for (let i=0; i<_arrowMeshes.length; i++) {
         let thisArrowMesh = _arrowMeshes[i];
@@ -49,6 +50,7 @@ export function fadeDownAll(val) {
         }
     }
 }
+
 export function update(cameraPoints) {
     let scene = Globals.get("scene");
 
@@ -61,7 +63,6 @@ export function update(cameraPoints) {
     let cameraPos = scene.activeCamera.position;
 
     // Go through each of the cameraPoints and position an arrow there.
-    console.log(cameraPoints);
     for (let i=0; i<cameraPoints.length(); i++) {
         let arrowToUse = _arrowMeshes[i];
         arrowToUse.visibility = 1.0;

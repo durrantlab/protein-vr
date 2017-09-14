@@ -111,38 +111,55 @@ class CameraPoints {
         // This removes any points in the same general direction, keeping the
         // one that is closest.
         let BABYLON = Globals.get("BABYLON");
-        for (let dIndex1=0; dIndex1<this.data.length - 1; dIndex1++) {
-            if (this.data[dIndex1] !== null) {
-                let pt1 = this.data[dIndex1].position;
-                let vec1 = pt1.subtract(pivotPt).normalize();
-    
-                for (let dIndex2=dIndex1+1; dIndex2<this.data.length; dIndex2++) {
-                    if (this.data[dIndex2] !== null) {
-                        let pt2 = this.data[dIndex2].position;
-                        let vec2 = pt2.subtract(pivotPt).normalize();
         
-                        let angleBetweenVecs = Math.acos(BABYLON.Vector3.Dot(vec1, vec2));
-                        if (angleBetweenVecs < 0.785398) {  // 45 degrees
-                            let dist1 = this.data[dIndex1].distance;
-                            let dist2 = this.data[dIndex2].distance;
+        // let pointRemoved: boolean = true;
+        // while (pointRemoved) {
+            // pointRemoved = false;
+            for (let dIndex1=0; dIndex1<this.data.length - 1; dIndex1++) {
+                if (this.data[dIndex1] !== null) {
+                    let pt1 = this.data[dIndex1].position;
+                    let vec1 = pt1.subtract(pivotPt).normalize();
         
-                            // Note that the below alters the data in the source list.
-                            // So don't use that list anymore. (Just use what this
-                            // function returns...)
-                            if (dist1 <= dist2) {
-                                this.data[dIndex2] = null;
-                            } else {
-                                this.data[dIndex1] = null;
+                    for (let dIndex2=dIndex1+1; dIndex2<this.data.length; dIndex2++) {
+                        if (this.data[dIndex2] !== null) {
+                            // console.log("a", dIndex1, dIndex2);
+
+                            let pt2 = this.data[dIndex2].position;
+                            let vec2 = pt2.subtract(pivotPt).normalize();
+            
+                            let angleBetweenVecs = Math.acos(BABYLON.Vector3.Dot(vec1, vec2));
+                            // console.log("a", dIndex1, dIndex2, ";", pt1, pt2, ";", vec1, vec2, ";", angleBetweenVecs);
+                            if (angleBetweenVecs < 0.785398) {  // 45 degrees
+                                let dist1 = this.data[dIndex1].distance;
+                                let dist2 = this.data[dIndex2].distance;
+            
+                                // Note that the below alters the data in the source list.
+                                // So don't use that list anymore. (Just use what this
+                                // function returns...)
+                                if (dist1 <= dist2) {
+                                    this.data[dIndex2] = null;
+                                } else {
+                                    this.data[dIndex1] = null;
+                                }
+
+                                // console.log("a", "criteria met");
+                                
+                                // pointRemoved = true;
+                                // break;
                             }
                         }
                     }
+
+                    // if (pointRemoved) { break; }
+
+                    // console.log("a", "criteria NOT met");
                 }
             }
-        }
+        // }
 
         // Now keep only ones that are not null
         let newCameraPoints = new CameraPoints();
-        for (let dIndex=0; dIndex<this.data.length - 1; dIndex++) {
+        for (let dIndex=0; dIndex<this.data.length; dIndex++) {
             let d = this.data[dIndex];
             if (d !== null) {
                 newCameraPoints.push(d);
@@ -180,10 +197,14 @@ export class Camera {
                     scene.activeCamera.attachControl(canvas);
                     break;
                 case "show-mobile-vr":
-                    this._setupVRCamera();
+                    this._setupVRDeviceOrientationFreeCamera();
                     break;
                 case "show-desktop-vr":
-                    // not sure what to do...
+                    // And as @Sebavan said, you need a user's interaction to
+                    // render the scene in the headset (at least required by
+                    // Chrome as far as I remember, not sure it's specified by
+                    // the spec).
+                    this._setupWebVRFreeCamera();
                     break;
             }
     
@@ -222,17 +243,40 @@ export class Camera {
         let BABYLON = Globals.get("BABYLON");
         let canvas = Globals.get("canvas");
 
-        var VJC = new BABYLON.VirtualJoysticksCamera("VJC", scene.activeCamera.position, scene);
-        VJC.rotation = scene.activeCamera.rotation;
+        var camera = new BABYLON.VirtualJoysticksCamera("VJC", scene.activeCamera.position, scene);
+        camera.rotation = scene.activeCamera.rotation;
         // VJC.checkCollisions = scene.activeCamera.checkCollisions;
         // VJC.applyGravity = scene.activeCamera.applyGravity;
-        scene.activeCamera = VJC;
+        // scene.activeCamera = VJC;
+        
+        this._makeCameraReplaceActiveCamera(camera);
         
         // Attach camera to canvas inputs
-        scene.activeCamera.attachControl(canvas);
+        // scene.activeCamera.attachControl(canvas);
     }
 
-    private _setupVRCamera() {
+    private _setupVRDeviceOrientationFreeCamera() {
+        let scene = Globals.get("scene");
+        let BABYLON = Globals.get("BABYLON");
+
+        // I feel like I should have to do the below... Why don't the defaults work?
+        var metrics = BABYLON.VRCameraMetrics.GetDefault();
+        //metrics.interpupillaryDistance = 0.5;
+
+        // Add VR camera here (google cardboard). 
+        let camera = new BABYLON.VRDeviceOrientationFreeCamera(
+            "deviceOrientationCamera", 
+            scene.activeCamera.position, 
+            scene,
+            false,  // compensate distortion. False = good anti-aliasing.
+            metrics
+        );
+
+        this._makeCameraReplaceActiveCamera(camera);
+    }
+
+    private _setupWebVRFreeCamera() {
+        // This code untested, but designed for stuff like Oculus rift.
         let scene = Globals.get("scene");
         let canvas = Globals.get("canvas");
         let BABYLON = Globals.get("BABYLON");
@@ -240,17 +284,36 @@ export class Camera {
 
         // I feel like I should have to do the below... Why don't the defaults work?
         var metrics = BABYLON.VRCameraMetrics.GetDefault();
-        //metrics.interpupillaryDistance = 0.5;
-
-        // Add VR camera here (Oculus Rift, HTC Vive, etc.)
-        let camera = new BABYLON.VRDeviceOrientationFreeCamera(
-            "deviceOrientationCamera", 
-            scene.activeCamera.position, 
-            scene,
-            false,  // compensate distortion
-            metrics
-        );
         
+        // According to this page, best practices include feature detection to
+        // pick the camera: http://playground.babylonjs.com/#QWIJYE#1 ;
+        // http://www.html5gamedevs.com/topic/31454-webvrfreecameraid-vs-vrdeviceorientationfreecamera/?tab=comments#comment-180688
+        let camera;
+        if (navigator.getVRDisplays) {
+            camera = new BABYLON.WebVRFreeCamera(
+                "deviceOrientationCamera", 
+                scene.activeCamera.position, 
+                scene,
+                false,  // compensate distortion
+                metrics
+            );
+        } else {
+            camera = new BABYLON.VRDeviceOrientationFreeCamera(
+                "deviceOrientationCamera", 
+                scene.activeCamera.position, 
+                scene,
+                false,  // compensate distortion. False = good anti-aliasing.
+                metrics
+            );
+        }
+
+        this._makeCameraReplaceActiveCamera(camera);
+    }
+
+    private _makeCameraReplaceActiveCamera(camera) {
+        let scene = Globals.get("scene");
+        let canvas = Globals.get("canvas");
+
         // Make VR camera match existing camera in scene
         // See http://www.babylonjs.com/js/loader.js
         if (scene.activeCamera.rotation) {
@@ -278,7 +341,7 @@ export class Camera {
         scene.activeCamera = camera;
     
         // Attach that camera to the canvas.
-        scene.activeCamera.attachControl(canvas);
+        scene.activeCamera.attachControl(canvas);        
     }
 
     private _setupMouseAndKeyboard() {
@@ -330,15 +393,19 @@ export class Camera {
     public _cameraCurrentlyAutoMoving: boolean = false;
 
     private _updatePos(timeRatio, camera) {
-        if (timeRatio < 0.5) {
-            // First half of time ratio, next sphere is fading in.
-            this._prevViewerSphere.visibility = 1.0;
-            this._nextViewerSphere.visibility = 2 * timeRatio;
-        } else {
-            // Second half, previous one fades out.
-            this._prevViewerSphere.visibility = 2.0 - 2 * timeRatio;
-            this._nextViewerSphere.visibility = 1.0;
-        }
+        let transitionPt = 0.05;  // Good for this to be hard-coded eventually.
+        // if (timeRatio < transitionPt) {
+            // First part of time ratio, next sphere is fading in.
+            // this._prevViewerSphere.visibility = 1.0;
+            // Quickly becomes visible.
+            this._nextViewerSphere.visibility = Math.min(timeRatio/transitionPt, 1.0);
+        // } else {
+            // Second part, previous one fades out.
+            // Slowly fades out
+            // alert("mo");
+            this._prevViewerSphere.visibility = (1 - timeRatio); //  / (1 - transitionPt);
+            // this._nextViewerSphere.visibility = 1.0;
+        //}
         // this._prevViewerSphere.visibility = 1.0 - timeRatio;
         // this._nextViewerSphere.visibility = timeRatio;
         camera.position = this._prevCameraPos.add(this._nextMovementVec.scale(timeRatio));
@@ -428,6 +495,8 @@ export class Camera {
 
         // Let's get the points close to the camera.
         let cameraLoc = camera.position;
+
+        // console.log("===========");
         
         // Calculate distances to all camera positions
         let cameraPoints = new CameraPoints();
@@ -439,24 +508,38 @@ export class Camera {
             let dist = pos.subtract(cameraLoc).length();
             cameraPoints.push({distance: dist, position: pos, associatedViewerSphere: viewerSpheres[i]});
         }
+
+        // console.log("Step 1:", cameraPoints);
         
         // Sort by distance
         cameraPoints.sort();
+
+        // console.log("Step 2:", cameraPoints);
         
         // Remove first one (closest). To make sure you're not staying
         // where you are.
         cameraPoints.removeFirst();
 
+        // console.log("Step 3:", cameraPoints);
+        
         // Keep only four points. So I guess paths can't be too bifurcated.
         let closeCameraData = cameraPoints.firstFewPoints(Globals.get("numNeighboringCameraPosForNavigation"));  // choose four close points
-                
-        // Remove the points that are off in the same general direction
-        closeCameraData = closeCameraData.removePointsInSameGeneralDirection(camera.position);
 
+        // console.log("Step 4:", closeCameraData);        
+
+        // Remove the points that are off in the same general direction
+        let closeCameraData2 = closeCameraData.removePointsInSameGeneralDirection(camera.position);
+        // if (closeCameraData2.length() === 1) {
+        //     debugger;
+        //     closeCameraData.removePointsInSameGeneralDirection(camera.position);
+        // }
+
+        // console.log("Step 5:", closeCameraData2);        
+        
         // Position the arrows.
-        Arrows.update(closeCameraData);
+        Arrows.update(closeCameraData2);
                 
-        this._closeCameraData = closeCameraData;
+        this._closeCameraData = closeCameraData2;
     }
 
     private _pickDirectionAndStartMoving(camera) {

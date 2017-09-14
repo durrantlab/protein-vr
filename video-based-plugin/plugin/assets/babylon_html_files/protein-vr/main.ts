@@ -34,7 +34,10 @@ export class Game {
         this._params = params;
 
         let isMobile = new MobileDetect(window.navigator.userAgent).mobile();
+        
         if (isMobile === null) { isMobile = false; }  // keep it boolean
+        else { isMobile = true; }
+        
         if (Globals.get("debug")) { isMobile = true; }
         Globals.set("isMobile", isMobile);
 
@@ -45,7 +48,7 @@ export class Game {
                 jQuery("#settings_panel").hide();
 
                 // Get the size of all the mobile-compatible png files.
-                jQuery.get("./frames/filesizes.json", (filesizes) => {
+                jQuery.get("frames/filesizes.json", (filesizes) => {
                     jQuery("#filesize-total").html((filesizes["small"] / 1000000).toFixed(1));
                 });
 

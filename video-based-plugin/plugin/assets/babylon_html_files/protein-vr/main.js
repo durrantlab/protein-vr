@@ -17,6 +17,9 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
             if (isMobile === null) {
                 isMobile = false;
             } // keep it boolean
+            else {
+                isMobile = true;
+            }
             if (Globals.get("debug")) {
                 isMobile = true;
             }
@@ -27,7 +30,7 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
                     // Hide the settings panel for now
                     jQuery("#settings_panel").hide();
                     // Get the size of all the mobile-compatible png files.
-                    jQuery.get("./frames/filesizes.json", (filesizes) => {
+                    jQuery.get("frames/filesizes.json", (filesizes) => {
                         jQuery("#filesize-total").html((filesizes["small"] / 1000000).toFixed(1));
                     });
                     // Make the ok-to-proceed button work.

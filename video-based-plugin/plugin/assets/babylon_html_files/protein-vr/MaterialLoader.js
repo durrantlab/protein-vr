@@ -8,7 +8,7 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
         let isMobile = Globals.get("isMobile");
         // Need to return an array of promises (one for each texture)
         return new Promise((resolve) => {
-            jQuery.get("./frames/filenames.json", (filenames) => {
+            jQuery.get("frames/filenames.json", (filenames) => {
                 // Do a check to make sure the number of png files matches the
                 // number of camera positions.
                 let cameraPositions = Globals.get("cameraPositions");
@@ -20,17 +20,14 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
                 for (let i = 0; i < filenames.length; i++) {
                     new Promise((resolve) => {
                         let filename;
-                        // if (Globals.get("debug")) {
-                        //     isMobile = true; // for debugging.
-                        // }
                         if (isMobile) {
                             // Some kind of phone... use low-res images
-                            filename = "./frames/" + filenames[i] + ".small.png?" + Math.random().toString(); // Note no caching, for debugging.
+                            filename = "frames/" + filenames[i] + ".small.png?" + Math.random().toString(); // Note no caching, for debugging.
                             // alert(filename);
                         }
                         else {
                             // desktop and laptops ... full res images
-                            filename = "./frames/" + filenames[i] + "?" + Math.random().toString(); // Note no caching, for debugging.
+                            filename = "frames/" + filenames[i] + "?" + Math.random().toString(); // Note no caching, for debugging.
                         }
                         let shader = new StandardShader_1.Shader(filename, true, () => {
                             setTimeout(() => {
