@@ -14,19 +14,5 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import bpy
-
-class ParentPanel():
-    """
-    A parent class that all other panels inherit.
-    """
-
-    def __init__(self, ui):
-        """
-        Initialize the panel.
-
-        :param ??? ui: The user-interface object passed to all panels.
-        """
-
-        self.ui = ui
-
+from .FixProblemsButton import OBJECT_OT_FixProblems
+from .SetupPanel import SetupPanel

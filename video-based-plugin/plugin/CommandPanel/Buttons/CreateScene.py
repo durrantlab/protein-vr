@@ -1,55 +1,32 @@
-from .ParentPanel import ParentPanel
-from .DurBlend import ButtonParentClass
-from .DurBlend import Messages
-from mathutils import Vector
-from . import Utils
+# ProteinVR is a Blender addon for making educational VR movies.
+# Copyright (C) 2017  Jacob D. Durrant
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from ...DurBlend import ButtonParentClass
+from ...DurBlend import Messages
+from ... import Utils
+from ...Utils import object_is_proteinvr_clickable
 import bpy
 import os
-import glob
-from bpy import context
-import numpy
 import shutil
+import glob
 import json
-import random
+import numpy
 
 obj_names = Utils.ObjNames()
 
-def object_is_proteinvr_clickable(obj):
-    return (
-        "hide" in dir(obj) and 
-        obj.hide == False and 
-        "vertices" in dir(obj.data) and 
-        not "ProteinVR_tmp_" in obj.name
-    )
-
-class CommandPanel(ParentPanel):
-    def draw_panel_if_needed(self):
-        activeObj = bpy.context.scene.objects.active
-
-        if object_is_proteinvr_clickable(activeObj):
-            self.ui.use_box_row(activeObj.name + " Properties")
-            self.ui.object_property("proteinvr_clickable")
-
-        # Set up UI
-        # self.ui.use_layout_row()
-        self.ui.use_box_row("Make Scene")
-        # self.ui.label("Make Scene")
-
-        # self.ui.use_box_row("Options")
-        self.ui.scene_property("proteinvr_output_dir")
-        self.ui.scene_property("proteinvr_use_existing_frames")
-        Messages.display_message("FRAMES_EXIST", self)
-
-        if bpy.context.scene.proteinvr_use_existing_frames == False:
-            self.ui.scene_property("proteinvr_bake_texture_size")
-            self.ui.scene_property("proteinvr_mobile_bake_texture_size")
-            self.ui.scene_property("proteinvr_num_cycles")
-            self.ui.scene_property("background_environment_image")
-            self.ui.scene_property("pngquant_path")
-        
-        self.ui.ops_button(rel_data_path="proteinvr.create_scene", button_label="Create Scene")
-        self.ui.ops_button(rel_data_path="proteinvr.render_scene_remotely", button_label="Render Scene Remotely")        
-        
 class OBJECT_OT_CreateScene(ButtonParentClass):
     """
     Create the ProteinVR scene.
@@ -59,13 +36,27 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
     bl_label = "Create Scene"
 
     def set_frame(self, frame):
+        """
+        Set the scene to a specific frame.
+
+        :param int frame: The frame number.
+        """
+
         bpy.context.scene.frame_set(frame)
         bpy.context.scene.update()
+        
+    def _step_0_existing_files_check_ok_and_copy(self):
+        """
+        Check to make sure the user-specified files exist. If so, start
+        copying some files.
+        
+        :returns: True if files are ok and copied. False otherwise.
+        :rtype: :class:`???`
+        """
 
-    def _step_0_existing_files_ok(self):
         # Save some things to variables
         self.scene = bpy.data.scenes["Scene"]
-        self.plugin_dir = os.path.dirname(os.path.realpath(__file__)) + os.sep
+        self.plugin_dir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + os.sep + ".." + os.sep + "..") + os.sep
         self.plugin_asset_dir = self.plugin_dir + "assets" + os.sep
 
         # Get proteinvr_output_dir
@@ -114,7 +105,11 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         return True
 
-    def _step_1_setup(self):
+    def _step_1_initialize_variables(self):
+        """
+        Initialize some variables.
+        """
+
         # Variables for the spheres
         self.camera = bpy.data.objects["Camera"]
         self.frame_start = self.scene.frame_start
@@ -126,12 +121,22 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         }
 
     def _step_2_get_camerea_positions(self):
+        """
+        Get the locations of the camera along the aniamted camera path.
+        """
+
         for this_frame in range(self.frame_start, self.frame_end + 1):
             self.set_frame(this_frame)
             this_camera_pos = self.camera.location.copy()
             self.extra_data["cameraPositions"].append([round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)])
 
     def _compress_png(self, filename):
+        """
+        Compress a png file. Uses pngquant.
+
+        :param str filename: The filename of the png to compress.
+        """
+
         if os.path.exists(self.scene.pngquant_path):
             cmd = self.scene.pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
             # print("RUN: " + cmd)          
@@ -141,7 +146,14 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             print("WARNING: pngquant path not valid: " + self.scene.pngquant_path)
 
     def _get_visible_objects_with_animations(self):
-        # Get all the objects that are currently visible, but have animations.
+        """
+        Get all the objects that are currently visible, but have animations.
+
+        :param list,list objs_that_move,animation_data: objs_that_move is a
+                         list of objects. animation_data is a dictionary that
+                         records the animation of the objects.
+        """
+
         # Note that this also saves the animation data. This isn't necessary
         # for identifying the object, but we have to get it anyway, so why not
         # save it?
@@ -166,7 +178,12 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         return objs_that_move, animation_data
         
     def _step_3_render_baked_frames(self, debug=False):
-        print("This def currently does a lot more than bake frames... separate it out...")
+        """
+        Render the baked frames, both mobile and full resolution.
+
+        :param bool debug: Whether to run in debug mode. Defaults to False.
+        """
+
         # Get all the objects that are currently visible, but have animations.
         objs_that_move, _ = self._get_visible_objects_with_animations()
         
@@ -180,8 +197,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.scene.cycles.samples = self.scene.proteinvr_num_cycles
         self.scene.cycles.preview_samples = self.scene.proteinvr_num_cycles
         self.scene.cycles.film_transparent = True  # Because you're saving the background separately.
-
-        # frame_file_names = []
 
         self.camera.rotation_mode = 'XYZ'
 
@@ -230,7 +245,10 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.scene.cycles.film_transparent = False  # Time to restore the environment lighting
 
     def _step_4_save_environmental_image(self):
-        # Get the environment texture and save that.
+        """
+        Get the environment texture and save that.
+        """
+
         src_background_environment_image = bpy.path.abspath(self.scene.background_environment_image)
         if os.path.exists(src_background_environment_image):
             shutil.copyfile(src_background_environment_image, self.proteinvr_output_dir + "environment.png")
@@ -238,6 +256,10 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             print("WARNING: Environmental texture file does not exist!")
 
     def _step_5_save_animation_data(self):
+        """
+        Save the animation data.
+        """
+        
         # Get all the objects that are currently visible, but have animations.
         objs_that_move, animation_data = self._get_visible_objects_with_animations()
 
@@ -274,7 +296,12 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             image.file_format = 'PNG'
             image.save()
 
-    def _step_6_save_filenames(self):
+    def _step_6_save_filenames_and_filesizes(self):
+        """
+        Record the filenames of the baked images. Also, get the total size of
+        the files.
+        """
+
         # Save list of all rendered frames
         frame_file_names = [os.path.basename(f) for f in glob.glob(self.frame_dir + "proteinvr_baked_texture*.png") if not ".small.png" in f]
         def key(a): return int(a.replace("proteinvr_baked_texture", "").replace(".png", ""))
@@ -297,6 +324,12 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         }, open(self.frame_dir + "filesizes.json",'w'))
 
     def _step_7_make_proteinvr_clickable_meshes(self):
+        """
+        Identify the meshes marked as clickable. Make and save simple OBJ
+        files that encompass those objects. Better to click on those simple
+        objects that the complex original meshes.
+        """
+
         # Now go through visible objects and get encompassing spheres
         for obj in bpy.data.objects:
             if object_is_proteinvr_clickable(obj) and obj.proteinvr_clickable == True:
@@ -356,21 +389,24 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         Runs when button pressed.
 
         :param bpy_types.Context context: The context.
+
+        :returns: A dictionary indicating that the button has finished.
+        :rtype: :class:`???`
         """
 
-        if self._step_0_existing_files_ok() == False:
+        if self._step_0_existing_files_check_ok_and_copy() == False:
             return {'FINISHED'}
 
         debug = False
 
-        self._step_1_setup()
+        self._step_1_initialize_variables()
         self._step_2_get_camerea_positions()
 
         if len(glob.glob(self.proteinvr_output_dir + "frames/*.png")) == 0:
             self._step_3_render_baked_frames(debug)
         self._step_4_save_environmental_image()
         self._step_5_save_animation_data()
-        self._step_6_save_filenames()
+        self._step_6_save_filenames_and_filesizes()
         self._step_7_make_proteinvr_clickable_meshes()
 
         json.dump(
@@ -381,85 +417,3 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         print(self.extra_data)
 
         return {'FINISHED'}
-
-
-class OBJECT_OT_RenderRemote(ButtonParentClass):
-    """
-    Render the scene remotely. For internal Durrantlab use.
-    """
-
-    bl_idname = "proteinvr.render_scene_remotely"
-    bl_label = "Render Scene Remotely"
-
-    # Hard code a few variables. This is ok, but this will only be used in
-    # the Durrant lab.
-
-    beefy_computer_for_rendering = "jdurrant@bob.bio.pitt.edu"
-    remote_scratch_directory = "/tmp/"
-    remote_blender_location_with_proteinvr_installed = "/home/jdurrant/DataB/spinel/programs/blender-2.78c-linux-glibc219-x86_64/blender"
-
-    def run_remote(self, cmd):
-        remote_cmd = 'ssh ' + self.beefy_computer_for_rendering + ' "' + cmd + '"'
-        print()
-        print(remote_cmd)
-        os.system(remote_cmd)
-    
-    def copy_to_remote(self, file, remote_dir):
-        remote_dir = remote_dir if remote_dir.endswith(os.sep) else remote_dir + os.sep
-        remote_cmd = 'scp ' + file + ' ' + self.beefy_computer_for_rendering + ':' + remote_dir
-        print()
-        print(remote_cmd)
-        os.system(remote_cmd)
-
-    def execute(self, context):
-        """
-        Runs when button pressed.
-
-        :param bpy_types.Context context: The context.
-        """
-
-        # I'm going to assume password-less authentication is enabled, because
-        # I'm not putting my password in code!
-
-        # Make sure internal data will be saved with blend file
-        if bpy.data.use_autopack == False:
-            bpy.ops.file.autopack_toggle()
-
-        # Save this blend file.
-        bpy.ops.wm.save_mainfile()
-
-        # Get a random id
-        dir_id = str(random.random()).replace(".", "")
-        remote_dir = self.remote_scratch_directory + os.sep + dir_id + os.sep
-
-        # Make a remote directory.
-        self.run_remote('mkdir -p ' + remote_dir)
-
-        # Copy the blend file to that directory.
-        blend_file = os.path.abspath(bpy.data.filepath)
-        self.copy_to_remote(blend_file, remote_dir)
-
-        # Copy the runit script.
-        runitpy_path = os.path.dirname(os.path.abspath(__file__)) + os.sep + "RenderRemote" + os.sep + "runit.py"
-        self.copy_to_remote(runitpy_path, remote_dir)
-
-        # Run things remotely now.
-        cmds = [
-            'cd ' + remote_dir,
-            self.remote_blender_location_with_proteinvr_installed + ' ' + os.path.basename(blend_file) + ' --background --python runit.py'
-        ]
-        self.run_remote("; ".join(cmds))
-
-        # Copy files back from remote machine. --remove-source-files 
-        remote_cmd = "rsync -rv " + self.beefy_computer_for_rendering + ":" + remote_dir + os.sep + "output" + os.sep + "* " + bpy.context.scene.proteinvr_output_dir + os.sep
-        print(remote_cmd)
-        print()
-        os.system(remote_cmd)
-
-        # Remote remote directory.
-        self.run_remote("rm -r " + remote_dir)
-
-        print()
-
-        return {'FINISHED'}
-

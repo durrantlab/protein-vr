@@ -1,6 +1,21 @@
-from .ParentPanel import ParentPanel
-from .DurBlend import ButtonParentClass
-from . import Utils
+# ProteinVR is a Blender addon for making educational VR movies.
+# Copyright (C) 2017  Jacob D. Durrant
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from ..ParentPanel import ParentPanel
+from .. import Utils
 import bmesh
 import bpy
 import os
@@ -9,21 +24,36 @@ from collections import OrderedDict
 obj_names = Utils.ObjNames()
 
 class SetupPanel(ParentPanel):
+    """
+    Class to display the setup panel. Encourages the user to set the Blender
+    parameters as required to use the plugin.
+    """
+
     def draw_panel_if_needed(self):
+        """
+        Check if the setup panel should be displayed. Display it if necessary.
+
+        :param ??? ui: The user-interface object passed to all panels.
+
+        :returns: true if it was displayed, false otherwise.
+        :rtype: :class:`boolean`
+        """
+
         global obj_names
 
+        # A list of the kinds of parameters that need to be set.
         msgs = OrderedDict()
         msgs["Missing Objects:"] = []
         msgs["Render Settings:"] = []
         msgs["3D Settings:"] = []
         # msgs["Missing UV Maps:"] = []
 
-        # Are there missing objects?
+        # Are there missing objects (just Camera for now)?
         for name in ["Camera"]:  # "ProteinVR_ViewerSphere" "ProteinVR_ForwardSphere", "ProteinVR_BackwardsSphere"
             if not name in obj_names.obj_names():
                 msgs["Missing Objects:"].append(name)
 
-        # Is it in cycles render?
+        # Is it in cycles render? And other settings are ok?
         if bpy.context.scene.render.engine != "CYCLES":
             msgs["Render Settings:"].append("Not CYCLES")
         
@@ -63,7 +93,7 @@ class SetupPanel(ParentPanel):
         #     if "uv_textures" in dir(obj.data) and len(obj.data.uv_textures) == 0:
         #         msgs["Missing UV Maps:"].append(obj.name)
 
-        # Show messages
+        # Show messages if anything is missing.
         if sum([len(msgs[k]) for k in msgs.keys()]) > 0:
             self.ui.use_layout_row()
             self.ui.label("Problems!")
@@ -80,73 +110,6 @@ class SetupPanel(ParentPanel):
 
             return True
         else:
+            # No messages to display, so return False.
             return False
-
-class OBJECT_OT_FixProblems(ButtonParentClass):
-    """
-    Make sure required objects are present in the scene.
-    """
-
-    bl_idname = "proteinvr.fix"
-    bl_label = "Fix"
-
-    def append_from_template_file(self, obj_name):
-        global obj_names
-
-        # Get the sphere from the template blend file.
-        obj_names.save_object_names()
-        blendfile = os.path.dirname(os.path.realpath(__file__)) + os.sep + "assets" + os.sep + "babylon.blend"
-        section = "\\Object\\"
-        object = obj_name
-
-        # See https://blender.stackexchange.com/questions/38060/how-to-link-append-with-a-python-script
-        filepath  = blendfile + section + object
-        directory = blendfile + section
-        filename  = object
-
-        bpy.ops.wm.append(
-            filepath=filepath, 
-            filename=filename,
-            directory=directory
-        )
-
-        # Make sure named correctly.
-        new_obj_name = obj_names.object_names_different()[0]
-        obj = bpy.data.objects[new_obj_name]
-        obj.name = obj_name
-
-        return obj
-
-    def execute(self, context):
-        """
-        Runs when button pressed.
-
-        :param bpy_types.Context context: The context.
-        """
-
-        global obj_names
-
-        # Make sure cycles mode, other settings
-        bpy.context.scene.render.engine = "CYCLES"
-        bpy.context.scene.cycles.min_bounces = 0
-        if bpy.context.scene.cycles.max_bounces > 4:
-            bpy.context.scene.cycles.max_bounces = 4
-        bpy.context.scene.cycles.caustics_reflective = False
-        bpy.context.scene.cycles.caustics_refractive = False
-        bpy.context.scene.cycles.sample_clamp_direct = 2.5
-        bpy.context.scene.cycles.sample_clamp_indirect = 2.5
-        if bpy.context.scene.cycles.blur_glossy < 2.0:
-            bpy.context.scene.cycles.blur_glossy = 2.0
-
-        # Go into Object mode
-        Utils.switch_mode("OBJECT")
-
-        if not "Camera" in obj_names.obj_names():
-            bpy.ops.object.camera_add()
-        
-        for camera in bpy.data.cameras:
-            camera.type = "PANO"
-            camera.cycles.panorama_type = "EQUIRECTANGULAR"
-
-        return {'FINISHED'}
 
