@@ -14,8 +14,29 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .Buttons.CreateScene import OBJECT_OT_CreateScene
-from .Buttons.RenderRemote import OBJECT_OT_RenderRemote
-from .Buttons.Sign import OBJECT_OT_Sign
-from .CommandPanel import CommandPanel
+from ...DurBlend import ButtonParentClass
+from ...DurBlend import Messages
+import bpy
 
+class OBJECT_OT_DoneSignPanel(ButtonParentClass):
+    """
+    Done with the sign panel.
+    """
+
+    bl_idname = "proteinvr.done_sign_panel"
+    bl_label = "Done"
+
+    def execute(self, context):
+        """
+        Runs when button pressed.
+
+        :param bpy_types.Context context: The context.
+
+        :returns: A dictionary indicating that the button has finished.
+        :rtype: :class:`???`
+        """
+
+        bpy.ops.object.select_all(action='DESELECT')
+        bpy.context.scene.objects.active = None
+
+        return {'FINISHED'}

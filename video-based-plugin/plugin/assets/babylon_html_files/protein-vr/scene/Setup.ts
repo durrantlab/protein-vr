@@ -6,6 +6,7 @@ import * as Globals from "../config/Globals";
 import { RenderingGroups } from "../config/Globals";
 import { Shader } from "../shaders/StandardShader";
 import * as Arrows from "./Arrows";
+import { setupAllSigns } from "./Sign";
 
 export function loadBabylonFile(): Promise<any> {
 
@@ -33,6 +34,12 @@ export function loadBabylonFile(): Promise<any> {
                 // Setup arrows
                 Arrows.setup();
 
+                // Setup signs
+                setupAllSigns();
+
+                // window.debugit = newScene.debugLayer;
+                // newScene.debugLayer.show();
+                
                 if (Globals.get("debug")) { newScene.debugLayer.show(); }
                 resolve({msg: "BABYLON.BABYLON LOADED"});
             });

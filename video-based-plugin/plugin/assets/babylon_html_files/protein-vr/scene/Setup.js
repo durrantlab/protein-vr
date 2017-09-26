@@ -1,4 +1,4 @@
-define(["require", "exports", "./Camera", "../config/Globals", "../config/Globals", "../shaders/StandardShader", "./Arrows"], function (require, exports, Camera_1, Globals, Globals_1, StandardShader_1, Arrows) {
+define(["require", "exports", "./Camera", "../config/Globals", "../config/Globals", "../shaders/StandardShader", "./Arrows", "./Sign"], function (require, exports, Camera_1, Globals, Globals_1, StandardShader_1, Arrows, Sign_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function loadBabylonFile() {
@@ -19,6 +19,10 @@ define(["require", "exports", "./Camera", "../config/Globals", "../config/Global
                     _setupEnvironmentalSphere(newScene, radius);
                     // Setup arrows
                     Arrows.setup();
+                    // Setup signs
+                    Sign_1.setupAllSigns();
+                    // window.debugit = newScene.debugLayer;
+                    // newScene.debugLayer.show();
                     if (Globals.get("debug")) {
                         newScene.debugLayer.show();
                     }

@@ -12,7 +12,13 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
     })(callBacks || (callBacks = {}));
     class Game {
         constructor(params) {
+            /*
+            The Game objecy constructor.
+    
+            :param obj params: The init parameters.
+            */
             this._params = params;
+            // Detect mobile.
             let isMobile = new MobileDetect(window.navigator.userAgent).mobile();
             if (isMobile === null) {
                 isMobile = false;
@@ -47,7 +53,13 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
             }
         }
         _loadGame(isMobile) {
-            // Bring in the loading panel...
+            /*
+            Start loading the game.
+    
+            :param bool isMobile: Whether or not the game is running in mobile.
+            */
+            // Bring in the loading panel... Code below associtated with second
+            // panel, but first here to start loading ASAP.
             jQuery("#loading_panel").load("./_loading.html", () => {
                 jQuery("#start-game").click(() => {
                     let engine = Globals.get("engine");
@@ -64,10 +76,11 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
                 alert("ERROR: Babylon not supported!");
             }
             else {
+                // NOTE: This is what user sees first.
                 // Get the canvas element from our HTML above
                 Globals.set("canvas", document.getElementById("renderCanvas"));
                 // Set the engine
-                this._resizeWindow();
+                this._resizeWindow(); // resize canvas when browser resized.
                 Globals.set("engine", new BABYLON.Engine(Globals.get("canvas"), true)); // second boolean is whether built-in smoothing will be used.
                 // Use promise to load user variables (both from json and
                 // specified via panel.)
@@ -93,7 +106,6 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
                     // Start loading the frames here... no need to resolve it
                     MaterialLoader.getFramePromises()
                         .then((fulfilled) => {
-                        // console.log(fulfilled, "MOO");  // add promise here?
                     });
                     // In parallel, continue the JSON sestup now that the scene is
                     // loaded.
@@ -108,6 +120,9 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
             }
         }
         _startRenderLoop() {
+            /*
+            Start the function that runs with every frame.
+            */
             // Once the scene is loaded, just register a render loop to render it
             let camera = Globals.get("camera");
             let scene = Globals.get("scene");
@@ -117,6 +132,9 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
             });
         }
         _resizeWindow() {
+            /*
+            Resize the canvas every time you resize the window.
+            */
             // Watch for browser/canvas resize events
             window.addEventListener("resize", () => {
                 Globals.get("engine").resize();
@@ -125,6 +143,9 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
     }
     exports.Game = Game;
     function start() {
+        /*
+        Make the game object and start it.
+        */
         let game = new Game({
             onJSONLoaded: function () {
                 console.log("DONE!!!");

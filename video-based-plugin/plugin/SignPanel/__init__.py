@@ -14,8 +14,5 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .Buttons.CreateScene import OBJECT_OT_CreateScene
-from .Buttons.RenderRemote import OBJECT_OT_RenderRemote
-from .Buttons.Sign import OBJECT_OT_Sign
-from .CommandPanel import CommandPanel
-
+from .Buttons.Done import OBJECT_OT_DoneSignPanel
+from .SignPanel import SignPanel

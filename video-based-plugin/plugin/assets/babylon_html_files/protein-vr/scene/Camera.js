@@ -307,45 +307,53 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows"]
             return toKeep;
         }
         _updatePos(timeRatio, camera) {
+            /*
+            Function that determines sphere visibility and camera location as the
+            user moves between two locations.
+    
+            :param number timeRatio: A number between 0.0 and 1.0, showing how far
+                          along the user is between the previous sphere location and the next
+                          one.
+                          
+            :param ??? camera: The BABYLON camera object.
+            */
             let transitionPt = 0.05; // Good for this to be hard-coded eventually.
-            // if (timeRatio < transitionPt) {
-            // First part of time ratio, next sphere is fading in.
-            // this._prevViewerSphere.visibility = 1.0;
-            // Quickly becomes visible.
             this._nextViewerSphere.visibility = Math.min(timeRatio / transitionPt, 1.0);
-            // } else {
-            // Second part, previous one fades out.
-            // Slowly fades out
-            // alert("mo");
             this._prevViewerSphere.visibility = (1 - timeRatio); //  / (1 - transitionPt);
-            // this._nextViewerSphere.visibility = 1.0;
-            //}
-            // this._prevViewerSphere.visibility = 1.0 - timeRatio;
-            // this._nextViewerSphere.visibility = timeRatio;
             camera.position = this._prevCameraPos.add(this._nextMovementVec.scale(timeRatio));
         }
         update() {
-            // This is run from the render loop
+            /*
+            Update the camera. This is run from the render loop (every frame).
+            */
             if (this._prevViewerSphere === undefined) {
-                // Not ready yet...
+                // Not ready yet... PNG images probably not loaded.
                 return;
             }
             let scene = Globals.get("scene");
             let BABYLON = Globals.get("BABYLON");
             let camera = scene.activeCamera;
+            // Get the time that's elapsed since this function was last called.
             let deltaTime = (new Date).getTime() - this._lastMovementTime;
             if (deltaTime < this._msUntilNextMoveAllowed) {
+                // Not enough time has passed to allow another movement.
                 this._cameraCurrentlyAutoMoving = true;
                 this._whileCameraAutoMoving(deltaTime, camera);
                 return;
             }
+            // NOTE: If you get here, you're ready to move again.
             if (this._cameraCurrentlyAutoMoving) {
+                // Since this._cameraCurrentlyAutoMoving is true, this must be the
+                // first time this function has been called since a new move was
+                // permitted.
                 this._cameraCurrentlyAutoMoving = false;
+                // Run a function for first-time moving allowed.
                 this._onDoneCameraAutoMoving(camera);
             }
-            // So it's time to pick a new destination.
-            // Only update things if user trying to move.
-            let result;
+            // So it's time to pick a new destination, but don't even try if the
+            // user doesn't want to move (i.e., no active keypress our mousedown.)
+            // Maybe they're looking around, not moving.
+            let result; // 
             if (Globals.get("mouseDownAdvances") === true) {
                 result = (this._mouseDownState === false) && (this._keyPressedState === undefined) && (this._firstRender === false);
             }
@@ -355,14 +363,19 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows"]
             if (result) {
                 return;
             }
-            this._firstRender = false; // It's no longer the first time rendering.        
+            // If you get here, you're ready to start moving, and the user
+            // actually wants to move.
+            this._firstRender = false; // It's no longer the first time rendering.
             this._onStartMove(camera);
         }
         _onStartMove(camera) {
-            // console.log("_onStartMove");
+            /*
+            Start the moving process from one sphere to the next. This function is
+            fired only once, at beginning of moving (not every frame).
+            */
             // Make sure everything hidden but present sphere.
             ViewerSphere.hideAll();
-            this._nextViewerSphere.visibility = 1.0;
+            this._nextViewerSphere.visibility = 1.0; // NOTE: Is this right?!?!?
             this._pickDirectionAndStartMoving(camera);
         }
         _whileCameraAutoMoving(deltaTime, camera) {
@@ -425,10 +438,19 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows"]
             this._closeCameraData = closeCameraData2;
         }
         _pickDirectionAndStartMoving(camera) {
-            // console.log("_startMoving");
+            /*
+            Based on camera's direction, determine the next location to move to.
+            This is called only once at the beinning of the moving cycle (not
+            every frame).
+    
+            :param ??? camera: BABYLON camera object.
+            */
             // Start by assuming new camera point should be the closest point.
             let newCameraData = this._closeCameraData.firstPoint();
             let maxDist = this._closeCameraData.data[this._closeCameraData.data.length - 1].distance;
+            // NOTE: Lazy loading script here? Only if this._closeCameraData
+            // contains all camera locations. I think it doesn't... I think some
+            // have been deleted elsewhere, but not sure.
             // Assign angles
             let lookingVec = camera.getTarget().subtract(camera.position);
             switch (this._keyPressedState) {
@@ -439,9 +461,11 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows"]
                     lookingVec = lookingVec.scale(-1);
                     break;
             }
+            // Calculate angles between camera looking vector and the various
+            // candidate camera locations.
             this._closeCameraData.addAnglesInPlace(camera.position, lookingVec);
-            // Throw out ones that aren't even in the general direction as the
-            // lookingVec
+            // Throw out candidate camera locations that aren't even in the
+            // general direction as the lookingVec
             let goodAngleCameraPoints = this._closeCameraData.lessThanCutoff(1.9198621771937625, "angle"); // 110 degrees
             switch (goodAngleCameraPoints.length()) {
                 case 0:

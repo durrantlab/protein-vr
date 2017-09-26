@@ -21,7 +21,13 @@ export function loadJSON() {
                 sphereShaders.push(null);
             }
             Globals.set("cameraPositions", cameraPositions);
-            Globals.set("sphereShaders", sphereShaders);            
+            Globals.set("sphereShaders", sphereShaders);      
+            
+            let signData = [];
+            for (let i=0; i<data["signs"].length; i++) {
+                signData.push(data["signs"][i])
+            }
+            Globals.set("signData", signData);
             resolve({msg: "LOADED PROTIENVR JSON"});
         });
     })

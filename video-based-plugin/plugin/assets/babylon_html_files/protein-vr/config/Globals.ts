@@ -16,7 +16,8 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         "isMobile": undefined,
         "numFrameTexturesLoaded": 0,
         "numNeighboringCameraPosForNavigation": 4,
-        "cameraTypeToUse": "show-desktop-screen"  // default
+        "cameraTypeToUse": "show-desktop-screen",  // default
+        "signData": []
     }
 }
 

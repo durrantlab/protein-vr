@@ -118,6 +118,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.extra_data = {
             "cameraPositions": [],
             "clickableFiles": [],
+            "signs": []
         }
 
     def _step_2_get_camerea_positions(self):
@@ -384,6 +385,18 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             # Remove the proteinvr_clickable mesh now that it's saved
             bpy.ops.object.delete()
 
+    def _step_8_save_signs(self):
+        """
+        Save the text and locations of the signs (billboards with text).
+        """
+
+        for o in bpy.data.objects:
+            if o.name.startswith("ProteinVRSign"):
+                self.extra_data["signs"].append({
+                    "location": list(o.location),
+                    "text": o.sign_text
+                })
+
     def execute(self, context):
         """
         Runs when button pressed.
@@ -408,6 +421,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self._step_5_save_animation_data()
         self._step_6_save_filenames_and_filesizes()
         self._step_7_make_proteinvr_clickable_meshes()
+        self._step_8_save_signs()
 
         json.dump(
             self.extra_data, 

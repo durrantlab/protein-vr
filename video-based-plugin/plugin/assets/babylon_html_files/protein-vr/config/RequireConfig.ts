@@ -21,5 +21,11 @@ declare var jQuery;
 
 // This require function starts the app
 require(['../main'], (main) => {
+    /*
+    Run the main start function.
+
+    :param ??? main: The main object.
+    */
+
     main.start();
 });

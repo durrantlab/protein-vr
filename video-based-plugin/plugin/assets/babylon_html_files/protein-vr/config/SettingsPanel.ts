@@ -99,7 +99,7 @@ export function allowUserToModifySettings() {
                     ""
                 )
             ) */ + 
-            `<button id="user_settings_done_button" type="button" class="btn btn-primary">Start</button>`
+            `<button id="user_settings_continue_button" type="button" class="btn btn-primary">Continue</button>`
             // <button id="broadcast_game_button" style="display: none;" type="button" class="btn btn-primary">Broadcast</button>`
         );
     
@@ -290,7 +290,7 @@ function addJavaScript(onSettingsPanelClosed) {
         // This does need to be registered on the window. If you do it
         // through a click in babylonjs, browsers will reject the
         // full-screen request.
-        jQuery("#user_settings_done_button").click(function() {
+        jQuery("#user_settings_continue_button").click(function() {
             figureOutWhichCameraToUse();
             jQuery("#settings_panel").fadeOut(() => {
                 jQuery("#loading_panel").fadeIn();
@@ -390,7 +390,7 @@ function addBroadcastModal() {
     jQuery("#start_game_from_modal").click(function() {
         jQuery('#broadcast_modal').modal('hide');
         PVRGlobals.teacherBroadcasting = true;
-        jQuery("#user_settings_done_button").click();
+        jQuery("#user_settings_continue_button").click();
     });
 
     jQuery('#broadcast_modal').on('shown.bs.modal', function () {

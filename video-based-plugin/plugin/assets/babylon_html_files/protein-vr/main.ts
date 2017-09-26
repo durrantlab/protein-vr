@@ -27,17 +27,24 @@ interface GameInterface {
 }
 
 export class Game {
-    // Load the BABYLON 3D engine. Variable here because defined within
-    // isSupported below.
+    /* The main class that runs the game. */
     private _params: GameInterface;
+
     constructor(params: GameInterface) {
+        /*
+        The Game objecy constructor.
+
+        :param obj params: The init parameters.
+        */
+
         this._params = params;
 
+        // Detect mobile.
         let isMobile = new MobileDetect(window.navigator.userAgent).mobile();
-        
+    
         if (isMobile === null) { isMobile = false; }  // keep it boolean
         else { isMobile = true; }
-        
+    
         if (Globals.get("debug")) { isMobile = true; }
         Globals.set("isMobile", isMobile);
 
@@ -65,10 +72,17 @@ export class Game {
         }
     }
     
-    private _loadGame(isMobile) {
-        // Bring in the loading panel...
+    private _loadGame(isMobile: boolean) {
+        /*
+        Start loading the game.
+
+        :param bool isMobile: Whether or not the game is running in mobile.
+        */
+
+        // Bring in the loading panel... Code below associtated with second
+        // panel, but first here to start loading ASAP.
         jQuery("#loading_panel").load("./_loading.html", () => {
-            jQuery("#start-game").click(() => {
+            jQuery("#start-game").click(() => {  // Start button within loading panel pressed.
                 let engine = Globals.get("engine");
                 let canvas = jQuery("canvas");
                 jQuery("#loading_panel").hide(); // fadeOut(() => {
@@ -87,11 +101,13 @@ export class Game {
         if (!BABYLON.Engine.isSupported()) {
             alert("ERROR: Babylon not supported!");
         } else {  // Babylon is supported
+            // NOTE: This is what user sees first.
+            
             // Get the canvas element from our HTML above
             Globals.set("canvas", document.getElementById("renderCanvas"));
 
             // Set the engine
-            this._resizeWindow();
+            this._resizeWindow();  // resize canvas when browser resized.
             Globals.set("engine", new BABYLON.Engine(Globals.get("canvas"), true));  // second boolean is whether built-in smoothing will be used.
 
             // Use promise to load user variables (both from json and
@@ -122,7 +138,6 @@ export class Game {
                 // Start loading the frames here... no need to resolve it
                 MaterialLoader.getFramePromises()
                 .then((fulfilled) => {
-                    // console.log(fulfilled, "MOO");  // add promise here?
                 })
                 
                 // In parallel, continue the JSON sestup now that the scene is
@@ -140,7 +155,11 @@ export class Game {
         }
     }
 
-    private _startRenderLoop() {
+    private _startRenderLoop(): void {
+        /*
+        Start the function that runs with every frame.
+        */
+
         // Once the scene is loaded, just register a render loop to render it
         let camera = Globals.get("camera");
         let scene = Globals.get("scene");
@@ -151,7 +170,11 @@ export class Game {
         });
     }
 
-    private _resizeWindow() {
+    private _resizeWindow(): void {
+        /*
+        Resize the canvas every time you resize the window.
+        */
+
         // Watch for browser/canvas resize events
         window.addEventListener("resize", () => {
             Globals.get("engine").resize();
@@ -160,6 +183,10 @@ export class Game {
 }        
 
 export function start() {
+    /*
+    Make the game object and start it.
+    */
+
     let game = new Game({
         onJSONLoaded: function() {
             console.log("DONE!!!");

@@ -2,6 +2,9 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function getFramePromises() {
+        /*
+        Start loading all the skybox images.
+        */
         let BABYLON = Globals.get("BABYLON");
         let scene = Globals.get("scene");
         let jQuery = Globals.get("jQuery");
@@ -17,13 +20,13 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
                     debugger;
                 }
                 let progressBarObj = jQuery("#loading-progress-bar .progress-bar");
+                // Loop through each PNG filename
                 for (let i = 0; i < filenames.length; i++) {
                     new Promise((resolve) => {
                         let filename;
                         if (isMobile) {
                             // Some kind of phone... use low-res images
                             filename = "frames/" + filenames[i] + ".small.png?" + Math.random().toString(); // Note no caching, for debugging.
-                            // alert(filename);
                         }
                         else {
                             // desktop and laptops ... full res images
@@ -31,11 +34,13 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
                         }
                         let shader = new StandardShader_1.Shader(filename, true, () => {
                             setTimeout(() => {
+                                // Get the total number of textures.
                                 let numTextures = Globals.get("numFrameTexturesLoaded") + 1;
                                 Globals.set("numFrameTexturesLoaded", numTextures);
+                                // Updating the progress bar.
                                 let progressVal = Math.round(100 * numTextures / filenames.length);
                                 progressBarObj.css("width", progressVal.toString() + "%");
-                                // This is running at time of execution, not OfflineAudioCompletionEvent.apply.apply. need to figure outerHeight.
+                                // If progress >= 100, continue on...
                                 if (progressVal >= 100) {
                                     _afterMaterialsLoaded();
                                 }
@@ -51,6 +56,10 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
     exports.getFramePromises = getFramePromises;
     var _afterMaterialsLoadedAlreadyExec = false;
     function _afterMaterialsLoaded() {
+        /*
+        Once all PNG files loaded, update the DOM and start setting up the
+        spheres.
+        */
         // Make sure this functiononly fires once...
         if (_afterMaterialsLoadedAlreadyExec) {
             return;
@@ -58,6 +67,7 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
         else {
             _afterMaterialsLoadedAlreadyExec = true;
         }
+        // Update the user interface now that all images are loaded.
         let jQuery = Globals.get("jQuery");
         // Start game button now enabled.
         jQuery("#start-game").prop("disabled", false);

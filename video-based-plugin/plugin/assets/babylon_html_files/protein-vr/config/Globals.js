@@ -19,7 +19,8 @@ define(["require", "exports"], function (require, exports) {
             "isMobile": undefined,
             "numFrameTexturesLoaded": 0,
             "numNeighboringCameraPosForNavigation": 4,
-            "cameraTypeToUse": "show-desktop-screen" // default
+            "cameraTypeToUse": "show-desktop-screen",
+            "signData": []
         };
     }
     function get(key) {
