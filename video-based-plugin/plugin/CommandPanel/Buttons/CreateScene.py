@@ -105,6 +105,9 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         return True
 
+
+
+
     def _step_1_initialize_variables(self):
         """
         Initialize some variables.
@@ -118,7 +121,29 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.extra_data = {
             "cameraPositions": [],
             "clickableFiles": [],
+            "meshedObjects": []
         }
+
+        # Put objects into "render layer" categories.
+        self.object_categories = {
+            "BACKGROUND": [],
+            "STATIC": [],
+            "MESHED": []  # Includes onces marked meshed, and any ones that have animations.
+        }
+
+        # TODO: PUT IN CATEGORIES HERE.
+        for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
+            if(obj.bpy.types.Object.background == True):
+                self.object_categories["BACKGROUND"].append(obj) # background = an eventual PNG file that will be the background image. NOT MOVING
+            elif(obj.bpy.types.Object.static == True):
+                    self.object_categories["STATIC"].append(obj) # Static = low quality non moving images, this based on user preference
+            elif(obj.bpy.types.Object.mesh == True):
+                    self.object_categories["MESH"].append(obj) # Meshed = high quality objects, ALL ANIMATED objects are here, but some non animated can be in there if use wants high quality
+            
+
+
+
+
 
     def _step_2_get_camerea_positions(self):
         """
@@ -149,18 +174,23 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         """
         Get all the objects that are currently visible, but have animations.
 
-        :param list,list objs_that_move,animation_data: objs_that_move is a
+        :param list,list meshed_objs,animation_data: meshed_objs is a
                          list of objects. animation_data is a dictionary that
                          records the animation of the objects.
         """
 
+
+        # DO WE NEED THIS METHOD ANYMORE NOW THAT WE HAVE A HASH TABLE THAT IS 
+        # CONTAINS ALL THE OBJECTS THAT ARE MESHED, How about switching this method to 
+        # get_meshed_animations?
+
         # Note that this also saves the animation data. This isn't necessary
         # for identifying the object, but we have to get it anyway, so why not
         # save it?
-        objs_that_move = []
+        meshed_objs = []
         animation_data = {}
-        for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
-            if obj.hide == False and obj.hide_render == False:
+        for obj in [o for o in bpy.data.objects if not "Camera" in o.name]: #change for loop to iterate through the hash table
+            if obj.hide == False and obj.hide_render == False: #would not need to check for hide value anymore
                 pos_loc_data = []
                 for f in range(self.frame_start, self.frame_end + 1):
                     self.set_frame(f)
@@ -173,22 +203,29 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 keys = set(keys)
                 num_keyframes = len(keys)
                 if num_keyframes > 1:
-                    objs_that_move.append(obj)
+                    meshed_objs.append(obj)
                     animation_data[obj.name] = pos_loc_data
-        return objs_that_move, animation_data
+        return meshed_objs, animation_data
         
-    def _step_3_render_baked_frames(self, debug=False):
+    def _step_3_render_static_frames(self, debug=False):
         """
-        Render the baked frames, both mobile and full resolution.
+        Render the frames, both mobile and full resolution.
 
         :param bool debug: Whether to run in debug mode. Defaults to False.
         """
 
+        # TODO: OUTLINE OF WHAT NEEDS TO HAPPEN.
+
+        # Hide all objects in Background and meshed category. Show objects in static category.
+        # For through each. For eaach frame, render a png file of the static images.
+
+        ##### OLD CODE BELOW #####
+
         # Get all the objects that are currently visible, but have animations.
-        objs_that_move, _ = self._get_visible_objects_with_animations()
+        meshed_objs, _ = self._get_visible_objects_with_animations()
         
         # Hide the moving objects (not rendered to sphere)
-        for obj in objs_that_move:
+        for obj in meshed_objs:          # INSTEAD OF ITERATING THROUGH THE ARRAY, GET RID OF IT, AND ITERATE THROUGH THE HAS TABLE
             obj.hide = True
             obj.hide_render = True
         
@@ -237,17 +274,27 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 else:
                     print("WARNING: Skipping the mobile textures...")
                 
-        # Reshow moving objects
-        for obj in objs_that_move:
+        # Reshow moving objects  
+        for obj in meshed_objs:  #ITERATE THROUGH HASH TABLE AGAIN?
             obj.hide = False
             obj.hide_render = False
 
         self.scene.cycles.film_transparent = False  # Time to restore the environment lighting
 
-    def _step_4_save_environmental_image(self):
+    def _step_4_render_background_image(self):
         """
         Get the environment texture and save that.
         """
+
+        # TODO:
+        # Next, render the background (only once)
+        #   Change to frame 1
+        #   Hide all objects in Static and meshed categories
+        #   Render background.png, using code like that below.
+
+        # DO WE WANT THE BACKGROUND TO BE A PNG FILE? OR WILL THIS BE CREATED IN BLENDER???
+
+        ##### OLD CODE BELOW #######
 
         src_background_environment_image = bpy.path.abspath(self.scene.background_environment_image)
         if os.path.exists(src_background_environment_image):
@@ -259,9 +306,14 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         """
         Save the animation data.
         """
+
+        #WHAT IS THE DIFFERENCE BETWEEN THIS METHOD AND get_visible_objects METHOD?
+        # WE CAN CREATE AN ARRAY THAT STORES THE ANIMATION DATA THAT HAS THE SAME INDEX AS THE OBJECT
         
         # Get all the objects that are currently visible, but have animations.
-        objs_that_move, animation_data = self._get_visible_objects_with_animations()
+        meshed_objs, animation_data = self._get_visible_objects_with_animations()
+
+        # TODO: Add any object in the MESHED category to meshed_objs so it gets saved separately.
 
         # Save the animations
         self.extra_data["animations"] = animation_data
@@ -281,6 +333,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 axis_up="Y",
                 axis_forward="-Z"
             )
+
+            #WHAT IS THIS??????????
 
             # Search the node tree to find a texture
             texture_images = [n.image for n in bpy.data.objects["Cube"].active_material.node_tree.nodes if n.type == "TEX_IMAGE"]
@@ -329,6 +383,10 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         files that encompass those objects. Better to click on those simple
         objects that the complex original meshes.
         """
+
+
+        #WHAT IS THE PURPOSE OF CLICKABLE????
+        #DO WE WANT TO ADD CLICKABLE TO THE HASH TABLE???
 
         # Now go through visible objects and get encompassing spheres
         for obj in bpy.data.objects:
@@ -403,8 +461,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self._step_2_get_camerea_positions()
 
         if len(glob.glob(self.proteinvr_output_dir + "frames/*.png")) == 0:
-            self._step_3_render_baked_frames(debug)
-        self._step_4_save_environmental_image()
+            self._step_3_render_static_frames(debug)
+        self._step_4_render_background_image()
         self._step_5_save_animation_data()
         self._step_6_save_filenames_and_filesizes()
         self._step_7_make_proteinvr_clickable_meshes()
