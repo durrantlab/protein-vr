@@ -81,7 +81,6 @@ class ProteinVR(PanelParentClass):
         # Object-specific properties.
         bpy.types.Object.proteinvr_clickable = self.prop_funcs.boolProp("proteinvr_clickable", False, description="Whether this object is proteinvr_clickable.")
 
-        # WHERE DO I MAKE THE BUTTONS FOR THESE VARIABLES? AND IS THERE A WAY FOR ONLY ONE TO BE PRESSED TO BE MADE TRUE? WILL HELP SIMPLYFY CODE LATER ON
         # Boolean variables for the three object categories.
         bpy.types.Object.background = self.prop_funcs.boolProp("background_image", False, description="Assigning image to be the background")
         bpy.types.Object.static = self.prop_funcs.boolProp("static", False, description="Assigning 3-D objects that are static/low quality, they are NOT animated")
