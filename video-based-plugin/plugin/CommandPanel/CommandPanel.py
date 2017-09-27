@@ -54,6 +54,11 @@ class CommandPanel(ParentPanel):
             self.ui.use_box_row(activeObj.name + " Properties")
             self.ui.object_property("proteinvr_clickable")
 
+        self.ui.object_property("background")
+        self.ui.object_property("static")
+        self.ui.object_property("mesh")
+
+
         # Set up UI
         # self.ui.use_layout_row()
         self.ui.use_box_row("Make Scene")
