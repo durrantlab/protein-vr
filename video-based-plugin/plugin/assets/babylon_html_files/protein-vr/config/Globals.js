@@ -15,6 +15,7 @@ define(["require", "exports"], function (require, exports) {
             "sphereShaders": undefined,
             "backgroundSphere": undefined,
             "debug": false,
+            "breakCaching": true,
             "mouseDownAdvances": true,
             "isMobile": undefined,
             "numFrameTexturesLoaded": 0,

@@ -68,6 +68,12 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
                     canvas.show();
                     canvas.focus(); // to make sure keypresses work.
                     engine.switchFullscreen(UserVars.getParam("viewer") == UserVars.viewers["Screen"]);
+                    // If it's an HTC vive or something, you need to attach the
+                    // canvas here. This is because it can only be done on user
+                    // interaction.
+                    if (Globals.get("cameraTypeToUse") === "show-desktop-vr") {
+                        Globals.get("scene").activeCamera.attachControl(canvas);
+                    }
                     this._startRenderLoop();
                     engine.resize();
                 });

@@ -12,6 +12,7 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         "sphereShaders": undefined,
         "backgroundSphere": undefined,
         "debug": false,
+        "breakCaching": true,  // add ?random strings to end of png textures, so doesn't cache.
         "mouseDownAdvances": true,
         "isMobile": undefined,
         "numFrameTexturesLoaded": 0,

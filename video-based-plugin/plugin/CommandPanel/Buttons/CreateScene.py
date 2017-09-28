@@ -24,6 +24,7 @@ import shutil
 import glob
 import json
 import numpy
+import random
 
 obj_names = Utils.ObjNames()
 
@@ -397,6 +398,80 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                     "text": o.sign_text
                 })
 
+    def _step_9_generate_texture_babylon_and_manifest_files(self):
+        """
+        Wrap the textures in babylon files to take advantage of babylon's
+        caching system.
+        """
+
+        manifest = {
+            "version": int(1000000 * random.random()),
+            "enableSceneOffline" : True,
+            "enableTexturesOffline" : True
+        }
+
+        babylon = {
+            "materials": [
+                {
+                    "name": None,
+                    "id": None,
+                    "ambient": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "diffuse": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "specular": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "emissive": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "specularPower": 64,
+                    "alpha": 1,
+                    "backFaceCulling": True,
+                    "checkReadyOnlyOnce": False,
+                    "maxSimultaneousLights": 4,
+                    "emissiveTexture": {
+                        "name": None,
+                        "level": 1,
+                        "hasAlpha": 0,
+                        "coordinatesMode": 0,
+                        "uOffset": 0,
+                        "vOffset": 0,
+                        "uScale": 1,
+                        "vScale": 1,
+                        "uAng": 0,
+                        "vAng": 0,
+                        "wAng": 0,
+                        "wrapU": 0,
+                        "wrapV": 0,
+                        "coordinatesIndex": 0
+                    }
+                }
+            ]
+        }
+
+        png_files = glob.glob(self.frame_dir + "*.png")
+        png_files.append(os.path.abspath(self.frame_dir + "..") + os.sep + "environment.png")
+
+        for filename in png_files:
+            json.dump(manifest, open(filename + ".babylon.manifest", 'w'))
+
+            bsnm = os.path.basename(filename)
+            babylon["materials"][0]["name"] = bsnm
+            babylon["materials"][0]["id"] = bsnm
+            babylon["materials"][0]["emissiveTexture"]["name"] = bsnm
+            json.dump(babylon, open(filename + ".babylon", 'w'))
+
     def execute(self, context):
         """
         Runs when button pressed.
@@ -422,6 +497,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self._step_6_save_filenames_and_filesizes()
         self._step_7_make_proteinvr_clickable_meshes()
         self._step_8_save_signs()
+        self._step_9_generate_texture_babylon_and_manifest_files()
 
         json.dump(
             self.extra_data, 

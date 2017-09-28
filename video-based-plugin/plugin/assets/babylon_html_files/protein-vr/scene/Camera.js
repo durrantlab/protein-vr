@@ -272,7 +272,7 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows"]
             // Set the new (VR) camera to be active
             scene.activeCamera = camera;
             // Attach that camera to the canvas.
-            scene.activeCamera.attachControl(canvas);
+            scene.activeCamera.attachControl(canvas); // This won't work if desktop-based vr like htc vive. So this command also run on play-button click.
         }
         _setupMouseAndKeyboard() {
             let scene = Globals.get("scene");

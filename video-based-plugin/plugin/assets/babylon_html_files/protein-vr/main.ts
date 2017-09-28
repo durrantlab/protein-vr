@@ -93,6 +93,13 @@ export class Game {
                     UserVars.getParam("viewer") == UserVars.viewers["Screen"]
                 )
                 
+                // If it's an HTC vive or something, you need to attach the
+                // canvas here. This is because it can only be done on user
+                // interaction.
+                if (Globals.get("cameraTypeToUse") === "show-desktop-vr") {
+                    Globals.get("scene").activeCamera.attachControl(canvas);
+                }
+
                 this._startRenderLoop();
                 engine.resize();
             })

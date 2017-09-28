@@ -26,11 +26,14 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
                         let filename;
                         if (isMobile) {
                             // Some kind of phone... use low-res images
-                            filename = "frames/" + filenames[i] + ".small.png?" + Math.random().toString(); // Note no caching, for debugging.
+                            filename = "frames/" + filenames[i] + ".small.png"; // Note no caching, for debugging.
                         }
                         else {
                             // desktop and laptops ... full res images
-                            filename = "frames/" + filenames[i] + "?" + Math.random().toString(); // Note no caching, for debugging.
+                            filename = "frames/" + filenames[i]; // Note no caching, for debugging.
+                        }
+                        if (Globals.get("breakCaching") === false) {
+                            filename = filename + "?" + Math.random().toString();
                         }
                         let shader = new StandardShader_1.Shader(filename, true, () => {
                             setTimeout(() => {

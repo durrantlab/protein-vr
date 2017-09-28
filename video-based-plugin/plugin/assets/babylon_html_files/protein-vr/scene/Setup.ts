@@ -37,7 +37,7 @@ export function loadBabylonFile(): Promise<any> {
                 // Setup signs
                 setupAllSigns();
 
-                // window.debugit = newScene.debugLayer;
+                window.debugit = newScene.debugLayer;
                 // newScene.debugLayer.show();
                 
                 if (Globals.get("debug")) { newScene.debugLayer.show(); }
@@ -78,8 +78,9 @@ function _setupEnvironmentalSphere(newScene, radius) {
     backgroundSphere.isPickable = false;
     backgroundSphere.renderingGroupId = RenderingGroups.EnvironmentalSphere;
 
-    let shader2 = new Shader('environment.png', false);
-    backgroundSphere.material = shader2.material;
-    Globals.set("backgroundSphere", backgroundSphere);
+    let shader2 = new Shader('environment.png', false, () => {
+        backgroundSphere.material = shader2.material;
+        Globals.set("backgroundSphere", backgroundSphere);
+    });
 }
 

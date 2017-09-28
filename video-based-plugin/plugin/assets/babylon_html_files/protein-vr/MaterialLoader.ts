@@ -33,11 +33,16 @@ export function getFramePromises() {
 
                     if (isMobile) {
                         // Some kind of phone... use low-res images
-                        filename = "frames/" + filenames[i] + ".small.png?" + Math.random().toString();  // Note no caching, for debugging.
+                        filename = "frames/" + filenames[i] + ".small.png";  // Note no caching, for debugging.
                     } else {
                         // desktop and laptops ... full res images
-                        filename = "frames/" + filenames[i] + "?" + Math.random().toString();  // Note no caching, for debugging.
+                        filename = "frames/" + filenames[i];  // Note no caching, for debugging.
                     }
+
+                    if (Globals.get("breakCaching") === false) {
+                        filename = filename + "?" + Math.random().toString();
+                    }
+                    
                     let shader = new Shader(filename, true, () => {
                         setTimeout(() => {  // kind of like doEvents from VB days.
                             // Get the total number of textures.

@@ -21,7 +21,7 @@ define(["require", "exports", "./Camera", "../config/Globals", "../config/Global
                     Arrows.setup();
                     // Setup signs
                     Sign_1.setupAllSigns();
-                    // window.debugit = newScene.debugLayer;
+                    window.debugit = newScene.debugLayer;
                     // newScene.debugLayer.show();
                     if (Globals.get("debug")) {
                         newScene.debugLayer.show();
@@ -61,8 +61,9 @@ define(["require", "exports", "./Camera", "../config/Globals", "../config/Global
         backgroundSphere.rotation.y = 4.908738521234052; // To align export with scene. 281.25 degrees = 25/32*360
         backgroundSphere.isPickable = false;
         backgroundSphere.renderingGroupId = Globals_1.RenderingGroups.EnvironmentalSphere;
-        let shader2 = new StandardShader_1.Shader('environment.png', false);
-        backgroundSphere.material = shader2.material;
-        Globals.set("backgroundSphere", backgroundSphere);
+        let shader2 = new StandardShader_1.Shader('environment.png', false, () => {
+            backgroundSphere.material = shader2.material;
+            Globals.set("backgroundSphere", backgroundSphere);
+        });
     }
 });
