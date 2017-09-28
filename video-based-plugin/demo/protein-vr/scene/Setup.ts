@@ -1,0 +1,86 @@
+declare var BABYLON;
+
+import * as UserVars from "../config/UserVars";
+import { Camera } from "./Camera";
+import * as Globals from "../config/Globals";
+import { RenderingGroups } from "../config/Globals";
+import { Shader } from "../shaders/StandardShader";
+import * as Arrows from "./Arrows";
+import { setupAllSigns } from "./Sign";
+
+export function loadBabylonFile(): Promise<any> {
+
+    return new Promise((resolve) => {
+        BABYLON.SceneLoader.Load("", "babylon.babylon", Globals.get("engine"), (newScene) => {
+            Globals.set("scene", newScene);
+    
+            window.scrollTo(0, 1);  // supposed to autohide scroll bar.
+    
+            // Wait for textures and shaders to be ready
+            newScene.executeWhenReady(() => {
+                let camera = new Camera();
+                Globals.set("camera", camera);
+
+                // Delay textures until needed. Cool, but too slow for our purposes here...
+                // newScene.useDelayedTextureLoading = true
+                                
+                // Setup viewer sphere template
+                let radius = 12; // When using VR, this needs to be farther away that what it was rendered at. this._JSONData["viewerSphereSize"];
+                _setupViewerSphereTemplate(newScene, radius);
+                
+                // Set up environmental (background) sphere
+                _setupEnvironmentalSphere(newScene, radius);
+
+                // Setup arrows
+                Arrows.setup();
+
+                // Setup signs
+                setupAllSigns();
+
+                window.debugit = newScene.debugLayer;
+                // newScene.debugLayer.show();
+                
+                if (Globals.get("debug")) { newScene.debugLayer.show(); }
+                resolve({msg: "BABYLON.BABYLON LOADED"});
+            });
+        });
+    })
+}
+
+export function getMeshThatContainsStr(str: string, scene: any) {
+    // Identify viewer sphere template
+    let theMesh;
+    for (let t = 0; t < scene.meshes.length; t++) {
+        if (scene.meshes[t].name.indexOf(str) !== -1) {
+            theMesh = scene.meshes[t];
+            break;
+        }
+    }
+    return theMesh;
+}
+
+function _setupViewerSphereTemplate(newScene, radius) {
+    // Identify viewer sphere template
+    let viewerSphereTemplate = getMeshThatContainsStr("ProteinVR_ViewerSphere", newScene);
+    viewerSphereTemplate.scaling = new BABYLON.Vector3(radius, radius, -radius);
+    viewerSphereTemplate.isPickable = false;
+    viewerSphereTemplate.renderingGroupId = RenderingGroups.ViewerSphere;
+    viewerSphereTemplate.rotation.y = 4.908738521234052;  // To align export with scene. 281.25 degrees = 25/32*360
+    Globals.set("viewerSphereTemplate", viewerSphereTemplate);
+}
+
+function _setupEnvironmentalSphere(newScene, radius) {
+    let viewerSphereTemplate = Globals.get("viewerSphereTemplate")
+    let backgroundSphere = viewerSphereTemplate.clone("backgroundSphere");
+    let slightlyBiggerRadius = radius * 1.05;
+    backgroundSphere.scaling = new BABYLON.Vector3(slightlyBiggerRadius, slightlyBiggerRadius, -slightlyBiggerRadius);
+    backgroundSphere.rotation.y = 4.908738521234052;  // To align export with scene. 281.25 degrees = 25/32*360
+    backgroundSphere.isPickable = false;
+    backgroundSphere.renderingGroupId = RenderingGroups.EnvironmentalSphere;
+
+    let shader2 = new Shader('environment.png', false, () => {
+        backgroundSphere.material = shader2.material;
+        Globals.set("backgroundSphere", backgroundSphere);
+    });
+}
+
