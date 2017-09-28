@@ -44,6 +44,19 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         bpy.context.scene.frame_set(frame)
         bpy.context.scene.update()
+
+    #Created a Defined function for showing objects based on category
+    def show_objects(self, category):
+        for obj in self.object_categories[category]:
+            obj.hide = False
+            obj.hide_render = False
+
+    # Created a defined function for hiding objects based on category
+    def hide_objects(self, category):
+        for obj in self.object_categories[category]:
+            obj.hide = True
+            obj.hide_render = True
+
         
     def _step_0_existing_files_check_ok_and_copy(self):
         """
@@ -121,9 +134,10 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.extra_data = {
             "cameraPositions": [],
             "clickableFiles": [],
-            "meshedObjects": []
         }
 
+
+        # WOULD IT BE BETTER TO HAVE 4 CATEGORIES INSTEAD? HAVE LQ STATIC AND HQ STATIC? But still have the 3 layers that we talked about
         # Put objects into "render layer" categories.
         self.object_categories = {
             "BACKGROUND": [],
@@ -131,7 +145,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             "MESHED": []  # Includes onces marked meshed, and any ones that have animations.
         }
 
-        # TODO: PUT IN CATEGORIES HERE.
+        # Seperates the objects into their respective categories as specified by the user
         for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
             if(obj.bpy.types.Object.background == True):
                 self.object_categories["BACKGROUND"].append(obj) # background = an eventual PNG file that will be the background image. NOT MOVING
@@ -140,9 +154,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             elif(obj.bpy.types.Object.mesh == True):
                     self.object_categories["MESH"].append(obj) # Meshed = high quality objects, ALL ANIMATED objects are here, but some non animated can be in there if use wants high quality
             
-
-
-
 
 
     def _step_2_get_camerea_positions(self):
@@ -170,7 +181,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         else:
             print("WARNING: pngquant path not valid: " + self.scene.pngquant_path)
 
-    def _get_visible_objects_with_animations(self):
+    def _step_3_add_animated_objects_to_mesh_list_and_store_animation_data(self):
         """
         Get all the objects that are currently visible, but have animations.
 
@@ -179,6 +190,38 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                          records the animation of the objects.
         """
 
+        animation_data = {}
+
+        for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
+            if obj.hide == False and obj.hide_render == False: 
+                pos_loc_data = []
+                for f in range(self.frame_start, self.frame_end + 1):
+                    self.set_frame(f)
+                    loc = obj.location
+                    rot = obj.rotation_euler
+                    pos_loc_data.append((round(loc.x, 2), round(loc.y, 2), round(loc.z, 2), round(rot.x, 2), round(rot.y, 2), round(rot.z, 2)))
+
+                keys = ["_".join([str(i) for i in l]) for l in pos_loc_data]
+
+                keys = set(keys)
+                num_keyframes = len(keys)
+                if num_keyframes > 1:
+                    object_categories["MESH"].append(obj)
+                    animation_data[obj.name] = pos_loc_data
+                
+
+        # Get all the objects that are currently visible, but have animations.
+        #animation_data = self._step_3_add_animated_objects_to_mesh_list_and_store_animation_data()
+
+        # Save the animation data
+        self.extra_data["animations"] = animation_data
+
+        return
+        
+        
+        #return animation_data
+
+        ################################## OLD CODE #################################
 
         # DO WE NEED THIS METHOD ANYMORE NOW THAT WE HAVE A HASH TABLE THAT IS 
         # CONTAINS ALL THE OBJECTS THAT ARE MESHED, How about switching this method to 
@@ -187,31 +230,33 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # Note that this also saves the animation data. This isn't necessary
         # for identifying the object, but we have to get it anyway, so why not
         # save it?
-        meshed_objs = []
-        animation_data = {}
-        for obj in [o for o in bpy.data.objects if not "Camera" in o.name]: #change for loop to iterate through the hash table
-            if obj.hide == False and obj.hide_render == False: #would not need to check for hide value anymore
-                pos_loc_data = []
-                for f in range(self.frame_start, self.frame_end + 1):
-                    self.set_frame(f)
-                    loc = obj.location
-                    rot = obj.rotation_euler
-                    pos_loc_data.append((round(loc.x, 2), round(loc.y, 2), round(loc.z, 2), round(rot.x, 2), round(rot.y, 2), round(rot.z, 2)))
+        # meshed_objs = []
+        # animation_data = {}
+        # for obj in [o for o in bpy.data.objects if not "Camera" in o.name]: #change for loop to iterate through the hash table
+        #     if obj.hide == False and obj.hide_render == False: #would not need to check for hide value anymore
+        #         pos_loc_data = []
+        #         for f in range(self.frame_start, self.frame_end + 1):
+        #             self.set_frame(f)
+        #             loc = obj.location
+        #             rot = obj.rotation_euler
+        #             pos_loc_data.append((round(loc.x, 2), round(loc.y, 2), round(loc.z, 2), round(rot.x, 2), round(rot.y, 2), round(rot.z, 2)))
                 
-                keys = ["_".join([str(i) for i in l]) for l in pos_loc_data]
+        #         keys = ["_".join([str(i) for i in l]) for l in pos_loc_data]
 
-                keys = set(keys)
-                num_keyframes = len(keys)
-                if num_keyframes > 1:
-                    meshed_objs.append(obj)
-                    animation_data[obj.name] = pos_loc_data
-        return meshed_objs, animation_data
+        #         keys = set(keys)
+        #         num_keyframes = len(keys)
+        #         if num_keyframes > 1:
+        #             meshed_objs.append(obj)
+        #             animation_data[obj.name] = pos_loc_data
+        # return meshed_objs, animation_data
         
-    def _step_3_render_static_frames(self, debug=False):
+    def _step_4_render_static_frames(self, debug=False):
         """
         Render the frames, both mobile and full resolution.
 
-        :param bool debug: Whether to run in debug mode. Defaults to False.
+        :param bool debug: Whether to run in debug  # bpy.types.Object.background = self.prop_funcs.boolProp("background_image", False, description="Assigning image to be the background")
+        # bpy.types.Object.static = self.prop_funcs.boolProp("static", False, description="Assigning 3-D objects that are static/low quality, they are NOT animated")
+        # bpy.types.Object.mesh = self.prop_funcs.boolProp("mesh", False, description="Assigning 3-D objects that will be animated/High quality objects")mode. Defaults to False.
         """
 
         # TODO: OUTLINE OF WHAT NEEDS TO HAPPEN.
@@ -219,17 +264,13 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # Hide all objects in Background and meshed category. Show objects in static category.
         # For through each. For eaach frame, render a png file of the static images.
 
-        ##### OLD CODE BELOW #####
+        #Hiding objects in Background and Mesh category
+        hide_objects("BACKGROUND")
+        hide_objects("MESH")
 
-        # Get all the objects that are currently visible, but have animations.
-        meshed_objs, _ = self._get_visible_objects_with_animations()
-        
-        # Hide the moving objects (not rendered to sphere)
-        for obj in meshed_objs:          # INSTEAD OF ITERATING THROUGH THE ARRAY, GET RID OF IT, AND ITERATE THROUGH THE HAS TABLE
-            obj.hide = True
-            obj.hide_render = True
-        
-        # Setup cycles samples
+        # Showing objects in Static category
+        show_objects("STATIC")
+
         self.scene.render.resolution_percentage = 100.0
         self.scene.cycles.samples = self.scene.proteinvr_num_cycles
         self.scene.cycles.preview_samples = self.scene.proteinvr_num_cycles
@@ -237,51 +278,104 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         self.camera.rotation_mode = 'XYZ'
 
-        for this_frame in range(self.frame_start, self.frame_end + 1):
-            print("Frame", this_frame)
+        for static_obj in object_categories["STATIC"]:
+            for this_frame in range(self.frame_start, self.frame_end + 1):
+                print("Frame", this_frame)
 
-            self.set_frame(this_frame)
-            this_camera_pos = self.camera.location.copy()
-            self.camera.rotation_euler.x = 1.5707963267948966
-            self.camera.rotation_euler.y = 0.0
-            self.camera.rotation_euler.z = 0.0
-            self.camera.keyframe_insert(data_path="rotation_euler", frame=this_frame)
+                self.set_frame(this_frame)
+                this_camera_pos = self.camera.location.copy()
+                self.camera.rotation_euler.x = 1.5707963267948966
+                self.camera.rotation_euler.y = 0.0
+                self.camera.rotation_euler.z = 0.0
+                self.camera.keyframe_insert(data_path="rotation_euler", frame=this_frame)
 
-            if not debug:
-                # Create the image
-                self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png"
-                self.scene.render.image_settings.file_format = 'PNG'
-                self.scene.render.image_settings.color_mode = "RGBA"
-                self.scene.render.image_settings.compression = 100
-                self.scene.render.image_settings.quality = self.scene.jpeg_quality
-                self.scene.render.resolution_x = self.scene.proteinvr_bake_texture_size
-                self.scene.render.resolution_y = self.scene.proteinvr_bake_texture_size
-                self.scene.render.resolution_percentage = 100
-                bpy.ops.render.render(write_still=True)
-                self._compress_png(self.scene.render.filepath)
-
-                # frame_file_names.append("proteinvr_baked_texture" + str(this_frame) + ".png")
-
-                # Now render at 1/4 size. But note that I'm rerendering here,
-                # not resizing. So can be computationally intensive. I chose
-                # this because I believe it gives better results, but I'm not
-                # sure.
-                if self.scene.proteinvr_mobile_bake_texture_size != 0:
-                    self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
-                    self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png.small.png"
+                if not debug:
+                    self.scene.render.filepath = self.frame_dir + "protein_baked_texture" + str(this_frame) + ".png"
+                    self.scene.render.image_setting.file_format = 'PNG'
+                    self.scene.render.image_setting.file_format = "RGBA"
+                    self.scene.render.image_settings.compression = 100
+                    self.scene.render.image_settings.quality = self.scene.jpeg_quality
+                    self.scene.render.resolution_x = self.scene.proteinvr_bake_texture_size
+                    self.scene.render.resolution_y = self.scene.proteinvr_bake_texture_size
+                    self.scene.render.resolution_percentage = 100
                     bpy.ops.render.render(write_still=True)
                     self._compress_png(self.scene.render.filepath)
-                else:
-                    print("WARNING: Skipping the mobile textures...")
+
+                    if self.scene.proteinvr_mobile_bake_texture_size != 0:
+                        self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
+                        self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png.small.png"
+                        bpy.ops.render.render(write_still=True)
+                        self._compress_png(self.scene.render.filepath)
+                    else:
+                        print("WARNING: Skipping the mobile textures...")
+
+            show_objects("MESH")
+
+            self.scene.cycles.film_transparent = False
+
+        ######################################################## OLD CODE BELOW ##############################################
+
+        # # Get all the objects that are currently visible, but have animations.
+        # meshed_objs, _ = self._step_3_add_animated_objects_to_mesh_list_and_store_animation_data()
+        
+        # # Hide the moving objects (not rendered to sphere)
+        # for obj in meshed_objs:          # INSTEAD OF ITERATING THROUGH THE ARRAY, GET RID OF IT, AND ITERATE THROUGH THE HAS TABLE
+        #     obj.hide = True
+        #     obj.hide_render = True
+        
+        # # Setup cycles samples
+        # self.scene.render.resolution_percentage = 100.0
+        # self.scene.cycles.samples = self.scene.proteinvr_num_cycles
+        # self.scene.cycles.preview_samples = self.scene.proteinvr_num_cycles
+        # self.scene.cycles.film_transparent = True  # Because you're saving the background separately.
+
+        # self.camera.rotation_mode = 'XYZ'
+
+        # for this_frame in range(self.frame_start, self.frame_end + 1):
+        #     print("Frame", this_frame)
+
+        #     self.set_frame(this_frame)
+        #     this_camera_pos = self.camera.location.copy()
+        #     self.camera.rotation_euler.x = 1.5707963267948966
+        #     self.camera.rotation_euler.y = 0.0
+        #     self.camera.rotation_euler.z = 0.0
+        #     self.camera.keyframe_insert(data_path="rotation_euler", frame=this_frame)
+
+        #     if not debug:
+        #         # Create the image
+        #         self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png"
+        #         self.scene.render.image_settings.file_format = 'PNG'
+        #         self.scene.render.image_settings.color_mode = "RGBA"
+        #         self.scene.render.image_settings.compression = 100
+        #         self.scene.render.image_settings.quality = self.scene.jpeg_quality
+        #         self.scene.render.resolution_x = self.scene.proteinvr_bake_texture_size
+        #         self.scene.render.resolution_y = self.scene.proteinvr_bake_texture_size
+        #         self.scene.render.resolution_percentage = 100
+        #         bpy.ops.render.render(write_still=True)
+        #         self._compress_png(self.scene.render.filepath)
+
+        #         # frame_file_names.append("proteinvr_baked_texture" + str(this_frame) + ".png")
+
+        #         # Now render at 1/4 size. But note that I'm rerendering here,
+        #         # not resizing. So can be computationally intensive. I chose
+        #         # this because I believe it gives better results, but I'm not
+        #         # sure.
+        #         if self.scene.proteinvr_mobile_bake_texture_size != 0:
+        #             self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
+        #             self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png.small.png"
+        #             bpy.ops.render.render(write_still=True)
+        #             self._compress_png(self.scene.render.filepath)
+        #         else:
+        #             print("WARNING: Skipping the mobile textures...")
                 
-        # Reshow moving objects  
-        for obj in meshed_objs:  #ITERATE THROUGH HASH TABLE AGAIN?
-            obj.hide = False
-            obj.hide_render = False
+        # # Reshow moving objects  
+        # for obj in meshed_objs:  #ITERATE THROUGH HASH TABLE AGAIN?
+        #     obj.hide = False
+        #     obj.hide_render = False
 
-        self.scene.cycles.film_transparent = False  # Time to restore the environment lighting
+        # self.scene.cycles.film_transparent = False  # Time to restore the environment lighting
 
-    def _step_4_render_background_image(self):
+    def _step_5_render_background_image(self):
         """
         Get the environment texture and save that.
         """
@@ -294,6 +388,11 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         # DO WE WANT THE BACKGROUND TO BE A PNG FILE? OR WILL THIS BE CREATED IN BLENDER???
 
+        only_frame = self.frame_start
+
+        hide_objects("MESH")
+        hide_objects("STATIC")
+
         ##### OLD CODE BELOW #######
 
         src_background_environment_image = bpy.path.abspath(self.scene.background_environment_image)
@@ -302,22 +401,12 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         else:
             print("WARNING: Environmental texture file does not exist!")
 
-    def _step_5_save_animation_data(self):
+    def _step_6_save_meshed_objects(self):
         """
         Save the animation data.
         """
 
-        #WHAT IS THE DIFFERENCE BETWEEN THIS METHOD AND get_visible_objects METHOD?
-        # WE CAN CREATE AN ARRAY THAT STORES THE ANIMATION DATA THAT HAS THE SAME INDEX AS THE OBJECT
-        
-        # Get all the objects that are currently visible, but have animations.
-        meshed_objs, animation_data = self._get_visible_objects_with_animations()
-
-        # TODO: Add any object in the MESHED category to meshed_objs so it gets saved separately.
-
-        # Save the animations
-        self.extra_data["animations"] = animation_data
-        for obj_name in animation_data.keys():
+        for obj_name in object_categories["MESH"]: 
             obj = bpy.data.objects[obj_name]
 
             # Save the obj file.
@@ -334,10 +423,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 axis_forward="-Z"
             )
 
-            #WHAT IS THIS??????????
-
             # Search the node tree to find a texture
-            texture_images = [n.image for n in bpy.data.objects["Cube"].active_material.node_tree.nodes if n.type == "TEX_IMAGE"]
+            texture_images = [n.image for n in obj.active_material.node_tree.nodes if n.type == "TEX_IMAGE"]
             if len(texture_images) > 0:
                 print("=" * 15)
                 print("WARNING! More than one image node found in material for " + obj_name + ". Using " + str(texture_images[0]))
@@ -350,7 +437,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             image.file_format = 'PNG'
             image.save()
 
-    def _step_6_save_filenames_and_filesizes(self):
+    def _step_7_save_filenames_and_filesizes(self):
         """
         Record the filenames of the baked images. Also, get the total size of
         the files.
@@ -377,16 +464,12 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             "small": small_file_size
         }, open(self.frame_dir + "filesizes.json",'w'))
 
-    def _step_7_make_proteinvr_clickable_meshes(self):
+    def _step_8_make_proteinvr_clickable_meshes(self):
         """
         Identify the meshes marked as clickable. Make and save simple OBJ
         files that encompass those objects. Better to click on those simple
         objects that the complex original meshes.
         """
-
-
-        #WHAT IS THE PURPOSE OF CLICKABLE????
-        #DO WE WANT TO ADD CLICKABLE TO THE HASH TABLE???
 
         # Now go through visible objects and get encompassing spheres
         for obj in bpy.data.objects:
@@ -459,13 +542,14 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         self._step_1_initialize_variables()
         self._step_2_get_camerea_positions()
+        self._step_3_add_animated_objects_to_mesh_list_and_store_animation_data()
 
         if len(glob.glob(self.proteinvr_output_dir + "frames/*.png")) == 0:
-            self._step_3_render_static_frames(debug)
-        self._step_4_render_background_image()
-        self._step_5_save_animation_data()
-        self._step_6_save_filenames_and_filesizes()
-        self._step_7_make_proteinvr_clickable_meshes()
+            self._step_4_render_static_frames(debug)
+        self._step_5_render_background_image()
+        self._step_6_save_meshed_objects()
+        self._step_7_save_filenames_and_filesizes()
+        self._step_8_make_proteinvr_clickable_meshes()
 
         json.dump(
             self.extra_data, 

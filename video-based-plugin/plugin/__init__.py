@@ -82,9 +82,12 @@ class ProteinVR(PanelParentClass):
         bpy.types.Object.proteinvr_clickable = self.prop_funcs.boolProp("proteinvr_clickable", False, description="Whether this object is proteinvr_clickable.")
 
         # Boolean variables for the three object categories.
-        bpy.types.Object.background = self.prop_funcs.boolProp("background_image", False, description="Assigning image to be the background")
-        bpy.types.Object.static = self.prop_funcs.boolProp("static", False, description="Assigning 3-D objects that are static/low quality, they are NOT animated")
-        bpy.types.Object.mesh = self.prop_funcs.boolProp("mesh", False, description="Assigning 3-D objects that will be animated/High quality objects")
+        # bpy.types.Object.background = self.prop_funcs.boolProp("background_image", False, description="Assigning image to be the background")
+        # bpy.types.Object.static = self.prop_funcs.boolProp("static", False, description="Assigning 3-D objects that are static/low quality, they are NOT animated")
+        # bpy.types.Object.mesh = self.prop_funcs.boolProp("mesh", False, description="Assigning 3-D objects that will be animated/High quality objects")
+
+        bpy.types.Object.proteinvr_category = self.prop_funcs.enumProp("Object Category", [("static", "Static", "static"), ("mesh", "Mesh", "mesh"), ("background", "Background", "background")], description="Assign object to categories.")
+
 
         # Setup the two panels.
         self.SetupPanel = SetupPanel.SetupPanel(self.ui)
