@@ -179,7 +179,8 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows"]
                 }
                 this._setupMouseAndKeyboard();
                 // Move camera to first position.
-                scene.activeCamera.position = Globals.get("cameraPositions")[0];
+                let first_position = Globals.get("cameraPositions")[0];
+                scene.activeCamera.position = first_position;
                 // Add extra keys
                 // Additional control keys.
                 // this._parentObj.scene.activeCamera.keysUp.push(87);  // W. 38 is up arrow.
@@ -397,6 +398,8 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows"]
             this._updatePos(1.0, camera);
             // Determine where you can move from here.
             this._setCloseCameraDataAndArrows(camera);
+            // Make sure environmental sphere properly positioned.
+            Globals.get("backgroundSphere").position = camera.position;
         }
         _setCloseCameraDataAndArrows(camera) {
             // console.log("_setCloseCameraData");

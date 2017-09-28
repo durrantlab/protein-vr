@@ -211,7 +211,8 @@ export class Camera {
             this._setupMouseAndKeyboard();
     
             // Move camera to first position.
-            scene.activeCamera.position = Globals.get("cameraPositions")[0];
+            let first_position = Globals.get("cameraPositions")[0];
+            scene.activeCamera.position = first_position;
     
             // Add extra keys
             // Additional control keys.
@@ -499,6 +500,9 @@ export class Camera {
 
         // Determine where you can move from here.
         this._setCloseCameraDataAndArrows(camera);
+
+        // Make sure environmental sphere properly positioned.
+        Globals.get("backgroundSphere").position = camera.position;
 
     }
 

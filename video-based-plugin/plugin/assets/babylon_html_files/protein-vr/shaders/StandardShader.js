@@ -25,15 +25,7 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
                     this.material.backFaceCulling = false;
                     // Dispose of unneeded stuff
                     newMaterial.dispose();
-                    // aScene.dispose();
-                    // material.backFaceCulling = false;        
-                    // if (this._transparency) {
-                    //     material.opacityTexture = material.emissiveTexture;
-                    // }
-                    // this.material = material;
-                    // console.log(this);
-                    // console.log(material);
-                    // console.log("======")
+                    // aScene.dispose();  // gives an error.
                     callBack();
                 });
             });
