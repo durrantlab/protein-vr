@@ -12,8 +12,8 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
             let basename = textureFilename.replace(/.*\//, "");
             BABYLON.SceneLoader.Load(dirname, basename + ".babylon", Globals.get("engine"), (aScene) => {
                 aScene.executeWhenReady(() => {
-                    let material = aScene.materials[0];
-                    let texture = material.emissiveTexture;
+                    let newMaterial = aScene.materials[0];
+                    let texture = newMaterial.emissiveTexture;
                     this.material = new BABYLON.StandardMaterial("mat" + Math.random().toString(), scene);
                     this.material.diffuseColor = new BABYLON.Color3(0, 0, 0);
                     this.material.specularColor = new BABYLON.Color3(0, 0, 0);
@@ -23,6 +23,9 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
                         this.material.opacityTexture = texture;
                     }
                     this.material.backFaceCulling = false;
+                    // Dispose of unneeded stuff
+                    newMaterial.dispose();
+                    // aScene.dispose();
                     // material.backFaceCulling = false;        
                     // if (this._transparency) {
                     //     material.opacityTexture = material.emissiveTexture;

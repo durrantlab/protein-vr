@@ -15,8 +15,8 @@ export class Shader {
 
         BABYLON.SceneLoader.Load(dirname, basename + ".babylon", Globals.get("engine"), (aScene) => {
             aScene.executeWhenReady(() => {
-                let material = aScene.materials[0];
-                let texture = material.emissiveTexture;
+                let newMaterial = aScene.materials[0];
+                let texture = newMaterial.emissiveTexture;
 
                 this.material = new BABYLON.StandardMaterial("mat" + Math.random().toString(), scene);
                 this.material.diffuseColor = new BABYLON.Color3(0, 0, 0);
@@ -28,21 +28,15 @@ export class Shader {
                 }
                 
                 this.material.backFaceCulling = false;
+
+                // Dispose of unneeded stuff
+                newMaterial.dispose();
+                // aScene.dispose();  // gives an error.
                 
-                // material.backFaceCulling = false;        
-                
-                // if (this._transparency) {
-                //     material.opacityTexture = material.emissiveTexture;
-                // }
-                
-                // this.material = material;
-                // console.log(this);
-                // console.log(material);
-                // console.log("======")
                 callBack();
             });
         });
-        
+
         // return;
 
         // let texture = new BABYLON.Texture(textureFilename, scene, false, true, BABYLON.Texture.TRILINEAR_SAMPLINGMODE, () => {
