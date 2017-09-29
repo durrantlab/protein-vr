@@ -45,14 +45,24 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         bpy.context.scene.frame_set(frame)
         bpy.context.scene.update()
 
-    #Created a Defined function for showing objects based on category
     def show_objects(self, category):
+        """
+        Iterate through dictionary to hide all objects in specified category
+
+        :param str category: name of category
+        """
         for obj in self.object_categories[category]:
             obj.hide = False
             obj.hide_render = False
 
-    # Created a defined function for hiding objects based on category
+    # Defined function for hiding objects based on category
     def hide_objects(self, category):
+        """
+        Iterate through dictionary to show all objects in specified category
+
+        :param str category: name of category
+        """
+
         for obj in self.object_categories[category]:
             obj.hide = True
             obj.hide_render = True
@@ -135,9 +145,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             "cameraPositions": [],
             "clickableFiles": [],
         }
-
-
-        # WOULD IT BE BETTER TO HAVE 4 CATEGORIES INSTEAD? HAVE LQ STATIC AND HQ STATIC? But still have the 3 layers that we talked about
+        
         # Put objects into "render layer" categories.
         self.object_categories = {
             "BACKGROUND": [],
@@ -147,11 +155,11 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         # Seperates the objects into their respective categories as specified by the user
         for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
-            if(obj.bpy.types.Object.background == True):
+            if(obj.bpy.types.Object.proteinvr_category == "background"):
                 self.object_categories["BACKGROUND"].append(obj) # background = an eventual PNG file that will be the background image. NOT MOVING
-            elif(obj.bpy.types.Object.static == True):
+            elif(obj.bpy.types.Object.proteinvr_category == "static"):
                     self.object_categories["STATIC"].append(obj) # Static = low quality non moving images, this based on user preference
-            elif(obj.bpy.types.Object.mesh == True):
+            elif(obj.bpy.types.Object.proteinvr_category == "mesh"):
                     self.object_categories["MESH"].append(obj) # Meshed = high quality objects, ALL ANIMATED objects are here, but some non animated can be in there if use wants high quality
             
 
@@ -190,36 +198,31 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                          records the animation of the objects.
         """
 
+        # animation_data is a dictionary to hold location data of animated objects
         animation_data = {}
 
+        # Looping through all objects for error checking to make sure an animated object was not placed in the wrong category
         for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
             if obj.hide == False and obj.hide_render == False: 
                 pos_loc_data = []
-                for f in range(self.frame_start, self.frame_end + 1):
+                for f in range(self.frame_start, self.frame_end + 1):  # Looping through each frame
                     self.set_frame(f)
                     loc = obj.location
                     rot = obj.rotation_euler
-                    pos_loc_data.append((round(loc.x, 2), round(loc.y, 2), round(loc.z, 2), round(rot.x, 2), round(rot.y, 2), round(rot.z, 2)))
+                    pos_loc_data.append((round(loc.x, 2), round(loc.y, 2), round(loc.z, 2), round(rot.x, 2), round(rot.y, 2), round(rot.z, 2))) # Storing location data
 
                 keys = ["_".join([str(i) for i in l]) for l in pos_loc_data]
 
                 keys = set(keys)
                 num_keyframes = len(keys)
-                if num_keyframes > 1:
-                    object_categories["MESH"].append(obj)
-                    animation_data[obj.name] = pos_loc_data
-                
-
-        # Get all the objects that are currently visible, but have animations.
-        #animation_data = self._step_3_add_animated_objects_to_mesh_list_and_store_animation_data()
+                if num_keyframes > 1: # Checking to see if object is animated
+                    object_categories["MESH"].append(obj) # If object is animated then, add to category MESH
+                    animation_data[obj.name] = pos_loc_data # Add location data to animation_data dictionary with key of object name
 
         # Save the animation data
         self.extra_data["animations"] = animation_data
 
         return
-        
-        
-        #return animation_data
 
         ################################## OLD CODE #################################
 
@@ -259,10 +262,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # bpy.types.Object.mesh = self.prop_funcs.boolProp("mesh", False, description="Assigning 3-D objects that will be animated/High quality objects")mode. Defaults to False.
         """
 
-        # TODO: OUTLINE OF WHAT NEEDS TO HAPPEN.
-
         # Hide all objects in Background and meshed category. Show objects in static category.
-        # For through each. For eaach frame, render a png file of the static images.
+        # For through each. For each frame, render a png file of the static images.
 
         #Hiding objects in Background and Mesh category
         hide_objects("BACKGROUND")
@@ -291,8 +292,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
                 if not debug:
                     self.scene.render.filepath = self.frame_dir + "protein_baked_texture" + str(this_frame) + ".png"
-                    self.scene.render.image_setting.file_format = 'PNG'
-                    self.scene.render.image_setting.file_format = "RGBA"
+                    self.scene.render.image_settings.file_format = 'PNG'
+                    self.scene.render.image_settings.file_format = "RGBA"
                     self.scene.render.image_settings.compression = 100
                     self.scene.render.image_settings.quality = self.scene.jpeg_quality
                     self.scene.render.resolution_x = self.scene.proteinvr_bake_texture_size
@@ -379,27 +380,29 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         """
         Get the environment texture and save that.
         """
-
-        # TODO:
         # Next, render the background (only once)
         #   Change to frame 1
         #   Hide all objects in Static and meshed categories
         #   Render background.png, using code like that below.
 
-        # DO WE WANT THE BACKGROUND TO BE A PNG FILE? OR WILL THIS BE CREATED IN BLENDER???
-
-        only_frame = self.frame_start
+        self.set_frame = self.frame_start
 
         hide_objects("MESH")
         hide_objects("STATIC")
-
-        ##### OLD CODE BELOW #######
 
         src_background_environment_image = bpy.path.abspath(self.scene.background_environment_image)
         if os.path.exists(src_background_environment_image):
             shutil.copyfile(src_background_environment_image, self.proteinvr_output_dir + "environment.png")
         else:
             print("WARNING: Environmental texture file does not exist!")
+
+        ##### OLD CODE BELOW #######
+
+        # src_background_environment_image = bpy.path.abspath(self.scene.background_environment_image)
+        # if os.path.exists(src_background_environment_image):
+        #     shutil.copyfile(src_background_environment_image, self.proteinvr_output_dir + "environment.png")
+        # else:
+        #     print("WARNING: Environmental texture file does not exist!")
 
     def _step_6_save_meshed_objects(self):
         """
