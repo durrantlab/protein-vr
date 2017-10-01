@@ -203,8 +203,9 @@ export class Camera {
                     // And as @Sebavan said, you need a user's interaction to
                     // render the scene in the headset (at least required by
                     // Chrome as far as I remember, not sure it's specified by
-                    // the spec).
-                    this._setupWebVRFreeCamera();
+                    // the spec). So the below is commented out. It is instead
+                    // run when the user presses the play button...
+                    // this._setupWebVRFreeCamera();
                     break;
             }
     
@@ -276,7 +277,7 @@ export class Camera {
         this._makeCameraReplaceActiveCamera(camera);
     }
 
-    private _setupWebVRFreeCamera() {
+    public _setupWebVRFreeCamera() {
         // This code untested, but designed for stuff like Oculus rift.
         let scene = Globals.get("scene");
         let canvas = Globals.get("canvas");
@@ -298,6 +299,7 @@ export class Camera {
                 false,  // compensate distortion
                 metrics
             );
+            // console.log("Camera setup...");
         } else {
             camera = new BABYLON.VRDeviceOrientationFreeCamera(
                 "deviceOrientationCamera", 
@@ -307,8 +309,44 @@ export class Camera {
                 metrics
             );
         }
+        
+        jQuery("body").click(() => {
+            console.log(camera, canvas);
+            camera.attachControl(canvas, true);
+        })
 
+        camera.attachControl(canvas, true);  // Added this here to get
+                                                   // it as close to the click
+                                                   // event as possible. WebVR
+                                                   // only starts on user
+                                                   // interaction. 
         this._makeCameraReplaceActiveCamera(camera);
+        camera.initControllers();
+
+        // Keep attaching meshes to the controllers whenever a new one pops up.
+        setInterval(() => {
+            this._attachMeshToWebVRControllers();
+        }, 2000);
+        // console.log("controllers!", camera.controllers);
+        
+        window.camera = camera;
+    }
+
+    private _meshesAttachedToControllers = [];
+    private _attachMeshToWebVRControllers() {
+        let scene = Globals.get("scene");
+        let BABYLON = Globals.get("BABYLON");
+        let controllers = scene.activeCamera.controllers;
+        for (let i = 0; i < controllers.length; i++) {
+            if (this._meshesAttachedToControllers.length !== controllers.length) {
+                // No mesh yet attached
+                var box = BABYLON.Mesh.CreateBox("mesh", 3, scene);
+                this._meshesAttachedToControllers.push(box);
+                controllers[i].attachToMesh(box);
+            }
+        }
+
+        console.log(this._meshesAttachedToControllers, controllers);
     }
 
     private _makeCameraReplaceActiveCamera(camera) {
@@ -342,7 +380,7 @@ export class Camera {
         scene.activeCamera = camera;
     
         // Attach that camera to the canvas.
-        scene.activeCamera.attachControl(canvas);  // This won't work if desktop-based vr like htc vive. So this command also run on play-button click.
+        scene.activeCamera.attachControl(canvas, true);
     }
 
     private _setupMouseAndKeyboard() {

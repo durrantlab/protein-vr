@@ -97,7 +97,10 @@ export class Game {
                 // canvas here. This is because it can only be done on user
                 // interaction.
                 if (Globals.get("cameraTypeToUse") === "show-desktop-vr") {
-                    Globals.get("scene").activeCamera.attachControl(canvas);
+                    let camera = Globals.get("scene").activeCamera;
+                    console.log("Attaching. Camera set up already?");
+                    camera.attachControl(canvas);
+                    camera.initControllers();
                 }
 
                 this._startRenderLoop();

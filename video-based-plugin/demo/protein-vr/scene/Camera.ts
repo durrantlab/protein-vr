@@ -298,6 +298,7 @@ export class Camera {
                 false,  // compensate distortion
                 metrics
             );
+            console.log("Camera setup!");
         } else {
             camera = new BABYLON.VRDeviceOrientationFreeCamera(
                 "deviceOrientationCamera", 

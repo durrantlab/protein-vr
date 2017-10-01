@@ -31,6 +31,7 @@ export function getFramePromises() {
                 new Promise((resolve) => {
                     let filename: string;
 
+                    // isMobile = true;
                     if (isMobile) {
                         // Some kind of phone... use low-res images
                         filename = "frames/" + filenames[i] + ".small.png";  // Note no caching, for debugging.

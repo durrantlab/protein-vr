@@ -5,6 +5,7 @@ import * as SettingsPanel from "./config/SettingsPanel";
 import * as SceneSetup from "./scene/Setup";
 import * as Globals from "./config/Globals";
 import * as PVRJsonSetup from "./scene/PVRJsonSetup";
+import * as Camera from "./scene/Camera";
 
 declare var BABYLON;
 declare var jQuery;
@@ -85,6 +86,20 @@ export class Game {
             jQuery("#start-game").click(() => {  // Start button within loading panel pressed.
                 let engine = Globals.get("engine");
                 let canvas = jQuery("canvas");
+                let scene = Globals.get("scene");
+
+                // If it's an HTC vive or something, you need to attach the
+                // canvas here. This is because it can only be done on user
+                // interaction.
+                if (Globals.get("cameraTypeToUse") === "show-desktop-vr") {
+                    // console.log("Attaching. Camera set up already?");
+                    let cameraObj = Globals.get("camera");
+                    cameraObj._setupWebVRFreeCamera();
+                    // let camera = Globals.get("scene").activeCamera;
+                    // camera.attachControl(canvas);
+                    // console.log(cameraObj);
+                }
+                
                 jQuery("#loading_panel").hide(); // fadeOut(() => {
                 canvas.show();
                 canvas.focus();  // to make sure keypresses work.
@@ -93,13 +108,6 @@ export class Game {
                     UserVars.getParam("viewer") == UserVars.viewers["Screen"]
                 )
                 
-                // If it's an HTC vive or something, you need to attach the
-                // canvas here. This is because it can only be done on user
-                // interaction.
-                if (Globals.get("cameraTypeToUse") === "show-desktop-vr") {
-                    Globals.get("scene").activeCamera.attachControl(canvas);
-                }
-
                 this._startRenderLoop();
                 engine.resize();
             })

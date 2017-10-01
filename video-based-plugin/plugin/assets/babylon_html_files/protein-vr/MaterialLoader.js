@@ -24,6 +24,7 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
                 for (let i = 0; i < filenames.length; i++) {
                     new Promise((resolve) => {
                         let filename;
+                        // isMobile = true;
                         if (isMobile) {
                             // Some kind of phone... use low-res images
                             filename = "frames/" + filenames[i] + ".small.png"; // Note no caching, for debugging.
