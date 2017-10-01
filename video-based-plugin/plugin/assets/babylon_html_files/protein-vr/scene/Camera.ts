@@ -340,7 +340,7 @@ export class Camera {
         for (let i = 0; i < controllers.length; i++) {
             if (this._meshesAttachedToControllers.length !== controllers.length) {
                 // No mesh yet attached
-                var box = BABYLON.Mesh.CreateBox("mesh", 3, scene);
+                var box = BABYLON.Mesh.CreateBox("hand" + i.toString(), 3, scene);
                 this._meshesAttachedToControllers.push(box);
                 controllers[i].attachToMesh(box);
             }
