@@ -229,7 +229,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         return
 
-        ################################## OLD CODE #################################
+        ######################################################## OLD CODE ######################################################################
 
         # DO WE NEED THIS METHOD ANYMORE NOW THAT WE HAVE A HASH TABLE THAT IS 
         # CONTAINS ALL THE OBJECTS THAT ARE MESHED, How about switching this method to 
@@ -279,6 +279,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # Showing objects in Static category
         show_objects("STATIC")
 
+        # TODO: Some of these variables are not called after this.....
         self.scene.render.resolution_percentage = 100.0
         self.scene.cycles.samples = self.scene.proteinvr_num_cycles
         self.scene.cycles.preview_samples = self.scene.proteinvr_num_cycles
@@ -389,7 +390,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         """
         Get the environment texture and save that.
         """
-        # Next, render the background (only once)
+        #  Next, render the background (only once)
         #   Change to frame 1
         #   Hide all objects in Static and meshed categories
         #   Render background.png, using code like that below.
@@ -405,7 +406,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         else:
             print("WARNING: Environmental texture file does not exist!")
 
-        ############################ OLD CODE BELOW ################################
+        ################################################################# OLD CODE BELOW ########################################################################
 
         # src_background_environment_image = bpy.path.abspath(self.scene.background_environment_image)
         # if os.path.exists(src_background_environment_image):
