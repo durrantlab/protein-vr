@@ -229,7 +229,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         return
 
-        ######################################################## OLD CODE ######################################################################
+        ####################################################### OLD CODE ######################################################################
 
         # DO WE NEED THIS METHOD ANYMORE NOW THAT WE HAVE A HASH TABLE THAT IS 
         # CONTAINS ALL THE OBJECTS THAT ARE MESHED, How about switching this method to 
