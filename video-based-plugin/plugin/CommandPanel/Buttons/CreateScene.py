@@ -45,6 +45,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         bpy.context.scene.frame_set(frame)
         bpy.context.scene.update()
 
+
+
     def show_objects(self, category):
         """
         Iterate through dictionary to hide all objects in specified category
@@ -55,19 +57,36 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             obj.hide = False
             obj.hide_render = False
 
-    # Defined function for hiding objects based on category
+
+    
     def hide_objects(self, category):
         """
         Iterate through dictionary to show all objects in specified category
 
         :param str category: name of category
         """
-
         for obj in self.object_categories[category]:
             obj.hide = True
             obj.hide_render = True
 
-        
+
+
+    def _compress_png(self, filename):
+        """
+        Compress a png file. Uses pngquant.
+
+        :param str filename: The filename of the png to compress.
+        """
+        if os.path.exists(self.scene.pngquant_path):
+            cmd = self.scene.pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
+            # print("RUN: " + cmd)          
+            os.system(cmd)
+            os.rename(filename + '.tmp.png', filename)
+        else:
+            print("WARNING: pngquant path not valid: " + self.scene.pngquant_path)        
+
+
+
     def _step_0_existing_files_check_ok_and_copy(self):
         """
         Check to make sure the user-specified files exist. If so, start
@@ -130,7 +149,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
 
 
-
     def _step_1_initialize_variables(self):
         """
         Initialize some variables.
@@ -174,20 +192,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             this_camera_pos = self.camera.location.copy()
             self.extra_data["cameraPositions"].append([round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)])
 
-    def _compress_png(self, filename):
-        """
-        Compress a png file. Uses pngquant.
 
-        :param str filename: The filename of the png to compress.
-        """
-
-        if os.path.exists(self.scene.pngquant_path):
-            cmd = self.scene.pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
-            # print("RUN: " + cmd)          
-            os.system(cmd)
-            os.rename(filename + '.tmp.png', filename)
-        else:
-            print("WARNING: pngquant path not valid: " + self.scene.pngquant_path)
 
     def _step_3_add_animated_objects_to_mesh_list_and_store_animation_data(self):
         """
@@ -253,6 +258,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         #             animation_data[obj.name] = pos_loc_data
         # return meshed_objs, animation_data
         
+
+
     def _step_4_render_static_frames(self, debug=False):
         """
         Render the frames, both mobile and full resolution.
@@ -376,6 +383,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         # self.scene.cycles.film_transparent = False  # Time to restore the environment lighting
 
+
+
     def _step_5_render_background_image(self):
         """
         Get the environment texture and save that.
@@ -396,7 +405,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         else:
             print("WARNING: Environmental texture file does not exist!")
 
-        ##### OLD CODE BELOW #######
+        ############################ OLD CODE BELOW ################################
 
         # src_background_environment_image = bpy.path.abspath(self.scene.background_environment_image)
         # if os.path.exists(src_background_environment_image):
@@ -404,11 +413,13 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # else:
         #     print("WARNING: Environmental texture file does not exist!")
 
+
+
     def _step_6_save_meshed_objects(self):
         """
         Save the animation data.
         """
-
+        # TODO: DO WE STILL NEED TO SAVE THE ANIMATION DATA TO THE DISK?
         for obj_name in object_categories["MESH"]: 
             obj = bpy.data.objects[obj_name]
 
@@ -440,6 +451,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             image.file_format = 'PNG'
             image.save()
 
+
+
     def _step_7_save_filenames_and_filesizes(self):
         """
         Record the filenames of the baked images. Also, get the total size of
@@ -466,6 +479,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             "regular": reg_file_size,
             "small": small_file_size
         }, open(self.frame_dir + "filesizes.json",'w'))
+
+
 
     def _step_8_make_proteinvr_clickable_meshes(self):
         """
@@ -527,6 +542,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             
             # Remove the proteinvr_clickable mesh now that it's saved
             bpy.ops.object.delete()
+
+
 
     def execute(self, context):
         """
