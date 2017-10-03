@@ -41,7 +41,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         :param int frame: The frame number.
         """
-
         bpy.context.scene.frame_set(frame)
         bpy.context.scene.update()
 
@@ -202,7 +201,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                          list of objects. animation_data is a dictionary that
                          records the animation of the objects.
         """
-
+        
         # animation_data is a dictionary to hold location data of animated objects
         animation_data = {}
 
