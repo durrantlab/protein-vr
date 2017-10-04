@@ -8,3 +8,8 @@ cd -
 
 # Now copy that source to this directory.
 rsync -r --exclude="*.mm" --exclude="update*" ../plugin/assets/babylon_html_files/* ./
+
+# Start a server
+# http://0.0.0.0:8000 (or maybe localhost:8000)
+python -m SimpleHTTPServer 8000
+
