@@ -128,6 +128,7 @@ def preliminary_checks(scene_data, params):
                         #print( "result", image.name, image.filepath )
                     else:
                         # If it's here there's a problem.
+                        print("PROBLEM!!!!")
                         import pdb; pdb.set_trace()
                     # except:
                     #     scene_data["materials"][obj.name]["color"] = color[:3]

@@ -55,6 +55,8 @@ class CommandPanel(ParentPanel):
             self.ui.object_property("proteinvr_clickable")
 
         self.ui.object_property("proteinvr_category")
+        self.ui.ops_button(rel_data_path="proteinvr.set_background", button_label="Set As Background")
+
 
 
         # Set up UI

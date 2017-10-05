@@ -192,7 +192,7 @@ class Properties:
 
         return EnumProperty(
             name=txt,
-            #default = items[0],
+            default=items[0][0],
             description=description,
             update=update,
             items=items

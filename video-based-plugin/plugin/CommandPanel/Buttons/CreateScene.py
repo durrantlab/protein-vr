@@ -55,7 +55,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             obj.hide = False
             obj.hide_render = False
 
-    # Defined function for hiding objects based on category
     def hide_objects(self, category):
         """
         Iterate through dictionary to show all objects in specified category
@@ -155,7 +154,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         # Seperates the objects into their respective categories as specified by the user
         for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
-            if(obj.bpy.types.Object.proteinvr_category == "background"):
+            if(obj.bpy.types.Object.proteinvr_category == "background"): #Capitalize
                 self.object_categories["BACKGROUND"].append(obj) # background = an eventual PNG file that will be the background image. NOT MOVING
             elif(obj.bpy.types.Object.proteinvr_category == "static"):
                     self.object_categories["STATIC"].append(obj) # Static = low quality non moving images, this based on user preference

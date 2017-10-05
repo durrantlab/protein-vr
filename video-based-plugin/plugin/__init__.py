@@ -26,6 +26,7 @@ from .DurBlend import UI
 from .DurBlend import PanelParentClass
 from .DurBlend import ButtonParentClass
 
+
 from . import SetupPanel
 from . import CommandPanel
 
@@ -46,6 +47,7 @@ classes_used = []
 classes_used.append(SetupPanel.OBJECT_OT_FixProblems)
 classes_used.append(CommandPanel.OBJECT_OT_CreateScene)
 classes_used.append(CommandPanel.OBJECT_OT_RenderRemote)
+classes_used.append(CommandPanel.OBJECT_OT_SetBackground)
 
 ###### Below specific to this plugin ######
 
@@ -86,7 +88,9 @@ class ProteinVR(PanelParentClass):
         # bpy.types.Object.static = self.prop_funcs.boolProp("static", False, description="Assigning 3-D objects that are static/low quality, they are NOT animated")
         # bpy.types.Object.mesh = self.prop_funcs.boolProp("mesh", False, description="Assigning 3-D objects that will be animated/High quality objects")
 
-        bpy.types.Object.proteinvr_category = self.prop_funcs.enumProp("Object Category", [("static", "Static", "Static Category"), ("mesh", "Mesh", "Mesh Category"), ("background", "Background", "Background Category")], description="Assign object to categories.")
+        bpy.types.Object.proteinvr_category = self.prop_funcs.strProp("STATIC, BACKGROUND, or MESH", "STATIC", description="The full path to the pngquant executable.")
+
+        # bpy.types.Object.proteinvr_category = self.prop_funcs.enumProp("Object Category", items=[("static", "Static", "Static Category"), ("mesh", "Mesh", "Mesh Category"), ("background", "Background", "Background Category")], description="Assign object to categories.")
 
 
         # Setup the two panels.
