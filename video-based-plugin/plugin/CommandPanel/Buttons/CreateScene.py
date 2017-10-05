@@ -56,11 +56,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             obj.hide = False
             obj.hide_render = False
 
-<<<<<<< HEAD
-=======
 
     
->>>>>>> 2580edb179c7cf72a581b77098f239a71371291c
     def hide_objects(self, category):
         """
         Iterate through dictionary to show all objects in specified category
