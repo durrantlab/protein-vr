@@ -167,17 +167,17 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.object_categories = {
             "BACKGROUND": [],
             "STATIC": [],
-            "MESHED": []  # Includes onces marked meshed, and any ones that have animations.
+            "MESH": []  # Includes onces marked meshed, and any ones that have animations.
         }
 
         # Seperates the objects into their respective categories as specified by the user
         for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
-            if(obj.bpy.types.Object.proteinvr_category == "background"): #Capitalize
+            if(obj.proteinvr_category == "background"): #Capitalize
                 self.object_categories["BACKGROUND"].append(obj) # background = an eventual PNG file that will be the background image. NOT MOVING
-            elif(obj.bpy.types.Object.proteinvr_category == "static"):
-                    self.object_categories["STATIC"].append(obj) # Static = low quality non moving images, this based on user preference
-            elif(obj.bpy.types.Object.proteinvr_category == "mesh"):
-                    self.object_categories["MESH"].append(obj) # Meshed = high quality objects, ALL ANIMATED objects are here, but some non animated can be in there if use wants high quality
+            elif(obj.proteinvr_category == "static"):
+                self.object_categories["STATIC"].append(obj) # Static = low quality non moving images, this based on user preference
+            elif(obj.proteinvr_category == "mesh"):
+                self.object_categories["MESH"].append(obj) # Meshed = high quality objects, ALL ANIMATED objects are here, but some non animated can be in there if use wants high quality
             
 
 
@@ -220,7 +220,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 keys = set(keys)
                 num_keyframes = len(keys)
                 if num_keyframes > 1: # Checking to see if object is animated
-                    object_categories["MESH"].append(obj) # If object is animated then, add to category MESH
+                    self.object_categories["MESH"].append(obj) # If object is animated then, add to category MESH
                     animation_data[obj.name] = pos_loc_data # Add location data to animation_data dictionary with key of object name
 
         # Save the animation data
@@ -272,11 +272,11 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # For through each. For each frame, render a png file of the static images.
 
         #Hiding objects in Background and Mesh category
-        hide_objects("BACKGROUND")
-        hide_objects("MESH")
+        self.hide_objects("BACKGROUND")
+        self.hide_objects("MESH")
 
         # Showing objects in Static category
-        show_objects("STATIC")
+        self.show_objects("STATIC")
 
         # TODO: Some of these variables are not called after this.....
         self.scene.render.resolution_percentage = 100.0
@@ -286,7 +286,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         self.camera.rotation_mode = 'XYZ'
 
-        for static_obj in object_categories["STATIC"]:
+        for static_obj in self.object_categories["STATIC"]:
             for this_frame in range(self.frame_start, self.frame_end + 1):
                 print("Frame", this_frame)
 
@@ -298,9 +298,9 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 self.camera.keyframe_insert(data_path="rotation_euler", frame=this_frame)
 
                 if not debug:
-                    self.scene.render.filepath = self.frame_dir + "protein_baked_texture" + str(this_frame) + ".png"
+                    self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png"
                     self.scene.render.image_settings.file_format = 'PNG'
-                    self.scene.render.image_settings.file_format = "RGBA"
+                    self.scene.render.image_settings.color_mode = "RGBA"
                     self.scene.render.image_settings.compression = 100
                     self.scene.render.image_settings.quality = self.scene.jpeg_quality
                     self.scene.render.resolution_x = self.scene.proteinvr_bake_texture_size
@@ -313,11 +313,11 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                         self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
                         self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png.small.png"
                         bpy.ops.render.render(write_still=True)
-                        self._compress_png(self.scene.render.filepath)
+                        self._compress_png(self.scene.render.filepath)                    
                     else:
                         print("WARNING: Skipping the mobile textures...")
 
-            show_objects("MESH")
+            self.show_objects("MESH")
 
             self.scene.cycles.film_transparent = False
 
@@ -396,8 +396,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         self.set_frame = self.frame_start
 
-        hide_objects("MESH")
-        hide_objects("STATIC")
+        self.hide_objects("MESH")
+        self.hide_objects("STATIC")
 
         src_background_environment_image = bpy.path.abspath(self.scene.background_environment_image)
         if os.path.exists(src_background_environment_image):
@@ -420,7 +420,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         Save the animation data.
         """
         # TODO: DO WE STILL NEED TO SAVE THE ANIMATION DATA TO THE DISK?
-        for obj_name in object_categories["MESH"]: 
+        for obj_name in self.object_categories["MESH"]: 
             obj = bpy.data.objects[obj_name]
 
             # Save the obj file.
