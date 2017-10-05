@@ -54,8 +54,8 @@ class CommandPanel(ParentPanel):
             self.ui.use_box_row(activeObj.name + " Properties")
             self.ui.object_property("proteinvr_clickable")
 
-        self.ui.object_property("proteinvr_category")
-        self.ui.ops_button(rel_data_path="proteinvr.set_background", button_label="Set As Background")
+            self.ui.object_property("proteinvr_category")  # THIS IS THE LINE THAT CAUSES THE ERROR.
+            self.ui.ops_button(rel_data_path="proteinvr.set_background", button_label="Set As Background")
 
 
 

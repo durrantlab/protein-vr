@@ -16,6 +16,5 @@
 
 from .Buttons.CreateScene import OBJECT_OT_CreateScene
 from .Buttons.RenderRemote import OBJECT_OT_RenderRemote
-from .Buttons.SetBackground import OBJECT_OT_SetBackground
 from .CommandPanel import CommandPanel
 
