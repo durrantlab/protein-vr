@@ -80,7 +80,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             cmd = self.scene.pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
             # print("RUN: " + cmd)          
             os.system(cmd)
-            os.rename(filename + '.tmp.png', filename)
+            os.rename(filename, filename + '.tmp.png')
         else:
             print("WARNING: pngquant path not valid: " + self.scene.pngquant_path)        
 
@@ -420,8 +420,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         Save the animation data.
         """
         # TODO: DO WE STILL NEED TO SAVE THE ANIMATION DATA TO THE DISK?
-        for obj_name in self.object_categories["MESH"]: 
-            obj = bpy.data.objects[obj_name]
+        for obj in self.object_categories["MESH"]: 
+            #obj = bpy.data.objects[obj_name]
 
             # Save the obj file.
             filepath = self.proteinvr_output_dir + obj.name + "_animated.obj"
@@ -441,7 +441,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             texture_images = [n.image for n in obj.active_material.node_tree.nodes if n.type == "TEX_IMAGE"]
             if len(texture_images) > 0:
                 print("=" * 15)
-                print("WARNING! More than one image node found in material for " + obj_name + ". Using " + str(texture_images[0]))
+                print("WARNING! More than one image node found in material for " + obj.name + ". Using " + str(texture_images[0]))
                 print("=" * 15)
 
             # Save that texture
