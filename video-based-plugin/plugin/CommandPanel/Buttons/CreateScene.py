@@ -307,7 +307,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                     self.scene.render.resolution_y = self.scene.proteinvr_bake_texture_size
                     self.scene.render.resolution_percentage = 100
                     bpy.ops.render.render(write_still=True)
-                    self._compress_png(self.scene.render.filepath)
+                    self.background image_compress_png(self.scene.render.filepath)
 
                     if self.scene.proteinvr_mobile_bake_texture_size != 0:
                         self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
@@ -419,7 +419,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         """
         Save the animation data.
         """
-        # TODO: DO WE STILL NEED TO SAVE THE ANIMATION DATA TO THE DISK?
         for obj in self.object_categories["MESH"]: 
             #obj = bpy.data.objects[obj_name]
 
@@ -436,6 +435,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 axis_up="Y",
                 axis_forward="-Z"
             )
+
 
             # Search the node tree to find a texture
             texture_images = [n.image for n in obj.active_material.node_tree.nodes if n.type == "TEX_IMAGE"]
