@@ -1,6 +1,4 @@
 define(["require", "exports", "../config/Globals"], function (require, exports, Globals) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     class Shader {
         constructor(textureFilename, transparency = false, callBack = function () { }) {
             this.material = undefined;

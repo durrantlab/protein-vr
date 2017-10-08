@@ -1,6 +1,4 @@
 define(["require", "exports", "../config/Globals", "../config/Globals"], function (require, exports, Globals, Globals_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     function setupAllSigns() {
         // Get the sign data
         let signData = Globals.get("signData");

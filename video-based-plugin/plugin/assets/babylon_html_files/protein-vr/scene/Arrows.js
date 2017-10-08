@@ -1,6 +1,4 @@
 define(["require", "exports", "../config/Globals", "../config/Globals", "./Setup"], function (require, exports, Globals, Globals_1, Setup_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     var _arrowMeshes = [];
     function setup() {
         let BABYLON = Globals.get("BABYLON");

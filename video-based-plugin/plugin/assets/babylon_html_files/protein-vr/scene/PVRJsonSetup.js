@@ -1,6 +1,4 @@
 define(["require", "exports", "../config/Globals", "../config/Globals"], function (require, exports, Globals, Globals_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     var data;
     function loadJSON() {
         let jQuery = Globals.get("jQuery");

@@ -2,6 +2,7 @@ import * as UserVars from "../config/UserVars";
 import * as Globals from "../config/Globals";
 import * as ViewerSphere from "./ViewerSphere";
 import * as Arrows from "./Arrows";
+import { RenderingGroups } from "../config/Globals";
 
 interface CameraPointData {
     distance: number;
@@ -297,8 +298,10 @@ export class Camera {
                 scene.activeCamera.position, 
                 scene,
                 false,  // compensate distortion
+                // { trackPosition: true }
                 metrics
             );
+            camera.deviceScaleFactor = 1;
             // console.log("Camera setup...");
         } else {
             camera = new BABYLON.VRDeviceOrientationFreeCamera(
@@ -310,26 +313,147 @@ export class Camera {
             );
         }
         
-        jQuery("body").click(() => {
-            console.log(camera, canvas);
-            camera.attachControl(canvas, true);
-        })
+        scene.onPointerDown = function () {
+            // console.log("click down")
+            scene.onPointerDown = undefined;
+            scene.onPointerDown = () => {
+                camera.initControllers();
+            }
 
-        camera.attachControl(canvas, true);  // Added this here to get
+            // Attach that camera to the canvas.
+            camera.attachControl(canvas, true);
+            
+            // camera.onControllersAttachedObservable.add(() => {
+            //     console.log(camera.controllers, "DFDF")
+            //     camera.controllers.forEach((gp) => {
+            //         console.log("YO", gp);
+            //         let mesh = gp.hand === 'right' ? rightBox : leftBox;
+    
+            //         gp.onPadValuesChangedObservable.add(function (stateObject) {
+            //             let r = (stateObject.x + 1) / 2;
+            //             let g = (stateObject.y + 1) / 2;
+            //             mesh.material.diffuseColor.copyFromFloats(r, g, 1);
+            //         });
+            //         gp.onTriggerStateChangedObservable.add(function (stateObject) {
+            //             let scale = 2 - stateObject.value;
+            //             mesh.scaling.x = scale;
+            //         });
+            //         // oculus only
+            //         /*gp.onSecondaryTriggerStateChangedObservable.add(function (stateObject) {
+            //             let scale = 2 - stateObject.value;
+            //             mesh.scaling.z = scale;
+            //         });*/
+            //         gp.attachToMesh(mesh);
+            //     });
+            // });
+
+            // Now remove the original camera
+            let currentCamera = scene.activeCamera;
+            if (currentCamera) {
+                currentCamera.detachControl(canvas);
+                if (currentCamera.dispose) {
+                    currentCamera.dispose();
+                }
+            }
+            
+            // Set the new (VR) camera to be active
+            scene.activeCamera = camera;                        
+
+            // setInterval(() => {
+            //     camera.initControllers();
+            //     console.log("Search for controllers...")
+            //     console.log(camera.controllers);
+            // }, 1000)
+        }
+
+        // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
+        var rightBox = BABYLON.Mesh.CreateBox("sphere1", 0.1, scene);
+        rightBox.scaling.copyFromFloats(2, 1, 2);
+        var leftBox = BABYLON.Mesh.CreateBox("sphere1", 0.1, scene);
+        leftBox.scaling.copyFromFloats(2, 1, 2);
+
+        rightBox.material = new BABYLON.StandardMaterial('right', scene);
+        leftBox.material = new BABYLON.StandardMaterial('right', scene);
+
+        rightBox.renderingGroupId = RenderingGroups.VisibleObjects;
+        leftBox.renderingGroupId = RenderingGroups.VisibleObjects;
+        
+
+
+        // jQuery("canvas").click(() => {
+        //     jQuery("canvas").unbind("click");
+
+        //     // Among others things, attach the camera.
+        //     // this._makeCameraReplaceActiveCamera(camera);
+
+        //     // console.log(camera, canvas);
+        //     // camera.attachControl(canvas, true);
+        //     // camera.initControllers();
+        //     // this._meshesAttachedToControllers = [];
+
+        //     // adapted from https://www.babylonjs-playground.com/#5MV04#39
+
+        //     // let rightBox = BABYLON.Mesh.CreateBox("rightHand1", 0.1, scene);
+        //     // rightBox.scaling.copyFromFloats(2, 1, 2);
+        //     // let leftBox = BABYLON.Mesh.CreateBox("rightHand2", 0.1, scene);
+        //     // leftBox.scaling.copyFromFloats(2, 1, 2);
+        
+        //     // rightBox.material = new BABYLON.StandardMaterial('right', scene);
+        //     // leftBox.material = new BABYLON.StandardMaterial('right', scene);
+
+        //     // Now remove the original camera
+        //     let currentCamera = scene.activeCamera;
+        //     if (currentCamera) {
+        //         currentCamera.detachControl(canvas);
+        //         if (currentCamera.dispose) {
+        //             currentCamera.dispose();
+        //         }
+        //     }
+
+        //     // Attach that camera to the canvas.
+        //     camera.attachControl(canvas, true);
+        
+        //     // Set the new (VR) camera to be active
+        //     scene.activeCamera = camera;
+        
+        //     // camera.onControllersAttachedObservable.add(() => {
+        //     //     console.log(camera.controllers);
+        //     //     camera.controllers.forEach((gp) => {
+        //     //         let mesh = gp.hand === 'right' ? rightBox : leftBox;
+    
+        //     //         gp.onPadValuesChangedObservable.add(function (stateObject) {
+        //     //             let r = (stateObject.x + 1) / 2;
+        //     //             let g = (stateObject.y + 1) / 2;
+        //     //             mesh.material.diffuseColor.copyFromFloats(r, g, 1);
+        //     //         });
+        //     //         gp.onTriggerStateChangedObservable.add(function (stateObject) {
+        //     //             let scale = 2 - stateObject.value;
+        //     //             mesh.scaling.x = scale;
+        //     //         });
+        //     //         // oculus only
+        //     //         /*gp.onSecondaryTriggerStateChangedObservable.add(function (stateObject) {
+        //     //             let scale = 2 - stateObject.value;
+        //     //             mesh.scaling.z = scale;
+        //     //         });*/
+        //     //         gp.attachToMesh(mesh);
+        //     //     });
+        //     // });
+
+        // Keep attaching meshes to the controllers whenever a new one pops up.
+        setInterval(function() {
+            this._attachMeshToWebVRControllers();
+        }.bind(this), 2000);
+        //     console.log("controllers!", camera.controllers);
+        // })
+
+        // camera.attachControl(canvas, true);  // Added this here to get
                                                    // it as close to the click
                                                    // event as possible. WebVR
                                                    // only starts on user
                                                    // interaction. 
-        this._makeCameraReplaceActiveCamera(camera);
-        camera.initControllers();
 
-        // Keep attaching meshes to the controllers whenever a new one pops up.
-        setInterval(() => {
-            this._attachMeshToWebVRControllers();
-        }, 2000);
-        // console.log("controllers!", camera.controllers);
         
-        window.camera = camera;
+        // window.camera = camera;
     }
 
     private _meshesAttachedToControllers = [];
@@ -337,16 +461,24 @@ export class Camera {
         let scene = Globals.get("scene");
         let BABYLON = Globals.get("BABYLON");
         let controllers = scene.activeCamera.controllers;
-        for (let i = 0; i < controllers.length; i++) {
-            if (this._meshesAttachedToControllers.length !== controllers.length) {
-                // No mesh yet attached
-                var box = BABYLON.Mesh.CreateBox("hand" + i.toString(), 3, scene);
-                this._meshesAttachedToControllers.push(box);
-                controllers[i].attachToMesh(box);
-            }
+        if ((controllers === undefined) || (controllers.length === 0)) {
+            scene.activeCamera.initControllers();
         }
-
-        console.log(this._meshesAttachedToControllers, controllers);
+        if (controllers !== undefined) {
+            for (let i = 0; i < controllers.length; i++) {
+                if (this._meshesAttachedToControllers.length !== controllers.length) {
+                    // No mesh yet attached
+                    var box = BABYLON.Mesh.CreateBox("hand" + i.toString(), 3, scene);
+                    box.material = new BABYLON.StandardMaterial('right', scene);
+                    box.renderingGroupId = RenderingGroups.VisibleObjects;
+            
+                    this._meshesAttachedToControllers.push(box);
+                    controllers[i].attachToMesh(box);
+                }
+            }
+    
+            console.log(this._meshesAttachedToControllers, controllers);
+        }
     }
 
     private _makeCameraReplaceActiveCamera(camera) {

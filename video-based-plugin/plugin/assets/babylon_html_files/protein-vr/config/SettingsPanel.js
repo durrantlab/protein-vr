@@ -1,6 +1,4 @@
 define(["require", "exports", "./UserVars", "./Globals"], function (require, exports, UserVars, Globals) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     function allowUserToModifySettings() {
         return new Promise((resolve) => {
             let jQuery = Globals.get("jQuery");
@@ -17,36 +15,7 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
                 panel("Hardware", 
                 //row_even_split(
                 // [3,4,5],
-                radioBoxes("Viewer", UserVars.paramNames["viewer"], ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>']
-                // [85, 115]
-                )
-                /* radioBoxes(
-                    "Audio",
-                    UserVars.paramNames["audio"],
-                    ['<i class="icon-speaker"></i>', '<i class="icon-headphones"></i>', '<span class="glyphicon glyphicon-volume-off" aria-hidden=true></span>']
-                    // [100, 120, 75]
-                )*/
-                /*) +
-                row_even_split(
-                    radioBoxes(
-                        "Device",
-                        UserVars.paramNames["device"],
-                        ['<i class="icon-iphone"></i>', '<i class="icon-laptop"></i>', '<i class="icon-connectedpc"></i>']
-                        // [100, 100, 100]
-                    ), "" */ /*,
-                radioBoxes(
-                    "Moving",
-                    UserVars.paramNames["moving"],
-                    ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
-                    // [100, 100, 100]
-                )  + radioBoxes(  // commented out because of simplified UI
-                    "Looking",
-                    UserVars.paramNames["looking"],
-                    ['<i class="icon-mouse"></i>', '<i class="icon-hand-up"></i>'] //, '<i class="icon-connectedpc"></i>']
-                    // [100, 100, 100]
-                ) */ /*,
-            )*/
-                ) /* +
+                radioBoxes("Viewer", UserVars.paramNames["viewer"], ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>'])) /* +
             panelCollapsible(
                 "Initial Performance Settings",
                 `<div id="settings-msg" class="alert alert-info">
@@ -86,9 +55,7 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
                 )
             ) */
                 +
-                    `<button id="user_settings_continue_button" type="button" class="btn btn-primary">Continue</button>`
-            // <button id="broadcast_game_button" style="display: none;" type="button" class="btn btn-primary">Broadcast</button>`
-            );
+                    `<button id="user_settings_continue_button" type="button" class="btn btn-primary">Continue</button>`);
             settingsPanel.html(html);
             addJavaScript(() => { resolve({ msg: "USER MODIFIED SETTINGS" }); });
             // Set the values on the GUI.

@@ -1,6 +1,4 @@
 define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup"], function (require, exports, MaterialLoader, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     Globals.set("jQuery", jQuery);
     Globals.set("BABYLON", BABYLON);
     var callbacksComplete = [];
@@ -72,9 +70,6 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
                         // console.log("Attaching. Camera set up already?");
                         let cameraObj = Globals.get("camera");
                         cameraObj._setupWebVRFreeCamera();
-                        // let camera = Globals.get("scene").activeCamera;
-                        // camera.attachControl(canvas);
-                        // console.log(cameraObj);
                     }
                     jQuery("#loading_panel").hide(); // fadeOut(() => {
                     canvas.show();
@@ -125,10 +120,6 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
                 }).then((fulfilled) => Promise.resolve("DONE: PVR Json loading finished (after scene)"));
                 Promise.all([proteinVRJsonDone, allUserVarsAvailable])
                     .then((fulfilled) => Globals.get("camera").setup());
-                // .then((fulfilled) => this._startRenderLoop());
-                // loadBabylonFilePromiseDone.then((f) => {
-                //     console.log(f)
-                // })
             }
         }
         _startRenderLoop() {

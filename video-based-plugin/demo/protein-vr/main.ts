@@ -89,9 +89,9 @@ export class Game {
                 canvas.show();
                 canvas.focus();  // to make sure keypresses work.
     
-                engine.switchFullscreen(
-                    UserVars.getParam("viewer") == UserVars.viewers["Screen"]
-                )
+                // engine.switchFullscreen(
+                //     UserVars.getParam("viewer") == UserVars.viewers["Screen"]
+                // )
                 
                 // If it's an HTC vive or something, you need to attach the
                 // canvas here. This is because it can only be done on user

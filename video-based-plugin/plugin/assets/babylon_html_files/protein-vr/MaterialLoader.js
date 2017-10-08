@@ -1,6 +1,4 @@
 define(["require", "exports", "./config/Globals", "./shaders/StandardShader", "./scene/ViewerSphere"], function (require, exports, Globals, StandardShader_1, ViewerSphere) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     function getFramePromises() {
         /*
         Start loading all the skybox images.

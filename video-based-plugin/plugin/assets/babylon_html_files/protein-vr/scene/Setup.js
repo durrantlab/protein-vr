@@ -1,6 +1,4 @@
 define(["require", "exports", "./Camera", "../config/Globals", "../config/Globals", "../shaders/StandardShader", "./Arrows", "./Sign"], function (require, exports, Camera_1, Globals, Globals_1, StandardShader_1, Arrows, Sign_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     function loadBabylonFile() {
         return new Promise((resolve) => {
             BABYLON.SceneLoader.Load("", "babylon.babylon", Globals.get("engine"), (newScene) => {
