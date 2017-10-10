@@ -1,28 +1,34 @@
 define(["require", "exports", "./Camera", "../config/Globals", "../config/Globals", "../shaders/StandardShader", "./Arrows", "./Sign"], function (require, exports, Camera_1, Globals, Globals_1, StandardShader_1, Arrows, Sign_1) {
     function loadBabylonFile() {
         return new Promise((resolve) => {
-            BABYLON.SceneLoader.Load("", "babylon.babylon", Globals.get("engine"), (newScene) => {
-                Globals.set("scene", newScene);
+            var engine = Globals.get("engine");
+            var scene = new BABYLON.Scene(engine);
+            Globals.set("scene", scene);
+            // BABYLON.SceneLoader.Load("", "babylon.babylon", Globals.get("engine"), (newScene) => {
+            BABYLON.SceneLoader.Append("", "babylon.babylon", scene, () => {
                 window.scrollTo(0, 1); // supposed to autohide scroll bar.
                 // Wait for textures and shaders to be ready
-                newScene.executeWhenReady(() => {
+                scene.executeWhenReady(() => {
+                    console.log("Execute when ready");
                     let camera = new Camera_1.Camera();
                     Globals.set("camera", camera);
+                    console.log("BELOW SHOULD NOT BE HARDCODED!");
+                    camera._setupWebVRFreeCamera();
                     // Delay textures until needed. Cool, but too slow for our purposes here...
                     // newScene.useDelayedTextureLoading = true
                     // Setup viewer sphere template
                     let radius = 12; // When using VR, this needs to be farther away that what it was rendered at. this._JSONData["viewerSphereSize"];
-                    _setupViewerSphereTemplate(newScene, radius);
+                    _setupViewerSphereTemplate(scene, radius);
                     // Set up environmental (background) sphere
-                    _setupEnvironmentalSphere(newScene, radius);
+                    _setupEnvironmentalSphere(scene, radius);
                     // Setup arrows
                     Arrows.setup();
                     // Setup signs
                     Sign_1.setupAllSigns();
-                    window.debugit = newScene.debugLayer;
-                    // newScene.debugLayer.show();
+                    window.debugit = scene.debugLayer;
+                    // scene.debugLayer.show();
                     if (Globals.get("debug")) {
-                        newScene.debugLayer.show();
+                        scene.debugLayer.show();
                     }
                     resolve({ msg: "BABYLON.BABYLON LOADED" });
                 });
