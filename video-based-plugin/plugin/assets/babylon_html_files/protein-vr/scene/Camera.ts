@@ -205,7 +205,7 @@ export class Camera {
                     // Chrome as far as I remember, not sure it's specified by
                     // the spec). So the below is commented out. It is instead
                     // run when the user presses the play button...
-                    // this._setupWebVRFreeCamera();
+                    this._setupWebVRFreeCamera();
                     break;
             }
     
@@ -292,7 +292,6 @@ export class Camera {
         // http://www.html5gamedevs.com/topic/31454-webvrfreecameraid-vs-vrdeviceorientationfreecamera/?tab=comments#comment-180688
         let camera;
         if (navigator.getVRDisplays) {
-            console.log("Using WebVRFreeCamera");
             camera = new BABYLON.WebVRFreeCamera(
                 "webVRFreeCamera", 
                 scene.activeCamera.position, 
@@ -304,7 +303,6 @@ export class Camera {
             // camera.deviceScaleFactor = 1;
             // console.log("Camera setup...");
         } else {
-            console.log("Using deviceOrientationCamera");
             camera = new BABYLON.VRDeviceOrientationFreeCamera(
                 "deviceOrientationCamera", 
                 scene.activeCamera.position, 
@@ -355,11 +353,10 @@ export class Camera {
             }
         }, 1000);
 
-        window.CAMERA = camera;
+        // window.CAMERA = camera;
 
         // note that you're not calling _makeCameraReplaceActiveCamera. That's because that will attach the camera, but you don't want that to happen until after user clicks again.
-        scene.activeCamera = camera;  
-        console.log("Camera created");
+        scene.activeCamera = camera;
         
         scene.onPointerDown = function() {
             let canvas = Globals.get("canvas");
@@ -392,9 +389,6 @@ export class Camera {
             //     console.log(camera.controllers);
             // }, 1000)
         }
-
-
-
 
         // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
         // var rightBox = BABYLON.Mesh.CreateBox("sphere1", 0.1, scene);
@@ -549,7 +543,6 @@ export class Camera {
         let scene = Globals.get("scene");
         
         // First, setup mouse.
-        console.log("FIX THIS!!!");
         // scene.onPointerDown = function (evt, pickResult) {
         //     this._mouseDownState = true;
         // }.bind(this);

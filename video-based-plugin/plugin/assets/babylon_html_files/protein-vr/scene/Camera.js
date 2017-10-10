@@ -168,7 +168,7 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
                         // Chrome as far as I remember, not sure it's specified by
                         // the spec). So the below is commented out. It is instead
                         // run when the user presses the play button...
-                        // this._setupWebVRFreeCamera();
+                        this._setupWebVRFreeCamera();
                         break;
                 }
                 this._setupMouseAndKeyboard();
@@ -233,11 +233,9 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             // http://www.html5gamedevs.com/topic/31454-webvrfreecameraid-vs-vrdeviceorientationfreecamera/?tab=comments#comment-180688
             let camera;
             if (navigator.getVRDisplays) {
-                console.log("Using WebVRFreeCamera");
                 camera = new BABYLON.WebVRFreeCamera("webVRFreeCamera", scene.activeCamera.position, scene);
             }
             else {
-                console.log("Using deviceOrientationCamera");
                 camera = new BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", scene.activeCamera.position, scene);
             }
             // Detect when controllers are attached.
@@ -277,10 +275,9 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
                     }
                 }
             }, 1000);
-            window.CAMERA = camera;
+            // window.CAMERA = camera;
             // note that you're not calling _makeCameraReplaceActiveCamera. That's because that will attach the camera, but you don't want that to happen until after user clicks again.
             scene.activeCamera = camera;
-            console.log("Camera created");
             scene.onPointerDown = function () {
                 let canvas = Globals.get("canvas");
                 let scene = Globals.get("scene");
@@ -429,7 +426,6 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
         _setupMouseAndKeyboard() {
             let scene = Globals.get("scene");
             // First, setup mouse.
-            console.log("FIX THIS!!!");
             // scene.onPointerDown = function (evt, pickResult) {
             //     this._mouseDownState = true;
             // }.bind(this);

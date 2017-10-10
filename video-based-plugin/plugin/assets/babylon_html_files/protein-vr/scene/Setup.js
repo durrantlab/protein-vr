@@ -9,11 +9,8 @@ define(["require", "exports", "./Camera", "../config/Globals", "../config/Global
                 window.scrollTo(0, 1); // supposed to autohide scroll bar.
                 // Wait for textures and shaders to be ready
                 scene.executeWhenReady(() => {
-                    console.log("Execute when ready");
                     let camera = new Camera_1.Camera();
                     Globals.set("camera", camera);
-                    console.log("BELOW SHOULD NOT BE HARDCODED!");
-                    camera._setupWebVRFreeCamera();
                     // Delay textures until needed. Cool, but too slow for our purposes here...
                     // newScene.useDelayedTextureLoading = true
                     // Setup viewer sphere template
@@ -25,7 +22,7 @@ define(["require", "exports", "./Camera", "../config/Globals", "../config/Global
                     Arrows.setup();
                     // Setup signs
                     Sign_1.setupAllSigns();
-                    window.debugit = scene.debugLayer;
+                    // window.debugit = scene.debugLayer;
                     // scene.debugLayer.show();
                     if (Globals.get("debug")) {
                         scene.debugLayer.show();

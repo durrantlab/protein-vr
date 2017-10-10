@@ -22,12 +22,8 @@ export function loadBabylonFile(): Promise<any> {
     
             // Wait for textures and shaders to be ready
             scene.executeWhenReady(() => {
-                console.log("Execute when ready");
                 let camera = new Camera();
                 Globals.set("camera", camera);
-
-                console.log("BELOW SHOULD NOT BE HARDCODED!")
-                camera._setupWebVRFreeCamera()
 
                 // Delay textures until needed. Cool, but too slow for our purposes here...
                 // newScene.useDelayedTextureLoading = true
@@ -45,7 +41,7 @@ export function loadBabylonFile(): Promise<any> {
                 // Setup signs
                 setupAllSigns();
 
-                window.debugit = scene.debugLayer;
+                // window.debugit = scene.debugLayer;
                 // scene.debugLayer.show();
                 
                 if (Globals.get("debug")) { scene.debugLayer.show(); }
