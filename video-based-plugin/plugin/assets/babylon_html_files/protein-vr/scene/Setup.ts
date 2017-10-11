@@ -11,13 +11,17 @@ import { setupAllSigns } from "./Sign";
 export function loadBabylonFile(): Promise<any> {
 
     return new Promise((resolve) => {
-        BABYLON.SceneLoader.Load("", "babylon.babylon", Globals.get("engine"), (newScene) => {
-            Globals.set("scene", newScene);
+        var engine = Globals.get("engine");
+        var scene = new BABYLON.Scene(engine);
+        Globals.set("scene", scene);
+
+        // BABYLON.SceneLoader.Load("", "babylon.babylon", Globals.get("engine"), (newScene) => {
+        BABYLON.SceneLoader.Append("", "babylon.babylon", scene, () => {
     
             window.scrollTo(0, 1);  // supposed to autohide scroll bar.
     
             // Wait for textures and shaders to be ready
-            newScene.executeWhenReady(() => {
+            scene.executeWhenReady(() => {
                 let camera = new Camera();
                 Globals.set("camera", camera);
 
@@ -26,10 +30,10 @@ export function loadBabylonFile(): Promise<any> {
                                 
                 // Setup viewer sphere template
                 let radius = 12; // When using VR, this needs to be farther away that what it was rendered at. this._JSONData["viewerSphereSize"];
-                _setupViewerSphereTemplate(newScene, radius);
+                _setupViewerSphereTemplate(scene, radius);
                 
                 // Set up environmental (background) sphere
-                _setupEnvironmentalSphere(newScene, radius);
+                _setupEnvironmentalSphere(scene, radius);
 
                 // Setup arrows
                 Arrows.setup();
@@ -37,10 +41,10 @@ export function loadBabylonFile(): Promise<any> {
                 // Setup signs
                 setupAllSigns();
 
-                window.debugit = newScene.debugLayer;
-                // newScene.debugLayer.show();
+                // window.debugit = scene.debugLayer;
+                // scene.debugLayer.show();
                 
-                if (Globals.get("debug")) { newScene.debugLayer.show(); }
+                if (Globals.get("debug")) { scene.debugLayer.show(); }
                 resolve({msg: "BABYLON.BABYLON LOADED"});
             });
         });

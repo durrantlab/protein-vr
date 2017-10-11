@@ -66,15 +66,20 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
                     // If it's an HTC vive or something, you need to attach the
                     // canvas here. This is because it can only be done on user
                     // interaction.
-                    if (Globals.get("cameraTypeToUse") === "show-desktop-vr") {
-                        // console.log("Attaching. Camera set up already?");
-                        let cameraObj = Globals.get("camera");
-                        cameraObj._setupWebVRFreeCamera();
-                    }
+                    // if (Globals.get("cameraTypeToUse") === "show-desktop-vr") {
+                    // console.log("Attaching. Camera set up already?");
+                    // let cameraObj = Globals.get("camera");
+                    // cameraObj._setupWebVRFreeCamera();
+                    // let camera = Globals.get("scene").activeCamera;
+                    // camera.attachControl(canvas);
+                    // console.log(cameraObj);
+                    // }
                     jQuery("#loading_panel").hide(); // fadeOut(() => {
                     canvas.show();
                     canvas.focus(); // to make sure keypresses work.
-                    engine.switchFullscreen(UserVars.getParam("viewer") == UserVars.viewers["Screen"]);
+                    // engine.switchFullscreen(
+                    //     UserVars.getParam("viewer") == UserVars.viewers["Screen"]
+                    // )
                     this._startRenderLoop();
                     engine.resize();
                 });
