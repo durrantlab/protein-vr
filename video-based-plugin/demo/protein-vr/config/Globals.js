@@ -1,3 +1,5 @@
+// I'm sure there's a more elegant making a global-variable storage area that
+// doesn't pollute the global name space, but I'm going with this for now...
 define(["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -12,7 +14,7 @@ define(["require", "exports"], function (require, exports) {
             "viewerSphereTemplate": undefined,
             "cameraPositions": undefined,
             "viewerSpheres": undefined,
-            "sphereShaders": undefined,
+            "sphereMaterials": undefined,
             "backgroundSphere": undefined,
             "debug": false,
             "breakCaching": true,
@@ -21,18 +23,43 @@ define(["require", "exports"], function (require, exports) {
             "numFrameTexturesLoaded": 0,
             "numNeighboringCameraPosForNavigation": 4,
             "cameraTypeToUse": "show-desktop-screen",
-            "signData": []
+            "signData": [],
+            "lazyLoadViewerSpheres": true
         };
     }
     function get(key) {
+        /*
+        Get the value of a global variable.
+    
+        :param string key: The name of the global variable.
+    
+        :returns: The value.
+        :rtype: :class:`any`
+        */
         return window._proteinvrGlobals[key];
     }
     exports.get = get;
     function set(key, val) {
+        /*
+        Set the value of a global variable.
+    
+        :param string key: The name of the global variable.
+    
+        :param string val: The value.
+        */
         window._proteinvrGlobals[key] = val;
     }
     exports.set = set;
     function setArrayEntry(key, index, val) {
+        /*
+        Set an indexed value of a global array variable.
+    
+        :param string key: The name of the global variable.
+    
+        :param int index: The array index.
+    
+        :param any val: The value.
+        */
         window._proteinvrGlobals[key][index] = val;
     }
     exports.setArrayEntry = setArrayEntry;

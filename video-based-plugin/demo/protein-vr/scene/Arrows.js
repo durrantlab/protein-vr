@@ -1,8 +1,12 @@
+/* Makes guide arrows work in VR world. */
 define(["require", "exports", "../config/Globals", "../config/Globals", "./Setup"], function (require, exports, Globals, Globals_1, Setup_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var _arrowMeshes = [];
     function setup() {
+        /*
+        Setup the arrows.
+        */
         let BABYLON = Globals.get("BABYLON");
         let scene = Globals.get("scene");
         // Get the arrow mesh
@@ -12,7 +16,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Setup
         for (let i = 1; i < Globals.get("numNeighboringCameraPosForNavigation"); i++) {
             _arrowMeshes.push(arrowMesh.clone("ProteinVR_Arrow_clone" + i.toString()));
         }
-        // Update all arrows
+        // Set the materials and other properties on all arrows
         for (let i = 0; i < _arrowMeshes.length; i++) {
             let thisArrowMesh = _arrowMeshes[i];
             // Make it's material.
@@ -35,6 +39,11 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Setup
     }
     exports.setup = setup;
     function fadeDownAll(val) {
+        /*
+        An easy function to set the visibility on all presently visible arrows.
+    
+        :param num val: The visibility to set.
+        */
         // fade all arrows that are visible down.
         for (let i = 0; i < _arrowMeshes.length; i++) {
             let arrow = _arrowMeshes[i];
@@ -45,6 +54,13 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Setup
     }
     exports.fadeDownAll = fadeDownAll;
     function update(cameraPoints) {
+        /*
+        Update the location and position of the arrows.
+    
+        :param Camera.CameraPoints cameraPoints: An object containing information
+                                   about nearby locations to which the camera can
+                                   move.
+        */
         let scene = Globals.get("scene");
         // All arrows are initially hidden
         for (let i = 0; i < _arrowMeshes.length; i++) {

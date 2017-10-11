@@ -1,6 +1,6 @@
 import * as Globals from "../config/Globals";
 
-export class Shader {
+export class SphereMaterial {
     private _scene: any;
     public material: any = undefined;
     private _transparency: boolean = false;
@@ -13,6 +13,11 @@ export class Shader {
         let dirname = textureFilename.indexOf("/") === -1 ? "" : textureFilename.match(/.*\//)[0];
         let basename = textureFilename.replace( /.*\//, "" );
 
+        // TODO: This should be Append, not Load. 
+        
+        // NOTE TO WILLIAM: This is loading all babylon files up front. Only
+        // do this if global variable lazyLoadViewerSpheres is false.
+        
         BABYLON.SceneLoader.Load(dirname, basename + ".babylon", Globals.get("engine"), (aScene) => {
             aScene.executeWhenReady(() => {
                 let newMaterial = aScene.materials[0];

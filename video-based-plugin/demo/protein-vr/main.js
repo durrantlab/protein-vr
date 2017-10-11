@@ -1,4 +1,4 @@
-define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup"], function (require, exports, MaterialLoader, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup) {
+define(["require", "exports", "./sphere_material/MaterialLoader", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup"], function (require, exports, MaterialLoader, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Globals.set("jQuery", jQuery);
@@ -13,42 +13,25 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
     class Game {
         constructor(params) {
             /*
-            The Game objecy constructor.
+            The Game object constructor.
     
             :param obj params: The init parameters.
             */
             this._params = params;
             // Detect mobile.
             let isMobile = new MobileDetect(window.navigator.userAgent).mobile();
-            if (isMobile === null) {
-                isMobile = false;
-            } // keep it boolean
-            else {
-                isMobile = true;
-            }
+            isMobile = ((isMobile === null) || (isMobile === false)) ?
+                false : true; // keep it boolean
             if (Globals.get("debug")) {
                 isMobile = true;
             }
             Globals.set("isMobile", isMobile);
-            // Bring in mobile_data_warning_panel
             if (isMobile) {
-                jQuery("#mobile_data_warning_panel").load("./_filesize_warning.html", () => {
-                    // Hide the settings panel for now
-                    jQuery("#settings_panel").hide();
-                    // Get the size of all the mobile-compatible png files.
-                    jQuery.get("frames/filesizes.json", (filesizes) => {
-                        jQuery("#filesize-total").html((filesizes["small"] / 1000000).toFixed(1));
-                    });
-                    // Make the ok-to-proceed button work.
-                    jQuery("#filesize-warning-button").click(() => {
-                        jQuery("#mobile_data_warning_panel").fadeOut(() => {
-                            jQuery("#settings_panel").fadeIn();
-                            this._loadGame(isMobile);
-                        });
-                    });
-                });
+                // Show mobile_data_warning_panel if it is mobile.
+                this._showDataUseWarningPanel(isMobile);
             }
             else {
+                // Proceed with loading the game.
                 this._loadGame(isMobile);
             }
         }
@@ -56,38 +39,25 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
             /*
             Start loading the game.
     
-            :param bool isMobile: Whether or not the game is running in mobile.
+            :param bool isMobile: Whether the game is running in mobile.
             */
-            // Bring in the loading panel... Code below associtated with second
-            // panel, but first here to start loading ASAP.
-            jQuery("#loading_panel").load("./_loading.html", () => {
-                jQuery("#start-game").click(() => {
-                    let engine = Globals.get("engine");
-                    let canvas = jQuery("canvas");
-                    jQuery("#loading_panel").hide(); // fadeOut(() => {
-                    canvas.show();
-                    canvas.focus(); // to make sure keypresses work.
-                    engine.switchFullscreen(UserVars.getParam("viewer") == UserVars.viewers["Screen"]);
-                    // If it's an HTC vive or something, you need to attach the
-                    // canvas here. This is because it can only be done on user
-                    // interaction.
-                    if (Globals.get("cameraTypeToUse") === "show-desktop-vr") {
-                        Globals.get("scene").activeCamera.attachControl(canvas);
-                    }
-                    this._startRenderLoop();
-                    engine.resize();
-                });
-            });
             if (!BABYLON.Engine.isSupported()) {
                 alert("ERROR: Babylon not supported!");
             }
             else {
-                // NOTE: This is what user sees first.
+                // Bring in the loading panel... Why is this code here first,
+                // given that the settings panel is the first to appear in the UI?
+                // Because we need to start loading the scene ASAP, especially if
+                // no lazy-loading is specified. Note that the loading panel is
+                // always hidden by default, so all this happens without the
+                // user's knowledge.
+                this._showLoadingGamePanel();
                 // Get the canvas element from our HTML above
                 Globals.set("canvas", document.getElementById("renderCanvas"));
                 // Set the engine
                 this._resizeWindow(); // resize canvas when browser resized.
-                Globals.set("engine", new BABYLON.Engine(Globals.get("canvas"), true)); // second boolean is whether built-in smoothing will be used.
+                let engine = new BABYLON.Engine(Globals.get("canvas"), true);
+                Globals.set("engine", engine); // second boolean is whether built-in smoothing will be used.
                 // Use promise to load user variables (both from json and
                 // specified via panel.)
                 // UserVars.setup => SettingsPanel.allowUserToModifySettings
@@ -125,6 +95,67 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
                 // })
             }
         }
+        _showDataUseWarningPanel(isMobile) {
+            /*
+            Show mobile_data_warning_panel.
+    
+            :param bool isMobile: Whether the game is running in mobile.
+            */
+            jQuery("#mobile_data_warning_panel").load("./_filesize_warning.html", () => {
+                // Hide the settings panel for now
+                jQuery("#settings_panel").hide();
+                // Get the size of all the mobile-compatible png files.
+                jQuery.get("frames/filesizes.json", (filesizes) => {
+                    jQuery("#filesize-total").html((filesizes["small"] / 1000000).toFixed(1));
+                });
+                // Make the ok-to-proceed button work.
+                jQuery("#filesize-warning-button").click(() => {
+                    jQuery("#mobile_data_warning_panel").fadeOut(() => {
+                        jQuery("#settings_panel").fadeIn();
+                        this._loadGame(isMobile); // Proceed with loading the game.
+                    });
+                });
+            });
+        }
+        _showLoadingGamePanel() {
+            /*
+            Show the game-loading panel. When the game is loaded, the user can
+            press the start-game button, and the render loop begins.
+            */
+            // Bring in the loading panel... Why is this code here first, given
+            // that the settings panel is the first to appear in the UI? Because
+            // we need to start loading the scene ASAP, especially if no
+            // lazy-loading is specified.
+            jQuery("#loading_panel").load("./_loading.html", () => {
+                jQuery("#start-game").click(() => {
+                    let engine = Globals.get("engine");
+                    let canvas = jQuery("canvas");
+                    let scene = Globals.get("scene");
+                    // If it's an HTC vive or something, you need to attach the
+                    // canvas here. This is because it can only be done on user
+                    // interaction.
+                    // if (Globals.get("cameraTypeToUse") === "show-desktop-vr") {
+                    // console.log("Attaching. Camera set up already?");
+                    // let cameraObj = Globals.get("camera");
+                    // cameraObj._setupWebVRFreeCamera();
+                    // let camera = Globals.get("scene").activeCamera;
+                    // camera.attachControl(canvas);
+                    // console.log(cameraObj);
+                    // }
+                    jQuery("#loading_panel").hide(); // fadeOut(() => {
+                    canvas.show();
+                    canvas.focus(); // to make sure keypresses work.
+                    // TODO: Uncomment the below. No full screen for now to make
+                    // debugging easier.
+                    // engine.switchFullscreen(
+                    //     UserVars.getParam("viewer") == UserVars.viewers["Screen"]
+                    // )
+                    // Start the render loop.
+                    this._startRenderLoop();
+                    engine.resize();
+                });
+            });
+        }
         _startRenderLoop() {
             /*
             Start the function that runs with every frame.
@@ -150,7 +181,8 @@ define(["require", "exports", "./MaterialLoader", "./config/UserVars", "./config
     exports.Game = Game;
     function start() {
         /*
-        Make the game object and start it.
+        Make the game object and start it. This is the function that is run from
+        the RequireJS entry point.
         */
         let game = new Game({
             onJSONLoaded: function () {

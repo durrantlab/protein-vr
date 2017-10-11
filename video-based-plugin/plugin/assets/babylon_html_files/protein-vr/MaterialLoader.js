@@ -1,7 +1,12 @@
-define(["require", "exports", "./config/Globals", "./shaders/StandardShader", "./scene/ViewerSphere"], function (require, exports, Globals, StandardShader_1, ViewerSphere) {
+define(["require", "exports", "./config/Globals", "./sphere_material/SphereMaterial", "./scene/ViewerSphere"], function (require, exports, Globals, SphereMaterial_1, ViewerSphere) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     function getFramePromises() {
         /*
-        Start loading all the skybox images.
+        Start loading all the skybox images (view spheres).
+    
+        :returns: A promise to load them.
+        :rtype: :class:`Promise<any>`
         */
         let BABYLON = Globals.get("BABYLON");
         let scene = Globals.get("scene");
@@ -34,7 +39,9 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
                         if (Globals.get("breakCaching") === false) {
                             filename = filename + "?" + Math.random().toString();
                         }
-                        let shader = new StandardShader_1.Shader(filename, true, () => {
+                        // TODO: This isn't a shader anymore. Try renaming to
+                        // something reasonable.
+                        let sphere_material = new SphereMaterial_1.SphereMaterial(filename, true, () => {
                             setTimeout(() => {
                                 // Get the total number of textures.
                                 let numTextures = Globals.get("numFrameTexturesLoaded") + 1;
@@ -48,7 +55,7 @@ define(["require", "exports", "./config/Globals", "./shaders/StandardShader", ".
                                 }
                             });
                         });
-                        Globals.get("sphereShaders")[i] = shader;
+                        Globals.get("sphereMaterials")[i] = sphere_material;
                     });
                 }
                 resolve({ msg: "List of get-texture promises" }); //, promises: promises})

@@ -1,7 +1,9 @@
 /**
- * module to create/store/maintain system variables
+ * Module to create/store/maintain system variables
  */
 define(["require", "exports", "./Globals"], function (require, exports, Globals) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     // Setting up user parameters
     let mobileDefaults;
     let laptopDefaults;
@@ -12,31 +14,31 @@ define(["require", "exports", "./Globals"], function (require, exports, Globals)
         "desktop": {}
     };
     exports.paramNames = {};
+    var audios;
     (function (audios) {
         audios[audios["Speakers"] = 0] = "Speakers";
         audios[audios["Headphones"] = 1] = "Headphones";
         audios[audios["None"] = 2] = "None";
-    })(exports.audios || (exports.audios = {}));
-    var audios = exports.audios;
+    })(audios = exports.audios || (exports.audios = {}));
     exports.paramNames["audio"] = ["Speakers", "Headphones", "None"];
     exports.paramDefaults["mobile"]["audio"] = audios["Headphones"];
     exports.paramDefaults["laptop"]["audio"] = audios["Speakers"];
     exports.paramDefaults["desktop"]["audio"] = audios["Speakers"];
+    var viewers;
     (function (viewers) {
         viewers[viewers["Screen"] = 0] = "Screen";
         viewers[viewers["VRHeadset"] = 1] = "VRHeadset";
-    })(exports.viewers || (exports.viewers = {}));
-    var viewers = exports.viewers;
+    })(viewers = exports.viewers || (exports.viewers = {}));
     exports.paramNames["viewer"] = ["Screen", "VR Headset"];
     exports.paramDefaults["mobile"]["viewer"] = viewers["Screen"];
     exports.paramDefaults["laptop"]["viewer"] = viewers["Screen"];
     exports.paramDefaults["desktop"]["viewer"] = viewers["Screen"];
+    var devices;
     (function (devices) {
         devices[devices["Mobile"] = 0] = "Mobile";
         devices[devices["Laptop"] = 1] = "Laptop";
         devices[devices["Desktop"] = 2] = "Desktop";
-    })(exports.devices || (exports.devices = {}));
-    var devices = exports.devices;
+    })(devices = exports.devices || (exports.devices = {}));
     exports.paramNames["device"] = ["Mobile", "Laptop", "Desktop"];
     exports.paramDefaults["mobile"]["device"] = devices["Mobile"];
     exports.paramDefaults["laptop"]["device"] = devices["Laptop"];
@@ -105,11 +107,17 @@ define(["require", "exports", "./Globals"], function (require, exports, Globals)
      * This function will assign values to the system variables based on user input.
      */
     function setup() {
+        /*
+        Setup the user variables (defaults and any in local storage).
+    
+        :returns: A promise to set up the user variables.
+        :rtype: :class:`string`
+        */
         return new Promise((resolve) => {
             // Default values before anything. For now just use laptop defaults,
             // but in future would be good to detect device...
             var userVars;
-            let isMobile = Globals.get("isMobile"); // null if its not a phone at all.
+            let isMobile = Globals.get("isMobile");
             if (isMobile) {
                 userVars = exports.paramDefaults["mobile"];
             }
@@ -141,6 +149,12 @@ define(["require", "exports", "./Globals"], function (require, exports, Globals)
     }
     exports.setup = setup;
     function getLocalStorageParams() {
+        /*
+        Gets the user variables from local storage.
+    
+        :returns: The user variables, as a JSON object.
+        :rtype: :class:`string`
+        */
         // Get params from local storage
         let localStorageParamsStr = localStorage.getItem("proteinvr_params");
         let localStorageParams;
@@ -154,11 +168,24 @@ define(["require", "exports", "./Globals"], function (require, exports, Globals)
     }
     exports.getLocalStorageParams = getLocalStorageParams;
     function getParam(key) {
+        /*
+        Gets the value of a user variable in local storage.
+    
+        :param string key: The name of the variable.
+    
+        :returns: The value of the variable.
+        :rtype: :class:`any`
+        */
         let localStorageParams = getLocalStorageParams();
         return localStorageParams[key];
     }
     exports.getParam = getParam;
     function saveLocalStorageParams(params) {
+        /*
+        Sets user-defined variables in local storage.
+    
+        :param obj params: A JSON object containing the user variables.
+        */
         // let paramsToSave = jQuery.parseJSON(JSON.stringify(params));  // This makes a copy
         // delete paramsToSave["scenePath"];  // Don't save this one.
         // localStorage.setItem("proteinvr_params", JSON.stringify(paramsToSave));    
@@ -166,6 +193,13 @@ define(["require", "exports", "./Globals"], function (require, exports, Globals)
     }
     exports.saveLocalStorageParams = saveLocalStorageParams;
     function updateLocalStorageParams(paramName, value) {
+        /*
+        Update a user variable in local storage.
+    
+        :param string praamName: The name of the user variable.
+    
+        :param any value: The new value of the variable.
+        */
         // Get params from local storage
         let localStorageParams = getLocalStorageParams();
         // Update those params
@@ -176,6 +210,14 @@ define(["require", "exports", "./Globals"], function (require, exports, Globals)
     exports.updateLocalStorageParams = updateLocalStorageParams;
     // Convert strings to enums. A helper function.
     function stringToEnumVal(s) {
+        /*
+        Map a enum name to its value. Isn't this built into typescript?
+    
+        :param string s: The enum name.
+    
+        :returns: The enum value.
+        :rtype: :class:`string`
+        */
         if (typeof (s) === "string") {
             s = s.toLowerCase().replace(/ /g, '');
         }
@@ -193,7 +235,6 @@ define(["require", "exports", "./Globals"], function (require, exports, Globals)
                 }
             }
         }
-        // console.log("string id not found", s);
         return s;
     }
     exports.stringToEnumVal = stringToEnumVal;

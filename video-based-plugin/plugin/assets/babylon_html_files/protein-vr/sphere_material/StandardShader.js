@@ -1,4 +1,6 @@
 define(["require", "exports", "../config/Globals"], function (require, exports, Globals) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     class Shader {
         constructor(textureFilename, transparency = false, callBack = function () { }) {
             this.material = undefined;
@@ -8,6 +10,9 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
             this._transparency = transparency;
             let dirname = textureFilename.indexOf("/") === -1 ? "" : textureFilename.match(/.*\//)[0];
             let basename = textureFilename.replace(/.*\//, "");
+            // TODO: This should be Append, not Load. 
+            // NOTE TO WILLIAM: This is loading all babylon files up front. Only
+            // do this if global variable lazyLoadViewerSpheres is false.
             BABYLON.SceneLoader.Load(dirname, basename + ".babylon", Globals.get("engine"), (aScene) => {
                 aScene.executeWhenReady(() => {
                     let newMaterial = aScene.materials[0];

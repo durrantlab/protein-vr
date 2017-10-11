@@ -1,7 +1,9 @@
-import { Game } from "./main";
-import * as Globals from "./config/Globals";
-import { SphereMaterial } from "./sphere_material/SphereMaterial";
-import * as ViewerSphere from "./scene/ViewerSphere";
+/* This could be eventually merged with SphereMaterial.ts. */
+
+import { Game } from "../main";
+import * as Globals from "../config/Globals";
+import { SphereMaterial } from "../sphere_material/SphereMaterial";
+import * as ViewerSphere from "../scene/ViewerSphere";
 
 export function getFramePromises(): Promise<any> {
     /*

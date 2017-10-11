@@ -1,6 +1,6 @@
 import * as Globals from "../config/Globals";
 
-export class Shader {
+export class SphereMaterial {
     private _scene: any;
     public material: any = undefined;
     private _transparency: boolean = false;

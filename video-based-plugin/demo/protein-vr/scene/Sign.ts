@@ -1,7 +1,14 @@
+/* Add signs to the scene to guide the student. */
+
 import * as Globals from "../config/Globals";
 import { RenderingGroups } from "../config/Globals";
 
-export function setupAllSigns() {
+export function setupAllSigns(): void {
+    /*
+    Sets up the signs that have been loaded from the external json file.
+    */
+
+
     // Get the sign data
     let signData = Globals.get("signData");
 
@@ -48,7 +55,19 @@ export function setupAllSigns() {
     }
 }
 
-function _getLineData(line, context) {
+function _getLineData(line: string, context: any): any {
+    /*
+    Format the text to put on the sign and determine the total length of that
+    text when rendered in the browser.
+
+    :param string line: The text.
+
+    :param ??? context: The texture context.
+
+    :returns: A JSON object containing the formatted line and linewidth.
+    :rtype: :class:`obj`
+    */
+
     // Remove terminal and inital spaces
     line = line.replace(/\t/g, " ");
     line = line.replace(/ $/g, "");
@@ -64,7 +83,23 @@ function _getLineData(line, context) {
 
 }
 
-function _wrapText(context, text, margin, maxWidth, lineHeight, textureResolution) {
+function _wrapText(context: any, text: string, margin: number, maxWidth: number, lineHeight: number, textureResolution: number): void {
+    /*
+    Wraps text appropriately and draws it on the texture context.
+
+    :param ??? context: The texture context.
+
+    :param string text: The text.
+
+    :param number margin: The margin around the text.
+
+    :param number maxWidth: Can't remember what this is for.
+
+    :param number lineHeight: The height of the line (used for spacing).
+
+    :param number textureResolution: The resolution of the texture.
+    */
+
     // Adapted from http://www.html5gamedevs.com/topic/8958-dynamic-texure-drawtext-attributes-get-text-to-wrap/
     // Set some variables
     let line = '';
@@ -113,5 +148,5 @@ interface MakeSignInterface {
 }
 
 function makeSign(params: MakeSignInterface) {
-
+    // TODO: Need stuff here.
 }

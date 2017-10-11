@@ -1,30 +1,39 @@
+// Sets up the scene.
+
 declare var BABYLON;
 
 import * as UserVars from "../config/UserVars";
 import { Camera } from "./Camera";
 import * as Globals from "../config/Globals";
 import { RenderingGroups } from "../config/Globals";
-import { Shader } from "../shaders/StandardShader";
+import { SphereMaterial } from "../sphere_material/SphereMaterial";
 import * as Arrows from "./Arrows";
 import { setupAllSigns } from "./Sign";
 
 export function loadBabylonFile(): Promise<any> {
+    /*
+    Loads and sets up the main scene.
+
+    :returns: A promise to load and set  up the scene.
+    :rtype: :class:`Promise<any>`
+    */
 
     return new Promise((resolve) => {
-        var scene = new BABYLON.Scene(Globals.get("engine"));
+        var engine = Globals.get("engine");
+        var scene = new BABYLON.Scene(engine);
         Globals.set("scene", scene);
-        
-        // BABYLON.SceneLoader.Load("", "babylon.babylon", Globals.get("engine"), (newScene) => {
+
         BABYLON.SceneLoader.Append("", "babylon.babylon", scene, () => {
     
             window.scrollTo(0, 1);  // supposed to autohide scroll bar.
     
-            // Wait for textures and shaders to be ready
+            // Wait for textures and materials to be ready
             scene.executeWhenReady(() => {
                 let camera = new Camera();
                 Globals.set("camera", camera);
 
-                // Delay textures until needed. Cool, but too slow for our purposes here...
+                // Delay textures until needed. Cool, but too slow for our
+                // purposes here... Keep it commented out for now.
                 // newScene.useDelayedTextureLoading = true
                                 
                 // Setup viewer sphere template
@@ -32,7 +41,7 @@ export function loadBabylonFile(): Promise<any> {
                 _setupViewerSphereTemplate(scene, radius);
                 
                 // Set up environmental (background) sphere
-                _setupEnvironmentalSphere(scene, radius);
+                _setupEnvironmentalSphere(radius);
 
                 // Setup arrows
                 Arrows.setup();
@@ -40,8 +49,8 @@ export function loadBabylonFile(): Promise<any> {
                 // Setup signs
                 setupAllSigns();
 
-                window.debugit = scene.debugLayer;
-                // newScene.debugLayer.show();
+                // window.debugit = scene.debugLayer;
+                // scene.debugLayer.show();
                 
                 if (Globals.get("debug")) { scene.debugLayer.show(); }
                 resolve({msg: "BABYLON.BABYLON LOADED"});
@@ -50,7 +59,18 @@ export function loadBabylonFile(): Promise<any> {
     })
 }
 
-export function getMeshThatContainsStr(str: string, scene: any) {
+export function getMeshThatContainsStr(str: string, scene: any): any {
+    /*
+    Gets the first mesh with a name that contains the given substring.
+
+    :param string str: The substring.
+
+    :param ??? scene: The BABYLON scene.
+
+    :returns: The first mesh.
+    :rtype: :class:`???`
+    */
+
     // Identify viewer sphere template
     let theMesh;
     for (let t = 0; t < scene.meshes.length; t++) {
@@ -62,9 +82,18 @@ export function getMeshThatContainsStr(str: string, scene: any) {
     return theMesh;
 }
 
-function _setupViewerSphereTemplate(newScene, radius) {
+function _setupViewerSphereTemplate(scene: any, radius: number): void {
+    /*
+    Sets up the initial viewer sphere. This will be cloned for each valid
+    camera location in the scene.
+
+    :param ??? scene: The BABYLON scene.
+
+    :param number radius: The size of the viewer sphere.
+    */
+
     // Identify viewer sphere template
-    let viewerSphereTemplate = getMeshThatContainsStr("ProteinVR_ViewerSphere", newScene);
+    let viewerSphereTemplate = getMeshThatContainsStr("ProteinVR_ViewerSphere", scene);
     viewerSphereTemplate.scaling = new BABYLON.Vector3(radius, radius, -radius);
     viewerSphereTemplate.isPickable = false;
     viewerSphereTemplate.renderingGroupId = RenderingGroups.ViewerSphere;
@@ -72,7 +101,15 @@ function _setupViewerSphereTemplate(newScene, radius) {
     Globals.set("viewerSphereTemplate", viewerSphereTemplate);
 }
 
-function _setupEnvironmentalSphere(newScene, radius) {
+function _setupEnvironmentalSphere(radius): void {
+    /*
+    Sets up the environmental sphere (unchanging depending on position). Note
+    that Alex's blender plugin uses a different nomenclature. You should
+    standardize these names.
+
+    :param number radius: The size of the environmenal sphere.
+    */
+
     let viewerSphereTemplate = Globals.get("viewerSphereTemplate")
     let backgroundSphere = viewerSphereTemplate.clone("backgroundSphere");
     let slightlyBiggerRadius = radius * 1.05;
@@ -81,8 +118,8 @@ function _setupEnvironmentalSphere(newScene, radius) {
     backgroundSphere.isPickable = false;
     backgroundSphere.renderingGroupId = RenderingGroups.EnvironmentalSphere;
 
-    let shader2 = new Shader('environment.png', false, () => {
-        backgroundSphere.material = shader2.material;
+    let sphereMaterial2 = new SphereMaterial('environment.png', false, () => {
+        backgroundSphere.material = sphereMaterial2.material;
         Globals.set("backgroundSphere", backgroundSphere);
     });
 }

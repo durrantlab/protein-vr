@@ -1,6 +1,6 @@
 # This compiles and updates the code in the demo directory.
-
 # First, compile the source
+pwd
 cd ../plugin/assets/babylon_html_files/
 tsc --target es2015 --module amd protein-vr/config/RequireConfig.ts
 tsc --target es2015 --module amd protein-vr/main.ts
@@ -12,4 +12,3 @@ rsync -r --exclude="*.mm" --exclude="update*" ../plugin/assets/babylon_html_file
 # Start a server
 # http://0.0.0.0:8000 (or maybe localhost:8000)
 python -m SimpleHTTPServer 8000
-

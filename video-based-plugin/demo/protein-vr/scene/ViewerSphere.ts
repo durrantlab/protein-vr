@@ -1,12 +1,15 @@
+/* Create the viewer spheres. */
+
 import * as Globals from "../config/Globals";
-import { Shader } from "../shaders/StandardShader";
+import { SphereMaterial } from "../sphere_material/SphereMaterial";
 import { RenderingGroups } from "../config/Globals";
 
-var shader;
+var sphere_materials;
 
 export function setup(): void {
     /*
-    Setup the viewer spheres.
+    Setup the viewer spheres. Position them at the correct locations, for
+    example.
     */
     
     let scene = Globals.get("scene");
@@ -16,18 +19,18 @@ export function setup(): void {
     let viewerSphereTemplate = Globals.get("viewerSphereTemplate");
     
     // Go through and clone the viewer sphere for each of the camera locations.
-    let sphereShaders = Globals.get("sphereShaders");  // Contains materials with the PNG textures.
+    let sphereMaterials = Globals.get("sphereMaterials");  // Contains materials with the PNG textures.
     let cameraPositions = Globals.get("cameraPositions");
     let cameraObj = Globals.get("camera");
 
     let viewerSpheres = [];
-    for (let i = 0; i < sphereShaders.length; i++) {
-        // Clone the sphere for this specific PNG/shader
+    for (let i = 0; i < sphereMaterials.length; i++) {
+        // Clone the sphere for this specific PNG/materials
         let aViewerSphere = viewerSphereTemplate.clone("viewer_sphere" +i.toString());
 
         // Position that sphere at the associated camera location (in same order).
         aViewerSphere.position = cameraPositions[i];
-        aViewerSphere.material = sphereShaders[i].material;
+        aViewerSphere.material = sphereMaterials[i].material;
         
         if (i === 0) {  // first frame
             // First frame is initially visible.

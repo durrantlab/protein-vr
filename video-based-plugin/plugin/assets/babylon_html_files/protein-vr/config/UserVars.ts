@@ -1,12 +1,10 @@
 /**
- * module to create/store/maintain system variables
+ * Module to create/store/maintain system variables
  */ 
 
 // import * as Core from "../Core/Core";
 import * as SettingsPanel from "./SettingsPanel";
 import * as Globals from "./Globals";
-
-// declare var jQuery;
 
 // The interface
 interface userVarsInterface {
@@ -138,12 +136,18 @@ paramDefaults["desktop"]["device"] = devices["Desktop"];
  * This function will assign values to the system variables based on user input.
  */
 export function setup(): Promise<any> {
+    /*
+    Setup the user variables (defaults and any in local storage).
+
+    :returns: A promise to set up the user variables.
+    :rtype: :class:`string`
+    */
 
     return new Promise((resolve) => {
         // Default values before anything. For now just use laptop defaults,
         // but in future would be good to detect device...
         var userVars: userVarsInterface;
-        let isMobile = Globals.get("isMobile");  // null if its not a phone at all.
+        let isMobile = Globals.get("isMobile");
         
         if (isMobile){
             userVars = paramDefaults["mobile"];
@@ -178,7 +182,14 @@ export function setup(): Promise<any> {
     });
 }
 
-export function getLocalStorageParams() {
+export function getLocalStorageParams(): any {
+    /*
+    Gets the user variables from local storage.
+
+    :returns: The user variables, as a JSON object.
+    :rtype: :class:`string`
+    */
+    
     // Get params from local storage
     let localStorageParamsStr = localStorage.getItem("proteinvr_params");
     let localStorageParams;
@@ -191,19 +202,42 @@ export function getLocalStorageParams() {
     return localStorageParams;
 }
 
-export function getParam(key) {
+export function getParam(key: string): any {
+    /*
+    Gets the value of a user variable in local storage.
+
+    :param string key: The name of the variable.
+
+    :returns: The value of the variable.
+    :rtype: :class:`any`
+    */
+    
     let localStorageParams = getLocalStorageParams();
     return localStorageParams[key];
 }
 
-export function saveLocalStorageParams(params) {
+export function saveLocalStorageParams(params: any): void {
+    /*
+    Sets user-defined variables in local storage.
+
+    :param obj params: A JSON object containing the user variables.
+    */
+
     // let paramsToSave = jQuery.parseJSON(JSON.stringify(params));  // This makes a copy
     // delete paramsToSave["scenePath"];  // Don't save this one.
     // localStorage.setItem("proteinvr_params", JSON.stringify(paramsToSave));    
     localStorage.setItem("proteinvr_params", JSON.stringify(params));    
 }
 
-export function updateLocalStorageParams(paramName, value) {
+export function updateLocalStorageParams(paramName: string, value: any): void {
+    /*
+    Update a user variable in local storage.
+
+    :param string praamName: The name of the user variable.
+
+    :param any value: The new value of the variable.
+    */
+
     // Get params from local storage
     let localStorageParams = getLocalStorageParams()
     
@@ -216,6 +250,15 @@ export function updateLocalStorageParams(paramName, value) {
 
 // Convert strings to enums. A helper function.
 export function stringToEnumVal(s: any): any {
+    /*
+    Map a enum name to its value. Isn't this built into typescript?
+
+    :param string s: The enum name.
+
+    :returns: The enum value.
+    :rtype: :class:`string`
+    */
+
     if (typeof(s) === "string") {
         s = s.toLowerCase().replace(/ /g, '');
     }
@@ -236,7 +279,6 @@ export function stringToEnumVal(s: any): any {
         }
     }
 
-    // console.log("string id not found", s);
     return s;
 }
 

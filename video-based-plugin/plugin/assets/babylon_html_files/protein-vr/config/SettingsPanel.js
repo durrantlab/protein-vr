@@ -1,21 +1,57 @@
 define(["require", "exports", "./UserVars", "./Globals"], function (require, exports, UserVars, Globals) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     function allowUserToModifySettings() {
+        /*
+        Setup and show the settings panel.
+    
+        :returns: A promise to setup and show the settings panel.
+        :rtype: :class:`Promise`
+        */
         return new Promise((resolve) => {
             let jQuery = Globals.get("jQuery");
-            // Add div 
-            // jQuery = PVRGlobals.jQuery;
+            // Add div to contain all settings.
             jQuery("body").append(`<div id="settings_panel"></div>`);
             let settingsPanel = jQuery("#settings_panel");
-            // Make it fluid with bootstrap
+            // Make the settings panel fluid using bootstrap class
             settingsPanel.addClass("container-fluid");
-            // Add in html
+            // Create the panel html
             let html = panel('ProteinVR 1.0', `<div id="hardware-msg" class="alert alert-info">
                 Select your hardware setup:
             </div>` +
                 panel("Hardware", 
                 //row_even_split(
                 // [3,4,5],
-                radioBoxes("Viewer", UserVars.paramNames["viewer"], ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>'])) /* +
+                radioBoxes("Viewer", UserVars.paramNames["viewer"], ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>']
+                // [85, 115]
+                )
+                /* radioBoxes(
+                    "Audio",
+                    UserVars.paramNames["audio"],
+                    ['<i class="icon-speaker"></i>', '<i class="icon-headphones"></i>', '<span class="glyphicon glyphicon-volume-off" aria-hidden=true></span>']
+                    // [100, 120, 75]
+                )*/
+                /*) +
+                row_even_split(
+                    radioBoxes(
+                        "Device",
+                        UserVars.paramNames["device"],
+                        ['<i class="icon-iphone"></i>', '<i class="icon-laptop"></i>', '<i class="icon-connectedpc"></i>']
+                        // [100, 100, 100]
+                    ), "" */ /*,
+                radioBoxes(
+                    "Moving",
+                    UserVars.paramNames["moving"],
+                    ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
+                    // [100, 100, 100]
+                )  + radioBoxes(  // commented out because of simplified UI
+                    "Looking",
+                    UserVars.paramNames["looking"],
+                    ['<i class="icon-mouse"></i>', '<i class="icon-hand-up"></i>'] //, '<i class="icon-connectedpc"></i>']
+                    // [100, 100, 100]
+                ) */ /*,
+            )*/
+                ) /* +
             panelCollapsible(
                 "Initial Performance Settings",
                 `<div id="settings-msg" class="alert alert-info">
@@ -55,15 +91,29 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
                 )
             ) */
                 +
-                    `<button id="user_settings_continue_button" type="button" class="btn btn-primary">Continue</button>`);
+                    `<button id="user_settings_continue_button" type="button" class="btn btn-primary">Continue</button>`
+            // <button id="broadcast_game_button" style="display: none;" type="button" class="btn btn-primary">Broadcast</button>`
+            );
+            // Add that HTML to the DOM.
             settingsPanel.html(html);
+            // ???
             addJavaScript(() => { resolve({ msg: "USER MODIFIED SETTINGS" }); });
-            // Set the values on the GUI.
+            // Set default or previously saved values on the GUI.
             this.setGUIState();
         });
     }
     exports.allowUserToModifySettings = allowUserToModifySettings;
     function panel(title, html) {
+        /*
+        Return the HTML for a simple bootstrap panel.
+    
+        :param string title: The title of the panel.
+    
+        :param string html: The html contained in the panel.
+    
+        :returns: The panel HTML.
+        :rtype: :class:`string`
+        */
         return `
         <div class="panel panel-primary">
             <div class="panel-heading">
@@ -76,6 +126,16 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
     `;
     }
     function panelCollapsible(title, html) {
+        /*
+        Return the HTML for a simple collapsible bootstrap panel.
+    
+        :param string title: The title of the panel.
+    
+        :param string html: The html contained in the panel.
+    
+        :returns: The panel HTML.
+        :rtype: :class:`string`
+        */
         let rnd = Math.floor(Math.random() * 1000000).toString();
         return `
         <div class="panel panel-primary">
@@ -92,9 +152,31 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
     `;
     }
     function section(html) {
-        return `<div class="panel panel-default"><div class="panel-body">${html}</div></div>`;
+        /*
+        Return the HTML for a simple section (panel without header).
+    
+        :param string html: The html contained in the section.
+    
+        :returns: The section HTML.
+        :rtype: :class:`string`
+        */
+        return `
+        <div class="panel panel-default">
+            <div class="panel-body">${html}</div>
+        </div>
+    `;
     }
     function row_even_split(html1, html2) {
+        /*
+        Return a row with two columns.
+    
+        :param string html1: The html contained in the first column.
+    
+        :param string html2: The html contained in the second column.
+    
+        :returns: The row HTML.
+        :rtype: :class:`string`
+        */
         return `
         <div class="row">
             <div class="col-sm-6 col-xs-12">
@@ -107,6 +189,20 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
     `;
     }
     function row_thirds_split(widths, html1, html2, html3) {
+        /*
+        Return a row with three columns.
+    
+        :param number[] widths: The widths of the columns (should sum to 12).
+    
+        :param string html1: The html contained in the first column.
+    
+        :param string html2: The html contained in the second column.
+    
+        :param string html3: The html contained in the third column.
+    
+        :returns: The row HTML.
+        :rtype: :class:`string`
+        */
         return `
         <div class="row">
             <div class="col-lg-${widths[0]} col-xs-12">
@@ -122,6 +218,7 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
     `;
     }
     function radioBoxes(label, values, icons_if_phone = undefined) {
+        /* TODO: Docstring needed here! */
         let id = label.toLowerCase().replace(/ /g, '');
         let html = `<div class="form-group buttonbar-${id}">
                     <div class="btn-group btn-group-justified" data-toggle="buttons">
@@ -145,6 +242,7 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
         return html;
     }
     function setRadioState(id, varsToUse) {
+        /* TODO: Docstring needed here! */
         setTimeout(() => {
             // Get all the labels and make them default colored, no checkboxes.
             let labels = Globals.get("jQuery")(`.${id}-labels`);
@@ -162,6 +260,7 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
         }, 0);
     }
     function setGUIState() {
+        /* TODO: Docstring needed here! */
         let jQuery = Globals.get("jQuery");
         let varsToUse = jQuery.parseJSON(localStorage.getItem("proteinvr_params"));
         // Set the various radio states
@@ -174,6 +273,13 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
     }
     exports.setGUIState = setGUIState;
     function addJavaScript(onSettingsPanelClosed) {
+        /*
+        Sets up all the javascript required to make the settings panel work (i.e.,
+        when buttons pressed).
+    
+        :param func onSettingsPanelClosed: A callback function to run when
+                    settings panel is closed.
+        */
         let jQuery = Globals.get("jQuery");
         let engine = Globals.get("engine");
         // Make toggle boxes clickable.
@@ -232,6 +338,10 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
         }));
     }
     function figureOutWhichCameraToUse() {
+        /*
+        Figures out what kind of camera to use based on hardware and user
+        settings. Shows appropriate instructions in loading panel for that camera.
+        */
         let isMobile = Globals.get("isMobile");
         let jQuery = Globals.get("jQuery");
         // Figure out which kind of camera to use.
@@ -281,6 +391,7 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
         Globals.set("cameraTypeToUse", cameraTypeToUse);
     }
     function addBroadcastModal() {
+        /* TODO: Not currently implemented in this version of ProteinVR! */
         let jQuery = Globals.get("jQuery");
         let broadcastURL = window.location.href + '?id=' + PVRGlobals.broadcastID;
         jQuery("body").append(`

@@ -1,9 +1,17 @@
+/* Get data about the scene from external json files. */
+
 import * as Globals from "../config/Globals";
 import * as Camera from "./Camera";
 import { RenderingGroups } from "../config/Globals";
 
 var data;
-export function loadJSON() {
+export function loadJSON(): any {
+    /*
+    Load data about the scene from external json files.
+
+    :returns: A promise to load that external json data.
+    */
+    
     let jQuery = Globals.get("jQuery");
     let BABYLON = Globals.get("BABYLON");
 
@@ -13,16 +21,17 @@ export function loadJSON() {
             
             // Load camera tracks data
             let cameraPositions = []; 
-            let sphereShaders = [];  // For storage now.
+            let sphereMaterials = [];  // For storage now.
             for (let i=0; i<data["cameraPositions"].length; i++) {
                 let pt = data["cameraPositions"][i];
                 let v = new BABYLON.Vector3(pt[0], pt[2], pt[1]);  // note that Y and Z axes are switched on purpose.
                 cameraPositions.push(v);
-                sphereShaders.push(null);
+                sphereMaterials.push(null);
             }
             Globals.set("cameraPositions", cameraPositions);
-            Globals.set("sphereShaders", sphereShaders);      
+            Globals.set("sphereMaterials", sphereMaterials);      
             
+            // Load data about where to put signs.
             let signData = [];
             for (let i=0; i<data["signs"].length; i++) {
                 signData.push(data["signs"][i])
@@ -33,7 +42,14 @@ export function loadJSON() {
     })
 }
 
-export function afterSceneLoaded() {
+export function afterSceneLoaded(): any {
+    /*
+    Runs after the scene has loaded. Adds guid spheres, clickable files,
+    animated objects, etc.
+
+    :returns: A promise to do all that stuff.
+    */
+    
     return new Promise((resolve) => {
         if (Globals.get("debug")) {
             _addGuideSpheres();
@@ -47,7 +63,12 @@ export function afterSceneLoaded() {
 
 var _guideSpheres = [];
 var _guideSphereSize: number = 0.02;
-function _addGuideSpheres() {
+function _addGuideSpheres(): void {
+    /*
+    Adds guide spheres to the current scene. Useful for debugging. They show
+    the paths where the camera can move.
+    */
+    
     let BABYLON = Globals.get("BABYLON");
     let scene = Globals.get("scene");
 
@@ -72,7 +93,13 @@ function _addGuideSpheres() {
     }
 }
 
-function _loadClickableFiles() {
+function _loadClickableFiles(): void {
+    /*
+    Load and setup clickable objects. These are hidden objects that can be
+    clicked. So if the user clicks on an environmental sphere at the right
+    location, the correct clicked object can be detected.
+    */
+    
     let BABYLON = Globals.get("BABYLON");
     let scene = Globals.get("scene");
 
@@ -95,7 +122,11 @@ function _loadClickableFiles() {
     _makeSomeMeshesClickable();
 }
 
-function _loadAnimatedObjects() {
+function _loadAnimatedObjects(): void {
+    /*
+    Loads objects that are animated.
+    */
+
     let BABYLON = Globals.get("BABYLON");
     let scene = Globals.get("scene");
     let loader = new BABYLON.AssetsManager(scene);
@@ -127,7 +158,11 @@ function _loadAnimatedObjects() {
 }
 
 var _timeOfLastClick: number = new Date().getTime();  // A refractory period
-function _makeSomeMeshesClickable() {
+function _makeSomeMeshesClickable(): void {
+    /*
+    The code that detects mesh clicking.
+    */
+
     let scene = Globals.get("scene");
 
     // When click event is raised

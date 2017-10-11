@@ -1,7 +1,6 @@
 ///<reference path="../../Definitions/require.d.ts" />
 
-declare var jQuery;
-
+// Leave this config code here in case you need it in the future...
 // require.config({
 //     paths: {
 //         // jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min',
@@ -27,5 +26,6 @@ require(['../main'], (main) => {
     :param ??? main: The main object.
     */
 
+    // Start the game...
     main.start();
 });

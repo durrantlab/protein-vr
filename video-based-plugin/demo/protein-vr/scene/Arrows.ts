@@ -1,10 +1,16 @@
+/* Makes guide arrows work in VR world. */
+
 import * as Globals from "../config/Globals";
 import { RenderingGroups } from "../config/Globals";
 import { getMeshThatContainsStr } from "./Setup";
 
 var _arrowMeshes = [];
 
-export function setup() {
+export function setup(): void {
+    /*
+    Setup the arrows.
+    */
+
     let BABYLON = Globals.get("BABYLON");
     let scene = Globals.get("scene");
 
@@ -17,7 +23,7 @@ export function setup() {
         _arrowMeshes.push(arrowMesh.clone("ProteinVR_Arrow_clone" + i.toString()));
     }
     
-    // Update all arrows
+    // Set the materials and other properties on all arrows
     for (let i=0; i<_arrowMeshes.length; i++) {
         let thisArrowMesh = _arrowMeshes[i];
         
@@ -41,7 +47,13 @@ export function setup() {
     }
 }
 
-export function fadeDownAll(val) {
+export function fadeDownAll(val: number): void {
+    /*
+    An easy function to set the visibility on all presently visible arrows.
+
+    :param num val: The visibility to set.
+    */
+    
     // fade all arrows that are visible down.
     for (let i=0; i<_arrowMeshes.length; i++) {
         let arrow = _arrowMeshes[i];
@@ -51,7 +63,15 @@ export function fadeDownAll(val) {
     }
 }
 
-export function update(cameraPoints) {
+export function update(cameraPoints: any): void {
+    /*
+    Update the location and position of the arrows.
+
+    :param Camera.CameraPoints cameraPoints: An object containing information
+                               about nearby locations to which the camera can
+                               move.
+    */
+    
     let scene = Globals.get("scene");
 
     // All arrows are initially hidden

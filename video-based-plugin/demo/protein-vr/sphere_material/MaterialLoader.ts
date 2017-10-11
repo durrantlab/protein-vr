@@ -1,11 +1,16 @@
-import { Game } from "./main";
-import * as Globals from "./config/Globals";
-import { Shader } from "./shaders/StandardShader";
-import * as ViewerSphere from "./scene/ViewerSphere";
+/* This could be eventually merged with SphereMaterial.ts. */
 
-export function getFramePromises() {
+import { Game } from "../main";
+import * as Globals from "../config/Globals";
+import { SphereMaterial } from "../sphere_material/SphereMaterial";
+import * as ViewerSphere from "../scene/ViewerSphere";
+
+export function getFramePromises(): Promise<any> {
     /*
-    Start loading all the skybox images.
+    Start loading all the skybox images (view spheres).
+
+    :returns: A promise to load them.
+    :rtype: :class:`Promise<any>`
     */
 
     let BABYLON = Globals.get("BABYLON");
@@ -44,7 +49,9 @@ export function getFramePromises() {
                         filename = filename + "?" + Math.random().toString();
                     }
                     
-                    let shader = new Shader(filename, true, () => {
+                    // TODO: This isn't a shader anymore. Try renaming to
+                    // something reasonable.
+                    let sphere_material = new SphereMaterial(filename, true, () => {
                         setTimeout(() => {  // kind of like doEvents from VB days.
                             // Get the total number of textures.
                             let numTextures = Globals.get("numFrameTexturesLoaded") + 1;
@@ -60,7 +67,7 @@ export function getFramePromises() {
                             }
                         });
                     });
-                    Globals.get("sphereShaders")[i] = shader;
+                    Globals.get("sphereMaterials")[i] = sphere_material;
                 });
             }
 
