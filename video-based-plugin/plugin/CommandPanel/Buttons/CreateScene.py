@@ -307,7 +307,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                     self.scene.render.resolution_y = self.scene.proteinvr_bake_texture_size
                     self.scene.render.resolution_percentage = 100
                     bpy.ops.render.render(write_still=True)
-                    self.background image_compress_png(self.scene.render.filepath)
+                    self.background.image_compress_png(self.scene.render.filepath)
 
                     if self.scene.proteinvr_mobile_bake_texture_size != 0:
                         self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
