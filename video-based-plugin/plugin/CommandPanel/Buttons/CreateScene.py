@@ -24,6 +24,7 @@ import shutil
 import glob
 import json
 import numpy
+import random
 
 obj_names = Utils.ObjNames()
 
@@ -165,6 +166,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.extra_data = {
             "cameraPositions": [],
             "clickableFiles": [],
+            "signs": []
         }
         
         # Put objects into "render layer" categories.
@@ -556,7 +558,91 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             # Remove the proteinvr_clickable mesh now that it's saved
             bpy.ops.object.delete()
 
+    def _step_8_save_signs(self):
+        """
+        Save the text and locations of the signs (billboards with text).
+        """
 
+        for o in bpy.data.objects:
+            if o.name.startswith("ProteinVRSign"):
+                self.extra_data["signs"].append({
+                    "location": list(o.location),
+                    "text": o.sign_text
+                })
+
+    def _step_9_generate_texture_babylon_and_manifest_files(self):
+        """
+        Wrap the textures in babylon files to take advantage of babylon's
+        caching system.
+        """
+
+        manifest = {
+            "version": int(1000000 * random.random()),
+            "enableSceneOffline" : True,
+            "enableTexturesOffline" : True
+        }
+
+        babylon = {
+            "materials": [
+                {
+                    "name": None,
+                    "id": None,
+                    "ambient": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "diffuse": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "specular": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "emissive": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "specularPower": 64,
+                    "alpha": 1,
+                    "backFaceCulling": True,
+                    "checkReadyOnlyOnce": False,
+                    "maxSimultaneousLights": 4,
+                    "emissiveTexture": {
+                        "name": None,
+                        "level": 1,
+                        "hasAlpha": 0,
+                        "coordinatesMode": 0,
+                        "uOffset": 0,
+                        "vOffset": 0,
+                        "uScale": 1,
+                        "vScale": 1,
+                        "uAng": 0,
+                        "vAng": 0,
+                        "wAng": 0,
+                        "wrapU": 0,
+                        "wrapV": 0,
+                        "coordinatesIndex": 0
+                    }
+                }
+            ]
+        }
+
+        png_files = glob.glob(self.frame_dir + "*.png")
+        png_files.append(os.path.abspath(self.frame_dir + "..") + os.sep + "environment.png")
+
+        for filename in png_files:
+            json.dump(manifest, open(filename + ".babylon.manifest", 'w'))
+
+            bsnm = os.path.basename(filename)
+            babylon["materials"][0]["name"] = bsnm
+            babylon["materials"][0]["id"] = bsnm
+            babylon["materials"][0]["emissiveTexture"]["name"] = bsnm
+            json.dump(babylon, open(filename + ".babylon", 'w'))
 
     def execute(self, context):
         """

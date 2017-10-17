@@ -29,6 +29,7 @@ from .DurBlend import ButtonParentClass
 
 from . import SetupPanel
 from . import CommandPanel
+from . import SignPanel
 
 bl_info = {
     "name": "ProteinVR",
@@ -47,6 +48,8 @@ classes_used = []
 classes_used.append(SetupPanel.OBJECT_OT_FixProblems)
 classes_used.append(CommandPanel.OBJECT_OT_CreateScene)
 classes_used.append(CommandPanel.OBJECT_OT_RenderRemote)
+classes_used.append(CommandPanel.OBJECT_OT_Sign)
+classes_used.append(SignPanel.OBJECT_OT_DoneSignPanel)
 
 ###### Below specific to this plugin ######
 
@@ -81,6 +84,7 @@ class ProteinVR(PanelParentClass):
 
         # Object-specific properties.
         bpy.types.Object.proteinvr_clickable = self.prop_funcs.boolProp("proteinvr_clickable", False, description="Whether this object is proteinvr_clickable.")
+        bpy.types.Object.sign_text = self.prop_funcs.strProp("", "Put sign text here...", description="The text to display on this sign.")
 
         # Boolean variables for the three object categories.
         # bpy.types.Object.background = self.prop_funcs.boolProp("background_image", False, description="Assigning image to be the background")
@@ -93,6 +97,7 @@ class ProteinVR(PanelParentClass):
         # Setup the two panels.
         self.SetupPanel = SetupPanel.SetupPanel(self.ui)
         self.CommandPanel = CommandPanel.CommandPanel(self.ui)
+        self.SignPanel = SignPanel.SignPanel(self.ui)
         
     def draw(self, context):
         """
@@ -111,8 +116,10 @@ class ProteinVR(PanelParentClass):
         # Check to see if critical scene elements have been set up.
         if self.SetupPanel.draw_panel_if_needed() == True:
             return
-
-        self.CommandPanel.draw_panel_if_needed()
+        elif self.SignPanel.draw_panel_if_needed() == True:
+            return
+        else:
+            self.CommandPanel.draw_panel_if_needed()
 
 def menu_func(self, context):
     """

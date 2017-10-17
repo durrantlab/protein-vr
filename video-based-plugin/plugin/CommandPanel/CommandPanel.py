@@ -56,6 +56,10 @@ class CommandPanel(ParentPanel):
             self.ui.object_property("proteinvr_category")
 
 
+        # Commands
+        self.ui.use_box_row("Commands")
+        self.ui.ops_button(rel_data_path="proteinvr.mark_sign_location", button_label="Mark Sign Location")
+
         # Set up UI
         # self.ui.use_layout_row()
         self.ui.use_box_row("Make Scene")

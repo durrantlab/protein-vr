@@ -1,7 +1,10 @@
+/* Things related to camera setup and movement. */
+
 import * as UserVars from "../config/UserVars";
 import * as Globals from "../config/Globals";
 import * as ViewerSphere from "./ViewerSphere";
 import * as Arrows from "./Arrows";
+import { RenderingGroups } from "../config/Globals";
 
 interface CameraPointData {
     distance: number;
@@ -12,13 +15,38 @@ interface CameraPointData {
 }
 
 class CameraPoints {
+    /*
+    A class that keeps track of and processes the valid locations where the
+    camera can reside (i.e., at the centers of viewer spheres.)
+    */
+
     public data: CameraPointData[] = [];
 
-    public push(d: CameraPointData) {
+    public push(d: CameraPointData): void {
+        /*
+        Add a point to the list of camera points.
+
+        :param CameraPointData d: The data point to add.
+        */
+
         this.data.push(d);
     }
 
     private _getValBasedOnCriteria(d: CameraPointData, criteria="distance") {
+        /*
+        Each camera data point contains several values (distance, angle,
+        score). This function retrieves a specific kind of value from a data
+        point.
+
+        :param CameraPointData d: The data point to get data from.
+
+        :param string criteria: The name of the kind of data to get. Defaults
+                      to "distance"
+
+        :returns: The corresponding value.
+        :rtype: :class:`number`
+        */
+    
         let val: number;
         switch (criteria) {
             case "distance":
@@ -32,7 +60,14 @@ class CameraPoints {
         }
     }
 
-    public sort(criteria="distance") {
+    public sort(criteria="distance"): void {
+        /*
+        Sorts the data points by a given criteria.
+
+        :param string criteria: The criteria to use. "distance", "angle", or
+                      "score". Defaults to "distance".
+        */
+
         this.data.sort(function(a, b) {
             let aVal: number = this.This._getValBasedOnCriteria(a, this.criteria);
             let bVal: number = this.This._getValBasedOnCriteria(b, this.criteria);
@@ -46,15 +81,40 @@ class CameraPoints {
         }));
     }
 
-    public removeFirst() {
+    public removeFirst(): void {
+        /*
+        Remove the first item presently in the list of data points. This
+        function is generally only useful if you've sorted the data points
+        first.
+        */
+
         this.data.shift();
     }
 
     public firstPoint(): CameraPointData {
+        /*
+        Get the first item presently in the list of data points. This function
+        is generally only useful if you've sorted the data points first.
+
+        :returns: The first camera point. 
+        :rtype: :class:`CameraPointData`
+        */
+
         return this.data[0];
     }
 
     public firstFewPoints(num: number): CameraPoints {
+        /*
+        Get the first several items presently in the list of data points. This
+        function is generally only useful if you've sorted the data points
+        first.
+
+        :param int num: The number of top points to return.
+
+        :returns: A CameraPoints containing the top points.
+        :rtype: :class:`CameraPoints`
+        */
+
         let newCameraPoints = new CameraPoints();
         for (let i=0; i<num; i++) {
             newCameraPoints.push(this.data[i]);
@@ -63,14 +123,44 @@ class CameraPoints {
     }
 
     public length(): number {
+        /*
+        Get the number of points in the current list.
+
+        :returns: the number of points.
+        :rtype: :class:`int`
+        */
+
         return this.data.length;
     }
 
     public get(index: number): CameraPointData {
+        /*
+        Get a specific data point from the list.
+
+        :param int index: The index of the data point.
+
+        :returns: The data point.
+        :rtype: :class:`CameraPointData`
+        */
+
         return this.data[index];
     }
 
     public lessThanCutoff(cutoff: number, criteria="distance"): CameraPoints {
+        /*
+        Get a list of all points that have values less than some cutoff.
+
+        :param number cutoff: The cutoff to use.
+
+        :param string criteria: The criteria to use. "distance", "angle", or
+                      "score". Defaults to "distance".
+
+        :param int num: The number of top points to return.
+
+        :returns: A CameraPoints containing the points that meet the criteria.
+        :rtype: :class:`CameraPoints`
+        */
+
         let newCameraPoints = new CameraPoints();
 
         for (let dIndex=0; dIndex<this.data.length; dIndex++) {
@@ -85,6 +175,16 @@ class CameraPoints {
     }
 
     public addAnglesInPlace(pivotPoint: any, vec1: any): void {
+        /*
+        Calculate angles between each of the points in this list and another
+        point, with a third central ("pivot") point specified..
+
+        :param BABYLON.Vector3 pivotPoint: The central point of the three
+                               points that form the angle.
+
+        :param BABYLON.Vector3 vec1: The third vector used to calculate the angle.
+        */
+
         let BABYLON = Globals.get("BABYLON");
         for (let i=0; i<this.data.length; i++) {
             let d = this.data[i];
@@ -95,6 +195,16 @@ class CameraPoints {
     }
 
     public addScoresInPlace(maxAngle: number, maxDistance: number): void {
+        /*
+        Calculate scores for each of the points in this. Points right in front
+        of the camera are given higher values, so both distance and angle play
+        roles.
+
+        :param number maxAngle: The maximum acceptable angle.
+
+        :param number maxDistance: The maximum acceptable distance.
+        */
+
         // Combination of angle (should be close to 0) and distance (should be
         // close to 0). But need to be normalized.
 
@@ -107,55 +217,50 @@ class CameraPoints {
         }        
     }
 
-    public removePointsInSameGeneralDirection(pivotPt) {  // pivotPt is probably the camera location
+    public removePointsInSameGeneralDirection(pivotPt): any {  // pivotPt is probably the camera location
+        /*
+        Get a list of data points without those points that are off more or
+        less the same direction relative to the camera. No need for two arrows
+        pointing in the same direction.
+
+        :param BABYLON.Vector3 pivotPt: Probably the camera location.
+
+        :returns: A CameraPoints containing the points that meet the criteria.
+        :rtype: :class:`CameraPoints`
+        */
+
         // This removes any points in the same general direction, keeping the
         // one that is closest.
         let BABYLON = Globals.get("BABYLON");
-        
-        // let pointRemoved: boolean = true;
-        // while (pointRemoved) {
-            // pointRemoved = false;
-            for (let dIndex1=0; dIndex1<this.data.length - 1; dIndex1++) {
-                if (this.data[dIndex1] !== null) {
-                    let pt1 = this.data[dIndex1].position;
-                    let vec1 = pt1.subtract(pivotPt).normalize();
-        
-                    for (let dIndex2=dIndex1+1; dIndex2<this.data.length; dIndex2++) {
-                        if (this.data[dIndex2] !== null) {
-                            // console.log("a", dIndex1, dIndex2);
 
-                            let pt2 = this.data[dIndex2].position;
-                            let vec2 = pt2.subtract(pivotPt).normalize();
-            
-                            let angleBetweenVecs = Math.acos(BABYLON.Vector3.Dot(vec1, vec2));
-                            // console.log("a", dIndex1, dIndex2, ";", pt1, pt2, ";", vec1, vec2, ";", angleBetweenVecs);
-                            if (angleBetweenVecs < 0.785398) {  // 45 degrees
-                                let dist1 = this.data[dIndex1].distance;
-                                let dist2 = this.data[dIndex2].distance;
-            
-                                // Note that the below alters the data in the source list.
-                                // So don't use that list anymore. (Just use what this
-                                // function returns...)
-                                if (dist1 <= dist2) {
-                                    this.data[dIndex2] = null;
-                                } else {
-                                    this.data[dIndex1] = null;
-                                }
-
-                                // console.log("a", "criteria met");
-                                
-                                // pointRemoved = true;
-                                // break;
+        for (let dIndex1=0; dIndex1<this.data.length - 1; dIndex1++) {
+            if (this.data[dIndex1] !== null) {
+                let pt1 = this.data[dIndex1].position;
+                let vec1 = pt1.subtract(pivotPt).normalize();
+    
+                for (let dIndex2=dIndex1+1; dIndex2<this.data.length; dIndex2++) {
+                    if (this.data[dIndex2] !== null) {
+                        let pt2 = this.data[dIndex2].position;
+                        let vec2 = pt2.subtract(pivotPt).normalize();
+        
+                        let angleBetweenVecs = Math.acos(BABYLON.Vector3.Dot(vec1, vec2));
+                        if (angleBetweenVecs < 0.785398) {  // 45 degrees
+                            let dist1 = this.data[dIndex1].distance;
+                            let dist2 = this.data[dIndex2].distance;
+        
+                            // Note that the below alters the data in the source list.
+                            // So don't use that list anymore. (Just use what this
+                            // function returns...)
+                            if (dist1 <= dist2) {
+                                this.data[dIndex2] = null;
+                            } else {
+                                this.data[dIndex1] = null;
                             }
                         }
                     }
-
-                    // if (pointRemoved) { break; }
-
-                    // console.log("a", "criteria NOT met");
                 }
             }
-        // }
+        }
 
         // Now keep only ones that are not null
         let newCameraPoints = new CameraPoints();
@@ -172,13 +277,21 @@ class CameraPoints {
 }
 
 export class Camera {
+    /* Class containing functions and properties of the camera. */
+
     private BABYLON: any;
 
     private _mouseDownState: boolean = false;
     private _keyPressedState: number = undefined;
     private _firstRender: boolean = true;
 
-    public setup() {
+    public setup(): any {
+        /*
+        Sets up the camera.
+
+        :returns: A promise to set up the camera.
+        :rtype: :class:`any`
+        */
 
         return new Promise((resolve) => {
             let scene = Globals.get("scene");
@@ -187,7 +300,6 @@ export class Camera {
             let isMobile = Globals.get("isMobile");
             let jQuery = Globals.get("jQuery");
             
-
             // Load the appropriate camera.
             switch (Globals.get("cameraTypeToUse")) {
                 case "show-mobile-virtual-joystick":
@@ -203,7 +315,8 @@ export class Camera {
                     // And as @Sebavan said, you need a user's interaction to
                     // render the scene in the headset (at least required by
                     // Chrome as far as I remember, not sure it's specified by
-                    // the spec).
+                    // the spec). So the below is commented out. It is instead
+                    // run when the user presses the play button...
                     this._setupWebVRFreeCamera();
                     break;
             }
@@ -211,51 +324,43 @@ export class Camera {
             this._setupMouseAndKeyboard();
     
             // Move camera to first position.
-            scene.activeCamera.position = Globals.get("cameraPositions")[0];
+            let first_position = Globals.get("cameraPositions")[0];
+            scene.activeCamera.position = first_position;
     
             // Add extra keys
             // Additional control keys.
+            // TODO: Some reason this is commented out? Good to investigate...
             // this._parentObj.scene.activeCamera.keysUp.push(87);  // W. 38 is up arrow.
             // this._parentObj.scene.activeCamera.keysLeft.push(65);  // A. 37 if left arrow.
             // this._parentObj.scene.activeCamera.keysDown.push(83);  // S. 40 is down arrow.
             // this._parentObj.scene.activeCamera.keysRight.push(68);  // D. 39 is right arrow.
     
-            // this.scene.activeCamera.inertia = 0.0;
-
-            // Add anti-aliasing to this camera.
-            // This works but darkens the scene.
-            // var pipeline = new BABYLON.DefaultRenderingPipeline(
-            //     "default", // The name of the pipeline
-            //     false, // Do you want HDR textures ?
-            //     scene, // The scene instance
-            //     scene.activeCamera // The list of cameras to be attached to
-            // );
-            // pipeline.fxaaEnabled = true;
-            // pipeline.bloomEnabled = false;
-            // pipeline.imageProcessingEnabled = false;
-
             resolve({msg: "CAMERA SETUP"})
         });
     }
 
-    private _setupVirtualJoystick() {
+    private _setupVirtualJoystick(): void {
+        /*
+        Sets up a virtual joystick. Good for users on phones who don't have
+        google cardboard.
+        */
+
         let scene = Globals.get("scene");
         let BABYLON = Globals.get("BABYLON");
         let canvas = Globals.get("canvas");
 
         var camera = new BABYLON.VirtualJoysticksCamera("VJC", scene.activeCamera.position, scene);
         camera.rotation = scene.activeCamera.rotation;
-        // VJC.checkCollisions = scene.activeCamera.checkCollisions;
-        // VJC.applyGravity = scene.activeCamera.applyGravity;
-        // scene.activeCamera = VJC;
         
         this._makeCameraReplaceActiveCamera(camera);
-        
-        // Attach camera to canvas inputs
-        // scene.activeCamera.attachControl(canvas);
     }
 
-    private _setupVRDeviceOrientationFreeCamera() {
+    private _setupVRDeviceOrientationFreeCamera(): void {
+        /*
+        Sets up a VRDeviceOrientationFreeCamera. Good for folks on phones who
+        have google cardboard.
+        */
+
         let scene = Globals.get("scene");
         let BABYLON = Globals.get("BABYLON");
 
@@ -275,7 +380,12 @@ export class Camera {
         this._makeCameraReplaceActiveCamera(camera);
     }
 
-    private _setupWebVRFreeCamera() {
+    public _setupWebVRFreeCamera(): void {
+        /*
+        Sets up the WebVR camera. Good for folks using Oculus Rift or HTC Vive
+        on their desktops.
+        */
+
         // This code untested, but designed for stuff like Oculus rift.
         let scene = Globals.get("scene");
         let canvas = Globals.get("canvas");
@@ -283,7 +393,7 @@ export class Camera {
         let jQuery = Globals.get("jQuery");
 
         // I feel like I should have to do the below... Why don't the defaults work?
-        var metrics = BABYLON.VRCameraMetrics.GetDefault();
+        // var metrics = BABYLON.VRCameraMetrics.GetDefault();
         
         // According to this page, best practices include feature detection to
         // pick the camera: http://playground.babylonjs.com/#QWIJYE#1 ;
@@ -291,26 +401,109 @@ export class Camera {
         let camera;
         if (navigator.getVRDisplays) {
             camera = new BABYLON.WebVRFreeCamera(
-                "deviceOrientationCamera", 
+                "webVRFreeCamera", 
                 scene.activeCamera.position, 
-                scene,
-                false,  // compensate distortion
-                metrics
+                scene
+                // false,  // compensate distortion
+                // { trackPosition: true }
+                // metrics
             );
+            // camera.deviceScaleFactor = 1;
         } else {
             camera = new BABYLON.VRDeviceOrientationFreeCamera(
                 "deviceOrientationCamera", 
                 scene.activeCamera.position, 
-                scene,
-                false,  // compensate distortion. False = good anti-aliasing.
-                metrics
+                scene
+                // false,  // compensate distortion. False = good anti-aliasing.
+                // metrics
             );
         }
 
-        this._makeCameraReplaceActiveCamera(camera);
+        // Keep the below because I think I'll use it in the future...
+        // Detect when controllers are attached.
+        // camera.onControllersAttachedObservable.add(function() {
+        //     console.log(camera.controllers, "DFDF")
+        //     camera.controllers.forEach(function(gp) {
+        //         console.log(gp);
+        //         // console.log("YO", gp);
+        //         // let mesh = gp.hand === 'right' ? rightBox : leftBox;
+
+        //         // gp.onPadValuesChangedObservable.add(function (stateObject) {
+        //             // let r = (stateObject.x + 1) / 2;
+        //             // let g = (stateObject.y + 1) / 2;
+        //             // mesh.material.diffuseColor.copyFromFloats(r, g, 1);
+        //         // });
+        //         // gp.onTriggerStateChangedObservable.add(function (stateObject) {
+        //             // let scale = 2 - stateObject.value;
+        //             // mesh.scaling.x = scale;
+        //         // });
+        //         // oculus only
+        //         /*gp.onSecondaryTriggerStateChangedObservable.add(function (stateObject) {
+        //             let scale = 2 - stateObject.value;
+        //             mesh.scaling.z = scale;
+        //         });*/
+        //         // gp.attachToMesh(mesh);
+        //     });
+        // });
+        
+        // Detect when controllers are attached. Dumb that I can't get onControllersAttachedObservable to work.
+        setInterval(() => {
+            if (camera.controllers !== undefined) {
+                for (let i=0; i<camera.controllers.length; i++) {
+                    let mesh = camera.controllers[i]._mesh;
+                    
+                    if (mesh !== undefined) {
+                        mesh.renderingGroupId = RenderingGroups.VisibleObjects;                        
+                        for (let j=0; j<mesh._children.length; j++) {
+                            let childMesh = mesh._children[j];
+                            childMesh.renderingGroupId = RenderingGroups.VisibleObjects;
+                        }
+                    }
+                }
+            }
+        }, 1000);
+
+        // note that you're not calling _makeCameraReplaceActiveCamera. That's
+        // because that will attach the camera, but you don't want that to
+        // happen until after user clicks again.
+        scene.activeCamera = camera;
+        
+        scene.onPointerDown = () => {
+            scene.onPointerDown = undefined;
+
+            // scene.onPointerDown = () => {
+            //     camera.initControllers();
+            // }
+
+            // Attach that camera to the canvas.
+            scene.activeCamera.attachControl(canvas, true);
+
+            // In case they want to look through desktop VR but navigate with mouse?
+            this._setupMouseClick();
+        }
+
+        // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
+        // var rightBox = BABYLON.Mesh.CreateBox("sphere1", 0.1, scene);
+        // rightBox.scaling.copyFromFloats(2, 1, 2);
+        // var leftBox = BABYLON.Mesh.CreateBox("sphere1", 0.1, scene);
+        // leftBox.scaling.copyFromFloats(2, 1, 2);
+
+        // rightBox.material = new BABYLON.StandardMaterial('right', scene);
+        // leftBox.material = new BABYLON.StandardMaterial('right', scene);
+
+        // rightBox.renderingGroupId = RenderingGroups.VisibleObjects;
+        // leftBox.renderingGroupId = RenderingGroups.VisibleObjects;
     }
 
-    private _makeCameraReplaceActiveCamera(camera) {
+    private _makeCameraReplaceActiveCamera(camera: any): void {
+        /*
+        Attaches the camera to the scene, among other things. Note that this
+        isn't used for WebVR camera, which must be attached to the canvas on
+        user click.
+
+        :param any camera: The BABYLON camera to attach.
+        */
+
         let scene = Globals.get("scene");
         let canvas = Globals.get("canvas");
 
@@ -341,20 +534,24 @@ export class Camera {
         scene.activeCamera = camera;
     
         // Attach that camera to the canvas.
-        scene.activeCamera.attachControl(canvas);        
+        scene.activeCamera.attachControl(canvas, true);
     }
 
-    private _setupMouseAndKeyboard() {
+    private _setupMouseAndKeyboard(): void {
+        /*
+        Setup mouse and keyboard navigation.
+        */
+        
         let scene = Globals.get("scene");
         
+        // TODO: Commented out for WebVR debugging. This should be attached
+        // after initial WebVR canvas-attach click.
+        
         // First, setup mouse.
-        scene.onPointerDown = function (evt, pickResult) {
-            this._mouseDownState = true;
-        }.bind(this);
-
-        scene.onPointerUp = function (evt, pickResult) {
-            this._mouseDownState = false;
-        }.bind(this);
+        if (Globals.get("cameraTypeToUse") !== "show-desktop-vr") {
+            // Because if it's desktop VR, this function will be bound AFTER the first click (which starts the VR camera).
+            this._setupMouseClick();
+        }
 
         // Now keyboard
         // No arrow navigation on camera. You'll redo custom.
@@ -371,16 +568,21 @@ export class Camera {
             this._keyPressedState = undefined;
         }.bind(this));
     }
-    
-    private _keepDataWithinDist(data: CameraPointData[], cutoffDist: number): CameraPointData[] {
-        let toKeep: CameraPointData[] = [];
-        for (let i=0; i<data.length; i++) {
-            let d = data[i];
-            if (d.distance < cutoffDist) {
-                toKeep.push(d);
-            }
-        }
-        return toKeep;
+
+    private _setupMouseClick(): void {
+        /*
+        Setup mouse clicking. Separate from above function to work with HTC Vive too (not bound until after initial click).
+        */
+        
+        let scene = Globals.get("scene");
+
+        scene.onPointerDown = function (evt, pickResult) {
+            this._mouseDownState = true;
+        }.bind(this);
+
+        scene.onPointerUp = function (evt, pickResult) {
+            this._mouseDownState = false;
+        }.bind(this);
     }
     
     private _speedInUnitsPerSecond = 1;    
@@ -392,29 +594,31 @@ export class Camera {
     public _nextViewerSphere: any;
     public _cameraCurrentlyAutoMoving: boolean = false;
 
-    private _updatePos(timeRatio, camera) {
+    private _updatePos(timeRatio: number, camera: any): void {
+        /*
+        Function that determines sphere visibility and camera location as the
+        user moves between two locations.
+
+        :param number timeRatio: A number between 0.0 and 1.0, showing how far
+                      along the user is between the previous sphere location and the next
+                      one.
+                      
+        :param ??? camera: The BABYLON camera object.
+        */
+
         let transitionPt = 0.05;  // Good for this to be hard-coded eventually.
-        // if (timeRatio < transitionPt) {
-            // First part of time ratio, next sphere is fading in.
-            // this._prevViewerSphere.visibility = 1.0;
-            // Quickly becomes visible.
-            this._nextViewerSphere.visibility = Math.min(timeRatio/transitionPt, 1.0);
-        // } else {
-            // Second part, previous one fades out.
-            // Slowly fades out
-            // alert("mo");
-            this._prevViewerSphere.visibility = (1 - timeRatio); //  / (1 - transitionPt);
-            // this._nextViewerSphere.visibility = 1.0;
-        //}
-        // this._prevViewerSphere.visibility = 1.0 - timeRatio;
-        // this._nextViewerSphere.visibility = timeRatio;
+        this._nextViewerSphere.visibility = Math.min(timeRatio/transitionPt, 1.0);
+        this._prevViewerSphere.visibility = (1 - timeRatio); //  / (1 - transitionPt);
         camera.position = this._prevCameraPos.add(this._nextMovementVec.scale(timeRatio));
     }
 
     public update() {
-        // This is run from the render loop
+        /* 
+        Update the camera. This is run from the render loop (every frame).
+        */
+
         if (this._prevViewerSphere === undefined) {
-            // Not ready yet...
+            // Not ready yet... PNG images probably not loaded.
             return;
         }
 
@@ -422,20 +626,31 @@ export class Camera {
         let BABYLON = Globals.get("BABYLON");
         let camera = scene.activeCamera;
 
+        // Get the time that's elapsed since this function was last called.
         let deltaTime = (new Date).getTime() - this._lastMovementTime;
+
         if (deltaTime < this._msUntilNextMoveAllowed) {
+            // Not enough time has passed to allow another movement.
             this._cameraCurrentlyAutoMoving = true;
             this._whileCameraAutoMoving(deltaTime, camera);
             return;
         }
 
+        // NOTE: If you get here, you're ready to move again.
+
         if (this._cameraCurrentlyAutoMoving) {
+            // Since this._cameraCurrentlyAutoMoving is true, this must be the
+            // first time this function has been called since a new move was
+            // permitted.
             this._cameraCurrentlyAutoMoving = false;
+            
+            // Run a function for first-time moving allowed.
             this._onDoneCameraAutoMoving(camera);
         }
         
-        // So it's time to pick a new destination.
-        // Only update things if user trying to move.
+        // So it's time to pick a new destination, but don't even try if the
+        // user doesn't want to move (i.e., no active keypress our mousedown.)
+        // Maybe they're looking around, not moving.
         let result;
         if (Globals.get("mouseDownAdvances") === true) {
             result = (this._mouseDownState === false) && (this._keyPressedState === undefined) && (this._firstRender === false);
@@ -444,23 +659,36 @@ export class Camera {
         }
         if (result) { return; }
 
-        this._firstRender = false;  // It's no longer the first time rendering.        
-        
+        // If you get here, you're ready to start moving, and the user
+        // actually wants to move.
+        this._firstRender = false;  // It's no longer the first time rendering.
         this._onStartMove(camera);
     }
 
-    private _onStartMove(camera) {
-        // console.log("_onStartMove");
+    private _onStartMove(camera): void {
+        /*
+        Start the moving process from one sphere to the next. This function is
+        fired only once, at beginning of moving (not every frame).
+
+        :param ??? camera: The BABYLON camera.
+        */
         
         // Make sure everything hidden but present sphere.
         ViewerSphere.hideAll();
-        this._nextViewerSphere.visibility = 1.0;
-        
-        this._pickDirectionAndStartMoving(camera);
+        this._nextViewerSphere.visibility = 1.0;  // NOTE: Is this right?!?!?
+        this._pickDirectionAndStartMoving(camera.position, camera.getTarget());
     }
 
-    private _whileCameraAutoMoving(deltaTime, camera) {
-        // console.log("_whileCameraAutoMoving");
+    private _whileCameraAutoMoving(deltaTime: number, camera: any): void {
+        /*
+        Runs every frame while the camera is transitioning from one valid
+        camera location to the next.
+
+        :param number deltaTime: The time since the camera started moving.
+
+        :param ??? camera: The BABYLON camera.
+        */
+
         // Still in auto-moving phase. So auto-move here.
         let timeRatio = deltaTime / this._msUntilNextMoveAllowed;
         // let sigmoidalVal = 1.0/(1.0 + Math.exp(-(20 * timeRatio - 10)))
@@ -473,30 +701,41 @@ export class Camera {
         // Move background sphere too.
         let backgroundSphere = Globals.get("backgroundSphere");
         backgroundSphere.position = camera.position;
-
     }
 
-    private _onDoneCameraAutoMoving(camera) {
-        // console.log("_onDoneCameraAutoMoving");
+    private _onDoneCameraAutoMoving(camera): void {
+        /*
+        Runs once when the camera finishes transitioning from one valid camera
+        location to the next.
+
+        :param ??? camera: The BABYLON camera.
+        */
+        
         // Make sure completed transition to full visibility.
         this._updatePos(1.0, camera);
 
         // Determine where you can move from here.
         this._setCloseCameraDataAndArrows(camera);
 
+        // Make sure environmental sphere properly positioned.
+        Globals.get("backgroundSphere").position = camera.position;
+
     }
 
     private _closeCameraData;
-    private _setCloseCameraDataAndArrows(camera) {
-        // console.log("_setCloseCameraData");
+    private _setCloseCameraDataAndArrows(camera: any): void {
+        /*
+        Identifies other valid camera locations that are near this one. Uses
+        this information to set the arrow locations.
+
+        :param ??? camera: The BABYLON camera.
+        */
 
         // This filters the camera points, keeping only those that are
         // uniqueish and close to the camera.
 
         // Let's get the points close to the camera.
         let cameraLoc = camera.position;
-
-        // console.log("===========");
         
         // Calculate distances to all camera positions
         let cameraPoints = new CameraPoints();
@@ -508,24 +747,24 @@ export class Camera {
             let dist = pos.subtract(cameraLoc).length();
             cameraPoints.push({distance: dist, position: pos, associatedViewerSphere: viewerSpheres[i]});
         }
-
-        // console.log("Step 1:", cameraPoints);
         
         // Sort by distance
         cameraPoints.sort();
 
-        // console.log("Step 2:", cameraPoints);
+        // WILLIAM TODO: This function is for positioning arrows, but let's
+        // take a detour here and also lazy load textures.
+        let closeCameraDataForTextureLoading = cameraPoints.firstFewPoints(Globals.get("SOME NEW GLOBAL VARIABLE CUTOFF HERE"));  // choose four close points
+        // STUFF HERE TO LOAD THE TEXTURES CORRESPONDING TO THE SPHERES AT POINTS closeCameraDataForTextureLoading
+        // Only do this stuff if global variable lazyLoadViewerSpheres is true.
+
+        // Now back to worrying about arrows....
         
         // Remove first one (closest). To make sure you're not staying
         // where you are.
         cameraPoints.removeFirst();
 
-        // console.log("Step 3:", cameraPoints);
-        
         // Keep only four points. So I guess paths can't be too bifurcated.
         let closeCameraData = cameraPoints.firstFewPoints(Globals.get("numNeighboringCameraPosForNavigation"));  // choose four close points
-
-        // console.log("Step 4:", closeCameraData);        
 
         // Remove the points that are off in the same general direction
         let closeCameraData2 = closeCameraData.removePointsInSameGeneralDirection(camera.position);
@@ -534,32 +773,42 @@ export class Camera {
         //     closeCameraData.removePointsInSameGeneralDirection(camera.position);
         // }
 
-        // console.log("Step 5:", closeCameraData2);        
-        
         // Position the arrows.
         Arrows.update(closeCameraData2);
                 
         this._closeCameraData = closeCameraData2;
     }
 
-    private _pickDirectionAndStartMoving(camera) {
-        // console.log("_startMoving");
+    // private _pickDirectionAndStartMoving(camera: any): void {
+    private _pickDirectionAndStartMoving(focalPoint: any, targetPoint: any): void {
+        /*
+        Based on camera's direction, determine the next location to move to.
+        This is called only once at the beinning of the moving cycle (not
+        every frame).
+
+        :param ??? focalPoint: BABYLON.Vector3 location. Probably the location of the camera.
+
+        :param ??? targetPoint: BABYLON.Vector3 location. Probably the getTarget() of the camera.
+        */
 
         // Start by assuming new camera point should be the closest point.
         let newCameraData: CameraPointData = this._closeCameraData.firstPoint();
         let maxDist = this._closeCameraData.data[this._closeCameraData.data.length-1].distance;
 
         // Assign angles
-        let lookingVec = camera.getTarget().subtract(camera.position);
+        let lookingVec = targetPoint.subtract(focalPoint).normalize();
+
+        console.log(focalPoint, targetPoint, lookingVec);
+        
         switch (this._keyPressedState) {
-            case 83:
+            case 83:  // Up arrow?
                 lookingVec = lookingVec.scale(-1);
                 break;
-            case 40:
+            case 40:  // W?
                 lookingVec = lookingVec.scale(-1);
                 break;
 
-            // Could't reliably distinguish between right and left...
+            // TODO: Could't reliably distinguish between right and left...
             // case 65:
             //     lookingVec = new this.BABYLON.Vector3(lookingVec.z, 0, lookingVec.x)
             //     break;
@@ -574,10 +823,12 @@ export class Camera {
             //     break;
         }
 
-        this._closeCameraData.addAnglesInPlace(camera.position, lookingVec);
+        // Calculate angles between camera looking vector and the various
+        // candidate camera locations.
+        this._closeCameraData.addAnglesInPlace(focalPoint, lookingVec);
 
-        // Throw out ones that aren't even in the general direction as the
-        // lookingVec
+        // Throw out candidate camera locations that aren't even in the
+        // general direction as the lookingVec
         let goodAngleCameraPoints = this._closeCameraData.lessThanCutoff(1.9198621771937625, "angle");  // 110 degrees
 
         switch(goodAngleCameraPoints.length()) {
@@ -597,7 +848,7 @@ export class Camera {
         }
 
         // Set values to govern next auto movement.
-        this._prevCameraPos = camera.position.clone();
+        this._prevCameraPos = focalPoint.clone();
         this._nextMovementVec = newCameraData.position.subtract(this._prevCameraPos);
         this._prevViewerSphere = this._nextViewerSphere;
         this._nextViewerSphere = newCameraData.associatedViewerSphere;
