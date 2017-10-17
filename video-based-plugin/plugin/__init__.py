@@ -26,6 +26,7 @@ from .DurBlend import UI
 from .DurBlend import PanelParentClass
 from .DurBlend import ButtonParentClass
 
+
 from . import SetupPanel
 from . import CommandPanel
 from . import SignPanel
@@ -84,6 +85,14 @@ class ProteinVR(PanelParentClass):
         # Object-specific properties.
         bpy.types.Object.proteinvr_clickable = self.prop_funcs.boolProp("proteinvr_clickable", False, description="Whether this object is proteinvr_clickable.")
         bpy.types.Object.sign_text = self.prop_funcs.strProp("", "Put sign text here...", description="The text to display on this sign.")
+
+        # Boolean variables for the three object categories.
+        # bpy.types.Object.background = self.prop_funcs.boolProp("background_image", False, description="Assigning image to be the background")
+        # bpy.types.Object.static = self.prop_funcs.boolProp("static", False, description="Assigning 3-D objects that are static/low quality, they are NOT animated")
+        # bpy.types.Object.mesh = self.prop_funcs.boolProp("mesh", False, description="Assigning 3-D objects that will be animated/High quality objects")
+
+        bpy.types.Object.proteinvr_category = self.prop_funcs.enumProp("Object Category", items=[("static", "Static", "Static Category"), ("mesh", "Mesh", "Mesh Category"), ("background", "Background", "Background Category")], description="Assign object to categories.")
+
 
         # Setup the two panels.
         self.SetupPanel = SetupPanel.SetupPanel(self.ui)

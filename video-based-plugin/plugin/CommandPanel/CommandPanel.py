@@ -53,6 +53,8 @@ class CommandPanel(ParentPanel):
         if object_is_proteinvr_clickable(activeObj):
             self.ui.use_box_row(activeObj.name + " Properties")
             self.ui.object_property("proteinvr_clickable")
+            self.ui.object_property("proteinvr_category")
+
 
         # Commands
         self.ui.use_box_row("Commands")
