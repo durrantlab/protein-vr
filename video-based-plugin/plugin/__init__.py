@@ -75,7 +75,6 @@ class ProteinVR(PanelParentClass):
         # Set up general scene properties.
         bpy.types.Scene.proteinvr_output_dir = self.prop_funcs.strProp("Output directory", "/tmp/proteinvr/", 'DIR_PATH', description="The output directory where the ProteinVR scene will be saved.")
         bpy.types.Scene.pngquant_path = self.prop_funcs.strProp("PNGQUANT Path", os.path.dirname(__file__) + os.sep + "pngquant" + os.sep + "pngquant", 'FILE_PATH', description="The full path to the pngquant executable.")
-        bpy.types.Scene.background_environment_image = self.prop_funcs.strProp("Environment Image", "", 'FILE_PATH', description="The path to the environment texture. Should be already resized and compressed Recommend high-resolution.")
         bpy.types.Scene.proteinvr_use_existing_frames = self.prop_funcs.boolProp("Existing frames", False, description="Whether to use a previously rendered (existing) frames.")
         bpy.types.Scene.proteinvr_bake_texture_size = self.prop_funcs.intProp("Texture Size", min=128, max=8192, default=4096, description="The size of the square texture to render. Higher means higher resolution. Good to use power of 2. Recommended: 4096 for final render.")
         bpy.types.Scene.proteinvr_mobile_bake_texture_size = self.prop_funcs.intProp("Mobile Texture Size", min=0, max=8192, default=1024, description="The size of the square texture to render fore use on mobile. Higher means higher resolution. Good to use power of 2. Recommended: 1024 for final render.")

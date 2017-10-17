@@ -74,7 +74,6 @@ class CommandPanel(ParentPanel):
             self.ui.scene_property("proteinvr_bake_texture_size")
             self.ui.scene_property("proteinvr_mobile_bake_texture_size")
             self.ui.scene_property("proteinvr_num_cycles")
-            self.ui.scene_property("background_environment_image")
             self.ui.scene_property("pngquant_path")
         
         self.ui.ops_button(rel_data_path="proteinvr.create_scene", button_label="Create Scene")
