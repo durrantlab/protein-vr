@@ -330,8 +330,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 print("FILENAME:", filename)
                 self._render_whatever_is_visible(filename)
 
-            # self.show_objects("MESH")
-
 
         ######################################################## OLD CODE BELOW ##############################################
 
