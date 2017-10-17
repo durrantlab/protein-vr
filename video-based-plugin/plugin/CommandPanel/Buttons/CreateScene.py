@@ -76,11 +76,15 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         :param str filename: The filename of the png to compress.
         """
+
+        # TODO: Make compression work on ubuntu
+        return
+
         if os.path.exists(self.scene.pngquant_path):
             cmd = self.scene.pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
-            # print("RUN: " + cmd)          
+            # print("RUN: " + cmd)
             os.system(cmd)
-            os.rename(filename, filename + '.tmp.png')
+            os.rename(filename + '.tmp.png', filename)
         else:
             print("WARNING: pngquant path not valid: " + self.scene.pngquant_path)        
 
@@ -257,7 +261,33 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         #             animation_data[obj.name] = pos_loc_data
         # return meshed_objs, animation_data
         
+    def _render_whatever_is_visible(self, filename):
+        # TODO: Some of these variables are not called after this.....
+        self.scene.render.resolution_percentage = 100.0
+        self.scene.cycles.samples = self.scene.proteinvr_num_cycles
+        self.scene.cycles.preview_samples = self.scene.proteinvr_num_cycles
+        self.scene.cycles.film_transparent = True  # Because you're saving the background separately.
 
+        self.scene.render.filepath = filename
+        self.scene.render.image_settings.file_format = 'PNG'
+        self.scene.render.image_settings.color_mode = "RGBA"
+        self.scene.render.image_settings.compression = 100
+        self.scene.render.image_settings.quality = self.scene.jpeg_quality
+        self.scene.render.resolution_x = self.scene.proteinvr_bake_texture_size
+        self.scene.render.resolution_y = self.scene.proteinvr_bake_texture_size
+        self.scene.render.resolution_percentage = 100
+        bpy.ops.render.render(write_still=True)
+        self._compress_png(self.scene.render.filepath)
+
+        if self.scene.proteinvr_mobile_bake_texture_size != 0:
+            self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
+            self.scene.render.filepath = filename + ".small.png"
+            bpy.ops.render.render(write_still=True)
+            self._compress_png(self.scene.render.filepath)                    
+        else:
+            print("WARNING: Skipping the mobile textures...")
+
+        self.scene.cycles.film_transparent = False
 
     def _step_4_render_static_frames(self, debug=False):
         """
@@ -271,6 +301,10 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # Hide all objects in Background and meshed category. Show objects in static category.
         # For through each. For each frame, render a png file of the static images.
 
+        print("BACKGROUND:", self.object_categories["BACKGROUND"])
+        print("MESH:", self.object_categories["MESH"])
+        print("STATICS:", self.object_categories["STATIC"])
+
         #Hiding objects in Background and Mesh category
         self.hide_objects("BACKGROUND")
         self.hide_objects("MESH")
@@ -278,48 +312,26 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # Showing objects in Static category
         self.show_objects("STATIC")
 
-        # TODO: Some of these variables are not called after this.....
-        self.scene.render.resolution_percentage = 100.0
-        self.scene.cycles.samples = self.scene.proteinvr_num_cycles
-        self.scene.cycles.preview_samples = self.scene.proteinvr_num_cycles
-        self.scene.cycles.film_transparent = True  # Because you're saving the background separately.
-
         self.camera.rotation_mode = 'XYZ'
 
-        for static_obj in self.object_categories["STATIC"]:
-            for this_frame in range(self.frame_start, self.frame_end + 1):
-                print("Frame", this_frame)
+        # for static_obj in self.object_categories["STATIC"]:
+        for this_frame in range(self.frame_start, self.frame_end + 1):
+            print("Frame", this_frame)
 
-                self.set_frame(this_frame)
-                this_camera_pos = self.camera.location.copy()
-                self.camera.rotation_euler.x = 1.5707963267948966
-                self.camera.rotation_euler.y = 0.0
-                self.camera.rotation_euler.z = 0.0
-                self.camera.keyframe_insert(data_path="rotation_euler", frame=this_frame)
+            self.set_frame(this_frame)
+            this_camera_pos = self.camera.location.copy()
+            self.camera.rotation_euler.x = 1.5707963267948966
+            self.camera.rotation_euler.y = 0.0
+            self.camera.rotation_euler.z = 0.0
+            self.camera.keyframe_insert(data_path="rotation_euler", frame=this_frame)
 
-                if not debug:
-                    self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png"
-                    self.scene.render.image_settings.file_format = 'PNG'
-                    self.scene.render.image_settings.color_mode = "RGBA"
-                    self.scene.render.image_settings.compression = 100
-                    self.scene.render.image_settings.quality = self.scene.jpeg_quality
-                    self.scene.render.resolution_x = self.scene.proteinvr_bake_texture_size
-                    self.scene.render.resolution_y = self.scene.proteinvr_bake_texture_size
-                    self.scene.render.resolution_percentage = 100
-                    bpy.ops.render.render(write_still=True)
-                    self._compress_png(self.scene.render.filepath)
+            if not debug:
+                filename = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png"
+                print("FILENAME:", filename)
+                self._render_whatever_is_visible(filename)
 
-                    if self.scene.proteinvr_mobile_bake_texture_size != 0:
-                        self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
-                        self.scene.render.filepath = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png.small.png"
-                        bpy.ops.render.render(write_still=True)
-                        self._compress_png(self.scene.render.filepath)                    
-                    else:
-                        print("WARNING: Skipping the mobile textures...")
+            # self.show_objects("MESH")
 
-            self.show_objects("MESH")
-
-            self.scene.cycles.film_transparent = False
 
         ######################################################## OLD CODE BELOW ##############################################
 
@@ -398,12 +410,15 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         self.hide_objects("MESH")
         self.hide_objects("STATIC")
+        self.show_objects("BACKGROUND")
 
-        src_background_environment_image = bpy.path.abspath(self.scene.background_environment_image)
-        if os.path.exists(src_background_environment_image):
-            shutil.copyfile(src_background_environment_image, self.proteinvr_output_dir + "environment.png")
-        else:
-            print("WARNING: Environmental texture file does not exist!")
+        self._render_whatever_is_visible(self.proteinvr_output_dir + "environment.png")
+
+        # src_background_environment_image = bpy.path.abspath(self.scene.background_environment_image)
+        # if os.path.exists(src_background_environment_image):
+        #     shutil.copyfile(src_background_environment_image, self.proteinvr_output_dir + "environment.png")
+        # else:
+        #     print("WARNING: Environmental texture file does not exist!")
 
         ################################################################# OLD CODE BELOW ########################################################################
 
