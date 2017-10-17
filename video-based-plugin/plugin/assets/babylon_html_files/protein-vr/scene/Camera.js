@@ -370,10 +370,12 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
                 if (camera.controllers !== undefined) {
                     for (let i = 0; i < camera.controllers.length; i++) {
                         let mesh = camera.controllers[i]._mesh;
-                        mesh.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects;
-                        for (let j = 0; j < mesh._children.length; j++) {
-                            let childMesh = mesh._children[j];
-                            childMesh.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects;
+                        if (mesh !== undefined) {
+                            mesh.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects;
+                            for (let j = 0; j < mesh._children.length; j++) {
+                                let childMesh = mesh._children[j];
+                                childMesh.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects;
+                            }
                         }
                     }
                 }
@@ -382,15 +384,15 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             // because that will attach the camera, but you don't want that to
             // happen until after user clicks again.
             scene.activeCamera = camera;
-            scene.onPointerDown = function () {
-                let canvas = Globals.get("canvas");
-                let scene = Globals.get("scene");
+            scene.onPointerDown = () => {
                 scene.onPointerDown = undefined;
                 // scene.onPointerDown = () => {
                 //     camera.initControllers();
                 // }
                 // Attach that camera to the canvas.
                 scene.activeCamera.attachControl(canvas, true);
+                // In case they want to look through desktop VR but navigate with mouse?
+                this._setupMouseClick();
             };
             // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
             // var rightBox = BABYLON.Mesh.CreateBox("sphere1", 0.1, scene);
@@ -444,12 +446,10 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             // TODO: Commented out for WebVR debugging. This should be attached
             // after initial WebVR canvas-attach click.
             // First, setup mouse.
-            scene.onPointerDown = function (evt, pickResult) {
-                this._mouseDownState = true;
-            }.bind(this);
-            scene.onPointerUp = function (evt, pickResult) {
-                this._mouseDownState = false;
-            }.bind(this);
+            if (Globals.get("cameraTypeToUse") !== "show-desktop-vr") {
+                // Because if it's desktop VR, this function will be bound AFTER the first click (which starts the VR camera).
+                this._setupMouseClick();
+            }
             // Now keyboard
             // No arrow navigation on camera. You'll redo custom.
             scene.activeCamera.keysUp = [];
@@ -462,6 +462,18 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             window.addEventListener("keyup", function (evt) {
                 this._keyPressedState = undefined;
             }.bind(this));
+        }
+        _setupMouseClick() {
+            /*
+            Setup mouse clicking. Separate from above function to work with HTC Vive too (not bound until after initial click).
+            */
+            let scene = Globals.get("scene");
+            scene.onPointerDown = function (evt, pickResult) {
+                this._mouseDownState = true;
+            }.bind(this);
+            scene.onPointerUp = function (evt, pickResult) {
+                this._mouseDownState = false;
+            }.bind(this);
         }
         _updatePos(timeRatio, camera) {
             /*
@@ -626,12 +638,12 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
     
             :param ??? targetPoint: BABYLON.Vector3 location. Probably the getTarget() of the camera.
             */
-            // debugger;
             // Start by assuming new camera point should be the closest point.
             let newCameraData = this._closeCameraData.firstPoint();
             let maxDist = this._closeCameraData.data[this._closeCameraData.data.length - 1].distance;
             // Assign angles
-            let lookingVec = targetPoint.subtract(focalPoint);
+            let lookingVec = targetPoint.subtract(focalPoint).normalize();
+            console.log(focalPoint, targetPoint, lookingVec);
             switch (this._keyPressedState) {
                 case 83:
                     lookingVec = lookingVec.scale(-1);
