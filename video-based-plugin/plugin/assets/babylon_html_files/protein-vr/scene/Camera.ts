@@ -546,9 +546,9 @@ export class Camera {
         // after initial WebVR canvas-attach click.
         
         // First, setup mouse.
-        // scene.onPointerDown = function (evt, pickResult) {
-        //     this._mouseDownState = true;
-        // }.bind(this);
+        scene.onPointerDown = function (evt, pickResult) {
+            this._mouseDownState = true;
+        }.bind(this);
 
         scene.onPointerUp = function (evt, pickResult) {
             this._mouseDownState = false;
@@ -661,7 +661,7 @@ export class Camera {
         // Make sure everything hidden but present sphere.
         ViewerSphere.hideAll();
         this._nextViewerSphere.visibility = 1.0;  // NOTE: Is this right?!?!?
-        this._pickDirectionAndStartMoving(camera);
+        this._pickDirectionAndStartMoving(camera.position, camera.getTarget());
     }
 
     private _whileCameraAutoMoving(deltaTime: number, camera: any): void {
@@ -764,21 +764,26 @@ export class Camera {
         this._closeCameraData = closeCameraData2;
     }
 
-    private _pickDirectionAndStartMoving(camera: any): void {
+    // private _pickDirectionAndStartMoving(camera: any): void {
+    private _pickDirectionAndStartMoving(focalPoint: any, targetPoint: any): void {
         /*
         Based on camera's direction, determine the next location to move to.
         This is called only once at the beinning of the moving cycle (not
         every frame).
 
-        :param ??? camera: BABYLON camera object.
+        :param ??? focalPoint: BABYLON.Vector3 location. Probably the location of the camera.
+
+        :param ??? targetPoint: BABYLON.Vector3 location. Probably the getTarget() of the camera.
         */
+
+        // debugger;
 
         // Start by assuming new camera point should be the closest point.
         let newCameraData: CameraPointData = this._closeCameraData.firstPoint();
         let maxDist = this._closeCameraData.data[this._closeCameraData.data.length-1].distance;
 
         // Assign angles
-        let lookingVec = camera.getTarget().subtract(camera.position);
+        let lookingVec = targetPoint.subtract(focalPoint);
         switch (this._keyPressedState) {
             case 83:  // Up arrow?
                 lookingVec = lookingVec.scale(-1);
@@ -804,7 +809,7 @@ export class Camera {
 
         // Calculate angles between camera looking vector and the various
         // candidate camera locations.
-        this._closeCameraData.addAnglesInPlace(camera.position, lookingVec);
+        this._closeCameraData.addAnglesInPlace(focalPoint, lookingVec);
 
         // Throw out candidate camera locations that aren't even in the
         // general direction as the lookingVec
@@ -827,7 +832,7 @@ export class Camera {
         }
 
         // Set values to govern next auto movement.
-        this._prevCameraPos = camera.position.clone();
+        this._prevCameraPos = focalPoint.clone();
         this._nextMovementVec = newCameraData.position.subtract(this._prevCameraPos);
         this._prevViewerSphere = this._nextViewerSphere;
         this._nextViewerSphere = newCameraData.associatedViewerSphere;

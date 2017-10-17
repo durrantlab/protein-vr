@@ -1,7 +1,5 @@
 /* Things related to camera setup and movement. */
 define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows", "../config/Globals"], function (require, exports, Globals, ViewerSphere, Arrows, Globals_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     class CameraPoints {
         constructor() {
             /*
@@ -238,7 +236,6 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
     }
     class Camera {
         constructor() {
-            /* Class containing functions and properties of the camera. */
             this._mouseDownState = false;
             this._keyPressedState = undefined;
             this._firstRender = true;
@@ -338,18 +335,10 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             // http://www.html5gamedevs.com/topic/31454-webvrfreecameraid-vs-vrdeviceorientationfreecamera/?tab=comments#comment-180688
             let camera;
             if (navigator.getVRDisplays) {
-                camera = new BABYLON.WebVRFreeCamera("webVRFreeCamera", scene.activeCamera.position, scene
-                // false,  // compensate distortion
-                // { trackPosition: true }
-                // metrics
-                );
-                // camera.deviceScaleFactor = 1;
+                camera = new BABYLON.WebVRFreeCamera("webVRFreeCamera", scene.activeCamera.position, scene);
             }
             else {
-                camera = new BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", scene.activeCamera.position, scene
-                // false,  // compensate distortion. False = good anti-aliasing.
-                // metrics
-                );
+                camera = new BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", scene.activeCamera.position, scene);
             }
             // Keep the below because I think I'll use it in the future...
             // Detect when controllers are attached.
@@ -455,9 +444,9 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             // TODO: Commented out for WebVR debugging. This should be attached
             // after initial WebVR canvas-attach click.
             // First, setup mouse.
-            // scene.onPointerDown = function (evt, pickResult) {
-            //     this._mouseDownState = true;
-            // }.bind(this);
+            scene.onPointerDown = function (evt, pickResult) {
+                this._mouseDownState = true;
+            }.bind(this);
             scene.onPointerUp = function (evt, pickResult) {
                 this._mouseDownState = false;
             }.bind(this);
@@ -546,7 +535,7 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             // Make sure everything hidden but present sphere.
             ViewerSphere.hideAll();
             this._nextViewerSphere.visibility = 1.0; // NOTE: Is this right?!?!?
-            this._pickDirectionAndStartMoving(camera);
+            this._pickDirectionAndStartMoving(camera.position, camera.getTarget());
         }
         _whileCameraAutoMoving(deltaTime, camera) {
             /*
@@ -626,19 +615,23 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             Arrows.update(closeCameraData2);
             this._closeCameraData = closeCameraData2;
         }
-        _pickDirectionAndStartMoving(camera) {
+        // private _pickDirectionAndStartMoving(camera: any): void {
+        _pickDirectionAndStartMoving(focalPoint, targetPoint) {
             /*
             Based on camera's direction, determine the next location to move to.
             This is called only once at the beinning of the moving cycle (not
             every frame).
     
-            :param ??? camera: BABYLON camera object.
+            :param ??? focalPoint: BABYLON.Vector3 location. Probably the location of the camera.
+    
+            :param ??? targetPoint: BABYLON.Vector3 location. Probably the getTarget() of the camera.
             */
+            // debugger;
             // Start by assuming new camera point should be the closest point.
             let newCameraData = this._closeCameraData.firstPoint();
             let maxDist = this._closeCameraData.data[this._closeCameraData.data.length - 1].distance;
             // Assign angles
-            let lookingVec = camera.getTarget().subtract(camera.position);
+            let lookingVec = targetPoint.subtract(focalPoint);
             switch (this._keyPressedState) {
                 case 83:
                     lookingVec = lookingVec.scale(-1);
@@ -649,7 +642,7 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             }
             // Calculate angles between camera looking vector and the various
             // candidate camera locations.
-            this._closeCameraData.addAnglesInPlace(camera.position, lookingVec);
+            this._closeCameraData.addAnglesInPlace(focalPoint, lookingVec);
             // Throw out candidate camera locations that aren't even in the
             // general direction as the lookingVec
             let goodAngleCameraPoints = this._closeCameraData.lessThanCutoff(1.9198621771937625, "angle"); // 110 degrees
@@ -669,7 +662,7 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
                     break;
             }
             // Set values to govern next auto movement.
-            this._prevCameraPos = camera.position.clone();
+            this._prevCameraPos = focalPoint.clone();
             this._nextMovementVec = newCameraData.position.subtract(this._prevCameraPos);
             this._prevViewerSphere = this._nextViewerSphere;
             this._nextViewerSphere = newCameraData.associatedViewerSphere;

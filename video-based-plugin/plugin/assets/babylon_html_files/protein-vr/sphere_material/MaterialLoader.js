@@ -1,7 +1,5 @@
 /* This could be eventually merged with SphereMaterial.ts. */
 define(["require", "exports", "../config/Globals", "../sphere_material/SphereMaterial", "../scene/ViewerSphere"], function (require, exports, Globals, SphereMaterial_1, ViewerSphere) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     function getFramePromises() {
         /*
         Start loading all the skybox images (view spheres).
