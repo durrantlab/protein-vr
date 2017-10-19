@@ -3,26 +3,26 @@
 
 if ((<any>window)._proteinvrGlobals === undefined) {
     (<any>window)._proteinvrGlobals = {
-        "scene": undefined,
-        "engine": undefined,
-        "canvas": undefined,
-        "camera": undefined,
-        "jQuery": undefined,
-        "BABYLON": undefined,
-        "viewerSphereTemplate": undefined,
-        "cameraPositions": undefined,
-        "viewerSpheres": undefined,
-        "sphereMaterials": undefined,
-        "backgroundSphere": undefined,
-        "debug": false,
+        "scene": undefined,  // BABYLON.scene object.
+        "engine": undefined,  // BABYLON.engine object
+        "canvas": undefined,  // The canvas where the scene is rendered (from DOM)
+        "camera": undefined,  // BABYLON.camera object.
+        "jQuery": undefined,  // The jQuery library.
+        "BABYLON": undefined,  // The BABYLON library
+        "viewerSphereTemplate": undefined,  // The initial viewsphere BABYLON mesh that all others inherit.
+        "cameraPositions": undefined,  // Valid camera positions, pulled from data.json (PVRJsonSetup.ts)
+        "viewerSpheres": undefined,  // The BABYLON.mesh viewerspheres (derived from the template above)
+        "sphereMaterials": undefined,  // The materials associated with each viewer sphere.
+        "backgroundSphere": undefined,  // The background sphere (sky box)
+        "debug": false,  // Whether or not to run in debug mode.
         "breakCaching": true,  // add ?random strings to end of png textures, so doesn't cache.
-        "mouseDownAdvances": true,
-        "isMobile": undefined,
-        "numFrameTexturesLoaded": 0,
-        "numNeighboringCameraPosForNavigation": 4,
-        "cameraTypeToUse": "show-desktop-screen",  // default
-        "signData": [],
-        "lazyLoadViewerSpheres": true
+        "mouseDownAdvances": true,  // Whether or not clicking the mouse advances your position.
+        "isMobile": undefined,  // Mobile device?
+        "numFrameTexturesLoaded": 0,  // The total number offrames loaded (from data.json?)
+        "numNeighboringCameraPosForNavigation": 4,  // Max number of navigation arrows
+        "cameraTypeToUse": "show-desktop-screen",  // Camera type (VR headsert vs. screen, etc.)
+        "signData": [],  // Data about signs. Work in progress.
+        "lazyLoadViewerSpheres": true  // Whether or not to lazy load textures/materials.
     }
 }
 

@@ -756,6 +756,7 @@ export class Camera {
         let closeCameraDataForTextureLoading = cameraPoints.firstFewPoints(Globals.get("SOME NEW GLOBAL VARIABLE CUTOFF HERE"));  // choose four close points
         // STUFF HERE TO LOAD THE TEXTURES CORRESPONDING TO THE SPHERES AT POINTS closeCameraDataForTextureLoading
         // Only do this stuff if global variable lazyLoadViewerSpheres is true.
+        
 
         // Now back to worrying about arrows....
         

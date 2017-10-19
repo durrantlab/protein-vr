@@ -54,6 +54,7 @@ class CommandPanel(ParentPanel):
             self.ui.use_box_row(activeObj.name + " Properties")
             self.ui.object_property("proteinvr_clickable")
             self.ui.object_property("proteinvr_category")
+            Messages.display_message("NODE_ERROR", self)
 
 
         # Commands

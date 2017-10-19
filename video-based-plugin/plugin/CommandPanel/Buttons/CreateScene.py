@@ -51,6 +51,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         :param str category: name of category
         """
+
         for obj in self.object_categories[category]:
             obj.hide = False
             obj.hide_render = False
@@ -61,9 +62,33 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         :param str category: name of category
         """
+
         for obj in self.object_categories[category]:
             obj.hide = True
             obj.hide_render = True
+
+    def save_visibility_state(self):
+        """
+        Saves the hide and hide_render properties of all objects.
+        """
+
+        self.visibility_states = {}
+        for obj in bpy.data.objects:
+            name = obj.name
+            self.visibility_states[name] = {
+                "hide": obj.hide,
+                "hide_render": obj.hide_render
+            }
+    
+    def restore_visibility_state(self):
+        """
+        Restores the initial hide and hide_render properties of all objects.
+        """
+
+        for obj in bpy.data.objects:
+            name = obj.name
+            obj.hide = self.visibility_states[name]["hide"]
+            obj.hide_render = self.visibility_states[name]["hide_render"]
 
     def _compress_png(self, filename):
         """
@@ -166,8 +191,11 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             "MESH": []  # Includes onces marked meshed, and any ones that have animations.
         }
 
+        self.objects_to_consider = [o for o in bpy.data.objects if o.type not in ["CAMERA", "LAMP"]]
+
         # Seperates the objects into their respective categories as specified by the user
-        for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
+        # for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
+        for obj in self.objects_to_consider:
             if(obj.proteinvr_category == "background"): #Capitalize
                 self.object_categories["BACKGROUND"].append(obj) # background = an eventual PNG file that will be the background image. NOT MOVING
             elif(obj.proteinvr_category == "static"):
@@ -198,7 +226,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         animation_data = {}
 
         # Looping through all objects for error checking to make sure an animated object was not placed in the wrong category
-        for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
+        # for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
+        for obj in self.objects_to_consider:
             if obj.hide == False and obj.hide_render == False: 
                 pos_loc_data = []
                 for f in range(self.frame_start, self.frame_end + 1):  # Looping through each frame
@@ -213,10 +242,15 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 num_keyframes = len(keys)
                 if num_keyframes > 1: # Checking to see if object is animated
                     self.object_categories["MESH"].append(obj) # If object is animated then, add to category MESH
+                    if obj in self.object_categories["STATIC"]:
+                        self.object_categories["STATIC"].remove(obj)
+                    if obj in self.object_categories["BACKGROUND"]:
+                        self.object_categories["BACKGROUND"].remove(obj)
                     animation_data[obj.name] = pos_loc_data # Add location data to animation_data dictionary with key of object name
 
         # Save the animation data
         self.extra_data["animations"] = animation_data
+        print("hII", self.object_categories)
 
     def _render_whatever_is_visible(self, filename):
         # TODO: Some of these variables are not called after this.....
@@ -255,8 +289,9 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # bpy.types.Object.mesh = self.prop_funcs.boolProp("mesh", False, description="Assigning 3-D objects that will be animated/High quality objects")mode. Defaults to False.
         """
 
-        # Hide all objects in Background and meshed category. Show objects in static category.
-        # For through each. For each frame, render a png file of the static images.
+        # Hide all objects in Background and meshed category. Show objects in
+        # static category. For through each. For each frame, render a png file
+        # of the static images.
 
         print("BACKGROUND:", self.object_categories["BACKGROUND"])
         print("MESH:", self.object_categories["MESH"])
@@ -271,7 +306,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         self.camera.rotation_mode = 'XYZ'
 
-        # for static_obj in self.object_categories["STATIC"]:
         for this_frame in range(self.frame_start, self.frame_end + 1):
             print("Frame", this_frame)
 
@@ -309,8 +343,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         Save the animation data.
         """
         for obj in self.object_categories["MESH"]: 
-            #obj = bpy.data.objects[obj_name]
-
             # Save the obj file.
             filepath = self.proteinvr_output_dir + obj.name + "_animated.obj"
             bpy.ops.export_scene.obj(
@@ -326,6 +358,15 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             )
 
             # Search the node tree to find a texture
+
+            if not "nodes" in dir(obj.active_material.node_tree):
+                Messages.send_message(
+                    "NODE_ERROR", 
+                    'Object "' + obj.name + '" has no node tree (material).',
+                    operator=self
+                )
+                return False
+
             texture_images = [n.image for n in obj.active_material.node_tree.nodes if n.type == "TEX_IMAGE"]
             if len(texture_images) > 0:
                 print("=" * 15)
@@ -333,11 +374,30 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 print("=" * 15)
 
             # Save that texture
-            image = texture_images[0] # ******** There is some sort of error here **********
-            image.alpha_mode = 'STRAIGHT'
-            image.filepath_raw = self.proteinvr_output_dir + obj.name + "_animated.png"
-            image.file_format = 'PNG'
-            image.save()
+            if len(texture_images) > 0:
+                image = texture_images[0] # ******** There is some sort of error here **********
+                image.alpha_mode = 'STRAIGHT'
+                image.filepath_raw = self.proteinvr_output_dir + obj.name + "_animated.png"
+                image.file_format = 'PNG'
+
+                try:
+                    image.save()
+                except:
+                    Messages.send_message(
+                        "NODE_ERROR", 
+                        'Object "' + obj.name + '" has a texture node, but the texture is not .',
+                        operator=self
+                    )
+                    return False                    
+            else:
+                Messages.send_message(
+                    "NODE_ERROR", 
+                    'Object "' + obj.name + '" has no texture node. Required for objects of category "Mesh".',
+                    operator=self
+                )
+                return False
+
+        return True
 
     def _step_7_save_filenames_and_filesizes(self):
         """
@@ -374,7 +434,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         """
 
         # Now go through visible objects and get encompassing spheres
-        for obj in bpy.data.objects:
+        # for obj in bpy.data.objects:
+        for obj in self.objects_to_consider:
             if object_is_proteinvr_clickable(obj) and obj.proteinvr_clickable == True:
                 # Get the vert coordintes
                 vert_coors = [(obj.matrix_world * v.co) for v in obj.data.vertices]
@@ -523,7 +584,10 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         :rtype: :class:`???`
         """
 
+        self.save_visibility_state()
+
         if self._step_0_existing_files_check_ok_and_copy() == False:
+            self.restore_visibility_state()
             return {'FINISHED'}
 
         debug = False
@@ -534,18 +598,22 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         if len(glob.glob(self.proteinvr_output_dir + "frames/*.png")) == 0:
             self._step_4_render_static_frames(debug)
+        
         self._step_5_render_background_image()
-        self._step_6_save_meshed_objects()
-        self._step_7_save_filenames_and_filesizes()
-        self._step_8_make_proteinvr_clickable_meshes()
-        self._step_9_save_signs()
-        self._step_10_generate_texture_babylon_and_manifest_files()
 
-        json.dump(
-            self.extra_data, 
-            open(self.proteinvr_output_dir + "data.json", 'w')
-        )
+        if self._step_6_save_meshed_objects():
+            self._step_7_save_filenames_and_filesizes()
+            self._step_8_make_proteinvr_clickable_meshes()
+            self._step_9_save_signs()
+            self._step_10_generate_texture_babylon_and_manifest_files()
 
-        print(self.extra_data)
+            json.dump(
+                self.extra_data, 
+                open(self.proteinvr_output_dir + "data.json", 'w')
+            )
+
+            print(self.extra_data)
+
+        self.restore_visibility_state()
 
         return {'FINISHED'}
