@@ -352,24 +352,53 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         self._render_whatever_is_visible(self.proteinvr_output_dir + "environment.png")
 
+    def _save_as_obj(self, obj, filepath):
+        """
+        Save a given obj as an obj file.
+        """
+
+        # Make sure visible
+        last_hide = obj.hide
+        last_hide_render = obj.hide_render
+        obj.hide = False
+        obj.hide_render = False
+
+        # Select the Object.
+        bpy.ops.object.select_all(action='DESELECT')
+        obj.select = True
+        bpy.context.scene.objects.active = obj
+
+        # Render obj file
+        bpy.ops.export_scene.obj(
+            filepath=filepath,
+            check_existing=False,
+            use_selection=True,
+            use_mesh_modifiers=True,
+            use_normals=True,
+            use_materials=False,
+            global_scale=1.0,
+            axis_up="Y",
+            axis_forward="-Z"
+        )
+
+        # Restore previous visibility
+        obj.hide = last_hide
+        obj.hide_render = last_hide_render
+
     def _step_6_save_meshed_objects(self):
         """
         Save the animation data.
         """
+
+        # Start by hiding everything
+        for obj in bpy.data.objects:
+            obj.hide = True
+            obj.hide_render = True
+
         for obj in self.object_categories["MESH"]: 
             # Save the obj file.
             filepath = self.proteinvr_output_dir + obj.name + "_animated.obj"
-            bpy.ops.export_scene.obj(
-                filepath=filepath,
-                check_existing=False,
-                use_selection=True,
-                use_mesh_modifiers=True,
-                use_normals=True,
-                use_materials=False,
-                global_scale=1.0,
-                axis_up="Y",
-                axis_forward="-Z"
-            )
+            self._save_as_obj(obj, filepath)
 
             # Search the node tree to find a texture
 
@@ -480,23 +509,9 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         # Export the shrinkwrapped proteinvr_clickable objects
         for obj in [o for o in bpy.data.objects if o.name.startswith("ProteinVR_tmp_")]:
-            bpy.ops.object.select_all(action='DESELECT')
-            obj.select = True
-            bpy.context.scene.objects.active = obj
-
             if obj.type == 'MESH':
                 filepath = self.proteinvr_output_dir + obj.name.replace("ProteinVR_tmp_", "proteinvr_clickable_") + ".obj"
-                bpy.ops.export_scene.obj(
-                    filepath=filepath,
-                    check_existing=False,
-                    use_selection=True,
-                    use_mesh_modifiers=True,
-                    use_normals=True,
-                    use_materials=False,
-                    global_scale=1.0,
-                    axis_up="Y",
-                    axis_forward="-Z"
-                )
+                self._save_as_obj(obj, filepath)
                 self.extra_data["clickableFiles"].append(os.path.basename(filepath))
             
             # Remove the proteinvr_clickable mesh now that it's saved
