@@ -25,6 +25,7 @@ import glob
 import json
 import numpy
 import random
+import subprocess
 
 obj_names = Utils.ObjNames()
 
@@ -97,8 +98,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         :param str filename: The filename of the png to compress.
         """
 
-        # TODO: Make compression work on ubuntu
-        return
+        if self.scene.pngquant_path == "":
+            return
 
         if os.path.exists(self.scene.pngquant_path):
             cmd = self.scene.pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
@@ -203,6 +204,20 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             elif(obj.proteinvr_category == "mesh"):
                 self.object_categories["MESH"].append(obj) # Meshed = high quality objects, ALL ANIMATED objects are here, but some non animated can be in there if use wants high quality
 
+        # Make sure self.scene.pngquant_path contains executable file
+        if self.scene.pngquant_path != "":
+            try:
+                subprocess.Popen(self.scene.pngquant_path, stderr=subprocess.PIPE)
+            except:
+                Messages.send_message(
+                    "PNGQUANT_ERROR", 
+                    'Error trying to execute ' + self.scene.pngquant_path,
+                    operator=self
+                )
+                return False
+
+        return True                
+
     def _step_2_get_camerea_positions(self):
         """
         Get the locations of the camera along the aniamted camera path.
@@ -250,7 +265,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         # Save the animation data
         self.extra_data["animations"] = animation_data
-        print("hII", self.object_categories)
 
     def _render_whatever_is_visible(self, filename):
         # TODO: Some of these variables are not called after this.....
@@ -592,7 +606,10 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         debug = False
 
-        self._step_1_initialize_variables()
+        if self._step_1_initialize_variables() == False:
+            self.restore_visibility_state()
+            return {'FINISHED'}
+
         self._step_2_get_camerea_positions()
         self._step_3_add_animated_objects_to_mesh_list_and_store_animation_data()
 

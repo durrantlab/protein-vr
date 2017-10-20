@@ -76,6 +76,7 @@ class CommandPanel(ParentPanel):
             self.ui.scene_property("proteinvr_mobile_bake_texture_size")
             self.ui.scene_property("proteinvr_num_cycles")
             self.ui.scene_property("pngquant_path")
+            Messages.display_message("PNGQUANT_ERROR", self)
         
         self.ui.ops_button(rel_data_path="proteinvr.create_scene", button_label="Create Scene")
         self.ui.ops_button(rel_data_path="proteinvr.render_scene_remotely", button_label="Render Scene Remotely")        
