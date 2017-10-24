@@ -1,6 +1,8 @@
 // I'm sure there's a more elegant making a global-variable storage area that
 // doesn't pollute the global name space, but I'm going with this for now...
 define(["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     if (window._proteinvrGlobals === undefined) {
         window._proteinvrGlobals = {
             "scene": undefined,
@@ -11,6 +13,8 @@ define(["require", "exports"], function (require, exports) {
             "BABYLON": undefined,
             "viewerSphereTemplate": undefined,
             "cameraPositions": undefined,
+            "animationData": undefined,
+            "firstFrameIndex": undefined,
             "viewerSpheres": undefined,
             "sphereMaterials": undefined,
             "backgroundSphere": undefined,
@@ -22,7 +26,8 @@ define(["require", "exports"], function (require, exports) {
             "numNeighboringCameraPosForNavigation": 4,
             "cameraTypeToUse": "show-desktop-screen",
             "signData": [],
-            "lazyLoadViewerSpheres": true
+            "lazyLoadViewerSpheres": true,
+            "meshesWithAnimations": [] // A list of all the meshes that have associated PVR meshes
         };
     }
     function get(key) {
@@ -61,11 +66,11 @@ define(["require", "exports"], function (require, exports) {
         window._proteinvrGlobals[key][index] = val;
     }
     exports.setArrayEntry = setArrayEntry;
+    var RenderingGroups;
     (function (RenderingGroups) {
         RenderingGroups[RenderingGroups["VisibleObjects"] = 3] = "VisibleObjects";
         RenderingGroups[RenderingGroups["ViewerSphere"] = 2] = "ViewerSphere";
         RenderingGroups[RenderingGroups["EnvironmentalSphere"] = 1] = "EnvironmentalSphere";
         RenderingGroups[RenderingGroups["ClickableObjects"] = 0] = "ClickableObjects";
-    })(exports.RenderingGroups || (exports.RenderingGroups = {}));
-    var RenderingGroups = exports.RenderingGroups;
+    })(RenderingGroups = exports.RenderingGroups || (exports.RenderingGroups = {}));
 });

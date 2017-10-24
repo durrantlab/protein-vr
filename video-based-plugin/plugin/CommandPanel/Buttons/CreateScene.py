@@ -228,6 +228,15 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             this_camera_pos = self.camera.location.copy()
             self.extra_data["cameraPositions"].append([round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)])
 
+    def _get_animation_keyframes(self, obj):
+        pos_loc_data = []
+        for f in range(self.frame_start, self.frame_end + 1):  # Looping through each frame
+            self.set_frame(f)
+            loc = obj.location
+            rot = obj.rotation_euler
+            pos_loc_data.append((round(loc.x, 2), round(loc.y, 2), round(loc.z, 2), round(rot.x, 2), round(rot.y, 2), round(rot.z, 2))) # Storing location data
+        return pos_loc_data
+
     def _step_3_add_animated_objects_to_mesh_list_and_store_animation_data(self):
         """
         Get all the objects that are currently visible, but have animations.
@@ -244,16 +253,11 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
         for obj in self.objects_to_consider:
             if obj.hide == False and obj.hide_render == False: 
-                pos_loc_data = []
-                for f in range(self.frame_start, self.frame_end + 1):  # Looping through each frame
-                    self.set_frame(f)
-                    loc = obj.location
-                    rot = obj.rotation_euler
-                    pos_loc_data.append((round(loc.x, 2), round(loc.y, 2), round(loc.z, 2), round(rot.x, 2), round(rot.y, 2), round(rot.z, 2))) # Storing location data
+                pos_loc_data = self._get_animation_keyframes(obj)
 
                 keys = ["_".join([str(i) for i in l]) for l in pos_loc_data]
 
-                keys = set(keys)
+                keys = set(keys)  # Get unique keys
                 num_keyframes = len(keys)
                 if num_keyframes > 1: # Checking to see if object is animated
                     self.object_categories["MESH"].append(obj) # If object is animated then, add to category MESH
@@ -263,8 +267,16 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                         self.object_categories["BACKGROUND"].remove(obj)
                     animation_data[obj.name] = pos_loc_data # Add location data to animation_data dictionary with key of object name
 
+        # Add in "animation data" of meshes that are not animted. Why? Because
+        # when you export them, you'll export at the origin. You need to be
+        # able to move them to the correct location.
+        for obj in self.object_categories["MESH"]:
+            if not obj.name in animation_data.keys():
+                animation_data[obj.name] = self._get_animation_keyframes(obj)        
+
         # Save the animation data
         self.extra_data["animations"] = animation_data
+        self.extra_data["firstFrameIndex"] = self.frame_start
 
     def _render_whatever_is_visible(self, filename):
         # TODO: Some of these variables are not called after this.....
@@ -298,9 +310,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         """
         Render the frames, both mobile and full resolution.
 
-        :param bool debug: Whether to run in debug  # bpy.types.Object.background = self.prop_funcs.boolProp("background_image", False, description="Assigning image to be the background")
-        # bpy.types.Object.static = self.prop_funcs.boolProp("static", False, description="Assigning 3-D objects that are static/low quality, they are NOT animated")
-        # bpy.types.Object.mesh = self.prop_funcs.boolProp("mesh", False, description="Assigning 3-D objects that will be animated/High quality objects")mode. Defaults to False.
+        :param bool debug: Whether to run in debug
         """
 
         # Hide all objects in Background and meshed category. Show objects in
@@ -397,7 +407,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         for obj in self.object_categories["MESH"]: 
             # Save the obj file.
-            filepath = self.proteinvr_output_dir + obj.name + "_animated.obj"
+            filepath = self.proteinvr_output_dir + obj.name + "_mesh.obj"
             self._save_as_obj(obj, filepath)
 
             # Search the node tree to find a texture
@@ -418,9 +428,9 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
             # Save that texture
             if len(texture_images) > 0:
-                image = texture_images[0] # ******** There is some sort of error here **********
+                image = texture_images[0]
                 image.alpha_mode = 'STRAIGHT'
-                image.filepath_raw = self.proteinvr_output_dir + obj.name + "_animated.png"
+                image.filepath_raw = self.proteinvr_output_dir + obj.name + "_mesh.png"
                 image.file_format = 'PNG'
 
                 try:

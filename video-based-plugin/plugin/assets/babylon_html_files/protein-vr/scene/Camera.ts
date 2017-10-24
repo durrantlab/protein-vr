@@ -799,7 +799,7 @@ export class Camera {
         // Assign angles
         let lookingVec = targetPoint.subtract(focalPoint).normalize();
 
-        console.log(focalPoint, targetPoint, lookingVec);
+        // console.log(focalPoint, targetPoint, lookingVec);
         
         switch (this._keyPressedState) {
             case 83:  // Up arrow?

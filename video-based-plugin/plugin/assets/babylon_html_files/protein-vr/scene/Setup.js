@@ -1,5 +1,7 @@
 // Sets up the scene.
 define(["require", "exports", "./Camera", "../config/Globals", "../config/Globals", "../sphere_material/SphereMaterial", "./Arrows", "./Sign"], function (require, exports, Camera_1, Globals, Globals_1, SphereMaterial_1, Arrows, Sign_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     function loadBabylonFile() {
         /*
         Loads and sets up the main scene.

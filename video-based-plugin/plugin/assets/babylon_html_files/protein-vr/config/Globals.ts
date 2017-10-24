@@ -11,6 +11,8 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         "BABYLON": undefined,  // The BABYLON library
         "viewerSphereTemplate": undefined,  // The initial viewsphere BABYLON mesh that all others inherit.
         "cameraPositions": undefined,  // Valid camera positions, pulled from data.json (PVRJsonSetup.ts)
+        "animationData": undefined,  // Stores animation data. Keys are mesh names, lists of [x, y, z, rotx, roty, rotz] as values.
+        "firstFrameIndex": undefined,  // The index of the first animation frame.
         "viewerSpheres": undefined,  // The BABYLON.mesh viewerspheres (derived from the template above)
         "sphereMaterials": undefined,  // The materials associated with each viewer sphere.
         "backgroundSphere": undefined,  // The background sphere (sky box)
@@ -22,7 +24,8 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         "numNeighboringCameraPosForNavigation": 4,  // Max number of navigation arrows
         "cameraTypeToUse": "show-desktop-screen",  // Camera type (VR headsert vs. screen, etc.)
         "signData": [],  // Data about signs. Work in progress.
-        "lazyLoadViewerSpheres": true  // Whether or not to lazy load textures/materials.
+        "lazyLoadViewerSpheres": true,  // Whether or not to lazy load textures/materials.
+        "meshesWithAnimations": []  // A list of all the meshes that have associated PVR meshes
     }
 }
 

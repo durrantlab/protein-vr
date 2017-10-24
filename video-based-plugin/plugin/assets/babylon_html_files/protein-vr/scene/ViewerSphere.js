@@ -1,5 +1,7 @@
 /* Create the viewer spheres. */
 define(["require", "exports", "../config/Globals"], function (require, exports, Globals) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var sphere_materials;
     function setup() {
         /*

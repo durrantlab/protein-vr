@@ -2,6 +2,8 @@
  * Module to create/store/maintain system variables
  */
 define(["require", "exports", "./Globals"], function (require, exports, Globals) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     // Setting up user parameters
     let mobileDefaults;
     let laptopDefaults;
@@ -12,31 +14,31 @@ define(["require", "exports", "./Globals"], function (require, exports, Globals)
         "desktop": {}
     };
     exports.paramNames = {};
+    var audios;
     (function (audios) {
         audios[audios["Speakers"] = 0] = "Speakers";
         audios[audios["Headphones"] = 1] = "Headphones";
         audios[audios["None"] = 2] = "None";
-    })(exports.audios || (exports.audios = {}));
-    var audios = exports.audios;
+    })(audios = exports.audios || (exports.audios = {}));
     exports.paramNames["audio"] = ["Speakers", "Headphones", "None"];
     exports.paramDefaults["mobile"]["audio"] = audios["Headphones"];
     exports.paramDefaults["laptop"]["audio"] = audios["Speakers"];
     exports.paramDefaults["desktop"]["audio"] = audios["Speakers"];
+    var viewers;
     (function (viewers) {
         viewers[viewers["Screen"] = 0] = "Screen";
         viewers[viewers["VRHeadset"] = 1] = "VRHeadset";
-    })(exports.viewers || (exports.viewers = {}));
-    var viewers = exports.viewers;
+    })(viewers = exports.viewers || (exports.viewers = {}));
     exports.paramNames["viewer"] = ["Screen", "VR Headset"];
     exports.paramDefaults["mobile"]["viewer"] = viewers["Screen"];
     exports.paramDefaults["laptop"]["viewer"] = viewers["Screen"];
     exports.paramDefaults["desktop"]["viewer"] = viewers["Screen"];
+    var devices;
     (function (devices) {
         devices[devices["Mobile"] = 0] = "Mobile";
         devices[devices["Laptop"] = 1] = "Laptop";
         devices[devices["Desktop"] = 2] = "Desktop";
-    })(exports.devices || (exports.devices = {}));
-    var devices = exports.devices;
+    })(devices = exports.devices || (exports.devices = {}));
     exports.paramNames["device"] = ["Mobile", "Laptop", "Desktop"];
     exports.paramDefaults["mobile"]["device"] = devices["Mobile"];
     exports.paramDefaults["laptop"]["device"] = devices["Laptop"];

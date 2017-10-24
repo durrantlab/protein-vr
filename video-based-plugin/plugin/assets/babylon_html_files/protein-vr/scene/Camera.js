@@ -1,5 +1,7 @@
 /* Things related to camera setup and movement. */
 define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows", "../config/Globals"], function (require, exports, Globals, ViewerSphere, Arrows, Globals_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     class CameraPoints {
         constructor() {
             /*
@@ -236,6 +238,7 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
     }
     class Camera {
         constructor() {
+            /* Class containing functions and properties of the camera. */
             this._mouseDownState = false;
             this._keyPressedState = undefined;
             this._firstRender = true;
@@ -335,10 +338,18 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             // http://www.html5gamedevs.com/topic/31454-webvrfreecameraid-vs-vrdeviceorientationfreecamera/?tab=comments#comment-180688
             let camera;
             if (navigator.getVRDisplays) {
-                camera = new BABYLON.WebVRFreeCamera("webVRFreeCamera", scene.activeCamera.position, scene);
+                camera = new BABYLON.WebVRFreeCamera("webVRFreeCamera", scene.activeCamera.position, scene
+                // false,  // compensate distortion
+                // { trackPosition: true }
+                // metrics
+                );
+                // camera.deviceScaleFactor = 1;
             }
             else {
-                camera = new BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", scene.activeCamera.position, scene);
+                camera = new BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", scene.activeCamera.position, scene
+                // false,  // compensate distortion. False = good anti-aliasing.
+                // metrics
+                );
             }
             // Keep the below because I think I'll use it in the future...
             // Detect when controllers are attached.
@@ -643,7 +654,7 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             let maxDist = this._closeCameraData.data[this._closeCameraData.data.length - 1].distance;
             // Assign angles
             let lookingVec = targetPoint.subtract(focalPoint).normalize();
-            console.log(focalPoint, targetPoint, lookingVec);
+            // console.log(focalPoint, targetPoint, lookingVec);
             switch (this._keyPressedState) {
                 case 83:
                     lookingVec = lookingVec.scale(-1);

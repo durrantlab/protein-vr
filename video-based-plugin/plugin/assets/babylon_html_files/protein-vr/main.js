@@ -1,4 +1,6 @@
 define(["require", "exports", "./sphere_material/MaterialLoader", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup"], function (require, exports, MaterialLoader, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     Globals.set("jQuery", jQuery);
     Globals.set("BABYLON", BABYLON);
     var callbacksComplete = [];
@@ -87,6 +89,10 @@ define(["require", "exports", "./sphere_material/MaterialLoader", "./config/User
                 }).then((fulfilled) => Promise.resolve("DONE: PVR Json loading finished (after scene)"));
                 Promise.all([proteinVRJsonDone, allUserVarsAvailable])
                     .then((fulfilled) => Globals.get("camera").setup());
+                // .then((fulfilled) => this._startRenderLoop());
+                // loadBabylonFilePromiseDone.then((f) => {
+                //     console.log(f)
+                // })
             }
         }
         _showDataUseWarningPanel(isMobile) {
@@ -157,7 +163,12 @@ define(["require", "exports", "./sphere_material/MaterialLoader", "./config/User
             // Once the scene is loaded, just register a render loop to render it
             let camera = Globals.get("camera");
             let scene = Globals.get("scene");
+            let meshesWithAnimations = Globals.get("meshesWithAnimations");
             Globals.get("engine").runRenderLoop(() => {
+                // Update the positions of any animations.
+                for (let i = 0; i < meshesWithAnimations.length; i++) {
+                    meshesWithAnimations[i].PVRAnimation.updatePos();
+                }
                 camera.update();
                 scene.render();
             });
