@@ -42,6 +42,7 @@ export function loadJSON(): any {
             // Load animation data
             Globals.set("animationData", data["animations"]);
             Globals.set("firstFrameIndex", data["firstFrameIndex"]);
+            Globals.set("lastFrameIndex", data["lastFrameIndex"]);
 
             resolve({msg: "LOADED PROTIENVR JSON"});
         });
@@ -161,7 +162,9 @@ function _loadAnimatedObjects(): void {
                 // Setup animations. Currently hard coded. TODO: Need more
                 // elegant solution here!!!
                 let anim = new Animations.Animation(mesh); // , 1, 5, 10);
-                window.mesh = mesh;
+                // if (window.mesh ===undefined) {
+                //     window.mesh = mesh;
+                // }
                 // anim.play(1, 5, 10.0);
                 // setInterval(() => {
                 //     anim.updatePos();

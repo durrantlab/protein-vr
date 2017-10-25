@@ -26,6 +26,7 @@ import json
 import numpy
 import random
 import subprocess
+from collections import OrderedDict
 
 obj_names = Utils.ObjNames()
 
@@ -229,13 +230,22 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             self.extra_data["cameraPositions"].append([round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)])
 
     def _get_animation_keyframes(self, obj):
-        pos_loc_data = []
+        pos_loc_data = OrderedDict()
+        last_pos_hash = ""
         for f in range(self.frame_start, self.frame_end + 1):  # Looping through each frame
             self.set_frame(f)
             loc = obj.location
             rot = obj.rotation_euler
-            pos_loc_data.append((round(loc.x, 2), round(loc.y, 2), round(loc.z, 2), round(rot.x, 2), round(rot.y, 2), round(rot.z, 2))) # Storing location data
+            pos = (round(loc.x, 2), round(loc.y, 2), round(loc.z, 2), round(rot.x, 2), round(rot.y, 2), round(rot.z, 2)) # Storing location data
+            new_pos_hash = self._list_of_nums_to_key(pos)
+            if new_pos_hash != last_pos_hash:
+                pos_loc_data[f] = pos
+            last_pos_hash = new_pos_hash
+            
         return pos_loc_data
+
+    def _list_of_nums_to_key(self, list_of_nums):
+        return "_".join([str(i) for i in list_of_nums])
 
     def _step_3_add_animated_objects_to_mesh_list_and_store_animation_data(self):
         """
@@ -255,7 +265,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             if obj.hide == False and obj.hide_render == False: 
                 pos_loc_data = self._get_animation_keyframes(obj)
 
-                keys = ["_".join([str(i) for i in l]) for l in pos_loc_data]
+                keys = [self._list_of_nums_to_key(l) for l in pos_loc_data.values()]
 
                 keys = set(keys)  # Get unique keys
                 num_keyframes = len(keys)
@@ -277,6 +287,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # Save the animation data
         self.extra_data["animations"] = animation_data
         self.extra_data["firstFrameIndex"] = self.frame_start
+        self.extra_data["lastFrameIndex"] = self.frame_end
 
     def _render_whatever_is_visible(self, filename):
         # TODO: Some of these variables are not called after this.....

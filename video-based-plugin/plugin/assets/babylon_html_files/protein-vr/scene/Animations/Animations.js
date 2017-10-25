@@ -9,7 +9,7 @@ define(["require", "exports", "../../config/Globals", "./CubicSpline"], function
             this._obj = undefined;
             this._BABYLON = Globals.get("BABYLON");
             this._firstFrameIndex = undefined;
-            this._numFrames = undefined;
+            this._lastFrameIndex = undefined;
             this._playing = false;
             this._playStartTime = undefined;
             this._playStartFrame = undefined;
@@ -27,15 +27,18 @@ define(["require", "exports", "../../config/Globals", "./CubicSpline"], function
             let animationData = Globals.get("animationData");
             let firstFrameIndex = Globals.get("firstFrameIndex");
             this._firstFrameIndex = firstFrameIndex;
+            let lastFrameIndex = Globals.get("lastFrameIndex");
+            this._lastFrameIndex = lastFrameIndex;
             let objAnimData = animationData[objName];
-            this._numFrames = objAnimData.length;
             // Extract just the desired frames.
             let framesToKeep = [];
             let posAndRot = [];
-            for (let i = 0; i < objAnimData.length; i++) {
-                let frameIndex = firstFrameIndex + i;
-                framesToKeep.push(frameIndex);
-                posAndRot.push(objAnimData[i]);
+            let lastPosAndRot = undefined;
+            for (let i = firstFrameIndex; i <= lastFrameIndex; i++) {
+                framesToKeep.push(i);
+                let thisPosAndRot = (objAnimData[i] !== undefined) ? objAnimData[i] : lastPosAndRot;
+                posAndRot.push(thisPosAndRot);
+                lastPosAndRot = thisPosAndRot;
             }
             // Make a spline.
             this._animationSpline = new CubicSpline.MultiDimenSpline(framesToKeep, posAndRot);
@@ -57,7 +60,7 @@ define(["require", "exports", "../../config/Globals", "./CubicSpline"], function
         }
         play(durationInSeconds, animationStartFrame = undefined, animationEndFrame = undefined, playLoop = "FALSE") {
             animationStartFrame = animationStartFrame === undefined ? this._firstFrameIndex : animationStartFrame;
-            animationEndFrame = animationEndFrame === undefined ? this._firstFrameIndex + this._numFrames - 1 : animationEndFrame;
+            animationEndFrame = animationEndFrame === undefined ? this._lastFrameIndex : animationEndFrame;
             this._playStartTime = new Date().getTime() / 1000;
             this._playStartFrame = animationStartFrame;
             this._playEndFrame = animationEndFrame;

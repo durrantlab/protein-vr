@@ -13,6 +13,7 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         "cameraPositions": undefined,  // Valid camera positions, pulled from data.json (PVRJsonSetup.ts)
         "animationData": undefined,  // Stores animation data. Keys are mesh names, lists of [x, y, z, rotx, roty, rotz] as values.
         "firstFrameIndex": undefined,  // The index of the first animation frame.
+        "lastFrameIndex": undefined,
         "viewerSpheres": undefined,  // The BABYLON.mesh viewerspheres (derived from the template above)
         "sphereMaterials": undefined,  // The materials associated with each viewer sphere.
         "backgroundSphere": undefined,  // The background sphere (sky box)

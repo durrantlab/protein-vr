@@ -10,13 +10,24 @@ import * as Globals from "../../config/Globals";
 import * as CubicSpline from "./CubicSpline";
 
 export class Animation {
+    /*
+    A class to manage animations (not armature animations... just translation
+    and rotation).
+    */
+
     private _animationSpline = undefined;
     private _obj = undefined;
     private _BABYLON = Globals.get("BABYLON");
     private _firstFrameIndex: number = undefined;
-    private _numFrames: number = undefined;
+    private _lastFrameIndex: number = undefined;
 
     constructor(obj: any) {
+        /*
+        Construct the Animation object for a mesh.
+
+        :param ??? obj: The BABYLON.Mesh object to animate.
+        */
+
         if (typeof(obj) === "string") {
             let scene = Globals.get("scene");
             obj = scene.getMeshByName(obj);
@@ -29,16 +40,19 @@ export class Animation {
         let animationData = Globals.get("animationData");
         let firstFrameIndex = Globals.get("firstFrameIndex");
         this._firstFrameIndex = firstFrameIndex;
+        let lastFrameIndex = Globals.get("lastFrameIndex");
+        this._lastFrameIndex = lastFrameIndex;
         let objAnimData = animationData[objName];
-        this._numFrames = objAnimData.length;
 
         // Extract just the desired frames.
         let framesToKeep = [];
         let posAndRot = [];
-        for (let i=0; i<objAnimData.length; i++) {
-            let frameIndex = firstFrameIndex + i;
-            framesToKeep.push(frameIndex);
-            posAndRot.push(objAnimData[i]);
+        let lastPosAndRot = undefined;
+        for (let i=firstFrameIndex; i<=lastFrameIndex; i++) {
+            framesToKeep.push(i);
+            let thisPosAndRot = (objAnimData[i] !== undefined) ? objAnimData[i] : lastPosAndRot;
+            posAndRot.push(thisPosAndRot);
+            lastPosAndRot = thisPosAndRot;
         }
 
         // Make a spline.
@@ -56,6 +70,12 @@ export class Animation {
     }
 
     public setAnimationFrame(frameIndex: number) {
+        /*
+        Positions and rotates the object tomatch a given animation frame.
+
+        :param number frameIndex: The frame number.
+        */
+
         // See https://doc.babylonjs.com/tutorials/position,_rotate,_translate_and_spaces
         let vals = this._animationSpline.get(frameIndex);
         let pos = new this._BABYLON.Vector3(vals[0], vals[2], vals[1]);
@@ -72,9 +92,23 @@ export class Animation {
     private _playDeltaFrames: number = undefined;
     private _playLoop: string = "FALSE";
 
-    public play(durationInSeconds: number, animationStartFrame: number = undefined, animationEndFrame: number = undefined, playLoop: string = "FALSE") {
+    public play(durationInSeconds: number, animationStartFrame: number = undefined, animationEndFrame: number = undefined, playLoop: string = "FALSE"): void {
+        /*
+        Play the animation.
+
+        :param number durationInSeconds: The duration of the animation.
+
+        :param number animationStartFrame: The starting frame number.
+
+        :param number animationEndFrame: The ending frame number.
+
+        :param string playLoop: How to play the animation. "FALSE" means no
+                      loop. "LOOP" means loop the animation. "ROCK" means go
+                      forward through the animation, then back, then forward.
+        */
+        
         animationStartFrame = animationStartFrame === undefined ? this._firstFrameIndex : animationStartFrame;
-        animationEndFrame = animationEndFrame === undefined ? this._firstFrameIndex + this._numFrames - 1: animationEndFrame;
+        animationEndFrame = animationEndFrame === undefined ? this._lastFrameIndex: animationEndFrame;
         
         this._playStartTime = new Date().getTime() / 1000;
         this._playStartFrame = animationStartFrame;
@@ -85,11 +119,20 @@ export class Animation {
         this._playLoop = playLoop;
     }
 
-    public stop() {
+    public stop(): void {
+        /*
+        Stop playing the animation.
+        */
+
         this._playing = false;
     }
 
-    public updatePos() {
+    public updatePos(): void {
+        /*
+        Update the animation based on the amount of time that has passed since
+        the animation was started. Also iniates looping.
+        */
+        
         if (this._playing) {
             let deltaTimeInSecs = new Date().getTime() / 1000 - this._playStartTime;
             if (deltaTimeInSecs <= this._playDurationInSeconds) {
@@ -116,9 +159,6 @@ export class Animation {
                     default:
                         console.log("ERROR");
                         debugger;
-                }
-                if (this._playLoop ) {
-                } else {
                 }
             }
         }

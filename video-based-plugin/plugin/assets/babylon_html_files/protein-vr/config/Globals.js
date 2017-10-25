@@ -15,6 +15,7 @@ define(["require", "exports"], function (require, exports) {
             "cameraPositions": undefined,
             "animationData": undefined,
             "firstFrameIndex": undefined,
+            "lastFrameIndex": undefined,
             "viewerSpheres": undefined,
             "sphereMaterials": undefined,
             "backgroundSphere": undefined,
