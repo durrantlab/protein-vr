@@ -138,9 +138,9 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Anima
                     // Setup animations. Currently hard coded. TODO: Need more
                     // elegant solution here!!!
                     let anim = new Animations.Animation(mesh); // , 1, 5, 10);
-                    if (window.mesh === undefined) {
-                        window.mesh = mesh;
-                    }
+                    // if (window.mesh ===undefined) {
+                    //     window.mesh = mesh;
+                    // }
                     // anim.play(1, 5, 10.0);
                     // setInterval(() => {
                     //     anim.updatePos();

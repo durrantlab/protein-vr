@@ -386,7 +386,6 @@ export class Camera {
         on their desktops.
         */
 
-
         // This code untested, but designed for stuff like Oculus rift.
         let scene = Globals.get("scene");
         let canvas = Globals.get("canvas");
@@ -452,11 +451,13 @@ export class Camera {
             if (camera.controllers !== undefined) {
                 for (let i=0; i<camera.controllers.length; i++) {
                     let mesh = camera.controllers[i]._mesh;
-                    mesh.renderingGroupId = RenderingGroups.VisibleObjects;
-
-                    for (let j=0; j<mesh._children.length; j++) {
-                        let childMesh = mesh._children[j];
-                        childMesh.renderingGroupId = RenderingGroups.VisibleObjects;
+                    
+                    if (mesh !== undefined) {
+                        mesh.renderingGroupId = RenderingGroups.VisibleObjects;                        
+                        for (let j=0; j<mesh._children.length; j++) {
+                            let childMesh = mesh._children[j];
+                            childMesh.renderingGroupId = RenderingGroups.VisibleObjects;
+                        }
                     }
                 }
             }
@@ -467,17 +468,18 @@ export class Camera {
         // happen until after user clicks again.
         scene.activeCamera = camera;
         
-        scene.onPointerDown = function() {
-            let canvas = Globals.get("canvas");
-            let scene = Globals.get("scene");
-
+        scene.onPointerDown = () => {
             scene.onPointerDown = undefined;
+
             // scene.onPointerDown = () => {
             //     camera.initControllers();
             // }
 
             // Attach that camera to the canvas.
             scene.activeCamera.attachControl(canvas, true);
+
+            // In case they want to look through desktop VR but navigate with mouse?
+            this._setupMouseClick();
         }
 
         // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
@@ -546,13 +548,10 @@ export class Camera {
         // after initial WebVR canvas-attach click.
         
         // First, setup mouse.
-        // scene.onPointerDown = function (evt, pickResult) {
-        //     this._mouseDownState = true;
-        // }.bind(this);
-
-        scene.onPointerUp = function (evt, pickResult) {
-            this._mouseDownState = false;
-        }.bind(this);
+        if (Globals.get("cameraTypeToUse") !== "show-desktop-vr") {
+            // Because if it's desktop VR, this function will be bound AFTER the first click (which starts the VR camera).
+            this._setupMouseClick();
+        }
 
         // Now keyboard
         // No arrow navigation on camera. You'll redo custom.
@@ -568,6 +567,22 @@ export class Camera {
         window.addEventListener("keyup", function(evt) {
             this._keyPressedState = undefined;
         }.bind(this));
+    }
+
+    private _setupMouseClick(): void {
+        /*
+        Setup mouse clicking. Separate from above function to work with HTC Vive too (not bound until after initial click).
+        */
+        
+        let scene = Globals.get("scene");
+
+        scene.onPointerDown = function (evt, pickResult) {
+            this._mouseDownState = true;
+        }.bind(this);
+
+        scene.onPointerUp = function (evt, pickResult) {
+            this._mouseDownState = false;
+        }.bind(this);
     }
     
     private _speedInUnitsPerSecond = 1;    
@@ -661,7 +676,7 @@ export class Camera {
         // Make sure everything hidden but present sphere.
         ViewerSphere.hideAll();
         this._nextViewerSphere.visibility = 1.0;  // NOTE: Is this right?!?!?
-        this._pickDirectionAndStartMoving(camera);
+        this._pickDirectionAndStartMoving(camera.position, camera.getTarget());
     }
 
     private _whileCameraAutoMoving(deltaTime: number, camera: any): void {
@@ -741,6 +756,7 @@ export class Camera {
         let closeCameraDataForTextureLoading = cameraPoints.firstFewPoints(Globals.get("SOME NEW GLOBAL VARIABLE CUTOFF HERE"));  // choose four close points
         // STUFF HERE TO LOAD THE TEXTURES CORRESPONDING TO THE SPHERES AT POINTS closeCameraDataForTextureLoading
         // Only do this stuff if global variable lazyLoadViewerSpheres is true.
+        
 
         // Now back to worrying about arrows....
         
@@ -764,13 +780,16 @@ export class Camera {
         this._closeCameraData = closeCameraData2;
     }
 
-    private _pickDirectionAndStartMoving(camera: any): void {
+    // private _pickDirectionAndStartMoving(camera: any): void {
+    private _pickDirectionAndStartMoving(focalPoint: any, targetPoint: any): void {
         /*
         Based on camera's direction, determine the next location to move to.
         This is called only once at the beinning of the moving cycle (not
         every frame).
 
-        :param ??? camera: BABYLON camera object.
+        :param ??? focalPoint: BABYLON.Vector3 location. Probably the location of the camera.
+
+        :param ??? targetPoint: BABYLON.Vector3 location. Probably the getTarget() of the camera.
         */
 
         // Start by assuming new camera point should be the closest point.
@@ -778,7 +797,10 @@ export class Camera {
         let maxDist = this._closeCameraData.data[this._closeCameraData.data.length-1].distance;
 
         // Assign angles
-        let lookingVec = camera.getTarget().subtract(camera.position);
+        let lookingVec = targetPoint.subtract(focalPoint).normalize();
+
+        // console.log(focalPoint, targetPoint, lookingVec);
+        
         switch (this._keyPressedState) {
             case 83:  // Up arrow?
                 lookingVec = lookingVec.scale(-1);
@@ -804,7 +826,7 @@ export class Camera {
 
         // Calculate angles between camera looking vector and the various
         // candidate camera locations.
-        this._closeCameraData.addAnglesInPlace(camera.position, lookingVec);
+        this._closeCameraData.addAnglesInPlace(focalPoint, lookingVec);
 
         // Throw out candidate camera locations that aren't even in the
         // general direction as the lookingVec
@@ -827,7 +849,7 @@ export class Camera {
         }
 
         // Set values to govern next auto movement.
-        this._prevCameraPos = camera.position.clone();
+        this._prevCameraPos = focalPoint.clone();
         this._nextMovementVec = newCameraData.position.subtract(this._prevCameraPos);
         this._prevViewerSphere = this._nextViewerSphere;
         this._nextViewerSphere = newCameraData.associatedViewerSphere;

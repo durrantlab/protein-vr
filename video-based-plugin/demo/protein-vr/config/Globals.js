@@ -13,6 +13,9 @@ define(["require", "exports"], function (require, exports) {
             "BABYLON": undefined,
             "viewerSphereTemplate": undefined,
             "cameraPositions": undefined,
+            "animationData": undefined,
+            "firstFrameIndex": undefined,
+            "lastFrameIndex": undefined,
             "viewerSpheres": undefined,
             "sphereMaterials": undefined,
             "backgroundSphere": undefined,
@@ -24,7 +27,8 @@ define(["require", "exports"], function (require, exports) {
             "numNeighboringCameraPosForNavigation": 4,
             "cameraTypeToUse": "show-desktop-screen",
             "signData": [],
-            "lazyLoadViewerSpheres": true
+            "lazyLoadViewerSpheres": true,
+            "meshesWithAnimations": [] // A list of all the meshes that have associated PVR meshes
         };
     }
     function get(key) {

@@ -35,7 +35,7 @@ export function loadBabylonFile(): Promise<any> {
                 // Delay textures until needed. Cool, but too slow for our
                 // purposes here... Keep it commented out for now.
                 // newScene.useDelayedTextureLoading = true
-                                
+
                 // Setup viewer sphere template
                 let radius = 12; // When using VR, this needs to be farther away that what it was rendered at. this._JSONData["viewerSphereSize"];
                 _setupViewerSphereTemplate(scene, radius);

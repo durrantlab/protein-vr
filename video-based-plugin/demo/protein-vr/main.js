@@ -163,7 +163,12 @@ define(["require", "exports", "./sphere_material/MaterialLoader", "./config/User
             // Once the scene is loaded, just register a render loop to render it
             let camera = Globals.get("camera");
             let scene = Globals.get("scene");
+            let meshesWithAnimations = Globals.get("meshesWithAnimations");
             Globals.get("engine").runRenderLoop(() => {
+                // Update the positions of any animations.
+                for (let i = 0; i < meshesWithAnimations.length; i++) {
+                    meshesWithAnimations[i].PVRAnimation.updatePos();
+                }
                 camera.update();
                 scene.render();
             });

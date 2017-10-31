@@ -3,6 +3,7 @@
 import * as Globals from "../config/Globals";
 import * as Camera from "./Camera";
 import { RenderingGroups } from "../config/Globals";
+import * as Animations from "./Animations/Animations";
 
 var data;
 export function loadJSON(): any {
@@ -20,7 +21,7 @@ export function loadJSON(): any {
             data = _data;
             
             // Load camera tracks data
-            let cameraPositions = []; 
+            let cameraPositions = [];
             let sphereMaterials = [];  // For storage now.
             for (let i=0; i<data["cameraPositions"].length; i++) {
                 let pt = data["cameraPositions"][i];
@@ -37,6 +38,12 @@ export function loadJSON(): any {
                 signData.push(data["signs"][i])
             }
             Globals.set("signData", signData);
+
+            // Load animation data
+            Globals.set("animationData", data["animations"]);
+            Globals.set("firstFrameIndex", data["firstFrameIndex"]);
+            Globals.set("lastFrameIndex", data["lastFrameIndex"]);
+
             resolve({msg: "LOADED PROTIENVR JSON"});
         });
     })
@@ -132,7 +139,7 @@ function _loadAnimatedObjects(): void {
     let loader = new BABYLON.AssetsManager(scene);
     for (var objName in data["animations"]) {
         if (data["animations"].hasOwnProperty(objName)) {
-            let objFilename = objName + "_animated.obj";
+            let objFilename = objName + "_mesh.obj";
             let meshTask = loader.addMeshTask(objFilename + "_name", "", "", objFilename);
             meshTask.onSuccess = function (task) {
                 let mesh = task.loadedMeshes[0];  // Why is this necessary?
@@ -146,11 +153,24 @@ function _loadAnimatedObjects(): void {
                 let mat = new BABYLON.StandardMaterial(mesh.name + "_material" + Math.random().toString(), scene);
                 mat.diffuseColor = new BABYLON.Color3(0, 0, 0);
                 mat.specularColor = new BABYLON.Color3(0, 0, 0);
-                mat.emissiveTexture = new BABYLON.Texture(mesh.name + "_animated.png", scene);
+                mat.emissiveTexture = new BABYLON.Texture(mesh.name + "_mesh.png", scene);
                 mat.diffuseTexture = null;
                 mat.backFaceCulling = false;
 
-                mesh.material = mat;                
+                mesh.material = mat;
+                
+                // Setup animations. Currently hard coded. TODO: Need more
+                // elegant solution here!!!
+                let anim = new Animations.Animation(mesh); // , 1, 5, 10);
+                // if (window.mesh ===undefined) {
+                //     window.mesh = mesh;
+                // }
+                // anim.play(1, 5, 10.0);
+                // setInterval(() => {
+                //     anim.updatePos();
+                // }, 10);
+                // window.anim = anim;
+                // console.log(mesh);
             }
         }
     }

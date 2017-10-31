@@ -193,7 +193,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             "MESH": []  # Includes onces marked meshed, and any ones that have animations.
         }
 
-        self.objects_to_consider = [o for o in bpy.data.objects if o.type not in ["CAMERA", "LAMP"]]
+        self.objects_to_consider = [o for o in bpy.data.objects if o.type not in ["CAMERA", "LAMP"] and o.hide == False and o.hide_render == False]
 
         # Seperates the objects into their respective categories as specified by the user
         # for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
@@ -499,6 +499,9 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         # Now go through visible objects and get encompassing spheres
         # for obj in bpy.data.objects:
+        self.restore_visibility_state()
+
+        # import pdb; pdb.set_trace()
         for obj in self.objects_to_consider:
             if object_is_proteinvr_clickable(obj) and obj.proteinvr_clickable == True:
                 # Get the vert coordintes

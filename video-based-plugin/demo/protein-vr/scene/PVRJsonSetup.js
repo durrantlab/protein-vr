@@ -1,5 +1,5 @@
 /* Get data about the scene from external json files. */
-define(["require", "exports", "../config/Globals", "../config/Globals"], function (require, exports, Globals, Globals_1) {
+define(["require", "exports", "../config/Globals", "../config/Globals", "./Animations/Animations"], function (require, exports, Globals, Globals_1, Animations) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var data;
@@ -31,6 +31,10 @@ define(["require", "exports", "../config/Globals", "../config/Globals"], functio
                     signData.push(data["signs"][i]);
                 }
                 Globals.set("signData", signData);
+                // Load animation data
+                Globals.set("animationData", data["animations"]);
+                Globals.set("firstFrameIndex", data["firstFrameIndex"]);
+                Globals.set("lastFrameIndex", data["lastFrameIndex"]);
                 resolve({ msg: "LOADED PROTIENVR JSON" });
             });
         });
@@ -115,7 +119,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals"], functio
         let loader = new BABYLON.AssetsManager(scene);
         for (var objName in data["animations"]) {
             if (data["animations"].hasOwnProperty(objName)) {
-                let objFilename = objName + "_animated.obj";
+                let objFilename = objName + "_mesh.obj";
                 let meshTask = loader.addMeshTask(objFilename + "_name", "", "", objFilename);
                 meshTask.onSuccess = function (task) {
                     let mesh = task.loadedMeshes[0]; // Why is this necessary?
@@ -127,10 +131,22 @@ define(["require", "exports", "../config/Globals", "../config/Globals"], functio
                     let mat = new BABYLON.StandardMaterial(mesh.name + "_material" + Math.random().toString(), scene);
                     mat.diffuseColor = new BABYLON.Color3(0, 0, 0);
                     mat.specularColor = new BABYLON.Color3(0, 0, 0);
-                    mat.emissiveTexture = new BABYLON.Texture(mesh.name + "_animated.png", scene);
+                    mat.emissiveTexture = new BABYLON.Texture(mesh.name + "_mesh.png", scene);
                     mat.diffuseTexture = null;
                     mat.backFaceCulling = false;
                     mesh.material = mat;
+                    // Setup animations. Currently hard coded. TODO: Need more
+                    // elegant solution here!!!
+                    let anim = new Animations.Animation(mesh); // , 1, 5, 10);
+                    // if (window.mesh ===undefined) {
+                    //     window.mesh = mesh;
+                    // }
+                    // anim.play(1, 5, 10.0);
+                    // setInterval(() => {
+                    //     anim.updatePos();
+                    // }, 10);
+                    // window.anim = anim;
+                    // console.log(mesh);
                 };
             }
         }
