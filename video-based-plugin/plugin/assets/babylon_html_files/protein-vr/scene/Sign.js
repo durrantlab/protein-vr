@@ -1,7 +1,5 @@
 /* Add signs to the scene to guide the student. */
 define(["require", "exports", "../config/Globals", "../config/Globals"], function (require, exports, Globals, Globals_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     function setupAllSigns() {
         /*
         Sets up the signs that have been loaded from the external json file.

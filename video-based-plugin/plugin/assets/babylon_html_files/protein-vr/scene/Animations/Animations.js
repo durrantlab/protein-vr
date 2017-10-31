@@ -1,8 +1,6 @@
 // Controls animations, loaded through data.json. Just translation and
 // rotation.
 define(["require", "exports", "../../config/Globals", "./CubicSpline"], function (require, exports, Globals, CubicSpline) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     class Animation {
         constructor(obj) {
             /*

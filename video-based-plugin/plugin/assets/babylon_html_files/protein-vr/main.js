@@ -1,6 +1,4 @@
 define(["require", "exports", "./sphere_material/MaterialLoader", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup"], function (require, exports, MaterialLoader, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     Globals.set("jQuery", jQuery);
     Globals.set("BABYLON", BABYLON);
     var callbacksComplete = [];
@@ -89,10 +87,6 @@ define(["require", "exports", "./sphere_material/MaterialLoader", "./config/User
                 }).then((fulfilled) => Promise.resolve("DONE: PVR Json loading finished (after scene)"));
                 Promise.all([proteinVRJsonDone, allUserVarsAvailable])
                     .then((fulfilled) => Globals.get("camera").setup());
-                // .then((fulfilled) => this._startRenderLoop());
-                // loadBabylonFilePromiseDone.then((f) => {
-                //     console.log(f)
-                // })
             }
         }
         _showDataUseWarningPanel(isMobile) {

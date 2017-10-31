@@ -1,7 +1,5 @@
 /* Things related to camera setup and movement. */
 define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows", "../config/Globals"], function (require, exports, Globals, ViewerSphere, Arrows, Globals_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     class CameraPoints {
         constructor() {
             /*
@@ -238,7 +236,6 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
     }
     class Camera {
         constructor() {
-            /* Class containing functions and properties of the camera. */
             this._mouseDownState = false;
             this._keyPressedState = undefined;
             this._firstRender = true;
@@ -338,18 +335,10 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             // http://www.html5gamedevs.com/topic/31454-webvrfreecameraid-vs-vrdeviceorientationfreecamera/?tab=comments#comment-180688
             let camera;
             if (navigator.getVRDisplays) {
-                camera = new BABYLON.WebVRFreeCamera("webVRFreeCamera", scene.activeCamera.position, scene
-                // false,  // compensate distortion
-                // { trackPosition: true }
-                // metrics
-                );
-                // camera.deviceScaleFactor = 1;
+                camera = new BABYLON.WebVRFreeCamera("webVRFreeCamera", scene.activeCamera.position, scene);
             }
             else {
-                camera = new BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", scene.activeCamera.position, scene
-                // false,  // compensate distortion. False = good anti-aliasing.
-                // metrics
-                );
+                camera = new BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", scene.activeCamera.position, scene);
             }
             // Keep the below because I think I'll use it in the future...
             // Detect when controllers are attached.
@@ -380,13 +369,47 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             setInterval(() => {
                 if (camera.controllers !== undefined) {
                     for (let i = 0; i < camera.controllers.length; i++) {
-                        let mesh = camera.controllers[i]._mesh;
+                        let controller = camera.controllers[i];
+                        // Make sure controller mesh visible
+                        let mesh = controller._mesh;
                         if (mesh !== undefined) {
                             mesh.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects;
                             for (let j = 0; j < mesh._children.length; j++) {
                                 let childMesh = mesh._children[j];
                                 childMesh.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects;
                             }
+                        }
+                        // detect controller click
+                        if (controller.onTriggerStateChangedObservable._observers.length === 0) {
+                            controller.onTriggerStateChangedObservable.add((stateObject) => {
+                                let state = (stateObject.pressed || stateObject.touched);
+                                this._mouseDownState = state; // Pretend it's a mouse click
+                            });
+                        }
+                        // if (controller.onPadValuesChangedObservable._observers.length === 0) {
+                        //     controller.onPadValuesChangedObservable.add((stateObject) => {
+                        //         let state = ((stateObject.x !== 0) || (stateObject.touched !== 0));
+                        //         this._mouseDownState = state;  // Pretend it's a mouse click
+                        //     });    
+                        // }
+                        if (controller.onPadStateChangedObservable._observers.length === 0) {
+                            controller.onPadStateChangedObservable.add((stateObject) => {
+                                let state = (stateObject.pressed || stateObject.touched);
+                                this._mouseDownState = state; // Pretend it's a mouse click
+                            });
+                        }
+                        if (controller.onSecondaryButtonStateChangedObservable._observers.length === 0) {
+                            controller.onSecondaryButtonStateChangedObservable.add((stateObject) => {
+                                let state = (stateObject.pressed || stateObject.touched);
+                                this._mouseDownState = state; // Pretend it's a mouse click
+                            });
+                        }
+                        if (controller.onMainButtonStateChangedObservable._observers.length === 0) {
+                            controller.onMainButtonStateChangedObservable.add((stateObject) => {
+                                // I don't think it's possible to trigger this on the Vive...
+                                let state = (stateObject.pressed || stateObject.touched);
+                                this._mouseDownState = state; // Pretend it's a mouse click
+                            });
                         }
                     }
                 }
@@ -548,6 +571,19 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             this._firstRender = false; // It's no longer the first time rendering.
             this._onStartMove(camera);
         }
+        _getCameraTarget(camera) {
+            if (Globals.get("cameraTypeToUse") === "show-desktop-vr") {
+                // A rigged camera. Average two looking vectors.
+                var leftCamera = camera.leftCamera;
+                var rightCamera = camera.rightCamera;
+                var vec1 = leftCamera.getTarget().subtract(leftCamera.position).normalize();
+                var vec2 = rightCamera.getTarget().subtract(rightCamera.position).normalize();
+                return vec1.add(vec2).scale(0.5).normalize();
+            }
+            else {
+                return camera.getTarget();
+            }
+        }
         _onStartMove(camera) {
             /*
             Start the moving process from one sphere to the next. This function is
@@ -558,7 +594,7 @@ define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows",
             // Make sure everything hidden but present sphere.
             ViewerSphere.hideAll();
             this._nextViewerSphere.visibility = 1.0; // NOTE: Is this right?!?!?
-            this._pickDirectionAndStartMoving(camera.position, camera.getTarget());
+            this._pickDirectionAndStartMoving(camera.position, this._getCameraTarget(camera));
         }
         _whileCameraAutoMoving(deltaTime, camera) {
             /*

@@ -450,14 +450,53 @@ export class Camera {
         setInterval(() => {
             if (camera.controllers !== undefined) {
                 for (let i=0; i<camera.controllers.length; i++) {
-                    let mesh = camera.controllers[i]._mesh;
-                    
+                    let controller = camera.controllers[i];
+
+                    // Make sure controller mesh visible
+                    let mesh = controller._mesh;
                     if (mesh !== undefined) {
                         mesh.renderingGroupId = RenderingGroups.VisibleObjects;                        
                         for (let j=0; j<mesh._children.length; j++) {
                             let childMesh = mesh._children[j];
                             childMesh.renderingGroupId = RenderingGroups.VisibleObjects;
                         }
+                    }
+
+                    // detect controller click
+                    if (controller.onTriggerStateChangedObservable._observers.length === 0) {
+                        controller.onTriggerStateChangedObservable.add((stateObject) => {
+                            let state = (stateObject.pressed || stateObject.touched);
+                            this._mouseDownState = state;  // Pretend it's a mouse click
+                        });    
+                    }
+
+                    // if (controller.onPadValuesChangedObservable._observers.length === 0) {
+                    //     controller.onPadValuesChangedObservable.add((stateObject) => {
+                    //         let state = ((stateObject.x !== 0) || (stateObject.touched !== 0));
+                    //         this._mouseDownState = state;  // Pretend it's a mouse click
+                    //     });    
+                    // }
+
+                    if (controller.onPadStateChangedObservable._observers.length === 0) {
+                        controller.onPadStateChangedObservable.add((stateObject) => {
+                            let state = (stateObject.pressed || stateObject.touched);
+                            this._mouseDownState = state;  // Pretend it's a mouse click
+                        });    
+                    }
+
+                    if (controller.onSecondaryButtonStateChangedObservable._observers.length === 0) {
+                        controller.onSecondaryButtonStateChangedObservable.add((stateObject) => {
+                            let state = (stateObject.pressed || stateObject.touched);
+                            this._mouseDownState = state;  // Pretend it's a mouse click
+                        });    
+                    }
+
+                    if (controller.onMainButtonStateChangedObservable._observers.length === 0) {
+                        controller.onMainButtonStateChangedObservable.add((stateObject) => {
+                            // I don't think it's possible to trigger this on the Vive...
+                            let state = (stateObject.pressed || stateObject.touched);
+                            this._mouseDownState = state;  // Pretend it's a mouse click
+                        });    
                     }
                 }
             }
@@ -665,6 +704,19 @@ export class Camera {
         this._onStartMove(camera);
     }
 
+    private _getCameraTarget(camera): any {
+        if (Globals.get("cameraTypeToUse") === "show-desktop-vr") {
+            // A rigged camera. Average two looking vectors.
+            var leftCamera = camera.leftCamera;
+            var rightCamera = camera.rightCamera;
+            var vec1 = leftCamera.getTarget().subtract(leftCamera.position).normalize();
+            var vec2 = rightCamera.getTarget().subtract(rightCamera.position).normalize();
+            return vec1.add(vec2).scale(0.5).normalize();
+        } else {
+            return camera.getTarget();
+        }
+    }
+
     private _onStartMove(camera): void {
         /*
         Start the moving process from one sphere to the next. This function is
@@ -676,7 +728,7 @@ export class Camera {
         // Make sure everything hidden but present sphere.
         ViewerSphere.hideAll();
         this._nextViewerSphere.visibility = 1.0;  // NOTE: Is this right?!?!?
-        this._pickDirectionAndStartMoving(camera.position, camera.getTarget());
+        this._pickDirectionAndStartMoving(camera.position, this._getCameraTarget(camera));
     }
 
     private _whileCameraAutoMoving(deltaTime: number, camera: any): void {
