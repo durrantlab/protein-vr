@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 define(["require", "exports", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup", "./scene/Camera/Camera", "./Spheres/SphereCollection"], function (require, exports, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup, Camera, SphereCollection) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+=======
+define(["require", "exports", "./sphere_material/MaterialLoader", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup"], function (require, exports, MaterialLoader, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup) {
+>>>>>>> a9a136ec8e19b168938dd1f0b51da02a5c071866
     Globals.set("jQuery", jQuery);
     Globals.set("BABYLON", BABYLON);
     var callbacksComplete = [];
@@ -66,6 +70,7 @@ define(["require", "exports", "./config/UserVars", "./config/SettingsPanel", "./
                 UserVars.setupDefaults();
                 SettingsPanel.allowUserToModifySettings();
                 // Load babylon file and set up scene.
+<<<<<<< HEAD
                 SceneSetup.loadBabylonFile();
                 // Load proteinVR-specific json file, in two parts because certain
                 // dependencies required for second half but not first.
@@ -76,6 +81,30 @@ define(["require", "exports", "./config/UserVars", "./config/SettingsPanel", "./
                 SphereCollection.create();
                 // Set up the camera.
                 Camera.setup();
+=======
+                // SceneSetup.loadBabylonFile
+                let sceneCreated = SceneSetup.loadBabylonFile()
+                    .then((fulfilled) => Promise.resolve("DONE: Scene created, babylon file loaded"));
+                // Load proteinVR-specific json file
+                // PVRJsonSetup.loadJSON
+                let PVRJsonLoadingStarted = PVRJsonSetup.loadJSON()
+                    .then((fulfilled) => Promise.resolve("DONE: PVR json loading started"));
+                // Babylon file and PVR Json loaded? Position guidespheres and
+                // make some meshes clickable.
+                // SceneSetup.loadBabylonFile + PVRJsonSetup.loadJSON => PVRJsonSetup.afterSceneLoaded
+                let proteinVRJsonDone = Promise.all([sceneCreated, PVRJsonLoadingStarted])
+                    .then((fulfilled) => {
+                    // Start loading the frames here... no need to resolve it
+                    MaterialLoader.getFramePromises()
+                        .then((fulfilled) => {
+                    });
+                    // In parallel, continue the JSON sestup now that the scene is
+                    // loaded.
+                    return PVRJsonSetup.afterSceneLoaded();
+                }).then((fulfilled) => Promise.resolve("DONE: PVR Json loading finished (after scene)"));
+                Promise.all([proteinVRJsonDone, allUserVarsAvailable])
+                    .then((fulfilled) => Globals.get("camera").setup());
+>>>>>>> a9a136ec8e19b168938dd1f0b51da02a5c071866
             }
         }
         _showDataUseWarningPanel(isMobile) {

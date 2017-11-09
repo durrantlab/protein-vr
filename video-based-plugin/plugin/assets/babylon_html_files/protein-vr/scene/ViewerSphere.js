@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 define(["require", "exports", "../config/Globals", "../Spheres/Sphere"], function (require, exports, Globals, Sphere_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -5,6 +6,10 @@ define(["require", "exports", "../config/Globals", "../Spheres/Sphere"], functio
     THIS;
     IN;
     TIME;
+=======
+/* Create the viewer spheres. */
+define(["require", "exports", "../config/Globals"], function (require, exports, Globals) {
+>>>>>>> a9a136ec8e19b168938dd1f0b51da02a5c071866
     var sphere_materials;
     function setup() {
         /*

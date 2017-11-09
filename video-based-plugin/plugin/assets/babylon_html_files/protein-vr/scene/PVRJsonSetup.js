@@ -1,7 +1,11 @@
 /* Get data about the scene from external json files. */
 define(["require", "exports", "../config/Globals", "../config/Globals", "./Animations/Animations"], function (require, exports, Globals, Globals_1, Animations) {
+<<<<<<< HEAD
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+=======
+    var data;
+>>>>>>> a9a136ec8e19b168938dd1f0b51da02a5c071866
     function loadJSON() {
         /*
         Load data about the scene from external json files.

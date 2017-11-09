@@ -1,10 +1,9 @@
 define(["require", "exports", "./UserVars", "./Globals"], function (require, exports, UserVars, Globals) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     function allowUserToModifySettings() {
         /*
         Setup and show the settings panel.
         */
+<<<<<<< HEAD
         if (Globals.delayExec(allowUserToModifySettings, ["DefaultUserVarsSet"], "allowUserToModifySettings", this)) {
             return;
         }
@@ -98,6 +97,69 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
         // ???
         addJavaScript(() => {
             Globals.milestone("UserSettingsSpecifiedDialogClosed", true);
+=======
+        return new Promise((resolve) => {
+            let jQuery = Globals.get("jQuery");
+            // Add div to contain all settings.
+            jQuery("body").append(`<div id="settings_panel"></div>`);
+            let settingsPanel = jQuery("#settings_panel");
+            // Make the settings panel fluid using bootstrap class
+            settingsPanel.addClass("container-fluid");
+            // Create the panel html
+            let html = panel('ProteinVR 1.0', `<div id="hardware-msg" class="alert alert-info">
+                Select your hardware setup:
+            </div>` +
+                panel("Hardware", 
+                //row_even_split(
+                // [3,4,5],
+                radioBoxes("Viewer", UserVars.paramNames["viewer"], ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>'])) /* +
+            panelCollapsible(
+                "Initial Performance Settings",
+                `<div id="settings-msg" class="alert alert-info">
+                    Initial performance settings. ProteinVR will adjust in game to maintain 30 frames per second.
+                </div>` +
+                row_thirds_split(
+                    [4, 4, 4],
+                    radioBoxes(
+                        "Textures",
+                        UserVars.paramNames["textures"],
+                        // [70, 85, 80]
+                    ),
+                    radioBoxes(
+                        "Objects",
+                        UserVars.paramNames["objects"],
+                        // [90, 85, 85]
+                    ),
+                    radioBoxes(
+                        "Fog",
+                        UserVars.paramNames["fog"],
+                        // [60, 55, 55]
+                    )
+                ) +
+                row_thirds_split(
+                    [4, 4, 4],
+                    radioBoxes(
+                        "Display",
+                        UserVars.paramNames["display"],
+                        // [70, 85, 80]
+                    ),
+                    radioBoxes(
+                        "Animations",
+                        UserVars.paramNames["animations"],
+                        // [70, 85, 80]
+                    ),
+                    ""
+                )
+            ) */
+                +
+                    `<button id="user_settings_continue_button" type="button" class="btn btn-primary">Continue</button>`);
+            // Add that HTML to the DOM.
+            settingsPanel.html(html);
+            // ???
+            addJavaScript(() => { resolve({ msg: "USER MODIFIED SETTINGS" }); });
+            // Set default or previously saved values on the GUI.
+            this.setGUIState();
+>>>>>>> a9a136ec8e19b168938dd1f0b51da02a5c071866
         });
         // Set default or previously saved values on the GUI.
         this.setGUIState();

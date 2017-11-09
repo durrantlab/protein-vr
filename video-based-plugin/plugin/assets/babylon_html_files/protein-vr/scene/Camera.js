@@ -1,4 +1,5 @@
 /* Things related to camera setup and movement. */
+<<<<<<< HEAD
 define(["require", "exports", "../config/Globals", "./Arrows", "../config/Globals", "../Spheres/SphereCollection"], function (require, exports, Globals, Arrows, Globals_1, SphereCollection) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -9,6 +10,87 @@ define(["require", "exports", "../config/Globals", "./Arrows", "../config/Global
     function setup() {
         /*
         Sets up the camera.
+=======
+define(["require", "exports", "../config/Globals", "./ViewerSphere", "./Arrows", "../config/Globals"], function (require, exports, Globals, ViewerSphere, Arrows, Globals_1) {
+    class CameraPoints {
+        constructor() {
+            /*
+            A class that keeps track of and processes the valid locations where the
+            camera can reside (i.e., at the centers of viewer spheres.)
+            */
+            this.data = [];
+        }
+        push(d) {
+            /*
+            Add a point to the list of camera points.
+    
+            :param CameraPointData d: The data point to add.
+            */
+            this.data.push(d);
+        }
+        _getValBasedOnCriteria(d, criteria = "distance") {
+            /*
+            Each camera data point contains several values (distance, angle,
+            score). This function retrieves a specific kind of value from a data
+            point.
+    
+            :param CameraPointData d: The data point to get data from.
+    
+            :param string criteria: The name of the kind of data to get. Defaults
+                          to "distance"
+    
+            :returns: The corresponding value.
+            :rtype: :class:`number`
+            */
+            let val;
+            switch (criteria) {
+                case "distance":
+                    return d.distance;
+                case "angle":
+                    return d.angle;
+                case "score":
+                    return d.score;
+                default:
+                    debugger;
+            }
+        }
+        sort(criteria = "distance") {
+            /*
+            Sorts the data points by a given criteria.
+    
+            :param string criteria: The criteria to use. "distance", "angle", or
+                          "score". Defaults to "distance".
+            */
+            this.data.sort(function (a, b) {
+                let aVal = this.This._getValBasedOnCriteria(a, this.criteria);
+                let bVal = this.This._getValBasedOnCriteria(b, this.criteria);
+                if (aVal < bVal) {
+                    return -1;
+                }
+                else if (aVal > bVal) {
+                    return 1;
+                }
+                else {
+                    return 0;
+                }
+            }.bind({
+                criteria: criteria,
+                This: this
+            }));
+        }
+        removeFirst() {
+            /*
+            Remove the first item presently in the list of data points. This
+            function is generally only useful if you've sorted the data points
+            first.
+            */
+            this.data.shift();
+        }
+        firstPoint() {
+            /*
+            Get the first item presently in the list of data points. This function
+            is generally only useful if you've sorted the data points first.
+>>>>>>> a9a136ec8e19b168938dd1f0b51da02a5c071866
     
         :returns: A promise to set up the camera.
         :rtype: :class:`any`
@@ -190,12 +272,28 @@ define(["require", "exports", "../config/Globals", "./Arrows", "../config/Global
         // rightBox.renderingGroupId = RenderingGroups.VisibleObjects;
         // leftBox.renderingGroupId = RenderingGroups.VisibleObjects;
     }
+<<<<<<< HEAD
     exports._setupWebVRFreeCamera = _setupWebVRFreeCamera;
     function _makeCameraReplaceActiveCamera(camera) {
         /*
         Attaches the camera to the scene, among other things. Note that this
         isn't used for WebVR camera, which must be attached to the canvas on
         user click.
+=======
+    class Camera {
+        constructor() {
+            this._mouseDownState = false;
+            this._keyPressedState = undefined;
+            this._firstRender = true;
+            this._speedInUnitsPerSecond = 1;
+            this._lastMovementTime = (new Date).getTime();
+            this._msUntilNextMoveAllowed = 0;
+            this._cameraCurrentlyAutoMoving = false;
+        }
+        setup() {
+            /*
+            Sets up the camera.
+>>>>>>> a9a136ec8e19b168938dd1f0b51da02a5c071866
     
         :param any camera: The BABYLON camera to attach.
         */
@@ -220,6 +318,7 @@ define(["require", "exports", "../config/Globals", "./Arrows", "../config/Global
         if (scene.activeCamera.dispose) {
             scene.activeCamera.dispose();
         }
+<<<<<<< HEAD
         // Set the new (VR) camera to be active
         scene.activeCamera = camera;
         // Attach that camera to the canvas.
@@ -236,6 +335,127 @@ define(["require", "exports", "../config/Globals", "./Arrows", "../config/Global
         if (Globals.get("cameraTypeToUse") !== "show-desktop-vr") {
             // Because if it's desktop VR, this function will be bound AFTER the first click (which starts the VR camera).
             _setupMouseClick();
+=======
+        _setupWebVRFreeCamera() {
+            /*
+            Sets up the WebVR camera. Good for folks using Oculus Rift or HTC Vive
+            on their desktops.
+            */
+            // This code untested, but designed for stuff like Oculus rift.
+            let scene = Globals.get("scene");
+            let canvas = Globals.get("canvas");
+            let BABYLON = Globals.get("BABYLON");
+            let jQuery = Globals.get("jQuery");
+            // I feel like I should have to do the below... Why don't the defaults work?
+            // var metrics = BABYLON.VRCameraMetrics.GetDefault();
+            // According to this page, best practices include feature detection to
+            // pick the camera: http://playground.babylonjs.com/#QWIJYE#1 ;
+            // http://www.html5gamedevs.com/topic/31454-webvrfreecameraid-vs-vrdeviceorientationfreecamera/?tab=comments#comment-180688
+            let camera;
+            if (navigator.getVRDisplays) {
+                camera = new BABYLON.WebVRFreeCamera("webVRFreeCamera", scene.activeCamera.position, scene);
+            }
+            else {
+                camera = new BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", scene.activeCamera.position, scene);
+            }
+            // Keep the below because I think I'll use it in the future...
+            // Detect when controllers are attached.
+            // camera.onControllersAttachedObservable.add(function() {
+            //     console.log(camera.controllers, "DFDF")
+            //     camera.controllers.forEach(function(gp) {
+            //         console.log(gp);
+            //         // console.log("YO", gp);
+            //         // let mesh = gp.hand === 'right' ? rightBox : leftBox;
+            //         // gp.onPadValuesChangedObservable.add(function (stateObject) {
+            //             // let r = (stateObject.x + 1) / 2;
+            //             // let g = (stateObject.y + 1) / 2;
+            //             // mesh.material.diffuseColor.copyFromFloats(r, g, 1);
+            //         // });
+            //         // gp.onTriggerStateChangedObservable.add(function (stateObject) {
+            //             // let scale = 2 - stateObject.value;
+            //             // mesh.scaling.x = scale;
+            //         // });
+            //         // oculus only
+            //         /*gp.onSecondaryTriggerStateChangedObservable.add(function (stateObject) {
+            //             let scale = 2 - stateObject.value;
+            //             mesh.scaling.z = scale;
+            //         });*/
+            //         // gp.attachToMesh(mesh);
+            //     });
+            // });
+            // Detect when controllers are attached. Dumb that I can't get onControllersAttachedObservable to work.
+            setInterval(() => {
+                if (camera.controllers !== undefined) {
+                    for (let i = 0; i < camera.controllers.length; i++) {
+                        let controller = camera.controllers[i];
+                        // Make sure controller mesh visible
+                        let mesh = controller._mesh;
+                        if (mesh !== undefined) {
+                            mesh.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects;
+                            for (let j = 0; j < mesh._children.length; j++) {
+                                let childMesh = mesh._children[j];
+                                childMesh.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects;
+                            }
+                        }
+                        // detect controller click
+                        if (controller.onTriggerStateChangedObservable._observers.length === 0) {
+                            controller.onTriggerStateChangedObservable.add((stateObject) => {
+                                let state = (stateObject.pressed || stateObject.touched);
+                                this._mouseDownState = state; // Pretend it's a mouse click
+                            });
+                        }
+                        // if (controller.onPadValuesChangedObservable._observers.length === 0) {
+                        //     controller.onPadValuesChangedObservable.add((stateObject) => {
+                        //         let state = ((stateObject.x !== 0) || (stateObject.touched !== 0));
+                        //         this._mouseDownState = state;  // Pretend it's a mouse click
+                        //     });    
+                        // }
+                        if (controller.onPadStateChangedObservable._observers.length === 0) {
+                            controller.onPadStateChangedObservable.add((stateObject) => {
+                                let state = (stateObject.pressed || stateObject.touched);
+                                this._mouseDownState = state; // Pretend it's a mouse click
+                            });
+                        }
+                        if (controller.onSecondaryButtonStateChangedObservable._observers.length === 0) {
+                            controller.onSecondaryButtonStateChangedObservable.add((stateObject) => {
+                                let state = (stateObject.pressed || stateObject.touched);
+                                this._mouseDownState = state; // Pretend it's a mouse click
+                            });
+                        }
+                        if (controller.onMainButtonStateChangedObservable._observers.length === 0) {
+                            controller.onMainButtonStateChangedObservable.add((stateObject) => {
+                                // I don't think it's possible to trigger this on the Vive...
+                                let state = (stateObject.pressed || stateObject.touched);
+                                this._mouseDownState = state; // Pretend it's a mouse click
+                            });
+                        }
+                    }
+                }
+            }, 1000);
+            // note that you're not calling _makeCameraReplaceActiveCamera. That's
+            // because that will attach the camera, but you don't want that to
+            // happen until after user clicks again.
+            scene.activeCamera = camera;
+            scene.onPointerDown = () => {
+                scene.onPointerDown = undefined;
+                // scene.onPointerDown = () => {
+                //     camera.initControllers();
+                // }
+                // Attach that camera to the canvas.
+                scene.activeCamera.attachControl(canvas, true);
+                // In case they want to look through desktop VR but navigate with mouse?
+                this._setupMouseClick();
+            };
+            // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
+            // var rightBox = BABYLON.Mesh.CreateBox("sphere1", 0.1, scene);
+            // rightBox.scaling.copyFromFloats(2, 1, 2);
+            // var leftBox = BABYLON.Mesh.CreateBox("sphere1", 0.1, scene);
+            // leftBox.scaling.copyFromFloats(2, 1, 2);
+            // rightBox.material = new BABYLON.StandardMaterial('right', scene);
+            // leftBox.material = new BABYLON.StandardMaterial('right', scene);
+            // rightBox.renderingGroupId = RenderingGroups.VisibleObjects;
+            // leftBox.renderingGroupId = RenderingGroups.VisibleObjects;
+>>>>>>> a9a136ec8e19b168938dd1f0b51da02a5c071866
         }
         // Now keyboard
         // No arrow navigation on camera. You'll redo custom.
@@ -324,8 +544,35 @@ define(["require", "exports", "../config/Globals", "./Arrows", "../config/Global
         else {
             result = (_keyPressedState === undefined) && (_firstRender === false);
         }
+<<<<<<< HEAD
         if (result) {
             return;
+=======
+        _getCameraTarget(camera) {
+            if (Globals.get("cameraTypeToUse") === "show-desktop-vr") {
+                // A rigged camera. Average two looking vectors.
+                var leftCamera = camera.leftCamera;
+                var rightCamera = camera.rightCamera;
+                var vec1 = leftCamera.getTarget().subtract(leftCamera.position).normalize();
+                var vec2 = rightCamera.getTarget().subtract(rightCamera.position).normalize();
+                return vec1.add(vec2).scale(0.5).normalize();
+            }
+            else {
+                return camera.getTarget();
+            }
+        }
+        _onStartMove(camera) {
+            /*
+            Start the moving process from one sphere to the next. This function is
+            fired only once, at beginning of moving (not every frame).
+    
+            :param ??? camera: The BABYLON camera.
+            */
+            // Make sure everything hidden but present sphere.
+            ViewerSphere.hideAll();
+            this._nextViewerSphere.visibility = 1.0; // NOTE: Is this right?!?!?
+            this._pickDirectionAndStartMoving(camera.position, this._getCameraTarget(camera));
+>>>>>>> a9a136ec8e19b168938dd1f0b51da02a5c071866
         }
         // If you get here, you're ready to start moving, and the user
         // actually wants to move.
