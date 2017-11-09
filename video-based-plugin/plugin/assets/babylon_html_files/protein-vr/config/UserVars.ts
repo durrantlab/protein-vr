@@ -135,51 +135,46 @@ paramDefaults["desktop"]["device"] = devices["Desktop"];
 /**
  * This function will assign values to the system variables based on user input.
  */
-export function setup(): Promise<any> {
+export function setupDefaults(): void {
     /*
     Setup the user variables (defaults and any in local storage).
-
-    :returns: A promise to set up the user variables.
-    :rtype: :class:`string`
     */
 
-    return new Promise((resolve) => {
-        // Default values before anything. For now just use laptop defaults,
-        // but in future would be good to detect device...
-        var userVars: userVarsInterface;
-        let isMobile = Globals.get("isMobile");
-        
-        if (isMobile){
-            userVars = paramDefaults["mobile"];
-        } else {
-            userVars = paramDefaults["laptop"];
-        }
+    // Default values before anything. For now just use laptop defaults,
+    // but in future would be good to detect device...
+    var userVars: userVarsInterface;
+    let isMobile = Globals.get("isMobile");
+    
+    if (isMobile){
+        userVars = paramDefaults["mobile"];
+    } else {
+        userVars = paramDefaults["laptop"];
+    }
 
-        // Here you overwrite with values from params.json. At this point,
-        // this is just the proteinvr scene to use.
-        let keys = Object.keys(userVars);
-        for (let i = 0; i < keys.length; i++) {
-            let key = keys[i];
-            let val = stringToEnumVal(userVars[key]);
+    // Here you overwrite with values from params.json. At this point,
+    // this is just the proteinvr scene to use.
+    let keys = Object.keys(userVars);
+    for (let i = 0; i < keys.length; i++) {
+        let key = keys[i];
+        let val = stringToEnumVal(userVars[key]);
+        userVars[key] = val;
+    }
+
+    // Now overwrite with copies from localstorage if you've got them.
+    let localStorageParams = getLocalStorageParams();
+    keys = Object.keys(localStorageParams);
+    for (let i = 0; i < keys.length; i++) {
+        let key = keys[i];
+        if (["scenePath"].indexOf(key) === -1) {  // Some parameters should never be overwritten from localstorage
+            let val = stringToEnumVal(localStorageParams[key]);
             userVars[key] = val;
         }
+    }
 
-        // Now overwrite with copies from localstorage if you've got them.
-        let localStorageParams = getLocalStorageParams();
-        keys = Object.keys(localStorageParams);
-        for (let i = 0; i < keys.length; i++) {
-            let key = keys[i];
-            if (["scenePath"].indexOf(key) === -1) {  // Some parameters should never be overwritten from localstorage
-                let val = stringToEnumVal(localStorageParams[key]);
-                userVars[key] = val;
-            }
-        }
+    // Save to local storage what you've got so far.
+    saveLocalStorageParams(userVars);
 
-        // Save to local storage what you've got so far.
-        saveLocalStorageParams(userVars);
-
-        resolve({msg: "USERVARS SET UP"});
-    });
+    Globals.milestone("DefaultUserVarsSet", true);
 }
 
 export function getLocalStorageParams(): any {

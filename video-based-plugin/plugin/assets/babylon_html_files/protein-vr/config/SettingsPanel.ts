@@ -3,119 +3,122 @@ import * as Globals from "./Globals";
 
 declare var PVRGlobals;
 
-export function allowUserToModifySettings(): any {
+export function allowUserToModifySettings() { //: any {
     /*
     Setup and show the settings panel.
-
-    :returns: A promise to setup and show the settings panel.
-    :rtype: :class:`Promise`
     */
 
-    return new Promise((resolve) => {
-        let jQuery = Globals.get("jQuery");
-    
-        // Add div to contain all settings.
-        jQuery("body").append(`<div id="settings_panel"></div>`)
-        let settingsPanel = jQuery("#settings_panel");
-    
-        // Make the settings panel fluid using bootstrap class
-        settingsPanel.addClass("container-fluid");
-    
-        // Create the panel html
-        let html = panel(
-            'ProteinVR 1.0', 
-            `<div id="hardware-msg" class="alert alert-info">
-                Select your hardware setup:
-            </div>` + 
-            panel(
-                "Hardware", 
-                //row_even_split(
-                    // [3,4,5],
-                    radioBoxes(
-                        "Viewer",
-                        UserVars.paramNames["viewer"],
-                        ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>']
-                        // [85, 115]
-                    )
-                    /* radioBoxes(
-                        "Audio",
-                        UserVars.paramNames["audio"],
-                        ['<i class="icon-speaker"></i>', '<i class="icon-headphones"></i>', '<span class="glyphicon glyphicon-volume-off" aria-hidden=true></span>']
-                        // [100, 120, 75]
-                    )*/
-                /*) +
-                row_even_split(
-                    radioBoxes(
-                        "Device",
-                        UserVars.paramNames["device"],
-                        ['<i class="icon-iphone"></i>', '<i class="icon-laptop"></i>', '<i class="icon-connectedpc"></i>']
-                        // [100, 100, 100]
-                    ), "" */ /*,
-                    radioBoxes(
-                        "Moving",
-                        UserVars.paramNames["moving"],
-                        ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
-                        // [100, 100, 100]
-                    )  + radioBoxes(  // commented out because of simplified UI
-                        "Looking",
-                        UserVars.paramNames["looking"],
-                        ['<i class="icon-mouse"></i>', '<i class="icon-hand-up"></i>'] //, '<i class="icon-connectedpc"></i>']
-                        // [100, 100, 100]
-                    ) */ /*,
-                )*/
-            ) /* + 
-            panelCollapsible(
-                "Initial Performance Settings",
-                `<div id="settings-msg" class="alert alert-info">
-                    Initial performance settings. ProteinVR will adjust in game to maintain 30 frames per second.
-                </div>` +
-                row_thirds_split(
-                    [4, 4, 4],
-                    radioBoxes(
-                        "Textures",
-                        UserVars.paramNames["textures"],
-                        // [70, 85, 80]
-                    ),
-                    radioBoxes(
-                        "Objects",
-                        UserVars.paramNames["objects"],
-                        // [90, 85, 85]
-                    ),
-                    radioBoxes(
-                        "Fog",
-                        UserVars.paramNames["fog"],
-                        // [60, 55, 55]
-                    )
-                ) + 
-                row_thirds_split(
-                    [4, 4, 4],
-                    radioBoxes(
-                        "Display",
-                        UserVars.paramNames["display"],
-                        // [70, 85, 80]
-                    ),
-                    radioBoxes(
-                        "Animations",
-                        UserVars.paramNames["animations"],
-                        // [70, 85, 80]
-                    ),
-                    ""
-                )
-            ) */ + 
-            `<button id="user_settings_continue_button" type="button" class="btn btn-primary">Continue</button>`
-            // <button id="broadcast_game_button" style="display: none;" type="button" class="btn btn-primary">Broadcast</button>`
-        );
-    
-        // Add that HTML to the DOM.
-        settingsPanel.html(html);
-    
-        // ???
-        addJavaScript(() => {resolve({msg: "USER MODIFIED SETTINGS"})});
-    
-        // Set default or previously saved values on the GUI.
-        this.setGUIState();
-    });
+    if (Globals.delayExec(allowUserToModifySettings,
+                          ["DefaultUserVarsSet"], 
+                          "allowUserToModifySettings", 
+                          this)) {
+        return;
+    }
 
+    let jQuery = Globals.get("jQuery");
+
+    // Add div to contain all settings.
+    jQuery("body").append(`<div id="settings_panel"></div>`)
+    let settingsPanel = jQuery("#settings_panel");
+
+    // Make the settings panel fluid using bootstrap class
+    settingsPanel.addClass("container-fluid");
+
+    // Create the panel html
+    let html = panel(
+        'ProteinVR 1.0', 
+        `<div id="hardware-msg" class="alert alert-info">
+            Select your hardware setup:
+        </div>` + 
+        panel(
+            "Hardware", 
+            //row_even_split(
+                // [3,4,5],
+                radioBoxes(
+                    "Viewer",
+                    UserVars.paramNames["viewer"],
+                    ['<i class="icon-imac"></i>', '<i class="icon-glassesalt"></i>']
+                    // [85, 115]
+                )
+                /* radioBoxes(
+                    "Audio",
+                    UserVars.paramNames["audio"],
+                    ['<i class="icon-speaker"></i>', '<i class="icon-headphones"></i>', '<span class="glyphicon glyphicon-volume-off" aria-hidden=true></span>']
+                    // [100, 120, 75]
+                )*/
+            /*) +
+            row_even_split(
+                radioBoxes(
+                    "Device",
+                    UserVars.paramNames["device"],
+                    ['<i class="icon-iphone"></i>', '<i class="icon-laptop"></i>', '<i class="icon-connectedpc"></i>']
+                    // [100, 100, 100]
+                ), "" */ /*,
+                radioBoxes(
+                    "Moving",
+                    UserVars.paramNames["moving"],
+                    ['<i class="icon-upright"></i>', '<i class="icon-manalt"></i>', '<i class="icon-lightning"></i>'] //, '<i class="icon-connectedpc"></i>']
+                    // [100, 100, 100]
+                )  + radioBoxes(  // commented out because of simplified UI
+                    "Looking",
+                    UserVars.paramNames["looking"],
+                    ['<i class="icon-mouse"></i>', '<i class="icon-hand-up"></i>'] //, '<i class="icon-connectedpc"></i>']
+                    // [100, 100, 100]
+                ) */ /*,
+            )*/
+        ) /* + 
+        panelCollapsible(
+            "Initial Performance Settings",
+            `<div id="settings-msg" class="alert alert-info">
+                Initial performance settings. ProteinVR will adjust in game to maintain 30 frames per second.
+            </div>` +
+            row_thirds_split(
+                [4, 4, 4],
+                radioBoxes(
+                    "Textures",
+                    UserVars.paramNames["textures"],
+                    // [70, 85, 80]
+                ),
+                radioBoxes(
+                    "Objects",
+                    UserVars.paramNames["objects"],
+                    // [90, 85, 85]
+                ),
+                radioBoxes(
+                    "Fog",
+                    UserVars.paramNames["fog"],
+                    // [60, 55, 55]
+                )
+            ) + 
+            row_thirds_split(
+                [4, 4, 4],
+                radioBoxes(
+                    "Display",
+                    UserVars.paramNames["display"],
+                    // [70, 85, 80]
+                ),
+                radioBoxes(
+                    "Animations",
+                    UserVars.paramNames["animations"],
+                    // [70, 85, 80]
+                ),
+                ""
+            )
+        ) */ + 
+        `<button id="user_settings_continue_button" type="button" class="btn btn-primary">Continue</button>`
+        // <button id="broadcast_game_button" style="display: none;" type="button" class="btn btn-primary">Broadcast</button>`
+    );
+
+    // Add that HTML to the DOM.
+    settingsPanel.html(html);
+
+    // ???
+    addJavaScript(() => {
+        Globals.milestone("UserSettingsSpecifiedDialogClosed", true);
+    });
+    
+    // Set default or previously saved values on the GUI.
+    this.setGUIState();
 }
 
 function panel(title: string, html: string): string {

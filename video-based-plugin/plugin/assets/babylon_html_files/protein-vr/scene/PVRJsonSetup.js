@@ -2,41 +2,25 @@
 define(["require", "exports", "../config/Globals", "../config/Globals", "./Animations/Animations"], function (require, exports, Globals, Globals_1, Animations) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var data;
     function loadJSON() {
         /*
         Load data about the scene from external json files.
-    
-        :returns: A promise to load that external json data.
         */
         let jQuery = Globals.get("jQuery");
         let BABYLON = Globals.get("BABYLON");
-        return new Promise((resolve) => {
-            jQuery.get("data.json", (_data) => {
-                data = _data;
-                // Load camera tracks data
-                let cameraPositions = [];
-                let sphereMaterials = []; // For storage now.
-                for (let i = 0; i < data["cameraPositions"].length; i++) {
-                    let pt = data["cameraPositions"][i];
-                    let v = new BABYLON.Vector3(pt[0], pt[2], pt[1]); // note that Y and Z axes are switched on purpose.
-                    cameraPositions.push(v);
-                    sphereMaterials.push(null);
-                }
-                Globals.set("cameraPositions", cameraPositions);
-                Globals.set("sphereMaterials", sphereMaterials);
-                // Load data about where to put signs.
-                let signData = [];
-                for (let i = 0; i < data["signs"].length; i++) {
-                    signData.push(data["signs"][i]);
-                }
-                Globals.set("signData", signData);
-                // Load animation data
-                Globals.set("animationData", data["animations"]);
-                Globals.set("firstFrameIndex", data["firstFrameIndex"]);
-                Globals.set("lastFrameIndex", data["lastFrameIndex"]);
-                resolve({ msg: "LOADED PROTIENVR JSON" });
-            });
+        jQuery.get("data.json", (_data) => {
+            exports.JSONData = _data;
+            // Load data about where to put signs.
+            let signData = [];
+            for (let i = 0; i < exports.JSONData["signs"].length; i++) {
+                signData.push(exports.JSONData["signs"][i]);
+            }
+            Globals.set("signData", signData);
+            // Load animation data
+            Globals.set("animationData", exports.JSONData["animations"]);
+            Globals.set("firstFrameIndex", exports.JSONData["firstFrameIndex"]);
+            Globals.set("lastFrameIndex", exports.JSONData["lastFrameIndex"]);
+            Globals.milestone("DataJsonLoadingStarted", true);
         });
     }
     exports.loadJSON = loadJSON;
@@ -44,47 +28,46 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Anima
         /*
         Runs after the scene has loaded. Adds guid spheres, clickable files,
         animated objects, etc.
-    
-        :returns: A promise to do all that stuff.
         */
-        return new Promise((resolve) => {
-            if (Globals.get("debug")) {
-                _addGuideSpheres();
-            }
-            _loadClickableFiles();
-            _loadAnimatedObjects();
-            resolve({ msg: "LOADED PROTEINVR JSON AFTER BABYLON SCENE LOADED" });
-        });
+        if (Globals.delayExec(afterSceneLoaded, ["BabylonSceneLoaded", "DataJsonLoadingStarted"], "afterSceneLoaded", this)) {
+            return;
+        }
+        // if (Globals.get("debug")) {
+        //     _addGuideSpheres();
+        // }
+        _loadClickableFiles();
+        _loadAnimatedObjects();
+        Globals.milestone("DataJsonLoadingDone", true);
     }
     exports.afterSceneLoaded = afterSceneLoaded;
-    var _guideSpheres = [];
-    var _guideSphereSize = 0.02;
-    function _addGuideSpheres() {
-        /*
-        Adds guide spheres to the current scene. Useful for debugging. They show
-        the paths where the camera can move.
-        */
-        let BABYLON = Globals.get("BABYLON");
-        let scene = Globals.get("scene");
-        // Add in guide spheres.
-        let sphereMat = new BABYLON.StandardMaterial("sphereMat" + Math.random().toString(), scene);
-        sphereMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
-        sphereMat.specularColor = new BABYLON.Color3(0, 0, 0);
-        sphereMat.diffuseTexture = null;
-        sphereMat.emissiveTexture = null; //new BABYLON.Texture("dot.png", scene);
-        sphereMat.emissiveColor = new BABYLON.Color3(0.8, 0.8, 0.8);
-        for (let i = 0; i < data["cameraPositions"].length; i++) {
-            let sphereLoc = data["cameraPositions"][i];
-            let sphere = BABYLON.Mesh.CreateDisc("guide_sphere" + i.toString(), 0.05, 12, scene, false, BABYLON.Mesh.DEFAULTSIDE);
-            sphere.material = sphereMat;
-            sphere.position.x = sphereLoc[0];
-            sphere.position.y = sphereLoc[2]; // note y and z reversed.
-            sphere.position.z = sphereLoc[1];
-            sphere.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects;
-            sphere.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
-            _guideSpheres.push(sphere);
-        }
-    }
+    // var _guideSpheres = [];
+    // var _guideSphereSize: number = 0.02;
+    // function _addGuideSpheres(): void {
+    //     /*
+    //     Adds guide spheres to the current scene. Useful for debugging. They show
+    //     the paths where the camera can move. Doesn't work.
+    //     */
+    //     let BABYLON = Globals.get("BABYLON");
+    //     let scene = Globals.get("scene");
+    //     // Add in guide spheres.
+    //     let sphereMat = new BABYLON.StandardMaterial("sphereMat" + Math.random().toString(), scene);
+    //     sphereMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    //     sphereMat.specularColor = new BABYLON.Color3(0, 0, 0);
+    //     sphereMat.diffuseTexture = null;
+    //     sphereMat.emissiveTexture = null; //new BABYLON.Texture("dot.png", scene);
+    //     sphereMat.emissiveColor = new BABYLON.Color3(0.8, 0.8, 0.8);
+    //     for (let i=0; i<data["viewerSpheres"].count(); i++) {
+    //         let sphereLoc = data["viewerSpheres"].getByIndex(i).position;
+    //         let sphere = BABYLON.Mesh.CreateDisc("guide_sphere" + i.toString(), 0.05, 12, scene, false, BABYLON.Mesh.DEFAULTSIDE);
+    //         sphere.material = sphereMat;
+    //         sphere.position.x = sphereLoc[0];
+    //         sphere.position.y = sphereLoc[2];  // note y and z reversed.
+    //         sphere.position.z = sphereLoc[1];
+    //         sphere.renderingGroupId = RenderingGroups.VisibleObjects;
+    //         sphere.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+    //         _guideSpheres.push(sphere);
+    //     }
+    // }
     function _loadClickableFiles() {
         /*
         Load and setup clickable objects. These are hidden objects that can be
@@ -95,7 +78,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Anima
         let scene = Globals.get("scene");
         // Load extra obj files
         let loader = new BABYLON.AssetsManager(scene);
-        let objFilenames = data["clickableFiles"];
+        let objFilenames = exports.JSONData["clickableFiles"];
         for (let i = 0; i < objFilenames.length; i++) {
             let objFilename = objFilenames[i];
             let meshTask = loader.addMeshTask(objFilename + "_name", "", "", objFilename);
@@ -117,8 +100,8 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Anima
         let BABYLON = Globals.get("BABYLON");
         let scene = Globals.get("scene");
         let loader = new BABYLON.AssetsManager(scene);
-        for (var objName in data["animations"]) {
-            if (data["animations"].hasOwnProperty(objName)) {
+        for (var objName in exports.JSONData["animations"]) {
+            if (exports.JSONData["animations"].hasOwnProperty(objName)) {
                 let objFilename = objName + "_mesh.obj";
                 let meshTask = loader.addMeshTask(objFilename + "_name", "", "", objFilename);
                 meshTask.onSuccess = function (task) {

@@ -3,60 +3,54 @@
 declare var BABYLON;
 
 import * as UserVars from "../config/UserVars";
-import { Camera } from "./Camera";
 import * as Globals from "../config/Globals";
 import { RenderingGroups } from "../config/Globals";
-import { SphereMaterial } from "../sphere_material/SphereMaterial";
+import { Material } from "../Spheres/Material";
 import * as Arrows from "./Arrows";
 import { setupAllSigns } from "./Sign";
 
-export function loadBabylonFile(): Promise<any> {
+export function loadBabylonFile(): void {
     /*
     Loads and sets up the main scene.
-
-    :returns: A promise to load and set  up the scene.
-    :rtype: :class:`Promise<any>`
     */
 
-    return new Promise((resolve) => {
-        var engine = Globals.get("engine");
-        var scene = new BABYLON.Scene(engine);
-        Globals.set("scene", scene);
+    var engine = Globals.get("engine");
+    var scene = new BABYLON.Scene(engine);
+    Globals.set("scene", scene);
 
-        BABYLON.SceneLoader.Append("", "babylon.babylon", scene, () => {
-    
-            window.scrollTo(0, 1);  // supposed to autohide scroll bar.
-    
-            // Wait for textures and materials to be ready
-            scene.executeWhenReady(() => {
-                let camera = new Camera();
-                Globals.set("camera", camera);
+    BABYLON.SceneLoader.Append("", "babylon.babylon", scene, () => {
 
-                // Delay textures until needed. Cool, but too slow for our
-                // purposes here... Keep it commented out for now.
-                // newScene.useDelayedTextureLoading = true
+        window.scrollTo(0, 1);  // supposed to autohide scroll bar.
 
-                // Setup viewer sphere template
-                let radius = 12; // When using VR, this needs to be farther away that what it was rendered at. this._JSONData["viewerSphereSize"];
-                _setupViewerSphereTemplate(scene, radius);
-                
-                // Set up environmental (background) sphere
-                _setupEnvironmentalSphere(radius);
+        // Wait for textures and materials to be ready
+        scene.executeWhenReady(() => {
+            // Delay textures until needed. Cool, but too slow for our
+            // purposes here... Keep it commented out for now.
+            // newScene.useDelayedTextureLoading = true
 
-                // Setup arrows
-                Arrows.setup();
+            // Setup viewer sphere template
+            let radius = 12; // When using VR, this needs to be farther away that what it was rendered at. this._JSONData["viewerSphereSize"];
+            _setupViewerSphereTemplate(scene, radius);
+            
+            // Set up environmental (background) sphere
+            _setupEnvironmentalSphere(radius);
 
-                // Setup signs
-                setupAllSigns();
+            // Setup arrows
+            Arrows.setup();
 
-                // window.debugit = scene.debugLayer;
-                // scene.debugLayer.show();
-                
-                if (Globals.get("debug")) { scene.debugLayer.show(); }
-                resolve({msg: "BABYLON.BABYLON LOADED"});
-            });
+            // Setup signs
+            setupAllSigns();
+
+            // window.debugit = scene.debugLayer;
+            // window.scene = scene;
+            // scene.debugLayer.show();
+
+            scene.clearColor = new BABYLON.Color3(0, 0, 0);
+            
+            if (Globals.get("debug")) { scene.debugLayer.show(); }
+            Globals.milestone("BabylonSceneLoaded", true);
         });
-    })
+    });
 }
 
 export function getMeshThatContainsStr(str: string, scene: any): any {
@@ -118,7 +112,7 @@ function _setupEnvironmentalSphere(radius): void {
     backgroundSphere.isPickable = false;
     backgroundSphere.renderingGroupId = RenderingGroups.EnvironmentalSphere;
 
-    let sphereMaterial2 = new SphereMaterial('environment.png', false, () => {
+    let sphereMaterial2 = new Material('environment.png', true, () => {
         backgroundSphere.material = sphereMaterial2.material;
         Globals.set("backgroundSphere", backgroundSphere);
     });

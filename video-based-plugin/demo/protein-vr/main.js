@@ -1,4 +1,4 @@
-define(["require", "exports", "./sphere_material/MaterialLoader", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup"], function (require, exports, MaterialLoader, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup) {
+define(["require", "exports", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup", "./scene/Camera/Camera", "./Spheres/SphereCollection"], function (require, exports, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup, Camera, SphereCollection) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Globals.set("jQuery", jQuery);
@@ -58,41 +58,24 @@ define(["require", "exports", "./sphere_material/MaterialLoader", "./config/User
                 this._resizeWindow(); // resize canvas when browser resized.
                 let engine = new BABYLON.Engine(Globals.get("canvas"), true);
                 Globals.set("engine", engine); // second boolean is whether built-in smoothing will be used.
-                // Use promise to load user variables (both from json and
-                // specified via panel.)
-                // UserVars.setup => SettingsPanel.allowUserToModifySettings
-                // Collect user-variable promises
-                // UserVars.setup => SettingsPanel.allowUserToModifySettings
-                let allUserVarsAvailable = UserVars.setup()
-                    .then((fulfilled) => SettingsPanel.allowUserToModifySettings())
-                    .then((fulfilled) => Promise.resolve("DONE: Have all user variables"));
+                // Note that these functions are all "smart" in that they won't
+                // run unless previous milestones are met. I thought this was
+                // better than callbacks, and using promises got ackward too.
+                // Tricky when you have so many interdependencies.
+                // Collect user variables (default and specified)
+                UserVars.setupDefaults();
+                SettingsPanel.allowUserToModifySettings();
                 // Load babylon file and set up scene.
-                // SceneSetup.loadBabylonFile
-                let sceneCreated = SceneSetup.loadBabylonFile()
-                    .then((fulfilled) => Promise.resolve("DONE: Scene created, babylon file loaded"));
-                // Load proteinVR-specific json file
-                // PVRJsonSetup.loadJSON
-                let PVRJsonLoadingStarted = PVRJsonSetup.loadJSON()
-                    .then((fulfilled) => Promise.resolve("DONE: PVR json loading started"));
-                // Babylon file and PVR Json loaded? Position guidespheres and
-                // make some meshes clickable.
-                // SceneSetup.loadBabylonFile + PVRJsonSetup.loadJSON => PVRJsonSetup.afterSceneLoaded
-                let proteinVRJsonDone = Promise.all([sceneCreated, PVRJsonLoadingStarted])
-                    .then((fulfilled) => {
-                    // Start loading the frames here... no need to resolve it
-                    MaterialLoader.getFramePromises()
-                        .then((fulfilled) => {
-                    });
-                    // In parallel, continue the JSON sestup now that the scene is
-                    // loaded.
-                    return PVRJsonSetup.afterSceneLoaded();
-                }).then((fulfilled) => Promise.resolve("DONE: PVR Json loading finished (after scene)"));
-                Promise.all([proteinVRJsonDone, allUserVarsAvailable])
-                    .then((fulfilled) => Globals.get("camera").setup());
-                // .then((fulfilled) => this._startRenderLoop());
-                // loadBabylonFilePromiseDone.then((f) => {
-                //     console.log(f)
-                // })
+                SceneSetup.loadBabylonFile();
+                // Load proteinVR-specific json file, in two parts because certain
+                // dependencies required for second half but not first.
+                PVRJsonSetup.loadJSON();
+                PVRJsonSetup.afterSceneLoaded();
+                // Create the sphere objects (but doesn't necessarily load
+                // textures and meshes).
+                SphereCollection.create();
+                // Set up the camera.
+                Camera.setup();
             }
         }
         _showDataUseWarningPanel(isMobile) {
@@ -131,17 +114,6 @@ define(["require", "exports", "./sphere_material/MaterialLoader", "./config/User
                     let engine = Globals.get("engine");
                     let canvas = jQuery("canvas");
                     let scene = Globals.get("scene");
-                    // If it's an HTC vive or something, you need to attach the
-                    // canvas here. This is because it can only be done on user
-                    // interaction.
-                    // if (Globals.get("cameraTypeToUse") === "show-desktop-vr") {
-                    // console.log("Attaching. Camera set up already?");
-                    // let cameraObj = Globals.get("camera");
-                    // cameraObj._setupWebVRFreeCamera();
-                    // let camera = Globals.get("scene").activeCamera;
-                    // camera.attachControl(canvas);
-                    // console.log(cameraObj);
-                    // }
                     jQuery("#loading_panel").hide(); // fadeOut(() => {
                     canvas.show();
                     canvas.focus(); // to make sure keypresses work.
@@ -161,7 +133,7 @@ define(["require", "exports", "./sphere_material/MaterialLoader", "./config/User
             Start the function that runs with every frame.
             */
             // Once the scene is loaded, just register a render loop to render it
-            let camera = Globals.get("camera");
+            // let camera = Globals.get("camera");
             let scene = Globals.get("scene");
             let meshesWithAnimations = Globals.get("meshesWithAnimations");
             Globals.get("engine").runRenderLoop(() => {
@@ -169,7 +141,7 @@ define(["require", "exports", "./sphere_material/MaterialLoader", "./config/User
                 for (let i = 0; i < meshesWithAnimations.length; i++) {
                     meshesWithAnimations[i].PVRAnimation.updatePos();
                 }
-                camera.update();
+                Camera.update();
                 scene.render();
             });
         }

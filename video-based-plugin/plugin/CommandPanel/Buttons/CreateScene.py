@@ -181,7 +181,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.frame_end = self.scene.frame_end
 
         self.extra_data = {
-            "cameraPositions": [],
+            "spheres": [],
             "clickableFiles": [],
             "signs": []
         }
@@ -227,7 +227,14 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         for this_frame in range(self.frame_start, self.frame_end + 1):
             self.set_frame(this_frame)
             this_camera_pos = self.camera.location.copy()
-            self.extra_data["cameraPositions"].append([round(this_camera_pos.x, 3), round(this_camera_pos.y, 3), round(this_camera_pos.z, 3)])
+            self.extra_data["spheres"].append({
+                "position": [
+                    round(this_camera_pos.x, 3), 
+                    round(this_camera_pos.y, 3), 
+                    round(this_camera_pos.z, 3)
+                ],
+                "mesh": None  # For now...
+            })
 
     def _get_animation_keyframes(self, obj):
         pos_loc_data = OrderedDict()
@@ -483,12 +490,20 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 small_file_size = small_file_size + filesize
             else:
                 reg_file_size = reg_file_size + filesize
-            
-        json.dump(frame_file_names, open(self.frame_dir + "filenames.json",'w'))
-        json.dump({
+        
+        for i, frame_file_name in enumerate(frame_file_names):
+            self.extra_data["spheres"][i]["material"] = frame_file_names[i]
+
+        self.extra_data["filesizes"] = {
             "regular": reg_file_size,
             "small": small_file_size
-        }, open(self.frame_dir + "filesizes.json",'w'))
+        }
+
+        # json.dump(frame_file_names, open(self.frame_dir + "filenames.json",'w'))
+        # json.dump({
+        #     "regular": reg_file_size,
+        #     "small": small_file_size
+        # }, open(self.frame_dir + "filesizes.json",'w'))
 
     def _step_8_make_proteinvr_clickable_meshes(self):
         """
