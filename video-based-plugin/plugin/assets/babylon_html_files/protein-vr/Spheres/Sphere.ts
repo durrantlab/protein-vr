@@ -14,7 +14,7 @@ export class Sphere {
     public meshFileName: string;
     public material: Material;
     private _uniqueID: string;
-    private _sphereMesh: any;  // BABYLON.Mesh
+    private _sphereMesh: any = undefined;  // BABYLON.Mesh
 
     constructor(textureFileName: string, meshFileName: string, position: any) {
         /*
@@ -112,6 +112,10 @@ export class Sphere {
         this.opacity(0.0);
 
         callBack();
+    }
+
+    public meshLoaded(): boolean {
+        return !(this._sphereMesh === undefined);
     }
 
     public unloadAssets(): void {
