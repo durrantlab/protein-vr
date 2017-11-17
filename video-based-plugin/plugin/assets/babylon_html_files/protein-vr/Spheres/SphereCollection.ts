@@ -46,6 +46,10 @@ export function create(): void {
         // WILLIAM: IF i = 0, first sphere, so use currentSphere() as a setter
         // below. Can't do this based on opacity, because not material loaded
         // yet.
+        
+        if (i === 0) {
+            currentSphere(sphere);
+        }
     }
     
     // Start updating the loading progress bar
@@ -66,7 +70,15 @@ function _loadRelevantAssets(): void {
     // Here, load and destroy the assets, as appropriate. For now, we're
     // not doing lazy loading, so let's just load them all.
 
-    _loadAllAssets();
+    if (Globals.get("lazyLoadViewSpheres") === false) { // if Lazy Loading is NOT enabled
+        _loadAllAssets();   // simply load all assets up front
+    } else {    // otherwise Lazy Loading must BE enabled, so we trigger the lazy loading scheme for the first sphere
+        for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {    // counting from 0 to whatever global Lazy Loading count is specified to itterate over a CameraPoints object ordered by distance
+            if (_currentSphere.allNeighboringSpheresOrderedByDistance()[i].associatedViewerSphere._assetsLoaded === false) {    // if the sphere we are looking at (one of the 16 nearest to the first sphere) has not had its assets loaded yet (NOTE: this will always be true at this point)
+                _currentSphere.allNeighboringSpheresOrderedByDistance()[i].associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
+            }
+        }
+    }
 }
 
 function _loadAllAssets(): void {
