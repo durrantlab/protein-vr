@@ -38,10 +38,14 @@ export function create(): void {
         let sphereDatum = sphereData[i];
         let pt = sphereDatum["position"];
         let position = new BABYLON.Vector3(pt[0], pt[2], pt[1]);  // note that Y and Z axes are switched on purpose.
-        let textureFilename = sphereDatum["material"];
-        let meshFilename = sphereDatum["mesh"];
+        let textureFilename = sphereDatum["material"];  // filename of the PNG file.
+        let meshFilename = sphereDatum["mesh"];  // filename of mesh
         let sphere = new Sphere(textureFilename, meshFilename, position);
         _spheres.push(sphere);
+
+        // WILLIAM: IF i = 0, first sphere, so use currentSphere() as a setter
+        // below. Can't do this based on opacity, because not material loaded
+        // yet.
     }
     
     // Start updating the loading progress bar

@@ -254,7 +254,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
     def _list_of_nums_to_key(self, list_of_nums):
         return "_".join([str(i) for i in list_of_nums])
 
-    def _step_3_add_animated_objects_to_mesh_list_and_store_animation_data(self):
+    def _step_3_store_animation_data_of_obj_in_mesh_list(self):
         """
         Get all the objects that are currently visible, but have animations.
 
@@ -263,26 +263,14 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                          records the animation of the objects.
         """
         
-        # animation_data is a dictionary to hold location data of animated objects
+        # animation_data is a dictionary to hold location data of animated
+        # objects that are assigned MESH.
         animation_data = {}
 
-        # Looping through all objects for error checking to make sure an animated object was not placed in the wrong category
-        # for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
+        # Get the animation data for all animated MESH objects.
         for obj in self.objects_to_consider:
-            if obj.hide == False and obj.hide_render == False: 
-                pos_loc_data = self._get_animation_keyframes(obj)
-
-                keys = [self._list_of_nums_to_key(l) for l in pos_loc_data.values()]
-
-                keys = set(keys)  # Get unique keys
-                num_keyframes = len(keys)
-                if num_keyframes > 1: # Checking to see if object is animated
-                    self.object_categories["MESH"].append(obj) # If object is animated then, add to category MESH
-                    if obj in self.object_categories["STATIC"]:
-                        self.object_categories["STATIC"].remove(obj)
-                    if obj in self.object_categories["BACKGROUND"]:
-                        self.object_categories["BACKGROUND"].remove(obj)
-                    animation_data[obj.name] = pos_loc_data # Add location data to animation_data dictionary with key of object name
+            if obj.hide == False and obj.hide_render == False and obj in self.object_categories["MESH"]: 
+                animation_data[obj.name] = self._get_animation_keyframes(obj) # Add location data to animation_data dictionary with key of object name
 
         # Add in "animation data" of meshes that are not animted. Why? Because
         # when you export them, you'll export at the origin. You need to be
@@ -446,20 +434,29 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
             # Save that texture
             if len(texture_images) > 0:
-                image = texture_images[0]
-                image.alpha_mode = 'STRAIGHT'
-                image.filepath_raw = self.proteinvr_output_dir + obj.name + "_mesh.png"
-                image.file_format = 'PNG'
+                img = texture_images[0]
 
-                try:
-                    image.save()
-                except:
-                    Messages.send_message(
-                        "NODE_ERROR", 
-                        'Object "' + obj.name + '" has a texture node, but the texture is not .',
-                        operator=self
-                    )
-                    return False                    
+                # See https://blender.stackexchange.com/questions/3128/why-blender-throws-an-exception-when-saving-a-copy-of-image
+                filepath = self.proteinvr_output_dir + obj.name + "_mesh.png"
+
+                # Store current render settings
+                settings = bpy.context.scene.render.image_settings
+                format = settings.file_format
+                mode = settings.color_mode
+                depth = settings.color_depth
+
+                # Change render settings to our target format
+                settings.file_format = 'PNG'
+
+                # Save image to PNG, this does NOT render anything! It only
+                # means that the save command will use the current scene's
+                # render settings.
+                img.save_render(filepath)
+
+                # Restore previous render settings
+                settings.file_format = format
+                settings.color_mode = mode
+                settings.color_depth = depth             
             else:
                 Messages.send_message(
                     "NODE_ERROR", 
@@ -665,7 +662,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             return {'FINISHED'}
 
         self._step_2_get_camerea_positions()
-        self._step_3_add_animated_objects_to_mesh_list_and_store_animation_data()
+        self._step_3_store_animation_data_of_obj_in_mesh_list()
 
         if len(glob.glob(self.proteinvr_output_dir + "frames/*.png")) == 0:
             self._step_4_render_static_frames(debug)

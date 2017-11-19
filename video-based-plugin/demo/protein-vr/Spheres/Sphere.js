@@ -16,6 +16,7 @@ define(["require", "exports", "./Material", "../config/Globals", "./CameraPoints
             :param BABYLON.Vector3 position: The location of the sphere in 3D
                                    space.
             */
+            this._sphereMesh = undefined; // BABYLON.Mesh
             this._allNeighboringSpheresByDist = undefined;
             this._navNeighboringSpheresByDist = undefined;
             // Specify the meshFileName location and textureFileName location when
@@ -86,6 +87,9 @@ define(["require", "exports", "./Material", "../config/Globals", "./CameraPoints
             // Hide the sphere. In ViewerSphere.ts, show just the first one.
             this.opacity(0.0);
             callBack();
+        }
+        meshLoaded() {
+            return !(this._sphereMesh === undefined);
         }
         unloadAssets() {
             /*
