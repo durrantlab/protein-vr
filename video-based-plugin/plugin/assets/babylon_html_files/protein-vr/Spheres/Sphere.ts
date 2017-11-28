@@ -15,6 +15,7 @@ export class Sphere {
     public material: Material;
     private _uniqueID: string;
     private _sphereMesh: any = undefined;  // BABYLON.Mesh
+    public _assetsLoaded: boolean = false; // assets are not loaded to begin with
 
     constructor(textureFileName: string, meshFileName: string, position: any) {
         /*
@@ -78,6 +79,9 @@ export class Sphere {
                 this._loadMesh(callBack);
             });
         });
+
+        let _assetsLoaded = true; // assets have now been loaded
+
     }
 
     private _loadMesh(callBack = function() {}): void {
@@ -176,8 +180,8 @@ export class Sphere {
                 // this is where currentSphere is changed, so this is where we want to load in assets for local spheres if lazy loading is enabled
                 if (Globals.get("lazyLoadViewSpheres") === true) {  // if we are Lazy Loading...
                     for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {    // counting from 0 to whatever global Lazy Loading count is specified to itterate over a CameraPoints object ordered by distance to this Sphere
-                        if (this.allNeighboringSpheresOrderedByDistance()[i].associatedViewerSphere._assetsLoaded === false) {    // if the sphere we are looking at (one of the 16 nearest to the this one) has not yet had its assets loaded
-                            this.allNeighboringSpheresOrderedByDistance()[i].associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
+                        if (this.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere._assetsLoaded === false) {    // if the sphere we are looking at (one of the 16 nearest to the this one) has not yet had its assets loaded
+                            this.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
                         }
                     }
                 }
