@@ -99,16 +99,16 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         :param str filename: The filename of the png to compress.
         """
 
-        if self.scene.pngquant_path == "":
+        if self.scene.proteinvr_pngquant_path == "":
             return
 
-        if os.path.exists(self.scene.pngquant_path):
-            cmd = self.scene.pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
+        if os.path.exists(self.scene.proteinvr_pngquant_path):
+            cmd = self.scene.proteinvr_pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
             # print("RUN: " + cmd)
             os.system(cmd)
             os.rename(filename + '.tmp.png', filename)
         else:
-            print("WARNING: pngquant path not valid: " + self.scene.pngquant_path)        
+            print("WARNING: pngquant path not valid: " + self.scene.proteinvr_pngquant_path)        
 
     def _step_0_existing_files_check_ok_and_copy(self):
         """
@@ -205,14 +205,14 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             elif(obj.proteinvr_category == "mesh"):
                 self.object_categories["MESH"].append(obj) # Meshed = high quality objects, ALL ANIMATED objects are here, but some non animated can be in there if use wants high quality
 
-        # Make sure self.scene.pngquant_path contains executable file
-        if self.scene.pngquant_path != "":
+        # Make sure self.scene.proteinvr_pngquant_path contains executable file
+        if self.scene.proteinvr_pngquant_path != "":
             try:
-                subprocess.Popen(self.scene.pngquant_path, stderr=subprocess.PIPE)
+                subprocess.Popen(self.scene.proteinvr_pngquant_path, stderr=subprocess.PIPE)
             except:
                 Messages.send_message(
                     "PNGQUANT_ERROR", 
-                    'Error trying to execute ' + self.scene.pngquant_path,
+                    'Error trying to execute ' + self.scene.proteinvr_pngquant_path,
                     operator=self
                 )
                 return False
@@ -295,7 +295,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.scene.render.image_settings.file_format = 'PNG'
         self.scene.render.image_settings.color_mode = "RGBA"
         self.scene.render.image_settings.compression = 100
-        self.scene.render.image_settings.quality = self.scene.jpeg_quality
+        self.scene.render.image_settings.quality = self.scene.proteinvr_jpeg_quality
         self.scene.render.resolution_x = self.scene.proteinvr_bake_texture_size
         self.scene.render.resolution_y = self.scene.proteinvr_bake_texture_size
         self.scene.render.resolution_percentage = 100
@@ -562,7 +562,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             if o.name.startswith("ProteinVRSign"):
                 self.extra_data["signs"].append({
                     "location": list(o.location),
-                    "text": o.sign_text
+                    "text": o.proteinvr_sign_text
                 })
 
     def _step_10_generate_texture_babylon_and_manifest_files(self):
@@ -639,6 +639,67 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             babylon["materials"][0]["emissiveTexture"]["name"] = bsnm
             json.dump(babylon, open(filename + ".babylon", 'w'))
 
+    def _get_nearest_index(self, index, coors):
+        coor = numpy.array(self.extra_data["spheres"][index]["position"])
+        dists = coors - coor
+        dists = dists * dists
+        dists = numpy.sum(dists, axis=1)
+        return numpy.argmin(dists)
+
+    def _frame_to_coor(self, frame_index):
+        array_index = self._frame_index_to_array_index(frame_index)
+        return numpy.array(self.extra_data["spheres"][array_index]["position"])
+    
+    def _frame_index_to_array_index(self, frame_index):
+        return frame_index - self.extra_data["firstFrameIndex"]
+
+    def _step_11_get_neighboring_path_points(self):
+        # What frames are the path points?
+        path_data, frames_that_connect_back_to_main_path = Utils.garden_path_string_to_data()
+
+        # Make a dictionary to store path points. Store some frame-neighbor
+        # data. 
+        frame_neighbors = {}
+        for start_frame, end_frame in path_data:
+            for frame in range(start_frame, end_frame + 1):
+                frame_neighbors[frame] = []
+
+                if frame != start_frame:
+                    frame_neighbors[frame].append(frame - 1)
+                if frame != end_frame:
+                    frame_neighbors[frame].append(frame + 1)
+
+        # For each * frame, find the closest frame in the main path Now go
+        # back and find frames that should connect back to the main path.
+        for connecting_frame in frames_that_connect_back_to_main_path:
+            connecting_frame_coor = self._frame_to_coor(connecting_frame)
+            best_dist_squared = 1e10
+            best_main_path_frame = -1
+            for main_path_index in range(path_data[0][0], path_data[0][1] + 1):
+                main_path_coor = self._frame_to_coor(main_path_index)
+                dist_squared = connecting_frame_coor - main_path_coor
+                dist_squared = dist_squared * dist_squared
+                dist_squared = numpy.sum(dist_squared)
+                if dist_squared < best_dist_squared:
+                    best_dist_squared = dist_squared
+                    best_main_path_frame = main_path_index
+
+                # print(connecting_frame_coor, main_path_coor, dist_squared)
+
+            frame_neighbors[best_main_path_frame].append(connecting_frame)
+            frame_neighbors[connecting_frame].append(best_main_path_frame)
+
+        # Now you need to convert the frame indexes in frame_neighbors to array indexies
+        frame_neighbors_with_array_indices = {}
+        for frame_index in frame_neighbors.keys():
+            array_index = self._frame_index_to_array_index(frame_index)
+            frame_neighbors_with_array_indices[array_index] = list(set([
+                self._frame_index_to_array_index(fi) for fi in frame_neighbors[frame_index]
+            ]))
+        
+        # Save that to json
+        self.extra_data["nextMoves"] = frame_neighbors_with_array_indices
+    
     def execute(self, context):
         """
         Runs when button pressed.
@@ -669,11 +730,14 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         
         self._step_5_render_background_image()
 
+        print("Why this if-statement logic? (BELOW) Why not just throw an error?")
+
         if self._step_6_save_meshed_objects():
             self._step_7_save_filenames_and_filesizes()
             self._step_8_make_proteinvr_clickable_meshes()
             self._step_9_save_signs()
-            self._step_10_generate_texture_babylon_and_manifest_files()
+            self._step_10_generate_texture_babylon_and_manifest_files()    
+            self._step_11_get_neighboring_path_points()
 
             json.dump(
                 self.extra_data, 

@@ -25,8 +25,8 @@ import glob
 os.mkdir("./output/")
 bpy.context.scene.proteinvr_output_dir = os.path.abspath("./output/") + os.sep
 
-# Make it so pngquant_path path doesn't exist. You'll do it separately...
-bpy.context.scene.pngquant_path = "" # "/usr/bin/pngquant"
+# Make it so proteinvr_pngquant_path path doesn't exist. You'll do it separately...
+bpy.context.scene.proteinvr_pngquant_path = "" # "/usr/bin/pngquant"
 
 # Make it so mobile won't be rendered. You'll do it separately...
 mobile_res = bpy.context.scene.proteinvr_mobile_bake_texture_size

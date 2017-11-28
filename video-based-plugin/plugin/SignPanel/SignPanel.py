@@ -46,7 +46,7 @@ class SignPanel(ParentPanel):
 
         # Show messages if anything is missing.
         self.ui.use_box_row("Sign Text")
-        self.ui.object_property(property_name="sign_text")
+        self.ui.object_property(property_name="proteinvr_sign_text")
         
         self.ui.use_layout_row()
         self.ui.ops_button(rel_data_path="proteinvr.done_sign_panel", button_label="Done")

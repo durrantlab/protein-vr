@@ -88,3 +88,53 @@ def object_is_proteinvr_clickable(obj):
         "vertices" in dir(obj.data) and 
         not "ProteinVR_tmp_" in obj.name
     )
+
+def garden_path_string_to_data():
+    data = []  # [[start_frame1, end_frame1], [start_frame2, end_frame2], ...]
+    frames_that_connect_back_to_main_path = []
+    try:
+        # Paths are separated by ;
+        paths = [p.strip() for p in bpy.context.scene.proteinvr_garden_paths.split(";")]
+
+        scene = bpy.data.scenes["Scene"]
+        scene_frame_start = scene.frame_start
+        scene_frame_end = scene.frame_end
+
+        # Go through each path
+        for i, path in enumerate(paths):
+            # First path is main path. It can't loop back on itself.
+            if i == 0 and "*" in path:
+                return None, None
+
+            # Frames are separated by -
+            frames = [f.strip() for f in path.split("-")]
+
+            # If a frame as "*" in it, mark it to be connected back to the
+            # main path.
+            for frame in frames:
+                if "*" in frame:
+                    frames_that_connect_back_to_main_path.append(
+                        int(frame.replace("*", ""))
+                    )
+            
+            # Remove any "*" and make int
+            frames = [int(f.replace("*", "")) for f in frames]
+
+            # Second frame in path must be greater than first.
+            if frames[0] > frames[1]:
+                return None, None
+            
+            # No frame can be less than scene_frame_start
+            if scene_frame_start > frames[0]:
+                return None, None
+            
+            # No frame can be more than scene_frame_end
+            if scene_frame_end < frames[1]:
+                return None, None
+            
+            # Save frames to data variable
+            data.append(frames)
+    except:
+        data = None
+    
+    return data, list(set(frames_that_connect_back_to_main_path))
