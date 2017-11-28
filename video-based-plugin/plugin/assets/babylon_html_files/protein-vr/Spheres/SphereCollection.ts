@@ -16,7 +16,7 @@ export function create(): void {
     loads the assets of the appropriate spheres (all of them if no lazy
     loading, select ones otherwise).
     */
-    
+
     if (Globals.delayExec(create,
                           ["BabylonSceneLoaded", "DataJsonLoadingStarted"], 
                           "create", 

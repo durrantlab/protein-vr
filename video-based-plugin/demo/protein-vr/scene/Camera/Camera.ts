@@ -2,7 +2,6 @@
 
 import * as UserVars from "../../config/UserVars";
 import * as Globals from "../../config/Globals";
-// import * as ViewerSphere from "./ViewerSphere";
 import * as Arrows from "../Arrows";
 import { Sphere } from "../../Spheres/Sphere";
 import * as SphereCollection from "../../Spheres/SphereCollection";

@@ -26,10 +26,18 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
             let sphereDatum = sphereData[i];
             let pt = sphereDatum["position"];
             let position = new BABYLON.Vector3(pt[0], pt[2], pt[1]); // note that Y and Z axes are switched on purpose.
-            let textureFilename = sphereDatum["material"];
-            let meshFilename = sphereDatum["mesh"];
+            let textureFilename = sphereDatum["material"]; // filename of the PNG file.
+            let meshFilename = sphereDatum["mesh"]; // filename of mesh
             let sphere = new Sphere_1.Sphere(textureFilename, meshFilename, position);
             _spheres.push(sphere);
+            // WILLIAM: IF i = 0, first sphere, so use currentSphere() as a setter
+            // below. Can't do this based on opacity, because not material loaded
+            // yet.
+            if (i === 0) {
+                currentSphere(sphere);
+                // load sphere's assets
+                sphere.loadAssets();
+            }
         }
         // Start updating the loading progress bar
         let jQuery = Globals.get("jQuery");
@@ -46,7 +54,16 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
         */
         // Here, load and destroy the assets, as appropriate. For now, we're
         // not doing lazy loading, so let's just load them all.
-        _loadAllAssets();
+        if (Globals.get("lazyLoadViewSpheres") === false) {
+            _loadAllAssets(); // simply load all assets up front
+        }
+        else {
+            for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {
+                if (_currentSphere.allNeighboringSpheresOrderedByDistance()[i].associatedViewerSphere._assetsLoaded === false) {
+                    _currentSphere.allNeighboringSpheresOrderedByDistance()[i].associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
+                }
+            }
+        }
     }
     function _loadAllAssets() {
         /*
@@ -57,6 +74,7 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
         // and textures.
         for (let i = 0; i < _spheres.length; i++) {
             let sphere = _spheres[i];
+            // if sphere._assetsLoaded === false
             sphere.loadAssets(() => {
                 if (i === 0) {
                     sphere.opacity(1.0);

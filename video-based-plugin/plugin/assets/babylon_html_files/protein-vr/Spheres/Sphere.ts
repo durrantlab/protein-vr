@@ -185,7 +185,6 @@ export class Sphere {
                         }
                     }
                 }
-                
             }
             return;
         }
@@ -208,6 +207,7 @@ export class Sphere {
         if (this._allNeighboringSpheresByDist === undefined) {
             // Let's get the points close to this sphere, since never before
             // calculated. Includes even this sphere.
+            debugger;
             this._allNeighboringSpheresByDist = new CameraPoints();
             for (let i=0; i<SphereCollection.count(); i++) {
                 let cameraPos = SphereCollection.getByIndex(i).position;

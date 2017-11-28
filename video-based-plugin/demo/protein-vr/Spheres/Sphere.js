@@ -16,6 +16,7 @@ define(["require", "exports", "./Material", "../config/Globals", "./CameraPoints
             :param BABYLON.Vector3 position: The location of the sphere in 3D
                                    space.
             */
+            this._sphereMesh = undefined; // BABYLON.Mesh
             this._allNeighboringSpheresByDist = undefined;
             this._navNeighboringSpheresByDist = undefined;
             // Specify the meshFileName location and textureFileName location when
@@ -87,6 +88,9 @@ define(["require", "exports", "./Material", "../config/Globals", "./CameraPoints
             this.opacity(0.0);
             callBack();
         }
+        meshLoaded() {
+            return !(this._sphereMesh === undefined);
+        }
         unloadAssets() {
             /*
             Unload the assets associated with this sphere (material and mesh) from
@@ -133,6 +137,14 @@ define(["require", "exports", "./Material", "../config/Globals", "./CameraPoints
                 if (val === 1.0) {
                     // debugger;
                     SphereCollection.currentSphere(this);
+                    // this is where currentSphere is changed, so this is where we want to load in assets for local spheres if lazy loading is enabled
+                    if (Globals.get("lazyLoadViewSpheres") === true) {
+                        for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {
+                            if (this.allNeighboringSpheresOrderedByDistance()[i].associatedViewerSphere._assetsLoaded === false) {
+                                this.allNeighboringSpheresOrderedByDistance()[i].associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
+                            }
+                        }
+                    }
                 }
                 return;
             }
