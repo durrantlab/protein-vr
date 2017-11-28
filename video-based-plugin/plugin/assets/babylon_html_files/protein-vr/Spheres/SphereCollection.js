@@ -58,11 +58,10 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
             _loadAllAssets(); // simply load all assets up front
         }
         else {
+            // if sphereCollection.count() is less than lazyLoadCount, just load everything up front instead even if lazy loading is enabled
             for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {
-                console.log(_currentSphere.allNeighboringSpheresOrderedByDistance());
-                debugger;
-                if (_currentSphere.allNeighboringSpheresOrderedByDistance()[i].associatedViewerSphere._assetsLoaded === false) {
-                    _currentSphere.allNeighboringSpheresOrderedByDistance()[i].associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
+                if (_currentSphere.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere._assetsLoaded === false) {
+                    _currentSphere.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
                 }
             }
         }
@@ -112,7 +111,9 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
         */
         for (let i = 0; i < _spheres.length; i++) {
             let viewerSphere = _spheres[i];
-            viewerSphere.opacity(0.0);
+            if (viewerSphere._assetsLoaded === true) {
+                viewerSphere.opacity(0.0);
+            }
         }
     }
     exports.hideAll = hideAll;

@@ -77,11 +77,10 @@ export class Sphere {
                 let numTextures = Globals.get("numFrameTexturesLoaded") + 1;
                 Globals.set("numFrameTexturesLoaded", numTextures);
                 this._loadMesh(callBack);
+                this._assetsLoaded = true; // assets have now been loaded
+                console.log("Loaded:", this);  // Loaded.
             });
         });
-
-        let _assetsLoaded = true; // assets have now been loaded
-
     }
 
     private _loadMesh(callBack = function() {}): void {
@@ -163,7 +162,13 @@ export class Sphere {
 
         } else {
             // Setter
+            console.log("Get ready for error:", this);
+            if (this._sphereMesh === undefined) {
+                debugger;
+            }
             this._sphereMesh.visibility = val;
+
+            // *********
             
             // Might as well make entirely invisible if opacity is 0.
             if (val === 0.0) {
@@ -207,7 +212,6 @@ export class Sphere {
         if (this._allNeighboringSpheresByDist === undefined) {
             // Let's get the points close to this sphere, since never before
             // calculated. Includes even this sphere.
-            debugger;
             this._allNeighboringSpheresByDist = new CameraPoints();
             for (let i=0; i<SphereCollection.count(); i++) {
                 let cameraPos = SphereCollection.getByIndex(i).position;

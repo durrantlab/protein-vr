@@ -134,7 +134,9 @@ export function hideAll() {
 
     for (let i = 0; i < _spheres.length; i++) {
         let viewerSphere = _spheres[i];
-        viewerSphere.opacity(0.0);
+        if (viewerSphere._assetsLoaded === true) {
+            viewerSphere.opacity(0.0);            
+        }
     }
 }
 

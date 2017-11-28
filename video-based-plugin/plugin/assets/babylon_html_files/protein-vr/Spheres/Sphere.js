@@ -17,6 +17,7 @@ define(["require", "exports", "./Material", "../config/Globals", "./CameraPoints
                                    space.
             */
             this._sphereMesh = undefined; // BABYLON.Mesh
+            this._assetsLoaded = false; // assets are not loaded to begin with
             this._allNeighboringSpheresByDist = undefined;
             this._navNeighboringSpheresByDist = undefined;
             // Specify the meshFileName location and textureFileName location when
@@ -58,6 +59,8 @@ define(["require", "exports", "./Material", "../config/Globals", "./CameraPoints
                     let numTextures = Globals.get("numFrameTexturesLoaded") + 1;
                     Globals.set("numFrameTexturesLoaded", numTextures);
                     this._loadMesh(callBack);
+                    this._assetsLoaded = true; // assets have now been loaded
+                    console.log("Loaded:", this); // Loaded.
                 });
             });
         }
@@ -125,7 +128,12 @@ define(["require", "exports", "./Material", "../config/Globals", "./CameraPoints
             }
             else {
                 // Setter
+                console.log("Get ready for error:", this);
+                if (this._sphereMesh === undefined) {
+                    debugger;
+                }
                 this._sphereMesh.visibility = val;
+                // *********
                 // Might as well make entirely invisible if opacity is 0.
                 if (val === 0.0) {
                     this._sphereMesh.isVisible = false;
@@ -140,8 +148,8 @@ define(["require", "exports", "./Material", "../config/Globals", "./CameraPoints
                     // this is where currentSphere is changed, so this is where we want to load in assets for local spheres if lazy loading is enabled
                     if (Globals.get("lazyLoadViewSpheres") === true) {
                         for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {
-                            if (this.allNeighboringSpheresOrderedByDistance()[i].associatedViewerSphere._assetsLoaded === false) {
-                                this.allNeighboringSpheresOrderedByDistance()[i].associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
+                            if (this.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere._assetsLoaded === false) {
+                                this.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
                             }
                         }
                     }
@@ -163,7 +171,6 @@ define(["require", "exports", "./Material", "../config/Globals", "./CameraPoints
             if (this._allNeighboringSpheresByDist === undefined) {
                 // Let's get the points close to this sphere, since never before
                 // calculated. Includes even this sphere.
-                debugger;
                 this._allNeighboringSpheresByDist = new CameraPoints_1.CameraPoints();
                 for (let i = 0; i < SphereCollection.count(); i++) {
                     let cameraPos = SphereCollection.getByIndex(i).position;
