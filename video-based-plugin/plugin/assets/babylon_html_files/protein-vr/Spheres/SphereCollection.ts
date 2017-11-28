@@ -16,7 +16,7 @@ export function create(): void {
     loads the assets of the appropriate spheres (all of them if no lazy
     loading, select ones otherwise).
     */
-    
+
     if (Globals.delayExec(create,
                           ["BabylonSceneLoaded", "DataJsonLoadingStarted"], 
                           "create", 
@@ -76,8 +76,8 @@ function _loadRelevantAssets(): void {
         _loadAllAssets();   // simply load all assets up front
     } else {    // otherwise Lazy Loading must BE enabled, so we trigger the lazy loading scheme for the first sphere
         for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {    // counting from 0 to whatever global Lazy Loading count is specified to itterate over a CameraPoints object ordered by distance
-            if (_currentSphere.allNeighboringSpheresOrderedByDistance()[i].associatedViewerSphere._assetsLoaded === false) {    // if the sphere we are looking at (one of the 16 nearest to the first sphere) has not had its assets loaded yet (NOTE: this will always be true at this point)
-                _currentSphere.allNeighboringSpheresOrderedByDistance()[i].associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
+            if (_currentSphere.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere._assetsLoaded === false) {    // if the sphere we are looking at (one of the 16 nearest to the first sphere) has not had its assets loaded yet (NOTE: this will always be true at this point)
+                _currentSphere.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
             }
         }
     }

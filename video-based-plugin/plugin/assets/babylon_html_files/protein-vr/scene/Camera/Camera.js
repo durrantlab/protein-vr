@@ -118,10 +118,10 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // Assign angles
         let lookingVec = targetPoint.subtract(focalPoint).normalize();
         switch (Devices.keyPressedState) {
-            case 83:// Up arrow?
+            case 83:
                 lookingVec = lookingVec.scale(-1);
                 break;
-            case 40:// W?
+            case 40:
                 lookingVec = lookingVec.scale(-1);
                 break;
         }
