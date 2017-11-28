@@ -49,6 +49,8 @@ export function create(): void {
         
         if (i === 0) {
             currentSphere(sphere);
+            // load sphere's assets
+            sphere.loadAssets();
         }
     }
     
@@ -91,6 +93,7 @@ function _loadAllAssets(): void {
     // and textures.
     for (let i=0; i<_spheres.length; i++) {
         let sphere: Sphere = _spheres[i];
+        // if sphere._assetsLoaded === false
         sphere.loadAssets(() => {
             if (i === 0) {
                 sphere.opacity(1.0);
