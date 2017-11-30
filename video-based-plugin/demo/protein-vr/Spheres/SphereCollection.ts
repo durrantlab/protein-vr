@@ -76,10 +76,7 @@ function _loadRelevantAssets(): void {
         _loadAllAssets();   // simply load all assets up front
     } else {    // otherwise Lazy Loading must BE enabled, so we trigger the lazy loading scheme for the first sphere
         // if sphereCollection.count() is less than lazyLoadCount, just load everything up front instead even if lazy loading is enabled
-        console.log("JJJJJ", _currentSphere.allNeighboringSpheresOrderedByDistance());
         for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {    // counting from 0 to whatever global Lazy Loading count is specified to itterate over a CameraPoints object ordered by distance
-
-            console.log("DDDD!!!!", _currentSphere.allNeighboringSpheresOrderedByDistance());
             if (_currentSphere.allNeighboringSpheresOrderedByDistance().get(i) === undefined) {
                 let dummy = _currentSphere.allNeighboringSpheresOrderedByDistance();
                 debugger;

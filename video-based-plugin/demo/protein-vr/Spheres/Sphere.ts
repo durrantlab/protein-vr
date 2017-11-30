@@ -54,6 +54,10 @@ export class Sphere {
         // LOAD THE MATERIAL
         // Note that this.textureFileName was set when the object was created.
 
+        if (this._assetsLoaded === true) {
+            return;
+        }
+
         let filename: string;
         
         // isMobile = true;
@@ -210,25 +214,30 @@ export class Sphere {
                     for (let i = 0; i < Globals.get("lazyLoadedSpheres").length; i++) { // itterate through the list of spheres with loaded assets
                         let nearNeighbor = false; // boolean to keep track of whether a sphere is in the lazyLoadCount nearest neighbors to the current sphere
                         for (let j = 0; j < Globals.get("lazyLoadCount"); j++) { // comparing against the lazyLoadCount nearest neighbors to the current sphere
+                            console.log("=====");
                             // console.log(Globals.get("lazyLoadedSpheres")[i])  // this is a sphere
+                            // console.log(Globals.get("lazyLoadedSpheres"))
+                            console.log(this.allNeighboringSpheresOrderedByDistance());
+                            debugger;
                             // console.log(this.allNeighboringSpheresOrderedByDistance().get(j).associatedViewerSphere)  // this is a camera point
                             // debugger;
 
                             //let sphere1 = Globals.get("lazyLoadedSpheres")[i] as String (do the same for this.allNeighboringSpheresOrderedByDistance().get(j).associatedViewerSphere) and then compare those strings
 
                             // WILLIAM: NEED TO COMPARE ATTRIBUTES OF BELOW (MAYBE SPHERE ID?)
+
                             if (Globals.get("lazyLoadedSpheres")[i] === this.allNeighboringSpheresOrderedByDistance().get(j).associatedViewerSphere) { // if the sphere at index i in the list of all loaded spheres matches some sphere in the nearest neighbor list
                                 let nearNeighbor = true;
                             }
                         }
                         if (nearNeighbor === false && Globals.get("lazyLoadedSpheres")[i] != this) { // if the sphere from the loaded assets array is not a nearest neighbor, we want to delete its assets from memory
-                            console.log("DDDD", Globals.get("lazyLoadedSpheres")[i]);                   // also need to make sure that we aren't unloading the current sphere since it won't be in its own nearest neighbors list
                             Globals.get("lazyLoadedSpheres")[i].unloadAssets(); // unload the assets
                             let lazyLoadedSpheres = Globals.get("lazyLoadedSpheres");
                             lazyLoadedSpheres.splice(i, 1); // remove it from the array
                             Globals.set("lazyLoadedSpheres", lazyLoadedSpheres);
                         }
                     }
+                    console.log("DONE");
                 }
             }
             return;

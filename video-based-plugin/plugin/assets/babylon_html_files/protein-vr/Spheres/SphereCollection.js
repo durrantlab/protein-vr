@@ -59,9 +59,7 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
         }
         else {
             // if sphereCollection.count() is less than lazyLoadCount, just load everything up front instead even if lazy loading is enabled
-            console.log("JJJJJ", _currentSphere.allNeighboringSpheresOrderedByDistance());
             for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {
-                console.log("DDDD!!!!", _currentSphere.allNeighboringSpheresOrderedByDistance());
                 if (_currentSphere.allNeighboringSpheresOrderedByDistance().get(i) === undefined) {
                     let dummy = _currentSphere.allNeighboringSpheresOrderedByDistance();
                     debugger;
