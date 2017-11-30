@@ -95,7 +95,7 @@ class CommandPanel(ParentPanel):
         if bpy.context.scene.proteinvr_use_existing_frames == False:
             self.ui.scene_property("proteinvr_bake_texture_size")
             self.ui.scene_property("proteinvr_mobile_bake_texture_size")
-            self.ui.scene_property("proteinvr_num_cycles")
+            self.ui.scene_property("proteinvr_num_samples")
             self.ui.scene_property("proteinvr_pngquant_path")
             Messages.display_message("PNGQUANT_ERROR", self)
         

@@ -287,8 +287,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
     def _render_whatever_is_visible(self, filename):
         # TODO: Some of these variables are not called after this.....
         self.scene.render.resolution_percentage = 100.0
-        self.scene.cycles.samples = self.scene.proteinvr_num_cycles
-        self.scene.cycles.preview_samples = self.scene.proteinvr_num_cycles
+        self.scene.cycles.samples = self.scene.proteinvr_num_samples
+        self.scene.cycles.preview_samples = self.scene.proteinvr_num_samples
         self.scene.cycles.film_transparent = True  # Because you're saving the background separately.
 
         self.scene.render.filepath = filename
