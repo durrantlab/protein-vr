@@ -72,10 +72,11 @@ function _loadRelevantAssets(): void {
     // Here, load and destroy the assets, as appropriate. For now, we're
     // not doing lazy loading, so let's just load them all.
 
-    if (Globals.get("lazyLoadViewSpheres") === false) { // if Lazy Loading is NOT enabled
+    if (Globals.get("lazyLoadViewerSpheres") === false) { // if Lazy Loading is NOT enabled
         _loadAllAssets();   // simply load all assets up front
     } else {    // otherwise Lazy Loading must BE enabled, so we trigger the lazy loading scheme for the first sphere
         // if sphereCollection.count() is less than lazyLoadCount, just load everything up front instead even if lazy loading is enabled
+        console.log("JJJJJ", _currentSphere.allNeighboringSpheresOrderedByDistance());
         for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {    // counting from 0 to whatever global Lazy Loading count is specified to itterate over a CameraPoints object ordered by distance
             if (_currentSphere.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere._assetsLoaded === false) {    // if the sphere we are looking at (one of the 16 nearest to the first sphere) has not had its assets loaded yet (NOTE: this will always be true at this point)
                 _currentSphere.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)

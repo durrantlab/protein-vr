@@ -73,13 +73,17 @@ export class Sphere {
         // Make the material.
         this.material = new Material(filename, true, () => {
             setTimeout(() => {  // kind of like doEvents from VB days.
+                console.log("Material loaded: ", this.textureFileName);
                 // Update the total number of textures loaded.
                 let numTextures = Globals.get("numFrameTexturesLoaded") + 1;
                 Globals.set("numFrameTexturesLoaded", numTextures);
                 this._loadMesh(callBack);
                 this._assetsLoaded = true; // assets have now been loaded
-                Globals.get("lazyLoadedSpheres").push(this);
-                console.log("Loaded:", this);  // Loaded.
+
+                let lazyLoadedSpheres = Globals.get("lazyLoadedSpheres");
+                lazyLoadedSpheres.push(this);
+                Globals.set("lazyLoadedSpheres", lazyLoadedSpheres);
+                // console.log("Loaded:", this);  // Loaded.
             });
         });
     }
@@ -115,6 +119,8 @@ export class Sphere {
         // Hide the sphere. In ViewerSphere.ts, show just the first one.
         this.opacity(0.0);
 
+        console.log("Mesh loaded: ", this.textureFileName);
+
         callBack();
     }
 
@@ -130,6 +136,7 @@ export class Sphere {
 
         this._unloadMesh();
         this._unloadMaterial();
+        this._assetsLoaded = false;
     }
 
     private _unloadMaterial(): void {
@@ -139,6 +146,10 @@ export class Sphere {
         */
 
         // Remove it from memory.
+        delete this.material;
+
+        console.log("Material unloaded: ", this.textureFileName);
+
     }
 
     private _unloadMesh() {
@@ -148,6 +159,10 @@ export class Sphere {
         */
 
         // Remove it from memory.
+        delete this._sphereMesh;
+
+        console.log("Mesh unloaded: ", this.textureFileName);
+        
     }
 
     public opacity(val: number = undefined): void {
@@ -163,8 +178,8 @@ export class Sphere {
 
         } else {
             // Setter
-            console.log("Get ready for error:", this);
             if (this._sphereMesh === undefined) {
+                console.log("Get ready for error:", this);
                 debugger;
             }
             this._sphereMesh.visibility = val;
@@ -184,7 +199,7 @@ export class Sphere {
                 SphereCollection.currentSphere(this);
 
                 // this is where currentSphere is changed, so this is where we want to load in assets for local spheres if lazy loading is enabled
-                if (Globals.get("lazyLoadViewSpheres") === true) {  // if we are Lazy Loading...
+                if (Globals.get("lazyLoadViewerSpheres") === true) {  // if we are Lazy Loading...
                     for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {    // counting from 0 to whatever global Lazy Loading count is specified to itterate over a CameraPoints object ordered by distance to this Sphere
                         if (this.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere._assetsLoaded === false) {    // if the sphere we are looking at (one of the 16 nearest to the this one) has not yet had its assets loaded
                             this.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
@@ -195,13 +210,23 @@ export class Sphere {
                     for (let i = 0; i < Globals.get("lazyLoadedSpheres").length; i++) { // itterate through the list of spheres with loaded assets
                         let nearNeighbor = false; // boolean to keep track of whether a sphere is in the lazyLoadCount nearest neighbors to the current sphere
                         for (let j = 0; j < Globals.get("lazyLoadCount"); j++) { // comparing against the lazyLoadCount nearest neighbors to the current sphere
-                            if (Globals.get("lazyLoadedSpheres")[i] = this.allNeighboringSpheresOrderedByDistance().get(j)) { // if the sphere at index i in the list of all loaded spheres matches some sphere in the nearest neighbor list
+                            // console.log(Globals.get("lazyLoadedSpheres")[i])  // this is a sphere
+                            // console.log(this.allNeighboringSpheresOrderedByDistance().get(j).associatedViewerSphere)  // this is a camera point
+                            // debugger;
+
+                            //let sphere1 = Globals.get("lazyLoadedSpheres")[i] as String (do the same for this.allNeighboringSpheresOrderedByDistance().get(j).associatedViewerSphere) and then compare those strings
+
+                            // WILLIAM: NEED TO COMPARE ATTRIBUTES OF BELOW (MAYBE SPHERE ID?)
+                            if (Globals.get("lazyLoadedSpheres")[i] === this.allNeighboringSpheresOrderedByDistance().get(j).associatedViewerSphere) { // if the sphere at index i in the list of all loaded spheres matches some sphere in the nearest neighbor list
                                 let nearNeighbor = true;
                             }
                         }
-                        if (nearNeighbor === false) { // if the sphere from the loaded assets array is not a nearest neighbor, we want to delete its assets from memory
+                        if (nearNeighbor === false && Globals.get("lazyLoadedSpheres")[i] != this) { // if the sphere from the loaded assets array is not a nearest neighbor, we want to delete its assets from memory
+                            console.log("DDDD", Globals.get("lazyLoadedSpheres")[i]);                   // also need to make sure that we aren't unloading the current sphere since it won't be in its own nearest neighbors list
                             Globals.get("lazyLoadedSpheres")[i].unloadAssets(); // unload the assets
-                            Globals.get("lazyLoadedSpheres").splice(i, 1); // remove it from the array
+                            let lazyLoadedSpheres = Globals.get("lazyLoadedSpheres");
+                            lazyLoadedSpheres.splice(i, 1); // remove it from the array
+                            Globals.set("lazyLoadedSpheres", lazyLoadedSpheres);
                         }
                     }
                 }
