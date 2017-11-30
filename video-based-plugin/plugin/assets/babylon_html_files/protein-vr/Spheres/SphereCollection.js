@@ -54,12 +54,18 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
         */
         // Here, load and destroy the assets, as appropriate. For now, we're
         // not doing lazy loading, so let's just load them all.
-        if (Globals.get("lazyLoadViewSpheres") === false) {
+        if (Globals.get("lazyLoadViewerSpheres") === false) {
             _loadAllAssets(); // simply load all assets up front
         }
         else {
             // if sphereCollection.count() is less than lazyLoadCount, just load everything up front instead even if lazy loading is enabled
+            console.log("JJJJJ", _currentSphere.allNeighboringSpheresOrderedByDistance());
             for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {
+                console.log("DDDD!!!!", _currentSphere.allNeighboringSpheresOrderedByDistance());
+                if (_currentSphere.allNeighboringSpheresOrderedByDistance().get(i) === undefined) {
+                    let dummy = _currentSphere.allNeighboringSpheresOrderedByDistance();
+                    debugger;
+                }
                 if (_currentSphere.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere._assetsLoaded === false) {
                     _currentSphere.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
                 }
