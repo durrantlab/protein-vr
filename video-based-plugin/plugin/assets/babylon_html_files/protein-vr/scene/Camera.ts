@@ -750,9 +750,9 @@ export class Camera {
         // fade out arrows with each move... looks good.
         Arrows.fadeDownAll(1.0 - timeRatio);
 
-        // Move background sphere too.
-        let backgroundSphere = Globals.get("backgroundSphere");
-        backgroundSphere.position = camera.position;
+        // Move skybox sphere too.
+        let skyboxSphere = Globals.get("skyboxSphere");
+        skyboxSphere.position = camera.position;
     }
 
     private _onDoneCameraAutoMoving(camera): void {
@@ -770,7 +770,7 @@ export class Camera {
         this._setCloseCameraDataAndArrows(camera);
 
         // Make sure environmental sphere properly positioned.
-        Globals.get("backgroundSphere").position = camera.position;
+        Globals.get("skyboxSphere").position = camera.position;
 
     }
 

@@ -89,7 +89,7 @@ class ProteinVR(PanelParentClass):
         bpy.types.Object.proteinvr_sign_text = self.prop_funcs.strProp("", "Put sign text here...", description="The text to display on this sign.")
 
         # Object categories
-        bpy.types.Object.proteinvr_category = self.prop_funcs.enumProp("Object Category", items=[("static", "Static", "Static Category"), ("mesh", "Mesh", "Mesh Category"), ("background", "Background", "Background Category")], description="Assign object to categories.")
+        bpy.types.Object.proteinvr_category = self.prop_funcs.enumProp("Object Category", items=[("static", "Static", "Static Category"), ("mesh", "Mesh", "Mesh Category"), ("skybox", "Skybox", "Skybox Category")], description="Assign object to categories.")
 
         # Setup the two panels.
         self.SetupPanel = SetupPanel.SetupPanel(self.ui)

@@ -69,10 +69,12 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             obj.hide = True
             obj.hide_render = True
 
-    def save_visibility_state(self):
+    def save_ui_state(self):
         """
-        Saves the hide and hide_render properties of all objects.
+        Saves the hide and hide_render properties of all objects. Also other
+        properties.
         """
+        self.scene = bpy.data.scenes["Scene"]
 
         self.visibility_states = {}
         for obj in bpy.data.objects:
@@ -81,8 +83,9 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 "hide": obj.hide,
                 "hide_render": obj.hide_render
             }
+        self.orig_film_transparent = self.scene.cycles.film_transparent
     
-    def restore_visibility_state(self):
+    def restore_ui_state(self):
         """
         Restores the initial hide and hide_render properties of all objects.
         """
@@ -91,6 +94,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             name = obj.name
             obj.hide = self.visibility_states[name]["hide"]
             obj.hide_render = self.visibility_states[name]["hide_render"]
+        self.scene.cycles.film_transparent = self.orig_film_transparent
 
     def _compress_png(self, filename):
         """
@@ -120,7 +124,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         """
 
         # Save some things to variables
-        self.scene = bpy.data.scenes["Scene"]
         self.plugin_dir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + os.sep + ".." + os.sep + "..") + os.sep
         self.plugin_asset_dir = self.plugin_dir + "assets" + os.sep
 
@@ -188,7 +191,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         
         # Put objects into "render layer" categories.
         self.object_categories = {
-            "BACKGROUND": [],
+            "SKYBOX": [],
             "STATIC": [],
             "MESH": []  # Includes onces marked meshed, and any ones that have animations.
         }
@@ -198,8 +201,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # Seperates the objects into their respective categories as specified by the user
         # for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
         for obj in self.objects_to_consider:
-            if(obj.proteinvr_category == "background"): #Capitalize
-                self.object_categories["BACKGROUND"].append(obj) # background = an eventual PNG file that will be the background image. NOT MOVING
+            if(obj.proteinvr_category == "skybox"): #Capitalize
+                self.object_categories["SKYBOX"].append(obj) # skybox = an eventual PNG file that will be the skybox image. NOT MOVING
             elif(obj.proteinvr_category == "static"):
                 self.object_categories["STATIC"].append(obj) # Static = low quality non moving images, this based on user preference
             elif(obj.proteinvr_category == "mesh"):
@@ -289,7 +292,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.scene.render.resolution_percentage = 100.0
         self.scene.cycles.samples = self.scene.proteinvr_num_samples
         self.scene.cycles.preview_samples = self.scene.proteinvr_num_samples
-        self.scene.cycles.film_transparent = True  # Because you're saving the background separately.
+        # self.scene.cycles.film_transparent = True  # Because you're saving the skybox separately.
 
         self.scene.render.filepath = filename
         self.scene.render.image_settings.file_format = 'PNG'
@@ -310,7 +313,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         else:
             print("WARNING: Skipping the mobile textures...")
 
-        self.scene.cycles.film_transparent = False
+        # self.scene.cycles.film_transparent = False
 
     def _step_4_render_static_frames(self, debug=False):
         """
@@ -319,17 +322,20 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         :param bool debug: Whether to run in debug
         """
 
-        # Hide all objects in Background and meshed category. Show objects in
+        # Hide all objects in Skybox and meshed category. Show objects in
         # static category. For through each. For each frame, render a png file
         # of the static images.
 
-        print("BACKGROUND:", self.object_categories["BACKGROUND"])
+        print("SKYBOX:", self.object_categories["SKYBOX"])
         print("MESH:", self.object_categories["MESH"])
         print("STATICS:", self.object_categories["STATIC"])
 
-        #Hiding objects in Background and Mesh category
-        self.hide_objects("BACKGROUND")
+        #Hiding objects in Skybox and Mesh category
+        self.hide_objects("SKYBOX")
         self.hide_objects("MESH")
+
+        # Hide any environmental HDR texture
+        self.scene.cycles.film_transparent = True
 
         # Showing objects in Static category
         self.show_objects("STATIC")
@@ -351,22 +357,25 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 print("FILENAME:", filename)
                 self._render_whatever_is_visible(filename)
 
-    def _step_5_render_background_image(self):
+    def _step_5_render_skybox_image(self):
         """
         Get the environment texture and save that.
         """
-        #  Next, render the background (only once)
+        #  Next, render the skybox (only once)
         #   Change to frame 1
         #   Hide all objects in Static and meshed categories
-        #   Render background.png, using code like that below.
+        #   Render skybox.png, using code like that below.
 
         self.set_frame = self.frame_start
 
         self.hide_objects("MESH")
         self.hide_objects("STATIC")
-        self.show_objects("BACKGROUND")
+        self.show_objects("SKYBOX")
 
-        self._render_whatever_is_visible(self.proteinvr_output_dir + "environment.png")
+        # Show any environmental HDR texture
+        self.scene.cycles.film_transparent = False
+
+        self._render_whatever_is_visible(self.proteinvr_output_dir + "environment.png")  # TODO: Rename to skybox.png later...
 
     def _save_as_obj(self, obj, filepath):
         """
@@ -511,7 +520,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         # Now go through visible objects and get encompassing spheres
         # for obj in bpy.data.objects:
-        self.restore_visibility_state()
+        self.restore_ui_state()
 
         # import pdb; pdb.set_trace()
         for obj in self.objects_to_consider:
@@ -582,26 +591,10 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 {
                     "name": None,
                     "id": None,
-                    "ambient": [
-                        0,
-                        0,
-                        0
-                    ],
-                    "diffuse": [
-                        0,
-                        0,
-                        0
-                    ],
-                    "specular": [
-                        0,
-                        0,
-                        0
-                    ],
-                    "emissive": [
-                        0,
-                        0,
-                        0
-                    ],
+                    "ambient": [0, 0, 0],
+                    "diffuse": [0, 0, 0],
+                    "specular": [0, 0, 0],
+                    "emissive": [0, 0, 0],
                     "specularPower": 64,
                     "alpha": 1,
                     "backFaceCulling": True,
@@ -710,16 +703,16 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         :rtype: :class:`???`
         """
 
-        self.save_visibility_state()
+        self.save_ui_state()
 
         if self._step_0_existing_files_check_ok_and_copy() == False:
-            self.restore_visibility_state()
+            self.restore_ui_state()
             return {'FINISHED'}
 
         debug = False
 
         if self._step_1_initialize_variables() == False:
-            self.restore_visibility_state()
+            self.restore_ui_state()
             return {'FINISHED'}
 
         self._step_2_get_camerea_positions()
@@ -728,7 +721,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         if len(glob.glob(self.proteinvr_output_dir + "frames/*.png")) == 0:
             self._step_4_render_static_frames(debug)
         
-        self._step_5_render_background_image()
+        self._step_5_render_skybox_image()
 
         print("Why this if-statement logic? (BELOW) Why not just throw an error?")
 
@@ -746,6 +739,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
             print(self.extra_data)
 
-        self.restore_visibility_state()
+        self.restore_ui_state()
 
         return {'FINISHED'}

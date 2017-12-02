@@ -16,7 +16,7 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         "lastFrameIndex": undefined,
         // "viewerSpheres": undefined,  // A Spheres.SphereCollection.SphereCollection object.
         // "sphereMaterials": undefined,  // The materials associated with each viewer sphere.
-        "backgroundSphere": undefined,  // The background sphere (sky box)
+        "skyboxSphere": undefined,  // The skybox sphere (sky box)
         "debug": false,  // Whether or not to run in debug mode.
         "breakCaching": true,  // add ?random strings to end of png textures, so doesn't cache.
         "mouseDownAdvances": true,  // Whether or not clicking the mouse advances your position.
@@ -26,6 +26,8 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         "cameraTypeToUse": "show-desktop-screen",  // Camera type (VR headsert vs. screen, etc.)
         "signData": [],  // Data about signs. Work in progress.
         "lazyLoadViewerSpheres": true,  // Whether or not to lazy load textures/materials.
+        "lazyLoadCount": 20, // Number of viewer spheres to lazy load at a time
+        "lazyLoadedSpheres": [], // An array which will contain all spheres which have had their assets loaded, used for removing unwanted assets from memory
         "meshesWithAnimations": [],  // A list of all the meshes that have associated PVR meshes
         "loadingMilestones": {}, // Flags used to tell different steps in the loading process whether or not they can proceed. Cleaner than promises, I think.
         "milestoneAttempted": [] // Where or not a given function that will end in a milestone complete has been run at least once. To prevent milestones from running multiple times.
