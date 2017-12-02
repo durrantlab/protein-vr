@@ -18,7 +18,7 @@ define(["require", "exports"], function (require, exports) {
             "lastFrameIndex": undefined,
             // "viewerSpheres": undefined,  // A Spheres.SphereCollection.SphereCollection object.
             // "sphereMaterials": undefined,  // The materials associated with each viewer sphere.
-            "backgroundSphere": undefined,
+            "skyboxSphere": undefined,
             "debug": false,
             "breakCaching": true,
             "mouseDownAdvances": true,
@@ -28,6 +28,8 @@ define(["require", "exports"], function (require, exports) {
             "cameraTypeToUse": "show-desktop-screen",
             "signData": [],
             "lazyLoadViewerSpheres": true,
+            "lazyLoadCount": 20,
+            "lazyLoadedSpheres": [],
             "meshesWithAnimations": [],
             "loadingMilestones": {},
             "milestoneAttempted": [] // Where or not a given function that will end in a milestone complete has been run at least once. To prevent milestones from running multiple times.

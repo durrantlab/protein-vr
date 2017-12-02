@@ -173,10 +173,10 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         _updateInterpolatedPositionWhileInMotion(timeRatio, camera);
         // fade out arrows with each move... looks good.
         Arrows.fadeDownAll(1.0 - timeRatio);
-        // Move background sphere too. It alwayd tracks the camera exactly (i.e.,
+        // Move skybox sphere too. It alwayd tracks the camera exactly (i.e.,
         // fixed relative to the camera).
-        let backgroundSphere = Globals.get("backgroundSphere");
-        backgroundSphere.position = camera.position;
+        let skyboxSphere = Globals.get("skyboxSphere");
+        skyboxSphere.position = camera.position;
     }
     function _updateInterpolatedPositionWhileInMotion(timeRatio, camera) {
         /*
@@ -208,6 +208,6 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // Set up new navigation arrows for new position.
         Arrows.update(_startingCameraInMotion_ViewerSphere.navigationNeighboringSpheresOrderedByDistance());
         // Make sure environmental sphere properly positioned.
-        Globals.get("backgroundSphere").position = camera.position;
+        Globals.get("skyboxSphere").position = camera.position;
     }
 });
