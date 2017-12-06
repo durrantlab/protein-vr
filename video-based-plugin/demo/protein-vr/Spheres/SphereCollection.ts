@@ -16,7 +16,7 @@ export function create(): void {
     loads the assets of the appropriate spheres (all of them if no lazy
     loading, select ones otherwise).
     */
-    
+
     if (Globals.delayExec(create,
                           ["BabylonSceneLoaded", "DataJsonLoadingStarted"], 
                           "create", 
@@ -46,6 +46,11 @@ export function create(): void {
         // WILLIAM: IF i = 0, first sphere, so use currentSphere() as a setter
         // below. Can't do this based on opacity, because not material loaded
         // yet.
+        if (i === 0) {
+            currentSphere(sphere);
+            // load sphere's assets
+            sphere.loadAssets();
+        }
     }
     
     // Start updating the loading progress bar
@@ -66,7 +71,21 @@ function _loadRelevantAssets(): void {
     // Here, load and destroy the assets, as appropriate. For now, we're
     // not doing lazy loading, so let's just load them all.
 
-    _loadAllAssets();
+    if (Globals.get("lazyLoadViewerSpheres") === false) { // if Lazy Loading is NOT enabled
+        _loadAllAssets();   // simply load all assets up front
+    } else {    // otherwise Lazy Loading must BE enabled, so we trigger the lazy loading scheme for the first sphere
+        // if sphereCollection.count() is less than lazyLoadCount, just load everything up front instead even if lazy loading is enabled
+        for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {    // counting from 0 to whatever global Lazy Loading count is specified to itterate over a CameraPoints object ordered by distance
+            if (_currentSphere.allNeighboringSpheresOrderedByDistance().get(i) === undefined) {
+                let dummy = _currentSphere.allNeighboringSpheresOrderedByDistance();
+                debugger;
+            }
+
+            if (_currentSphere.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere._assetsLoaded === false) {    // if the sphere we are looking at (one of the 16 nearest to the first sphere) has not had its assets loaded yet (NOTE: this will always be true at this point)
+                _currentSphere.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
+            }
+        }
+    }
 }
 
 function _loadAllAssets(): void {
@@ -79,6 +98,7 @@ function _loadAllAssets(): void {
     // and textures.
     for (let i=0; i<_spheres.length; i++) {
         let sphere: Sphere = _spheres[i];
+        // if sphere._assetsLoaded === false
         sphere.loadAssets(() => {
             if (i === 0) {
                 sphere.opacity(1.0);
@@ -118,7 +138,9 @@ export function hideAll() {
 
     for (let i = 0; i < _spheres.length; i++) {
         let viewerSphere = _spheres[i];
-        viewerSphere.opacity(0.0);
+        if (viewerSphere._assetsLoaded === true) {
+            viewerSphere.opacity(0.0);            
+        }
     }
 }
 
