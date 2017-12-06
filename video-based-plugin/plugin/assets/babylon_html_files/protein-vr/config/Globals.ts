@@ -16,7 +16,7 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         "lastFrameIndex": undefined,
         // "viewerSpheres": undefined,  // A Spheres.SphereCollection.SphereCollection object.
         // "sphereMaterials": undefined,  // The materials associated with each viewer sphere.
-        "backgroundSphere": undefined,  // The background sphere (sky box)
+        "skyboxSphere": undefined,  // The skybox sphere (sky box)
         "debug": false,  // Whether or not to run in debug mode.
         "breakCaching": true,  // add ?random strings to end of png textures, so doesn't cache.
         "mouseDownAdvances": true,  // Whether or not clicking the mouse advances your position.

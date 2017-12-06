@@ -18,7 +18,7 @@ define(["require", "exports"], function (require, exports) {
             "lastFrameIndex": undefined,
             // "viewerSpheres": undefined,  // A Spheres.SphereCollection.SphereCollection object.
             // "sphereMaterials": undefined,  // The materials associated with each viewer sphere.
-            "backgroundSphere": undefined,
+            "skyboxSphere": undefined,
             "debug": false,
             "breakCaching": true,
             "mouseDownAdvances": true,

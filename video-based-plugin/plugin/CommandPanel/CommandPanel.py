@@ -56,10 +56,31 @@ class CommandPanel(ParentPanel):
             self.ui.object_property("proteinvr_category")
             Messages.display_message("NODE_ERROR", self)
 
-
         # Commands
         self.ui.use_box_row("Commands")
         self.ui.ops_button(rel_data_path="proteinvr.mark_sign_location", button_label="Mark Sign Location")
+
+        # Garden Path Commands
+        self.ui.use_box_row("Garden Paths")
+        frame_data, frames_that_connect_back_to_main_path = Utils.garden_path_string_to_data()
+        if frame_data is None:
+            self.ui.label("Formatting error!")
+        else:
+            for i, d in enumerate(frame_data):
+                frame1, frame2 = d
+                self.ui.label("Path " + str(i+1) + ": Frame " + str(frame1) + " to frame " + str(frame2))
+            for frame in frames_that_connect_back_to_main_path:
+                self.ui.label("Frame " + str(frame) + " reaches Path 1")
+
+        # try:
+        #     paths = [p.strip() for p in bpy.context.scene.proteinvr_garden_paths.split(";")]
+        #     for i, path in enumerate(paths):
+        #         frames = [str(int(f)).strip() for f in path.split("-")]
+        #         self.ui.label("Path " + str(i+1) + ": Frame " + frames[0] + " to frame " + frames[1])
+        # except:
+        #     
+
+        self.ui.scene_property("proteinvr_garden_paths")
 
         # Set up UI
         # self.ui.use_layout_row()
@@ -74,8 +95,8 @@ class CommandPanel(ParentPanel):
         if bpy.context.scene.proteinvr_use_existing_frames == False:
             self.ui.scene_property("proteinvr_bake_texture_size")
             self.ui.scene_property("proteinvr_mobile_bake_texture_size")
-            self.ui.scene_property("proteinvr_num_cycles")
-            self.ui.scene_property("pngquant_path")
+            self.ui.scene_property("proteinvr_num_samples")
+            self.ui.scene_property("proteinvr_pngquant_path")
             Messages.display_message("PNGQUANT_ERROR", self)
         
         self.ui.ops_button(rel_data_path="proteinvr.create_scene", button_label="Create Scene")

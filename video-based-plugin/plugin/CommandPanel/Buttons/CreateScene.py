@@ -69,10 +69,12 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             obj.hide = True
             obj.hide_render = True
 
-    def save_visibility_state(self):
+    def save_ui_state(self):
         """
-        Saves the hide and hide_render properties of all objects.
+        Saves the hide and hide_render properties of all objects. Also other
+        properties.
         """
+        self.scene = bpy.data.scenes["Scene"]
 
         self.visibility_states = {}
         for obj in bpy.data.objects:
@@ -81,8 +83,9 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 "hide": obj.hide,
                 "hide_render": obj.hide_render
             }
+        self.orig_film_transparent = self.scene.cycles.film_transparent
     
-    def restore_visibility_state(self):
+    def restore_ui_state(self):
         """
         Restores the initial hide and hide_render properties of all objects.
         """
@@ -91,6 +94,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             name = obj.name
             obj.hide = self.visibility_states[name]["hide"]
             obj.hide_render = self.visibility_states[name]["hide_render"]
+        self.scene.cycles.film_transparent = self.orig_film_transparent
 
     def _compress_png(self, filename):
         """
@@ -99,16 +103,16 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         :param str filename: The filename of the png to compress.
         """
 
-        if self.scene.pngquant_path == "":
+        if self.scene.proteinvr_pngquant_path == "":
             return
 
-        if os.path.exists(self.scene.pngquant_path):
-            cmd = self.scene.pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
+        if os.path.exists(self.scene.proteinvr_pngquant_path):
+            cmd = self.scene.proteinvr_pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
             # print("RUN: " + cmd)
             os.system(cmd)
             os.rename(filename + '.tmp.png', filename)
         else:
-            print("WARNING: pngquant path not valid: " + self.scene.pngquant_path)        
+            print("WARNING: pngquant path not valid: " + self.scene.proteinvr_pngquant_path)        
 
     def _step_0_existing_files_check_ok_and_copy(self):
         """
@@ -120,7 +124,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         """
 
         # Save some things to variables
-        self.scene = bpy.data.scenes["Scene"]
         self.plugin_dir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + os.sep + ".." + os.sep + "..") + os.sep
         self.plugin_asset_dir = self.plugin_dir + "assets" + os.sep
 
@@ -188,7 +191,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         
         # Put objects into "render layer" categories.
         self.object_categories = {
-            "BACKGROUND": [],
+            "SKYBOX": [],
             "STATIC": [],
             "MESH": []  # Includes onces marked meshed, and any ones that have animations.
         }
@@ -198,21 +201,21 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # Seperates the objects into their respective categories as specified by the user
         # for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
         for obj in self.objects_to_consider:
-            if(obj.proteinvr_category == "background"): #Capitalize
-                self.object_categories["BACKGROUND"].append(obj) # background = an eventual PNG file that will be the background image. NOT MOVING
+            if(obj.proteinvr_category == "skybox"): #Capitalize
+                self.object_categories["SKYBOX"].append(obj) # skybox = an eventual PNG file that will be the skybox image. NOT MOVING
             elif(obj.proteinvr_category == "static"):
                 self.object_categories["STATIC"].append(obj) # Static = low quality non moving images, this based on user preference
             elif(obj.proteinvr_category == "mesh"):
                 self.object_categories["MESH"].append(obj) # Meshed = high quality objects, ALL ANIMATED objects are here, but some non animated can be in there if use wants high quality
 
-        # Make sure self.scene.pngquant_path contains executable file
-        if self.scene.pngquant_path != "":
+        # Make sure self.scene.proteinvr_pngquant_path contains executable file
+        if self.scene.proteinvr_pngquant_path != "":
             try:
-                subprocess.Popen(self.scene.pngquant_path, stderr=subprocess.PIPE)
+                subprocess.Popen(self.scene.proteinvr_pngquant_path, stderr=subprocess.PIPE)
             except:
                 Messages.send_message(
                     "PNGQUANT_ERROR", 
-                    'Error trying to execute ' + self.scene.pngquant_path,
+                    'Error trying to execute ' + self.scene.proteinvr_pngquant_path,
                     operator=self
                 )
                 return False
@@ -254,7 +257,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
     def _list_of_nums_to_key(self, list_of_nums):
         return "_".join([str(i) for i in list_of_nums])
 
-    def _step_3_add_animated_objects_to_mesh_list_and_store_animation_data(self):
+    def _step_3_store_animation_data_of_obj_in_mesh_list(self):
         """
         Get all the objects that are currently visible, but have animations.
 
@@ -263,26 +266,14 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                          records the animation of the objects.
         """
         
-        # animation_data is a dictionary to hold location data of animated objects
+        # animation_data is a dictionary to hold location data of animated
+        # objects that are assigned MESH.
         animation_data = {}
 
-        # Looping through all objects for error checking to make sure an animated object was not placed in the wrong category
-        # for obj in [o for o in bpy.data.objects if not "Camera" in o.name]:
+        # Get the animation data for all animated MESH objects.
         for obj in self.objects_to_consider:
-            if obj.hide == False and obj.hide_render == False: 
-                pos_loc_data = self._get_animation_keyframes(obj)
-
-                keys = [self._list_of_nums_to_key(l) for l in pos_loc_data.values()]
-
-                keys = set(keys)  # Get unique keys
-                num_keyframes = len(keys)
-                if num_keyframes > 1: # Checking to see if object is animated
-                    self.object_categories["MESH"].append(obj) # If object is animated then, add to category MESH
-                    if obj in self.object_categories["STATIC"]:
-                        self.object_categories["STATIC"].remove(obj)
-                    if obj in self.object_categories["BACKGROUND"]:
-                        self.object_categories["BACKGROUND"].remove(obj)
-                    animation_data[obj.name] = pos_loc_data # Add location data to animation_data dictionary with key of object name
+            if obj.hide == False and obj.hide_render == False and obj in self.object_categories["MESH"]: 
+                animation_data[obj.name] = self._get_animation_keyframes(obj) # Add location data to animation_data dictionary with key of object name
 
         # Add in "animation data" of meshes that are not animted. Why? Because
         # when you export them, you'll export at the origin. You need to be
@@ -299,15 +290,15 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
     def _render_whatever_is_visible(self, filename):
         # TODO: Some of these variables are not called after this.....
         self.scene.render.resolution_percentage = 100.0
-        self.scene.cycles.samples = self.scene.proteinvr_num_cycles
-        self.scene.cycles.preview_samples = self.scene.proteinvr_num_cycles
-        self.scene.cycles.film_transparent = True  # Because you're saving the background separately.
+        self.scene.cycles.samples = self.scene.proteinvr_num_samples
+        self.scene.cycles.preview_samples = self.scene.proteinvr_num_samples
+        # self.scene.cycles.film_transparent = True  # Because you're saving the skybox separately.
 
         self.scene.render.filepath = filename
         self.scene.render.image_settings.file_format = 'PNG'
         self.scene.render.image_settings.color_mode = "RGBA"
         self.scene.render.image_settings.compression = 100
-        self.scene.render.image_settings.quality = self.scene.jpeg_quality
+        self.scene.render.image_settings.quality = self.scene.proteinvr_jpeg_quality
         self.scene.render.resolution_x = self.scene.proteinvr_bake_texture_size
         self.scene.render.resolution_y = self.scene.proteinvr_bake_texture_size
         self.scene.render.resolution_percentage = 100
@@ -322,7 +313,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         else:
             print("WARNING: Skipping the mobile textures...")
 
-        self.scene.cycles.film_transparent = False
+        # self.scene.cycles.film_transparent = False
 
     def _step_4_render_static_frames(self, debug=False):
         """
@@ -331,17 +322,20 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         :param bool debug: Whether to run in debug
         """
 
-        # Hide all objects in Background and meshed category. Show objects in
+        # Hide all objects in Skybox and meshed category. Show objects in
         # static category. For through each. For each frame, render a png file
         # of the static images.
 
-        print("BACKGROUND:", self.object_categories["BACKGROUND"])
+        print("SKYBOX:", self.object_categories["SKYBOX"])
         print("MESH:", self.object_categories["MESH"])
         print("STATICS:", self.object_categories["STATIC"])
 
-        #Hiding objects in Background and Mesh category
-        self.hide_objects("BACKGROUND")
+        #Hiding objects in Skybox and Mesh category
+        self.hide_objects("SKYBOX")
         self.hide_objects("MESH")
+
+        # Hide any environmental HDR texture
+        self.scene.cycles.film_transparent = True
 
         # Showing objects in Static category
         self.show_objects("STATIC")
@@ -363,22 +357,25 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 print("FILENAME:", filename)
                 self._render_whatever_is_visible(filename)
 
-    def _step_5_render_background_image(self):
+    def _step_5_render_skybox_image(self):
         """
         Get the environment texture and save that.
         """
-        #  Next, render the background (only once)
+        #  Next, render the skybox (only once)
         #   Change to frame 1
         #   Hide all objects in Static and meshed categories
-        #   Render background.png, using code like that below.
+        #   Render skybox.png, using code like that below.
 
         self.set_frame = self.frame_start
 
         self.hide_objects("MESH")
         self.hide_objects("STATIC")
-        self.show_objects("BACKGROUND")
+        self.show_objects("SKYBOX")
 
-        self._render_whatever_is_visible(self.proteinvr_output_dir + "environment.png")
+        # Show any environmental HDR texture
+        self.scene.cycles.film_transparent = False
+
+        self._render_whatever_is_visible(self.proteinvr_output_dir + "environment.png")  # TODO: Rename to skybox.png later...
 
     def _save_as_obj(self, obj, filepath):
         """
@@ -446,20 +443,29 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
             # Save that texture
             if len(texture_images) > 0:
-                image = texture_images[0]
-                image.alpha_mode = 'STRAIGHT'
-                image.filepath_raw = self.proteinvr_output_dir + obj.name + "_mesh.png"
-                image.file_format = 'PNG'
+                img = texture_images[0]
 
-                try:
-                    image.save()
-                except:
-                    Messages.send_message(
-                        "NODE_ERROR", 
-                        'Object "' + obj.name + '" has a texture node, but the texture is not .',
-                        operator=self
-                    )
-                    return False                    
+                # See https://blender.stackexchange.com/questions/3128/why-blender-throws-an-exception-when-saving-a-copy-of-image
+                filepath = self.proteinvr_output_dir + obj.name + "_mesh.png"
+
+                # Store current render settings
+                settings = bpy.context.scene.render.image_settings
+                format = settings.file_format
+                mode = settings.color_mode
+                depth = settings.color_depth
+
+                # Change render settings to our target format
+                settings.file_format = 'PNG'
+
+                # Save image to PNG, this does NOT render anything! It only
+                # means that the save command will use the current scene's
+                # render settings.
+                img.save_render(filepath)
+
+                # Restore previous render settings
+                settings.file_format = format
+                settings.color_mode = mode
+                settings.color_depth = depth             
             else:
                 Messages.send_message(
                     "NODE_ERROR", 
@@ -514,7 +520,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         # Now go through visible objects and get encompassing spheres
         # for obj in bpy.data.objects:
-        self.restore_visibility_state()
+        self.restore_ui_state()
 
         # import pdb; pdb.set_trace()
         for obj in self.objects_to_consider:
@@ -565,7 +571,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             if o.name.startswith("ProteinVRSign"):
                 self.extra_data["signs"].append({
                     "location": list(o.location),
-                    "text": o.sign_text
+                    "text": o.proteinvr_sign_text
                 })
 
     def _step_10_generate_texture_babylon_and_manifest_files(self):
@@ -585,26 +591,10 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 {
                     "name": None,
                     "id": None,
-                    "ambient": [
-                        0,
-                        0,
-                        0
-                    ],
-                    "diffuse": [
-                        0,
-                        0,
-                        0
-                    ],
-                    "specular": [
-                        0,
-                        0,
-                        0
-                    ],
-                    "emissive": [
-                        0,
-                        0,
-                        0
-                    ],
+                    "ambient": [0, 0, 0],
+                    "diffuse": [0, 0, 0],
+                    "specular": [0, 0, 0],
+                    "emissive": [0, 0, 0],
                     "specularPower": 64,
                     "alpha": 1,
                     "backFaceCulling": True,
@@ -642,6 +632,67 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             babylon["materials"][0]["emissiveTexture"]["name"] = bsnm
             json.dump(babylon, open(filename + ".babylon", 'w'))
 
+    def _get_nearest_index(self, index, coors):
+        coor = numpy.array(self.extra_data["spheres"][index]["position"])
+        dists = coors - coor
+        dists = dists * dists
+        dists = numpy.sum(dists, axis=1)
+        return numpy.argmin(dists)
+
+    def _frame_to_coor(self, frame_index):
+        array_index = self._frame_index_to_array_index(frame_index)
+        return numpy.array(self.extra_data["spheres"][array_index]["position"])
+    
+    def _frame_index_to_array_index(self, frame_index):
+        return frame_index - self.extra_data["firstFrameIndex"]
+
+    def _step_11_get_neighboring_path_points(self):
+        # What frames are the path points?
+        path_data, frames_that_connect_back_to_main_path = Utils.garden_path_string_to_data()
+
+        # Make a dictionary to store path points. Store some frame-neighbor
+        # data. 
+        frame_neighbors = {}
+        for start_frame, end_frame in path_data:
+            for frame in range(start_frame, end_frame + 1):
+                frame_neighbors[frame] = []
+
+                if frame != start_frame:
+                    frame_neighbors[frame].append(frame - 1)
+                if frame != end_frame:
+                    frame_neighbors[frame].append(frame + 1)
+
+        # For each * frame, find the closest frame in the main path Now go
+        # back and find frames that should connect back to the main path.
+        for connecting_frame in frames_that_connect_back_to_main_path:
+            connecting_frame_coor = self._frame_to_coor(connecting_frame)
+            best_dist_squared = 1e10
+            best_main_path_frame = -1
+            for main_path_index in range(path_data[0][0], path_data[0][1] + 1):
+                main_path_coor = self._frame_to_coor(main_path_index)
+                dist_squared = connecting_frame_coor - main_path_coor
+                dist_squared = dist_squared * dist_squared
+                dist_squared = numpy.sum(dist_squared)
+                if dist_squared < best_dist_squared:
+                    best_dist_squared = dist_squared
+                    best_main_path_frame = main_path_index
+
+                # print(connecting_frame_coor, main_path_coor, dist_squared)
+
+            frame_neighbors[best_main_path_frame].append(connecting_frame)
+            frame_neighbors[connecting_frame].append(best_main_path_frame)
+
+        # Now you need to convert the frame indexes in frame_neighbors to array indexies
+        frame_neighbors_with_array_indices = {}
+        for frame_index in frame_neighbors.keys():
+            array_index = self._frame_index_to_array_index(frame_index)
+            frame_neighbors_with_array_indices[array_index] = list(set([
+                self._frame_index_to_array_index(fi) for fi in frame_neighbors[frame_index]
+            ]))
+        
+        # Save that to json
+        self.extra_data["nextMoves"] = frame_neighbors_with_array_indices
+    
     def execute(self, context):
         """
         Runs when button pressed.
@@ -652,31 +703,34 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         :rtype: :class:`???`
         """
 
-        self.save_visibility_state()
+        self.save_ui_state()
 
         if self._step_0_existing_files_check_ok_and_copy() == False:
-            self.restore_visibility_state()
+            self.restore_ui_state()
             return {'FINISHED'}
 
         debug = False
 
         if self._step_1_initialize_variables() == False:
-            self.restore_visibility_state()
+            self.restore_ui_state()
             return {'FINISHED'}
 
         self._step_2_get_camerea_positions()
-        self._step_3_add_animated_objects_to_mesh_list_and_store_animation_data()
+        self._step_3_store_animation_data_of_obj_in_mesh_list()
 
         if len(glob.glob(self.proteinvr_output_dir + "frames/*.png")) == 0:
             self._step_4_render_static_frames(debug)
         
-        self._step_5_render_background_image()
+        self._step_5_render_skybox_image()
+
+        print("Why this if-statement logic? (BELOW) Why not just throw an error?")
 
         if self._step_6_save_meshed_objects():
             self._step_7_save_filenames_and_filesizes()
             self._step_8_make_proteinvr_clickable_meshes()
             self._step_9_save_signs()
-            self._step_10_generate_texture_babylon_and_manifest_files()
+            self._step_10_generate_texture_babylon_and_manifest_files()    
+            self._step_11_get_neighboring_path_points()
 
             json.dump(
                 self.extra_data, 
@@ -685,6 +739,6 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
             print(self.extra_data)
 
-        self.restore_visibility_state()
+        self.restore_ui_state()
 
         return {'FINISHED'}

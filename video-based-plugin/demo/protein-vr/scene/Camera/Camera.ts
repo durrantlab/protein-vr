@@ -229,10 +229,10 @@ function _whileCameraInMotion(deltaTime: number, camera: any): void {
     // fade out arrows with each move... looks good.
     Arrows.fadeDownAll(1.0 - timeRatio);
 
-    // Move background sphere too. It alwayd tracks the camera exactly (i.e.,
+    // Move skybox sphere too. It alwayd tracks the camera exactly (i.e.,
     // fixed relative to the camera).
-    let backgroundSphere = Globals.get("backgroundSphere");
-    backgroundSphere.position = camera.position;
+    let skyboxSphere = Globals.get("skyboxSphere");
+    skyboxSphere.position = camera.position;
 }
 
 function _updateInterpolatedPositionWhileInMotion(timeRatio: number, camera: any): void {
@@ -273,5 +273,5 @@ function _cameraJustFinishedBeingInMotion(camera): void {
     );
 
     // Make sure environmental sphere properly positioned.
-    Globals.get("backgroundSphere").position = camera.position;
+    Globals.get("skyboxSphere").position = camera.position;
 }

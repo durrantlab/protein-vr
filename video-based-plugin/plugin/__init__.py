@@ -74,24 +74,22 @@ class ProteinVR(PanelParentClass):
 
         # Set up general scene properties.
         bpy.types.Scene.proteinvr_output_dir = self.prop_funcs.strProp("Output directory", "/tmp/proteinvr/", 'DIR_PATH', description="The output directory where the ProteinVR scene will be saved.")
-        bpy.types.Scene.pngquant_path = self.prop_funcs.strProp("PNGQUANT Path", os.path.dirname(__file__) + os.sep + "pngquant" + os.sep + "pngquant", 'FILE_PATH', description="The full path to the pngquant executable.")
+        bpy.types.Scene.proteinvr_pngquant_path = self.prop_funcs.strProp("PNGQUANT Path", os.path.dirname(__file__) + os.sep + "pngquant" + os.sep + "pngquant", 'FILE_PATH', description="The full path to the pngquant executable.")
         bpy.types.Scene.proteinvr_use_existing_frames = self.prop_funcs.boolProp("Use Existing Frames", False, description="Whether to use previously rendered (existing) frames.")
         bpy.types.Scene.proteinvr_bake_texture_size = self.prop_funcs.intProp("Texture Size", min=128, max=8192, default=4096, description="The size of the square texture to render. Higher means higher resolution. Good to use power of 2. Recommended: 4096 for final render.")
         bpy.types.Scene.proteinvr_mobile_bake_texture_size = self.prop_funcs.intProp("Mobile Texture Size", min=0, max=8192, default=1024, description="The size of the square texture to render fore use on mobile. Higher means higher resolution. Good to use power of 2. Recommended: 1024 for final render.")
-        bpy.types.Scene.proteinvr_num_cycles = self.prop_funcs.intProp("Number of Cycles", min=1, max=10000, default=16, description="The number of rendering cycles. Higher means better quality.")
-        bpy.types.Scene.jpeg_quality = self.prop_funcs.intProp("JPEG Quality", min=0, max=100, default=50, description="JPEG quality.")
+        bpy.types.Scene.proteinvr_num_samples = self.prop_funcs.intProp("Number of Samples", min=1, max=10000, default=16, description="The number of rendering cycles. Higher means better quality.")
+        bpy.types.Scene.proteinvr_jpeg_quality = self.prop_funcs.intProp("JPEG Quality", min=0, max=100, default=50, description="JPEG quality.")
+
+        # Garden Paths
+        bpy.types.Scene.proteinvr_garden_paths = self.prop_funcs.strProp("Frames", "1-20; 21*-25*", description="The garden path segments. Format: path1_startframe-path1_endframe; path2_startframe-path2_endframe; etc.")
 
         # Object-specific properties.
         bpy.types.Object.proteinvr_clickable = self.prop_funcs.boolProp("proteinvr_clickable", False, description="Whether this object is proteinvr_clickable.")
-        bpy.types.Object.sign_text = self.prop_funcs.strProp("", "Put sign text here...", description="The text to display on this sign.")
+        bpy.types.Object.proteinvr_sign_text = self.prop_funcs.strProp("", "Put sign text here...", description="The text to display on this sign.")
 
-        # Boolean variables for the three object categories.
-        # bpy.types.Object.background = self.prop_funcs.boolProp("background_image", False, description="Assigning image to be the background")
-        # bpy.types.Object.static = self.prop_funcs.boolProp("static", False, description="Assigning 3-D objects that are static/low quality, they are NOT animated")
-        # bpy.types.Object.mesh = self.prop_funcs.boolProp("mesh", False, description="Assigning 3-D objects that will be animated/High quality objects")
-
-        bpy.types.Object.proteinvr_category = self.prop_funcs.enumProp("Object Category", items=[("static", "Static", "Static Category"), ("mesh", "Mesh", "Mesh Category"), ("background", "Background", "Background Category")], description="Assign object to categories.")
-
+        # Object categories
+        bpy.types.Object.proteinvr_category = self.prop_funcs.enumProp("Object Category", items=[("static", "Static", "Static Category"), ("mesh", "Mesh", "Mesh Category"), ("skybox", "Skybox", "Skybox Category")], description="Assign object to categories.")
 
         # Setup the two panels.
         self.SetupPanel = SetupPanel.SetupPanel(self.ui)
