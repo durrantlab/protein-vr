@@ -10,6 +10,7 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
             this._textureHasTransparency = textureHasTransparency;
             let dirname = textureFilename.indexOf("/") === -1 ? "" : textureFilename.match(/.*\//)[0];
             let basename = textureFilename.replace(/.*\//, "");
+            BABYLON.SceneLoader.ShowLoadingScreen = false;
             BABYLON.SceneLoader.Append(dirname, basename + ".babylon", scene, () => {
                 scene.executeWhenReady(() => {
                     // Search through the materials to find the one with the id

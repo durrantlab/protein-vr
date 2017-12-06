@@ -62,6 +62,7 @@ export class Sphere {
         
         // isMobile = true;
         let isMobile = Globals.get("isMobile");
+        isMobile = true;
         if (isMobile) {
             // Some kind of phone... use low-res images
             filename = "frames/" + this.textureFileName + ".small.png";  // Note no caching, for debugging.
@@ -88,7 +89,7 @@ export class Sphere {
                 lazyLoadedSpheres.push(this);
                 Globals.set("lazyLoadedSpheres", lazyLoadedSpheres);
                 // console.log("Loaded:", this);  // Loaded.
-            });
+            }, 0);
         });
     }
 
@@ -180,12 +181,13 @@ export class Sphere {
             // Getter
             return this._sphereMesh.visibility;
 
-        } else {
+        } else if (this._sphereMesh !== undefined) {  // If this._sphereMesh is undefined, probably hasn't been loaded yet.
             // Setter
-            if (this._sphereMesh === undefined) {
-                console.log("Get ready for error:", this);
-                debugger;
-            }
+            // if (this._sphereMesh === undefined) {
+                // console.log("Get ready for error:", this);
+                // debugger;
+
+            // }
             this._sphereMesh.visibility = val;
 
             // *********
@@ -201,24 +203,31 @@ export class Sphere {
             if (val === 1.0) {
                 // debugger;
                 SphereCollection.currentSphere(this);
+                console.log("NOW ON SPHERE", SphereCollection.currentSphere().textureFileName)
 
-                // this is where currentSphere is changed, so this is where we want to load in assets for local spheres if lazy loading is enabled
+                // this is where currentSphere is changed, so this is where we
+                // want to load in assets for local spheres if lazy loading is
+                // enabled
                 if (Globals.get("lazyLoadViewerSpheres") === true) {  // if we are Lazy Loading...
-                    for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {    // counting from 0 to whatever global Lazy Loading count is specified to itterate over a CameraPoints object ordered by distance to this Sphere
+                    // Losf the assets that are nearby.
+                    for (let i = 1; i < Globals.get("lazyLoadCount") + 1; i++) {    // counting from 1 to whatever global Lazy Loading count is specified to itterate over a CameraPoints object ordered by distance to this Sphere
                         if (this.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere._assetsLoaded === false) {    // if the sphere we are looking at (one of the 16 nearest to the this one) has not yet had its assets loaded
+                            console.log("LOADED", this.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere.textureFileName)
                             this.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
                         }
                     }
-                    // below is code to remove unwanted assets from memory, it is not necessary to execute on the initial load of the nearest spheres to the first sphere
-                    // there is probably a better way to do this
+                    // below is code to remove unwanted assets from memory, it
+                    // is not necessary to execute on the initial load of the
+                    // nearest spheres to the first sphere there is probably a
+                    // better way to do this
                     for (let i = 0; i < Globals.get("lazyLoadedSpheres").length; i++) { // itterate through the list of spheres with loaded assets
                         let nearNeighbor = false; // boolean to keep track of whether a sphere is in the lazyLoadCount nearest neighbors to the current sphere
-                        for (let j = 0; j < Globals.get("lazyLoadCount"); j++) { // comparing against the lazyLoadCount nearest neighbors to the current sphere
-                            console.log("=====");
+                        for (let j = 1; j < Globals.get("lazyLoadCount") + 1; j++) { // comparing against the lazyLoadCount nearest neighbors to the current sphere
+                            // console.log("=====");
                             // console.log(Globals.get("lazyLoadedSpheres")[i])  // this is a sphere
                             // console.log(Globals.get("lazyLoadedSpheres"))
-                            console.log(this.allNeighboringSpheresOrderedByDistance());
-                            debugger;
+                            // console.log(this.allNeighboringSpheresOrderedByDistance());
+                            // debugger;
                             // console.log(this.allNeighboringSpheresOrderedByDistance().get(j).associatedViewerSphere)  // this is a camera point
                             // debugger;
 
@@ -226,14 +235,22 @@ export class Sphere {
 
                             // WILLIAM: NEED TO COMPARE ATTRIBUTES OF BELOW (MAYBE SPHERE ID?)
 
-                            if (Globals.get("lazyLoadedSpheres")[i] === this.allNeighboringSpheresOrderedByDistance().get(j).associatedViewerSphere) { // if the sphere at index i in the list of all loaded spheres matches some sphere in the nearest neighbor list
-                                let nearNeighbor = true;
+                            // console.log(Globals.get("lazyLoadedSpheres")[i].textureFileName)
+                            // console.log(this.allNeighboringSpheresOrderedByDistance().get(j).associatedViewerSphere.textureFileName)
+                            // console.log(nearNeighbor);
+                            // console.log("=====")
+                            if (Globals.get("lazyLoadedSpheres")[i].textureFileName === this.allNeighboringSpheresOrderedByDistance().get(j).associatedViewerSphere.textureFileName) { // if the sphere at index i in the list of all loaded spheres matches some sphere in the nearest neighbor list
+                                nearNeighbor = true;
+                                // console.log("JUST SET TO TRUE!!!!!", nearNeighbor)
+                                break;
                             }
                         }
-                        if (nearNeighbor === false && Globals.get("lazyLoadedSpheres")[i] != this) { // if the sphere from the loaded assets array is not a nearest neighbor, we want to delete its assets from memory
+                        if ((nearNeighbor === false) && (Globals.get("lazyLoadedSpheres")[i].textureFileName !== this.textureFileName)) { // if the sphere from the loaded assets array is not a nearest neighbor, we want to delete its assets from memory
                             Globals.get("lazyLoadedSpheres")[i].unloadAssets(); // unload the assets
+                            console.log("UNLOADED", Globals.get("lazyLoadedSpheres")[i].textureFileName)
+                            
                             let lazyLoadedSpheres = Globals.get("lazyLoadedSpheres");
-                            lazyLoadedSpheres.splice(i, 1); // remove it from the array
+                            lazyLoadedSpheres.splice(i, 1); // remove it from the array. DON'T SPLICE HERE. KEEP TRACK OF WHICH ONES TO SPLICE. THEN REMOVE THOSE AFTER LOOP IS DONE.
                             Globals.set("lazyLoadedSpheres", lazyLoadedSpheres);
                         }
                     }
