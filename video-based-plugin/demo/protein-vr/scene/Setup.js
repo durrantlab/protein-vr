@@ -19,7 +19,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "../Sphe
                 // Setup viewer sphere template
                 let radius = 12; // When using VR, this needs to be farther away that what it was rendered at. this._JSONData["viewerSphereSize"];
                 _setupViewerSphereTemplate(scene, radius);
-                // Set up environmental (background) sphere
+                // Set up environmental (skybox) sphere
                 _setupEnvironmentalSphere(radius);
                 // Setup arrows
                 Arrows.setup();
@@ -85,15 +85,15 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "../Sphe
         :param number radius: The size of the environmenal sphere.
         */
         let viewerSphereTemplate = Globals.get("viewerSphereTemplate");
-        let backgroundSphere = viewerSphereTemplate.clone("backgroundSphere");
+        let skyboxSphere = viewerSphereTemplate.clone("skyboxSphere");
         let slightlyBiggerRadius = radius * 1.05;
-        backgroundSphere.scaling = new BABYLON.Vector3(slightlyBiggerRadius, slightlyBiggerRadius, -slightlyBiggerRadius);
-        backgroundSphere.rotation.y = 4.908738521234052; // To align export with scene. 281.25 degrees = 25/32*360
-        backgroundSphere.isPickable = false;
-        backgroundSphere.renderingGroupId = Globals_1.RenderingGroups.EnvironmentalSphere;
+        skyboxSphere.scaling = new BABYLON.Vector3(slightlyBiggerRadius, slightlyBiggerRadius, -slightlyBiggerRadius);
+        skyboxSphere.rotation.y = 4.908738521234052; // To align export with scene. 281.25 degrees = 25/32*360
+        skyboxSphere.isPickable = false;
+        skyboxSphere.renderingGroupId = Globals_1.RenderingGroups.EnvironmentalSphere;
         let sphereMaterial2 = new Material_1.Material('environment.png', true, () => {
-            backgroundSphere.material = sphereMaterial2.material;
-            Globals.set("backgroundSphere", backgroundSphere);
+            skyboxSphere.material = sphereMaterial2.material;
+            Globals.set("skyboxSphere", skyboxSphere);
         });
     }
 });
