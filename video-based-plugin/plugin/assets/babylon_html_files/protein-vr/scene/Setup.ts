@@ -8,6 +8,7 @@ import { RenderingGroups } from "../config/Globals";
 import { Material } from "../Spheres/Material";
 import * as Arrows from "./Arrows";
 import { setupAllSigns } from "./Sign";
+import { TextureType } from "../Spheres/Material";
 
 export function loadBabylonFile(): void {
     /*
@@ -119,9 +120,10 @@ function _setupEnvironmentalSphere(radius): void {
     skyboxSphere.isPickable = false;
     skyboxSphere.renderingGroupId = RenderingGroups.EnvironmentalSphere;
 
-    let sphereMaterial2 = new Material('environment.png', true, () => {
+    let sphereMaterial2 = new Material(true);
+    sphereMaterial2.loadTexture('skybox.png', () => {
         skyboxSphere.material = sphereMaterial2.material;
         Globals.set("skyboxSphere", skyboxSphere);
-    });
+    }, TextureType.Full);
 }
 

@@ -28,8 +28,8 @@ define(["require", "exports"], function (require, exports) {
             "cameraTypeToUse": "show-desktop-screen",
             "signData": [],
             "lazyLoadViewerSpheres": true,
-            "lazyLoadCount": 20,
-            "lazyLoadedSpheres": [],
+            "lazyLoadCount": 10,
+            // "lazyLoadedSpheres": [], // An array which will contain all spheres which have had their assets loaded, used for removing unwanted assets from memory
             "meshesWithAnimations": [],
             "loadingMilestones": {},
             "milestoneAttempted": [] // Where or not a given function that will end in a milestone complete has been run at least once. To prevent milestones from running multiple times.

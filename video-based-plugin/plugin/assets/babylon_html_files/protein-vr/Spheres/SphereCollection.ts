@@ -9,6 +9,13 @@ var _progressBarObj;
 // export var nextViewerSphere: Sphere;
 
 var _currentSphere: Sphere = undefined;
+export var setCurrentSphereVar = (val: Sphere) => { _currentSphere = val; }
+
+var _timeOfLastMove: number = 0;
+export var setTimeOfLastMoveVar = () => { _timeOfLastMove = new Date().getTime(); }
+export var hasEnoughTimePastSinceLastMove = () => {
+    return new Date().getTime() - _timeOfLastMove < 1000
+}
 
 export function create(): void {
     /*
@@ -52,54 +59,61 @@ export function create(): void {
     _progressBarObj = jQuery("#loading-progress-bar .progress-bar");
     _startUpdatingAssetLoadBar();
 
+    // Start loading spheres, one per second.
+    setInterval(_loadNextSphere, 100);
+
     // Load the appropriate viewer spheres.
-    _loadRelevantAssets();
+    // _loadRelevantAssets();
 }
 
-function _loadRelevantAssets(): void {
-    /*
-    Loads the relevant assets given the current sphere. As currently
-    implemented, just loads all assets (no lazy loading).
-    */
-
-    // Here, load and destroy the assets, as appropriate. For now, we're
-    // not doing lazy loading, so let's just load them all.
-
-    if (Globals.get("lazyLoadViewerSpheres") === false) { // if Lazy Loading is NOT enabled
-        _loadAllAssets();   // simply load all assets up front
-    } else {    // otherwise Lazy Loading must BE enabled, so we trigger the lazy loading scheme for the first sphere
-        // // if sphereCollection.count() is less than lazyLoadCount, just load everything up front instead even if lazy loading is enabled
-        // for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {    // counting from 0 to whatever global Lazy Loading count is specified to itterate over a CameraPoints object ordered by distance
-        //     if (_currentSphere.neighboringSpheresForLazyLoadingOrderedByDistance().get(i) === undefined) {
-        //         let dummy = _currentSphere.neighboringSpheresForLazyLoadingOrderedByDistance();
-        //         debugger;
-        //     }
-
-        //     if (_currentSphere.neighboringSpheresForLazyLoadingOrderedByDistance().get(i).associatedViewerSphere.assetsLoaded === false) {    // if the sphere we are looking at (one of the 16 nearest to the first sphere) has not had its assets loaded yet (NOTE: this will always be true at this point)
-        //         _currentSphere.neighboringSpheresForLazyLoadingOrderedByDistance().get(i).associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
-        //     }
-        // }
-    }
+function _loadNextSphere() {
+    _currentSphere.loadNextUnloadedAsset();
 }
 
-function _loadAllAssets(): void {
-    /*
-    Load the assets of all spheres and sets the first spheres opacity to 1.0.
-    So no lazy loading here.
-    */
+// function _loadRelevantAssets(): void {
+//     /*
+//     Loads the relevant assets given the current sphere. As currently
+//     implemented, just loads all assets (no lazy loading).
+//     */
+
+//     // Here, load and destroy the assets, as appropriate. For now, we're
+//     // not doing lazy loading, so let's just load them all.
+
+//     if (Globals.get("lazyLoadViewerSpheres") === false) { // if Lazy Loading is NOT enabled
+//         _loadAllAssets();   // simply load all assets up front
+//     } else {    // otherwise Lazy Loading must BE enabled, so we trigger the lazy loading scheme for the first sphere
+//         // // if sphereCollection.count() is less than lazyLoadCount, just load everything up front instead even if lazy loading is enabled
+//         // for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {    // counting from 0 to whatever global Lazy Loading count is specified to itterate over a CameraPoints object ordered by distance
+//         //     if (_currentSphere.neighboringSpheresForLazyLoadingOrderedByDistance().get(i) === undefined) {
+//         //         let dummy = _currentSphere.neighboringSpheresForLazyLoadingOrderedByDistance();
+//         //         debugger;
+//         //     }
+
+//         //     if (_currentSphere.neighboringSpheresForLazyLoadingOrderedByDistance().get(i).associatedViewerSphere.assetsLoaded === false) {    // if the sphere we are looking at (one of the 16 nearest to the first sphere) has not had its assets loaded yet (NOTE: this will always be true at this point)
+//         //         _currentSphere.neighboringSpheresForLazyLoadingOrderedByDistance().get(i).associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
+//         //     }
+//         // }
+//     }
+// }
+
+// function _loadAllAssets(): void {
+//     /*
+//     Load the assets of all spheres and sets the first spheres opacity to 1.0.
+//     So no lazy loading here.
+//     */
     
-    // Use this if you don't want to lazy load. Loads the sphere meshes
-    // and textures.
-    for (let i=0; i<_spheres.length; i++) {
-        let sphere: Sphere = _spheres[i];
-        // if sphere.assetsLoaded === false
-        sphere.loadAssets(() => {
-            if (i === 0) {
-                sphere.opacity(1.0);
-            }
-        });
-    }
-}
+//     // Use this if you don't want to lazy load. Loads the sphere meshes
+//     // and textures.
+//     for (let i=0; i<_spheres.length; i++) {
+//         let sphere: Sphere = _spheres[i];
+//         // if sphere.assetsLoaded === false
+//         sphere.loadAssets(() => {
+//             if (i === 0) {
+//                 sphere.opacity(1.0);
+//             }
+//         });
+//     }
+// }
 
 export function getByIndex(idx: number): Sphere {
     /*
@@ -125,6 +139,16 @@ export function count(): number {
     return _spheres.length;
 }
 
+export function countLazyLoadedSpheres(): number {
+    let count = 0;
+    for (let i=0; i<_spheres.length; i++) {
+        if (_spheres[i].assetsLoaded) {
+            count = count + 1;
+        }
+    }
+    return count;
+}
+
 export function hideAll() {
     /*
     Hide all spheres. Helper function.
@@ -136,24 +160,6 @@ export function hideAll() {
             viewerSphere.opacity(0.0);            
         }
     }
-}
-
-export function setCurrentSphereVar(val: Sphere): any {
-    /*
-    Sets the current sphere variable, depending on whether val is defined.
-    Note that this just changes the variable in this SphereCollection. Use the
-    setToCurrentSphere funciton in each Sphere object to set this variable and
-    also update the lazy-loading scheme. I'm using the function only because
-    changing the variable directly isn't possible.
-
-    :param Sphere val: An optional parameter. If defined, the current sphere
-           will be set to this one.
-
-    :returns: Can return the current sphere, if val is defined. :rtype:
-    :class:`Sphere`
-    */
-
-    _currentSphere = val;
 }
 
 function _startUpdatingAssetLoadBar(): void {

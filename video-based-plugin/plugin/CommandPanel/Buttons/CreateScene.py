@@ -375,7 +375,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # Show any environmental HDR texture
         self.scene.cycles.film_transparent = False
 
-        self._render_whatever_is_visible(self.proteinvr_output_dir + "environment.png")  # TODO: Rename to skybox.png later...
+        self._render_whatever_is_visible(self.proteinvr_output_dir + "skybox.png")  # TODO: Rename to skybox.png later...
 
     def _save_as_obj(self, obj, filepath):
         """
@@ -621,7 +621,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         }
 
         png_files = glob.glob(self.frame_dir + "*.png")
-        png_files.append(os.path.abspath(self.frame_dir + "..") + os.sep + "environment.png")
+        png_files.append(os.path.abspath(self.frame_dir + "..") + os.sep + "skybox.png")
 
         for filename in png_files:
             json.dump(manifest, open(filename + ".babylon.manifest", 'w'))

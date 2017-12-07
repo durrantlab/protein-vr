@@ -1,5 +1,5 @@
 // Sets up the scene.
-define(["require", "exports", "../config/Globals", "../config/Globals", "../Spheres/Material", "./Arrows", "./Sign"], function (require, exports, Globals, Globals_1, Material_1, Arrows, Sign_1) {
+define(["require", "exports", "../config/Globals", "../config/Globals", "../Spheres/Material", "./Arrows", "./Sign", "../Spheres/Material"], function (require, exports, Globals, Globals_1, Material_1, Arrows, Sign_1, Material_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function loadBabylonFile() {
@@ -96,9 +96,10 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "../Sphe
         skyboxSphere.rotation.y = 4.908738521234052; // To align export with scene. 281.25 degrees = 25/32*360
         skyboxSphere.isPickable = false;
         skyboxSphere.renderingGroupId = Globals_1.RenderingGroups.EnvironmentalSphere;
-        let sphereMaterial2 = new Material_1.Material('environment.png', true, () => {
+        let sphereMaterial2 = new Material_1.Material(true);
+        sphereMaterial2.loadTexture('skybox.png', () => {
             skyboxSphere.material = sphereMaterial2.material;
             Globals.set("skyboxSphere", skyboxSphere);
-        });
+        }, Material_2.TextureType.Full);
     }
 });
