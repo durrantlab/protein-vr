@@ -24,6 +24,10 @@ export function loadBabylonFile(): void {
 
         // Wait for textures and materials to be ready
         scene.executeWhenReady(() => {
+            // Make it so subsequent textures are stored in indexeddb. This is
+            // hackish, but it works.
+            scene.database = new BABYLON.Database('babylon.babylon', function()  {});            
+
             // Delay textures until needed. Cool, but too slow for our
             // purposes here... Keep it commented out for now.
             // newScene.useDelayedTextureLoading = true
@@ -46,6 +50,9 @@ export function loadBabylonFile(): void {
             // scene.debugLayer.show();
 
             scene.clearColor = new BABYLON.Color3(0, 0, 0);
+
+            // No built-in loading screen.
+            BABYLON.SceneLoader.ShowLoadingScreen = false;
             
             if (Globals.get("debug")) { scene.debugLayer.show(); }
             Globals.milestone("BabylonSceneLoaded", true);

@@ -207,6 +207,8 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         _updateInterpolatedPositionWhileInMotion(1.0, camera);
         // Set up new navigation arrows for new position.
         Arrows.update(_startingCameraInMotion_ViewerSphere.navigationNeighboringSpheresOrderedByDistance());
+        // Set the current sphere to this one.
+        _startingCameraInMotion_ViewerSphere.setToCurrentSphere();
         // Make sure environmental sphere properly positioned.
         Globals.get("skyboxSphere").position = camera.position;
     }

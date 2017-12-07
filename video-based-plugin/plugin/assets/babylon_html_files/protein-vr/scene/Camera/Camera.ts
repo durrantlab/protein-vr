@@ -272,6 +272,9 @@ function _cameraJustFinishedBeingInMotion(camera): void {
         _startingCameraInMotion_ViewerSphere.navigationNeighboringSpheresOrderedByDistance()
     );
 
+    // Set the current sphere to this one.
+    _startingCameraInMotion_ViewerSphere.setToCurrentSphere();
+
     // Make sure environmental sphere properly positioned.
     Globals.get("skyboxSphere").position = camera.position;
 }

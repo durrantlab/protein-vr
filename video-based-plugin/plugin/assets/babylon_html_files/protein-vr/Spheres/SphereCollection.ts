@@ -42,18 +42,11 @@ export function create(): void {
         let meshFilename = sphereDatum["mesh"];  // filename of mesh
         let sphere = new Sphere(textureFilename, meshFilename, position);
         _spheres.push(sphere);
-
-        // WILLIAM: IF i = 0, first sphere, so use currentSphere() as a setter
-        // below. Can't do this based on opacity, because not material loaded
-        // yet.
-        
-        if (i === 0) {
-            currentSphere(sphere);
-            // load sphere's assets
-            sphere.loadAssets();
-        }
     }
-    
+
+    // The initial sphere is the first one
+    _spheres[0].setToCurrentSphere();
+
     // Start updating the loading progress bar
     let jQuery = Globals.get("jQuery");
     _progressBarObj = jQuery("#loading-progress-bar .progress-bar");
@@ -75,17 +68,17 @@ function _loadRelevantAssets(): void {
     if (Globals.get("lazyLoadViewerSpheres") === false) { // if Lazy Loading is NOT enabled
         _loadAllAssets();   // simply load all assets up front
     } else {    // otherwise Lazy Loading must BE enabled, so we trigger the lazy loading scheme for the first sphere
-        // if sphereCollection.count() is less than lazyLoadCount, just load everything up front instead even if lazy loading is enabled
-        for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {    // counting from 0 to whatever global Lazy Loading count is specified to itterate over a CameraPoints object ordered by distance
-            if (_currentSphere.allNeighboringSpheresOrderedByDistance().get(i) === undefined) {
-                let dummy = _currentSphere.allNeighboringSpheresOrderedByDistance();
-                debugger;
-            }
+        // // if sphereCollection.count() is less than lazyLoadCount, just load everything up front instead even if lazy loading is enabled
+        // for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {    // counting from 0 to whatever global Lazy Loading count is specified to itterate over a CameraPoints object ordered by distance
+        //     if (_currentSphere.neighboringSpheresForLazyLoadingOrderedByDistance().get(i) === undefined) {
+        //         let dummy = _currentSphere.neighboringSpheresForLazyLoadingOrderedByDistance();
+        //         debugger;
+        //     }
 
-            if (_currentSphere.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere._assetsLoaded === false) {    // if the sphere we are looking at (one of the 16 nearest to the first sphere) has not had its assets loaded yet (NOTE: this will always be true at this point)
-                _currentSphere.allNeighboringSpheresOrderedByDistance().get(i).associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
-            }
-        }
+        //     if (_currentSphere.neighboringSpheresForLazyLoadingOrderedByDistance().get(i).associatedViewerSphere.assetsLoaded === false) {    // if the sphere we are looking at (one of the 16 nearest to the first sphere) has not had its assets loaded yet (NOTE: this will always be true at this point)
+        //         _currentSphere.neighboringSpheresForLazyLoadingOrderedByDistance().get(i).associatedViewerSphere.loadAssets(); // load in that sphere's assets (mesh and material)
+        //     }
+        // }
     }
 }
 
@@ -99,7 +92,7 @@ function _loadAllAssets(): void {
     // and textures.
     for (let i=0; i<_spheres.length; i++) {
         let sphere: Sphere = _spheres[i];
-        // if sphere._assetsLoaded === false
+        // if sphere.assetsLoaded === false
         sphere.loadAssets(() => {
             if (i === 0) {
                 sphere.opacity(1.0);
@@ -139,30 +132,28 @@ export function hideAll() {
 
     for (let i = 0; i < _spheres.length; i++) {
         let viewerSphere = _spheres[i];
-        if (viewerSphere._assetsLoaded === true) {
+        if (viewerSphere.assetsLoaded === true) {
             viewerSphere.opacity(0.0);            
         }
     }
 }
 
-export function currentSphere(val: Sphere = undefined): any {
+export function setCurrentSphereVar(val: Sphere): any {
     /*
-    Gets or sets the current sphere, depending on whether val is defined.
+    Sets the current sphere variable, depending on whether val is defined.
+    Note that this just changes the variable in this SphereCollection. Use the
+    setToCurrentSphere funciton in each Sphere object to set this variable and
+    also update the lazy-loading scheme. I'm using the function only because
+    changing the variable directly isn't possible.
 
     :param Sphere val: An optional parameter. If defined, the current sphere
            will be set to this one.
 
-    :returns: Can return the current sphere, if val is defined.
-    :rtype: :class:`Sphere`
+    :returns: Can return the current sphere, if val is defined. :rtype:
+    :class:`Sphere`
     */
 
-    if (val === undefined) {
-        // Getter
-        return _currentSphere;
-    } else {
-        // Setter
-        _currentSphere = val;
-    }
+    _currentSphere = val;
 }
 
 function _startUpdatingAssetLoadBar(): void {
