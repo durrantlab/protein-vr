@@ -96,23 +96,23 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             obj.hide_render = self.visibility_states[name]["hide_render"]
         self.scene.cycles.film_transparent = self.orig_film_transparent
 
-    def _compress_png(self, filename):
-        """
-        Compress a png file. Uses pngquant.
+    # def _compress_png(self, filename):
+    #     """
+    #     Compress a png file. Uses pngquant.
 
-        :param str filename: The filename of the png to compress.
-        """
+    #     :param str filename: The filename of the png to compress.
+    #     """
 
-        if self.scene.proteinvr_pngquant_path == "":
-            return
+    #     if self.scene.proteinvr_pngquant_path == "":
+    #         return
 
-        if os.path.exists(self.scene.proteinvr_pngquant_path):
-            cmd = self.scene.proteinvr_pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
-            # print("RUN: " + cmd)
-            os.system(cmd)
-            os.rename(filename + '.tmp.png', filename)
-        else:
-            print("WARNING: pngquant path not valid: " + self.scene.proteinvr_pngquant_path)        
+    #     if os.path.exists(self.scene.proteinvr_pngquant_path):
+    #         cmd = self.scene.proteinvr_pngquant_path + ' --speed 1 --quality="0-50" ' + filename + ' -o ' + filename + '.tmp.png'  # --strip 
+    #         # print("RUN: " + cmd)
+    #         os.system(cmd)
+    #         os.rename(filename + '.tmp.png', filename)
+    #     else:
+    #         print("WARNING: pngquant path not valid: " + self.scene.proteinvr_pngquant_path)        
 
     def _step_0_existing_files_check_ok_and_copy(self):
         """
@@ -161,6 +161,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         # Copy some files
         shutil.copyfile(self.plugin_asset_dir + os.sep + "babylon.babylon", self.proteinvr_output_dir + "babylon.babylon")
+        shutil.copyfile(self.plugin_asset_dir + os.sep + "babylon.babylon.manifest", self.proteinvr_output_dir + "babylon.babylon.manifest")
         
         for path in glob.glob(self.plugin_asset_dir + "babylon_html_files" + os.sep + "*"):
             target_path = self.proteinvr_output_dir + os.path.basename(path)
@@ -209,16 +210,16 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 self.object_categories["MESH"].append(obj) # Meshed = high quality objects, ALL ANIMATED objects are here, but some non animated can be in there if use wants high quality
 
         # Make sure self.scene.proteinvr_pngquant_path contains executable file
-        if self.scene.proteinvr_pngquant_path != "":
-            try:
-                subprocess.Popen(self.scene.proteinvr_pngquant_path, stderr=subprocess.PIPE)
-            except:
-                Messages.send_message(
-                    "PNGQUANT_ERROR", 
-                    'Error trying to execute ' + self.scene.proteinvr_pngquant_path,
-                    operator=self
-                )
-                return False
+        # if self.scene.proteinvr_pngquant_path != "":
+        #     try:
+        #         subprocess.Popen(self.scene.proteinvr_pngquant_path, stderr=subprocess.PIPE)
+        #     except:
+        #         Messages.send_message(
+        #             "PNGQUANT_ERROR", 
+        #             'Error trying to execute ' + self.scene.proteinvr_pngquant_path,
+        #             operator=self
+        #         )
+        #         return False
 
         return True                
 
@@ -303,13 +304,13 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.scene.render.resolution_y = self.scene.proteinvr_bake_texture_size
         self.scene.render.resolution_percentage = 100
         bpy.ops.render.render(write_still=True)
-        self._compress_png(self.scene.render.filepath)
+        # self._compress_png(self.scene.render.filepath)
 
         if self.scene.proteinvr_mobile_bake_texture_size != 0:
             self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
             self.scene.render.filepath = filename + ".small.png"
             bpy.ops.render.render(write_still=True)
-            self._compress_png(self.scene.render.filepath)                    
+            # self._compress_png(self.scene.render.filepath)                    
         else:
             print("WARNING: Skipping the mobile textures...")
 
@@ -574,63 +575,63 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                     "text": o.proteinvr_sign_text
                 })
 
-    def _step_10_generate_texture_babylon_and_manifest_files(self):
-        """
-        Wrap the textures in babylon files to take advantage of babylon's
-        caching system.
-        """
+    # def _step_10_generate_texture_babylon_and_manifest_files(self):
+    #     """
+    #     Wrap the textures in babylon files to take advantage of babylon's
+    #     caching system.
+    #     """
 
-        manifest = {
-            "version": int(1000000 * random.random()),
-            "enableSceneOffline" : True,
-            "enableTexturesOffline" : True
-        }
+    #     manifest = {
+    #         "version": int(1000000 * random.random()),
+    #         "enableSceneOffline" : True,
+    #         "enableTexturesOffline" : True
+    #     }
 
-        babylon = {
-            "materials": [
-                {
-                    "name": None,
-                    "id": None,
-                    "ambient": [0, 0, 0],
-                    "diffuse": [0, 0, 0],
-                    "specular": [0, 0, 0],
-                    "emissive": [0, 0, 0],
-                    "specularPower": 64,
-                    "alpha": 1,
-                    "backFaceCulling": True,
-                    "checkReadyOnlyOnce": False,
-                    "maxSimultaneousLights": 4,
-                    "emissiveTexture": {
-                        "name": None,
-                        "level": 1,
-                        "hasAlpha": 0,
-                        "coordinatesMode": 0,
-                        "uOffset": 0,
-                        "vOffset": 0,
-                        "uScale": 1,
-                        "vScale": 1,
-                        "uAng": 0,
-                        "vAng": 0,
-                        "wAng": 0,
-                        "wrapU": 0,
-                        "wrapV": 0,
-                        "coordinatesIndex": 0
-                    }
-                }
-            ]
-        }
+    #     babylon = {
+    #         "materials": [
+    #             {
+    #                 "name": None,
+    #                 "id": None,
+    #                 "ambient": [0, 0, 0],
+    #                 "diffuse": [0, 0, 0],
+    #                 "specular": [0, 0, 0],
+    #                 "emissive": [0, 0, 0],
+    #                 "specularPower": 64,
+    #                 "alpha": 1,
+    #                 "backFaceCulling": True,
+    #                 "checkReadyOnlyOnce": False,
+    #                 "maxSimultaneousLights": 4,
+    #                 "emissiveTexture": {
+    #                     "name": None,
+    #                     "level": 1,
+    #                     "hasAlpha": 0,
+    #                     "coordinatesMode": 0,
+    #                     "uOffset": 0,
+    #                     "vOffset": 0,
+    #                     "uScale": 1,
+    #                     "vScale": 1,
+    #                     "uAng": 0,
+    #                     "vAng": 0,
+    #                     "wAng": 0,
+    #                     "wrapU": 0,
+    #                     "wrapV": 0,
+    #                     "coordinatesIndex": 0
+    #                 }
+    #             }
+    #         ]
+    #     }
 
-        png_files = glob.glob(self.frame_dir + "*.png")
-        png_files.append(os.path.abspath(self.frame_dir + "..") + os.sep + "skybox.png")
+    #     png_files = glob.glob(self.frame_dir + "*.png")
+    #     png_files.append(os.path.abspath(self.frame_dir + "..") + os.sep + "skybox.png")
 
-        for filename in png_files:
-            json.dump(manifest, open(filename + ".babylon.manifest", 'w'))
+    #     for filename in png_files:
+    #         json.dump(manifest, open(filename + ".babylon.manifest", 'w'))
 
-            bsnm = os.path.basename(filename)
-            babylon["materials"][0]["name"] = bsnm
-            babylon["materials"][0]["id"] = bsnm
-            babylon["materials"][0]["emissiveTexture"]["name"] = bsnm
-            json.dump(babylon, open(filename + ".babylon", 'w'))
+    #         bsnm = os.path.basename(filename)
+    #         babylon["materials"][0]["name"] = bsnm
+    #         babylon["materials"][0]["id"] = bsnm
+    #         babylon["materials"][0]["emissiveTexture"]["name"] = bsnm
+    #         json.dump(babylon, open(filename + ".babylon", 'w'))
 
     def _get_nearest_index(self, index, coors):
         coor = numpy.array(self.extra_data["spheres"][index]["position"])
@@ -646,7 +647,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
     def _frame_index_to_array_index(self, frame_index):
         return frame_index - self.extra_data["firstFrameIndex"]
 
-    def _step_11_get_neighboring_path_points(self):
+    def _step_10_get_neighboring_path_points(self):
         # What frames are the path points?
         path_data, frames_that_connect_back_to_main_path = Utils.garden_path_string_to_data()
 
@@ -692,6 +693,31 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         
         # Save that to json
         self.extra_data["nextMoves"] = frame_neighbors_with_array_indices
+
+    def _step_11_triggers(self):
+        # Make sure assets directory exists
+        mp3_dir = self.proteinvr_output_dir + "assets" + os.sep
+        if not os.path.exists(mp3_dir):
+            os.mkdir(mp3_dir)
+        
+        # Get the trigger data
+        trigger_data = json.loads(bpy.context.scene.trigger_string)
+
+        # Process each trigger entry
+        new_trigger_data = []
+        for frame_idx, cmd in trigger_data:
+            # Copy any mp3 files.
+            if cmd.upper().endswith(".MP3"):
+                new_filename = "assets" + os.sep + os.path.basename(cmd)
+                shutil.copyfile(cmd, self.proteinvr_output_dir + new_filename)
+                cmd = new_filename
+            
+            # Adjust the frame, so 0 frame is first used.
+            array_idx = self._frame_index_to_array_index(frame_idx)
+        
+            new_trigger_data.append([array_idx, cmd])
+
+        self.extra_data["triggers"] = new_trigger_data
     
     def execute(self, context):
         """
@@ -729,8 +755,11 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             self._step_7_save_filenames_and_filesizes()
             self._step_8_make_proteinvr_clickable_meshes()
             self._step_9_save_signs()
-            self._step_10_generate_texture_babylon_and_manifest_files()    
-            self._step_11_get_neighboring_path_points()
+            # self._step_10_generate_texture_babylon_and_manifest_files()    
+            self._step_10_get_neighboring_path_points()
+
+            # Save trigger data
+            self._step_11_triggers()
 
             json.dump(
                 self.extra_data, 

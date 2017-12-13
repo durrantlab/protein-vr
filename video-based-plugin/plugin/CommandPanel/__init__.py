@@ -17,5 +17,6 @@
 from .Buttons.CreateScene import OBJECT_OT_CreateScene
 from .Buttons.RenderRemote import OBJECT_OT_RenderRemote
 from .Buttons.Sign import OBJECT_OT_Sign
+from .Buttons.AddTrigger import OBJECT_OT_AddTrigger
 from .CommandPanel import CommandPanel
 

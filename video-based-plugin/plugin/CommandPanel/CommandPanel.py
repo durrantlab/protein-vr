@@ -23,6 +23,7 @@ from ..DurBlend import Messages
 from mathutils import Vector
 from .. import Utils
 from ..Utils import object_is_proteinvr_clickable
+import json
 
 # from .Buttons import OBJECT_OT_CreateScene
 # from .Buttons import OBJECT_OT_RenderRemote
@@ -71,6 +72,27 @@ class CommandPanel(ParentPanel):
                 self.ui.label("Path " + str(i+1) + ": Frame " + str(frame1) + " to frame " + str(frame2))
             for frame in frames_that_connect_back_to_main_path:
                 self.ui.label("Frame " + str(frame) + " reaches Path 1")
+        self.ui.scene_property("proteinvr_garden_paths")
+
+        # Triggers
+        self.ui.use_box_row("Triggers")
+        try: trigger_data = json.loads(bpy.context.scene.trigger_string)
+        except: trigger_data = None
+        if trigger_data is None:
+            self.ui.label("Formatting error!")
+        else:
+            for frame_idx, action in trigger_data:
+                if action.upper().endswith(".MP3"):
+                    action = os.path.basename(action)
+                self.ui.label("On frame " + str(frame_idx) + ': "' + action + '"')
+        self.ui.scene_property("trigger_string")
+
+        self.ui.label("New trigger at frame " + str(bpy.context.scene.frame_current) + "?")
+        self.ui.scene_property("add_trigger_cmd")
+        Messages.display_message("TRIGGER_FILE_NO_EXIST", self)
+        self.ui.ops_button(rel_data_path="proteinvr.add_trigger", button_label="Add")
+
+
 
         # try:
         #     paths = [p.strip() for p in bpy.context.scene.proteinvr_garden_paths.split(";")]
@@ -80,7 +102,6 @@ class CommandPanel(ParentPanel):
         # except:
         #     
 
-        self.ui.scene_property("proteinvr_garden_paths")
 
         # Set up UI
         # self.ui.use_layout_row()
@@ -96,11 +117,11 @@ class CommandPanel(ParentPanel):
             self.ui.scene_property("proteinvr_bake_texture_size")
             self.ui.scene_property("proteinvr_mobile_bake_texture_size")
             self.ui.scene_property("proteinvr_num_samples")
-            self.ui.scene_property("proteinvr_pngquant_path")
-            Messages.display_message("PNGQUANT_ERROR", self)
+            # self.ui.scene_property("proteinvr_pngquant_path")
+            # Messages.display_message("PNGQUANT_ERROR", self)
         
         self.ui.ops_button(rel_data_path="proteinvr.create_scene", button_label="Create Scene")
-        self.ui.ops_button(rel_data_path="proteinvr.render_scene_remotely", button_label="Render Scene Remotely")        
+        # self.ui.ops_button(rel_data_path="proteinvr.render_scene_remotely", button_label="Render Scene Remotely")        
         
 
 

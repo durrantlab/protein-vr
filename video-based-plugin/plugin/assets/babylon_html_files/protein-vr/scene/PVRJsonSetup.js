@@ -1,5 +1,5 @@
 /* Get data about the scene from external json files. */
-define(["require", "exports", "../config/Globals", "../config/Globals", "./Animations/Animations"], function (require, exports, Globals, Globals_1, Animations) {
+define(["require", "exports", "../config/Globals", "../config/Globals", "./Animations/Animations", "../Triggers/TriggerCollection"], function (require, exports, Globals, Globals_1, Animations, TriggerCollection) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function loadJSON() {
@@ -20,6 +20,13 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Anima
             Globals.set("animationData", exports.JSONData["animations"]);
             Globals.set("firstFrameIndex", exports.JSONData["firstFrameIndex"]);
             Globals.set("lastFrameIndex", exports.JSONData["lastFrameIndex"]);
+            Globals.set("nextMoves", exports.JSONData["nextMoves"]);
+            // Globals.set("triggers", );
+            TriggerCollection.create(exports.JSONData["triggers"]);
+            if (exports.JSONData["pngFileSizes"] !== undefined) {
+                // only defined if you've used optimize.py
+                Globals.set("pngFileSizes", exports.JSONData["pngFileSizes"]);
+            }
             Globals.milestone("DataJsonLoadingStarted", true);
         });
     }

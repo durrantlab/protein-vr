@@ -3,7 +3,11 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var BABYLON;
+    var isMobile;
     var _firstRender = true;
+    var _lastCameraRotation;
+    var _lastCameraRotationCheckTimestamp = 0;
+    var _msBetweenCameraAngleChecks = 500;
     function setup() {
         /*
         Sets up the camera.
@@ -13,9 +17,12 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
             return;
         }
         let scene = Globals.get("scene");
-        let BABYLON = Globals.get("BABYLON");
-        let isMobile = Globals.get("isMobile");
+        let engine = Globals.get("engine");
+        BABYLON = Globals.get("BABYLON");
+        isMobile = Globals.get("isMobile");
         let jQuery = Globals.get("jQuery");
+        _lastCameraRotation = new BABYLON.Vector3(0, 0, 0);
+        _lastCameraRotationCheckTimestamp = new Date().getTime();
         // Set up the camera type (HTC Vive, for example) and input (keyboard,
         // mouse, etc.)
         Devices.setup();
@@ -29,9 +36,53 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         _endingCameraInMotion_ViewerSphere = firstSphere;
         // Setup first steps forward
         _cameraJustFinishedBeingInMotion(scene.activeCamera);
+        // Add blur post processes that can be turned on and off. Only if mobile.
+        if (!isMobile) {
+            let blurPipeline = new BABYLON.PostProcessRenderPipeline(engine, "blurPipeline");
+            let kernel = 12.0;
+            var horizontalBlur = new BABYLON.PostProcessRenderEffect(engine, "horizontalBlurEffect", function () {
+                return new BABYLON.BlurPostProcess("hb", new BABYLON.Vector2(1.0, 0), kernel, 1.0, null, null, engine, false);
+            });
+            var verticalBlur = new BABYLON.PostProcessRenderEffect(engine, "verticalBlurEffect", function () {
+                return new BABYLON.BlurPostProcess("vb", new BABYLON.Vector2(0, 1.0), kernel, 1.0, null, null, engine, false);
+            });
+            // var antiAlias = new BABYLON.PostProcessRenderEffect(engine, "antialias", function() { 
+            //     return new BABYLON.FxaaPostProcess(
+            //         "aa", 5.0, null, null, engine, false
+            //     )
+            // });
+            blurPipeline.addEffect(horizontalBlur);
+            blurPipeline.addEffect(verticalBlur);
+            // blurPipeline.addEffect(antiAlias);
+            scene.postProcessRenderPipelineManager.addPipeline(blurPipeline);
+            scene.postProcessRenderPipelineManager.attachCamerasToRenderPipeline("blurPipeline", scene.activeCamera);
+            blur(false);
+        }
         Globals.milestone("CameraSetup", true);
     }
     exports.setup = setup;
+    function blur(val) {
+        if (isMobile) {
+            // No blur effect if it's mobile.
+            return;
+        }
+        let scene = Globals.get("scene");
+        switch (val) {
+            case true:
+                console.log("Blurring");
+                scene.postProcessRenderPipelineManager.enableEffectInPipeline("blurPipeline", "horizontalBlurEffect", scene.activeCamera);
+                scene.postProcessRenderPipelineManager.enableEffectInPipeline("blurPipeline", "verticalBlurEffect", scene.activeCamera);
+                // scene.postProcessRenderPipelineManager.detachCamerasFromRenderPipeline("blurPipeline", scene.activeCamera);
+                // scene.postProcessRenderPipelineManager.attachCamerasToRenderPipeline("blurPipeline", scene.activeCamera);        
+                break;
+            case false:
+                console.log("Unblurrng");
+                scene.postProcessRenderPipelineManager.disableEffectInPipeline("blurPipeline", "horizontalBlurEffect", scene.activeCamera);
+                scene.postProcessRenderPipelineManager.disableEffectInPipeline("blurPipeline", "verticalBlurEffect", scene.activeCamera);
+                break;
+        }
+    }
+    exports.blur = blur;
     var _speedInUnitsPerSecond = 1;
     var _lastMovementTime = (new Date).getTime();
     var _msUntilNextMoveAllowed = 0;
@@ -48,19 +99,35 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
             return;
         }
         let scene = Globals.get("scene");
-        let BABYLON = Globals.get("BABYLON");
+        let engine = Globals.get("engine");
         let camera = scene.activeCamera;
+        // if (newCameraRotation.equalsWithEpsilon(_lastCameraRotation, 0.3)) {  // Allow for about 10 degree deviation (0.3 when you do the math). Because with VR headset there will always be a little movement.
+        //     _lastCameraRotation = newCameraRotation;
+        // }
         // Get the time that's elapsed since this function was last called.
         // There's a refractoty period between movements... don't move unless
         // enough time has passed. This is needed because the camera automatically
         // moves between camera points. While in motion, you can initiate another
         // motion.
-        let deltaTime = (new Date).getTime() - _lastMovementTime;
+        let curTime = new Date().getTime();
+        let deltaTime = curTime - _lastMovementTime;
         if (deltaTime < _msUntilNextMoveAllowed) {
             // Not enough time has passed to allow another movement.
             _cameraCurrentlyInMotion = true;
             _whileCameraInMotion(deltaTime, camera);
             return;
+        }
+        if (curTime - _lastCameraRotationCheckTimestamp > _msBetweenCameraAngleChecks) {
+            _lastCameraRotationCheckTimestamp = curTime;
+            let newCameraRotation = camera.rotation.clone();
+            let dist = BABYLON.Vector3.Distance(newCameraRotation, _lastCameraRotation);
+            // console.log(dist);
+            // console.log(dist/engine.getFps());
+            if (dist > 0.05) {
+                SphereCollection.setTimeOfLastMoveVar();
+                // console.log("substantial movement");
+            }
+            _lastCameraRotation = newCameraRotation;
         }
         // NOTE: If you get here, you're ready to move again.
         if (_cameraCurrentlyInMotion) {
@@ -87,8 +154,11 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         }
         // If you get here, you're ready to start moving, and the user
         // actually wants to move.
-        _firstRender = false; // It's no longer the first time rendering.
         _cameraPickDirectionAndStartInMotion(camera);
+        if (_firstRender) {
+            blur(false); // Make sure not initially blurred.
+        }
+        _firstRender = false; // It's no longer the first time rendering.
     }
     exports.update = update;
     function _cameraPickDirectionAndStartInMotion(camera) {
@@ -101,6 +171,10 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         */
         // Note that at this point, it is _endingCameraInMotion that is the one
         // you're currently on. You haven't yet switched them... confusing...
+        // Blur the camera ("motion blur"). Also helps with lowres images during
+        // transition. It will be unblurred when high-res image-load attempt is
+        // made.
+        blur(true);
         // Make sure everything hidden but present sphere.
         SphereCollection.hideAll();
         _endingCameraInMotion_ViewerSphere.opacity(1.0);
@@ -203,12 +277,14 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
     
         :param ??? camera: The BABYLON camera.
         */
+        // Unblur the camera.
+        blur(false);
         // Make sure completed transition to full visibility.
         _updateInterpolatedPositionWhileInMotion(1.0, camera);
         // Set up new navigation arrows for new position.
-        Arrows.update(_startingCameraInMotion_ViewerSphere.navigationNeighboringSpheresOrderedByDistance());
+        Arrows.update(_endingCameraInMotion_ViewerSphere.navigationNeighboringSpheresOrderedByDistance());
         // Set the current sphere to this one.
-        _startingCameraInMotion_ViewerSphere.setToCurrentSphere();
+        _endingCameraInMotion_ViewerSphere.setToCurrentSphere();
         // Make sure environmental sphere properly positioned.
         Globals.get("skyboxSphere").position = camera.position;
     }

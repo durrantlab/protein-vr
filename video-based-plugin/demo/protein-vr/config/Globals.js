@@ -16,6 +16,9 @@ define(["require", "exports"], function (require, exports) {
             "animationData": undefined,
             "firstFrameIndex": undefined,
             "lastFrameIndex": undefined,
+            "pngFileSizes": undefined,
+            "nextMoves": undefined,
+            // "triggers": undefined,
             // "viewerSpheres": undefined,  // A Spheres.SphereCollection.SphereCollection object.
             // "sphereMaterials": undefined,  // The materials associated with each viewer sphere.
             "skyboxSphere": undefined,

@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License along with
 # this program.  If not, see <http://www.gnu.org/licenses/>.
 
+DEPRECIATED
+
 import bpy
 import os
 import glob
@@ -26,7 +28,7 @@ os.mkdir("./output/")
 bpy.context.scene.proteinvr_output_dir = os.path.abspath("./output/") + os.sep
 
 # Make it so proteinvr_pngquant_path path doesn't exist. You'll do it separately...
-bpy.context.scene.proteinvr_pngquant_path = "" # "/usr/bin/pngquant"
+# bpy.context.scene.proteinvr_pngquant_path = "" # "/usr/bin/pngquant"
 
 # Make it so mobile won't be rendered. You'll do it separately...
 mobile_res = bpy.context.scene.proteinvr_mobile_bake_texture_size
@@ -47,11 +49,11 @@ os.system("mkdir ./output/frames/orig/")
 os.system("cp ./output/frames/*png ./output/frames/orig/")
 
 # Now compress everything
-open("runit.sh", 'w').write("\n".join([
-    "echo Compressing " + png_filename + '; /usr/bin/pngquant --speed 1 --quality="0-50" ' + png_filename + ' -o ' + png_filename + ".tmp.png; mv " + png_filename + ".tmp.png " + png_filename
-    for png_filename in glob.glob("./output/frames/*.png")
-]))
-os.system("cat runit.sh | /usr/bin/parallel")
+# open("runit.sh", 'w').write("\n".join([
+#     "echo Compressing " + png_filename + '; /usr/bin/pngquant --speed 1 --quality="0-50" ' + png_filename + ' -o ' + png_filename + ".tmp.png; mv " + png_filename + ".tmp.png " + png_filename
+#     for png_filename in glob.glob("./output/frames/*.png")
+# ]))
+# os.system("cat runit.sh | /usr/bin/parallel")
 
 # Save helper sh files
 open("./output/frames/orig/make_mobile_images.sh", 'w').write("""
@@ -61,12 +63,12 @@ ls *png | grep -v "small.png" | awk '{print "echo " $1 ";convert " $1 " -resize 
 cp *.small.png ../
 """.strip())
 
-open("./output/frames/orig/compress_images.sh", "w").write("""
-export desktop_quality=75
-export mobile_quality=100
-ls *png | grep -v ".small.png" | awk '{print "echo " $1 "; pngquant --speed 1 --strip --quality=\"0-MOOSEDOG\" " $1 " -f -o ../" $1}' | sed "s/MOOSEDOG/${desktop_quality}/g" | parallel --no-notice
-ls *png | grep ".small.png" | awk '{print "echo " $1 "; pngquant --speed 1 --strip --quality=\"0-MOOSEDOG\" " $1 " -f -o ../" $1}' | sed "s/MOOSEDOG/${mobile_quality}/g" | parallel --no-notice
-""".strip())
+# open("./output/frames/orig/compress_images.sh", "w").write("""
+# export desktop_quality=75
+# export mobile_quality=100
+# ls *png | grep -v ".small.png" | awk '{print "echo " $1 "; pngquant --speed 1 --strip --quality=\"0-MOOSEDOG\" " $1 " -f -o ../" $1}' | sed "s/MOOSEDOG/${desktop_quality}/g" | parallel --no-notice
+# ls *png | grep ".small.png" | awk '{print "echo " $1 "; pngquant --speed 1 --strip --quality=\"0-MOOSEDOG\" " $1 " -f -o ../" $1}' | sed "s/MOOSEDOG/${mobile_quality}/g" | parallel --no-notice
+# """.strip())
 
 os.system("chmod a+rwx ./output/frames/orig/*.sh")
 

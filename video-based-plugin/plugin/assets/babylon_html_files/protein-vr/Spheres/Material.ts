@@ -23,58 +23,30 @@ export class Material {
         this.material.backFaceCulling = false;
     }
 
-    public loadTexture(textureFileName: string, callBack = function() {}, pickTextureType: TextureType = undefined): boolean {
+    public loadTexture(textureFileName: string, callBack = function() {}, pickTextureType: TextureType): boolean {
         let scene = Globals.get("scene");
         let BABYLON = Globals.get("BABYLON");
 
-        let isMobile: boolean = Globals.get("isMobile");
-        let recentlyMoved: boolean = SphereCollection.hasEnoughTimePastSinceLastMove();
+        // let isMobile: boolean = Globals.get("isMobile");
+        // let recentlyMoved: boolean = SphereCollection.hasEnoughTimePastSinceLastMove();
 
         let filename: string = "";
 
-        if (pickTextureType === undefined) {
-            // Figure out based on what's been previously loaded.
-            switch (this.textureType) {
-                case TextureType.None:
-                    // So you need to lead a texture.
-                    if (recentlyMoved || isMobile) {
-                        // Load the low-res texture
-                        filename = textureFileName + ".small.png";
-                        this.textureType = TextureType.Mobile;
-                    } else {
-                        // Load the high-res texture
-                        filename = textureFileName;
-                        this.textureType = TextureType.Full;
-                    }
-                    break;
-                case TextureType.Mobile:
-                    if (!recentlyMoved && !isMobile) {
-                        // Load high-res texture
-                        filename = textureFileName;
-                        this.textureType = TextureType.Full;
-                    }
-                    break;
-                case TextureType.Full:
-                    // Nothing to do.
-                    break;
-            }
-        } else {
-            // Use the TextureType specified
-            switch(pickTextureType) {
-                case TextureType.Mobile:
-                    // Load the low-res texture
-                    filename = textureFileName + ".small.png";
-                    this.textureType = TextureType.Mobile;
-                    break;
-                case TextureType.Full:
-                    // Load high-res texture
-                    filename = textureFileName;
-                    this.textureType = TextureType.Full;
-                    break;
-                default:
-                    console.log("ERROR!");
-                    debugger;
-            }
+        // Use the TextureType specified
+        switch(pickTextureType) {
+            case TextureType.Mobile:
+                // Load the low-res texture
+                filename = textureFileName + ".small.png";
+                this.textureType = TextureType.Mobile;
+                break;
+            case TextureType.Full:
+                // Load high-res texture
+                filename = textureFileName;
+                this.textureType = TextureType.Full;
+                break;
+            default:
+                console.log("ERROR!");
+                debugger;
         }
 
         if (filename !== "") {
@@ -84,12 +56,19 @@ export class Material {
             }
     
             var assetsManager = new BABYLON.AssetsManager(scene);
-            assetsManager.addTextureTask("textureId", filename);   
+            // console.log("GGG", filename);
+            assetsManager.addTextureTask("textureId" + Math.random().toString(), filename);   
             assetsManager.onTaskSuccess = (tasks) => {
+                // Get rid of old texture to free memory
+                if ((this.material.emissiveTexture !== undefined) && (this.material.emissiveTexture !== null)) {
+                    this.material.emissiveTexture.dispose();
+                }
+                
                 this.material.emissiveTexture = tasks.texture; // videoTexture;
                 if (this._textureHasTransparency) {
                     this.material.opacityTexture = tasks.texture;
                 }
+                // console.log(tasks.texture);
                 
                 callBack();
             }
@@ -104,10 +83,10 @@ export class Material {
     }
 
     public unloadTextureFromMemory() {
+        this.textureType = TextureType.None;
         if (this.material !== undefined) {
             this.material.emissiveTexture.dispose();
             this.material.emissiveTexture = null;
-            this.textureType = TextureType.None;
 
             // this.material.dispose();
             // this.material = null;

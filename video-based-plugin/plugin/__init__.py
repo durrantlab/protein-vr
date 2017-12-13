@@ -49,6 +49,7 @@ classes_used.append(SetupPanel.OBJECT_OT_FixProblems)
 classes_used.append(CommandPanel.OBJECT_OT_CreateScene)
 classes_used.append(CommandPanel.OBJECT_OT_RenderRemote)
 classes_used.append(CommandPanel.OBJECT_OT_Sign)
+classes_used.append(CommandPanel.OBJECT_OT_AddTrigger)
 classes_used.append(SignPanel.OBJECT_OT_DoneSignPanel)
 
 ###### Below specific to this plugin ######
@@ -74,7 +75,7 @@ class ProteinVR(PanelParentClass):
 
         # Set up general scene properties.
         bpy.types.Scene.proteinvr_output_dir = self.prop_funcs.strProp("Output directory", "/tmp/proteinvr/", 'DIR_PATH', description="The output directory where the ProteinVR scene will be saved.")
-        bpy.types.Scene.proteinvr_pngquant_path = self.prop_funcs.strProp("PNGQUANT Path", os.path.dirname(__file__) + os.sep + "pngquant" + os.sep + "pngquant", 'FILE_PATH', description="The full path to the pngquant executable.")
+        # bpy.types.Scene.proteinvr_pngquant_path = self.prop_funcs.strProp("PNGQUANT Path", os.path.dirname(__file__) + os.sep + "pngquant" + os.sep + "pngquant", 'FILE_PATH', description="The full path to the pngquant executable.")
         bpy.types.Scene.proteinvr_use_existing_frames = self.prop_funcs.boolProp("Use Existing Frames", False, description="Whether to use previously rendered (existing) frames.")
         bpy.types.Scene.proteinvr_bake_texture_size = self.prop_funcs.intProp("Texture Size", min=128, max=8192, default=4096, description="The size of the square texture to render. Higher means higher resolution. Good to use power of 2. Recommended: 4096 for final render.")
         bpy.types.Scene.proteinvr_mobile_bake_texture_size = self.prop_funcs.intProp("Mobile Texture Size", min=0, max=8192, default=1024, description="The size of the square texture to render fore use on mobile. Higher means higher resolution. Good to use power of 2. Recommended: 1024 for final render.")
@@ -83,6 +84,10 @@ class ProteinVR(PanelParentClass):
 
         # Garden Paths
         bpy.types.Scene.proteinvr_garden_paths = self.prop_funcs.strProp("Frames", "1-20; 21*-25*", description="The garden path segments. Format: path1_startframe-path1_endframe; path2_startframe-path2_endframe; etc.")
+
+        # Triggers
+        bpy.types.Scene.trigger_string = self.prop_funcs.strProp("(Source Data)", "[]", description="A string that describes all triggers.")
+        bpy.types.Scene.add_trigger_cmd = self.prop_funcs.strProp("Trigger", "*.mp3, http://*.html, etc.", description="What is triggered (the action).", subtype="FILE_PATH")
 
         # Object-specific properties.
         bpy.types.Object.proteinvr_clickable = self.prop_funcs.boolProp("proteinvr_clickable", False, description="Whether this object is proteinvr_clickable.")

@@ -14,6 +14,9 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         "animationData": undefined,  // Stores animation data. Keys are mesh names, lists of [x, y, z, rotx, roty, rotz] as values.
         "firstFrameIndex": undefined,  // The index of the first animation frame.
         "lastFrameIndex": undefined,
+        "pngFileSizes": undefined,
+        "nextMoves": undefined,
+        // "triggers": undefined,
         // "viewerSpheres": undefined,  // A Spheres.SphereCollection.SphereCollection object.
         // "sphereMaterials": undefined,  // The materials associated with each viewer sphere.
         "skyboxSphere": undefined,  // The skybox sphere (sky box)

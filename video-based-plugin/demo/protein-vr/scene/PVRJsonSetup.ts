@@ -5,6 +5,7 @@ import { RenderingGroups } from "../config/Globals";
 import * as Animations from "./Animations/Animations";
 import { Sphere } from "../Spheres/Sphere";
 import * as SphereCollection from "../Spheres/SphereCollection";
+import * as TriggerCollection from "../Triggers/TriggerCollection";
 
 export var JSONData;
 
@@ -30,6 +31,14 @@ export function loadJSON(): void {
         Globals.set("animationData", JSONData["animations"]);
         Globals.set("firstFrameIndex", JSONData["firstFrameIndex"]);
         Globals.set("lastFrameIndex", JSONData["lastFrameIndex"]);
+        Globals.set("nextMoves", JSONData["nextMoves"]);
+        // Globals.set("triggers", );
+        TriggerCollection.create(JSONData["triggers"]);
+
+        if (JSONData["pngFileSizes"] !== undefined) {
+            // only defined if you've used optimize.py
+            Globals.set("pngFileSizes", JSONData["pngFileSizes"]);
+        }
 
         Globals.milestone("DataJsonLoadingStarted", true);
     });

@@ -90,7 +90,11 @@ export function update(cameraPoints: any): void {
         let neighboringCameraPointPosition = cameraPoints.get(i).position;
         let vec = neighboringCameraPointPosition.subtract(cameraPos).normalize().scale(4.0);
         arrowToUse.position = cameraPos.add(vec);
-        arrowToUse.position.y = arrowToUse.position.y - 1.0;
+
+        // console.log(neighboringCameraPointPosition, cameraPos, vec, arrowToUse.position);
+        // console.log(cameraPos, arrowToUse.position)
+        
+        arrowToUse.position.y = arrowToUse.position.y - 2.0;
         arrowToUse.lookAt(
             cameraPos.add(vec.scale(8.0))
         );

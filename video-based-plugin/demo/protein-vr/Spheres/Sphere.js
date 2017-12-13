@@ -1,4 +1,4 @@
-define(["require", "exports", "./Material", "./Material", "../config/Globals", "./CameraPoints", "./SphereCollection"], function (require, exports, Material_1, Material_2, Globals, CameraPoints_1, SphereCollection) {
+define(["require", "exports", "./Material", "./Material", "../config/Globals", "./CameraPoints", "./SphereCollection", "../Triggers/TriggerCollection"], function (require, exports, Material_1, Material_2, Globals, CameraPoints_1, SphereCollection, TriggerCollection) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class Sphere {
@@ -18,31 +18,7 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
             */
             this.sphereMesh = null; // BABYLON.Mesh
             this.assetsLoaded = false; // assets are not loaded to begin with
-            // private _lazyLoadNeighbors(numNeighbors: number = undefined) {
-            //     // Get a list of spheres that need to be loaded (some might already be
-            //     // loaded)
-            //     let newSpheres = [];
-            //     let toLoad: CameraPoints = this.neighboringSpheresForLazyLoadingOrderedByDistance();  // all the ones to load, including ones already loaded.
-            //     for (let i=0; i<toLoad.length(); i++) {
-            //         let d = toLoad.get(i);
-            //         let sphere = d.associatedViewerSphere;
-            //         newSpheres.push(sphere);
-            //     }
-            //     // Get a list of the currently loaded spheres.
-            //     let currentlyLoaded = Globals.get("lazyLoadedSpheres");
-            //     // Get lists of spheres that are only in one or the other.
-            //     let spheresToProcess = Sets.difference(newSpheres, currentlyLoaded);
-            //     // Load new spheres
-            //     for (let i=0; i<spheresToProcess.inFirstOnly.length; i++) {
-            //         spheresToProcess.inFirstOnly[i].loadAssets();
-            //     }
-            //     // Unload spheres no longer needed
-            //     for (let i=0; i<spheresToProcess.inSecondOnly.length; i++) {
-            //         spheresToProcess.inSecondOnly[i].unloadAssets();
-            //     }
-            //     // Upload the list of currently loaded spheres
-            //     Globals.set("lazyLoadedSpheres", newSpheres);
-            // }
+            this.index = undefined;
             this._neighboringSpheresForLazyLoadingByDist = undefined;
             this._navNeighboringSpheresByDist = undefined;
             // Specify the meshFileName location and textureFileName location when
@@ -53,46 +29,6 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
             this.position = position;
             this.material = new Material_1.Material(true); // but no texture yet
         }
-        // public loadAssets(callBack = function() {}): void {
-        //     /*
-        //     Loads the external assets associated with this sphere (material and
-        //     mesh). Note that this does not happen on Sphere object creation.
-        //     :param func callBack: A callback function to run when the assets
-        //                 associated with this sphere are loaded.
-        //     */
-        //     // LOAD THE MATERIAL
-        //     // Note that this.textureFileName was set when the object was created.
-        //     if (this.assetsLoaded === true) {
-        //         return;
-        //     }
-        //     let filename: string;
-        //     let isMobile = Globals.get("isMobile");
-        //     isMobile = true;
-        //     if (isMobile) {
-        //         // Some kind of phone... use low-res images
-        //         filename = "frames/" + this.textureFileName + ".small.png";  // Note no caching, for debugging.
-        //     } else {
-        //         // desktop and laptops ... full res images
-        //         filename = "frames/" + this.textureFileName;  // Note no caching, for debugging.
-        //     }
-        //     if (Globals.get("breakCaching") === false) {
-        //         filename = filename + "?" + Math.random().toString();
-        //     }
-        //     // Make the material.
-        //     this.material.loadTexture(filename, () => {
-        //         setTimeout(() => {  // kind of like doEvents from VB days.
-        //             // console.log("Material loaded: ", this.textureFileName);
-        //             // Update the total number of textures loaded.
-        //             let numTextures = Globals.get("numFrameTexturesLoaded") + 1;
-        //             Globals.set("numFrameTexturesLoaded", numTextures);
-        //             this.loadMesh(callBack);
-        //             this.assetsLoaded = true; // assets have now been loaded
-        //             let lazyLoadedSpheres = Globals.get("lazyLoadedSpheres");
-        //             lazyLoadedSpheres.push(this);
-        //             Globals.set("lazyLoadedSpheres", lazyLoadedSpheres);
-        //         }, 0);
-        //     });
-        // }
         loadMesh(callBack = function () { }) {
             /*
             Loads the mesh specifically. This is in a separate private function
@@ -116,32 +52,38 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
                 this.sphereMesh = viewerSphereTemplate.clone("viewer_sphere_" + this.textureFileName);
                 // Position that sphere at the associated camera location (in same order).
                 this.sphereMesh.position = this.position;
-                this.sphereMesh.material = this.material.material;
                 // Hide the sphere. In ViewerSphere.ts, show just the first one.
                 this.opacity(0.0);
                 // console.log("Mesh loaded: ", this.textureFileName);
                 this.assetsLoaded = true; // Assets have now been loaded. Because spheres are always loaded after textures.
-                callBack();
+                SphereCollection.addToSpheresWithAssetsCount(1);
             }
+            // Do this regardless. If texture updated, need to update material.
+            this.sphereMesh.material = this.material.material;
+            callBack();
         }
-        loadNextUnloadedAsset() {
-            // Lazy loads the next unloaded asset.
-            let isMobile = Globals.get("isMobile");
-            let recentlyMoved = SphereCollection.hasEnoughTimePastSinceLastMove();
-            let neighborPts = this.neighboringSpheresForLazyLoadingOrderedByDistance();
-            // Now add in high-res little by little
-            for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {
-                let cameraPt = neighborPts.get(i);
-                let sphere = cameraPt.associatedViewerSphere;
-                // Load the texture.
-                let wasNewTexLoaded = sphere.material.loadTexture("frames/" + sphere.textureFileName, () => {
-                    sphere.loadMesh(); // Mesh has never been loaded, so take care of that.
-                });
-                if (wasNewTexLoaded) {
-                    // So only loading one high-res per function call.
-                    break;
-                }
+        tryToUpgradeTextureIfAppropriate() {
+            // Upgrades the texture of this sphere if it's appropriate.
+            if (this.material.textureType === Material_2.TextureType.Full) {
+                // Already maxed out;
+                // console.log("1");
+                return;
             }
+            if (!SphereCollection.hasEnoughTimePastSinceLastMove()) {
+                // Not enough time has passed since the user sat still. Only load
+                // if not much movement.
+                // console.log("3");
+                return;
+            }
+            if (Globals.get("isMobile")) {
+                // If it's mobile, you never want the high-res images.
+                // console.log("2");
+                return;
+            }
+            this.material.loadTexture("frames/" + this.textureFileName, () => {
+                this.loadMesh(); // Mesh has never been loaded, so take care of that.
+                console.log(this.sphereMesh.visibility, this.sphereMesh.isVisible);
+            }, Material_2.TextureType.Full);
             // For debugging...
             // console.log("==========");
             // for (let i=0; i<Globals.get("lazyLoadCount"); i++) {
@@ -150,24 +92,7 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
             //     // Load the texture.
             //     console.log("frames/" + sphere.textureFileName, sphere.material.textureType);
             // }
-            // Now check if there are too many spheres. If so, delete some that
-            // are too far away.
-            if (SphereCollection.countLazyLoadedSpheres() > Globals.get("lazyLoadCount")) {
-                for (let idx = neighborPts.length() - 1; idx > -1; idx--) {
-                    let cameraPt = neighborPts.get(idx);
-                    let sphere = cameraPt.associatedViewerSphere;
-                    if (sphere.assetsLoaded) {
-                        sphere.unloadAssets();
-                    }
-                    if (SphereCollection.countLazyLoadedSpheres() <= Globals.get("lazyLoadCount")) {
-                        break;
-                    }
-                }
-            }
         }
-        // public meshLoaded(): boolean {
-        //     return !(this.sphereMesh === null);  // *****
-        // }
         unloadAssets() {
             /*
             Unload the assets associated with this sphere (material and mesh) from
@@ -176,6 +101,7 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
             this._unloadMesh();
             this._unloadTexture();
             this.assetsLoaded = false;
+            SphereCollection.addToSpheresWithAssetsCount(-1);
         }
         _unloadTexture() {
             /*
@@ -214,13 +140,7 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
                 return this.sphereMesh.visibility;
             }
             else if ((this.sphereMesh !== undefined) && (this.sphereMesh !== null)) {
-                // Setter
-                // if (this.sphereMesh === undefined) {
-                // console.log("Get ready for error:", this);
-                // debugger;
-                // }
                 this.sphereMesh.visibility = val;
-                // *********
                 // Might as well make entirely invisible if opacity is 0.
                 if (val === 0.0) {
                     this.sphereMesh.isVisible = false;
@@ -239,6 +159,8 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
             SphereCollection.setCurrentSphereVar(this);
             // Update last move time.
             SphereCollection.setTimeOfLastMoveVar();
+            // Trigger any triggers
+            TriggerCollection.checkAll();
             // Make sure at least low-res neighbor textures loaded.
             let neighborPts = this.neighboringSpheresForLazyLoadingOrderedByDistance();
             // Here load the low-res for all of close neighbors (one swoop)
@@ -246,14 +168,23 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
                 let cameraPt = neighborPts.get(i);
                 let sphere = cameraPt.associatedViewerSphere;
                 if (!sphere.assetsLoaded) {
+                    let typeToLoad = Material_2.TextureType.Mobile;
+                    // If you're not on mobile, and if the full texture isn't very
+                    // big, just load the full texture instead.
+                    let pngFileSizes = Globals.get("pngFileSizes");
+                    if (pngFileSizes !== undefined) {
+                        // console.log("MOO", pngFileSizes[sphere.textureFileName]);
+                        if (pngFileSizes[sphere.textureFileName] < 100) {
+                            typeToLoad = Material_2.TextureType.Full;
+                        }
+                    }
                     sphere.material.loadTexture("frames/" + sphere.textureFileName, () => {
                         sphere.loadMesh(); // Mesh has never been loaded, so take care of that.
-                    }, Material_2.TextureType.Mobile);
+                    }, typeToLoad);
                 }
             }
-            // if (Globals.get("lazyLoadViewerSpheres") === true) {  // if we are Lazy Loading...
-            //     this._lazyLoadNeighbors();
-            // }
+            // Remove extra textures and meshes
+            SphereCollection.removeExtraSphereTexturesAndMeshesFromMemory();
         }
         neighboringSpheresForLazyLoadingOrderedByDistance() {
             /*
@@ -303,15 +234,31 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
             // position arrows and for next-step destinations when moving through
             // the scene.
             if (this._navNeighboringSpheresByDist === undefined) {
-                // Start by considering all neighbors
-                this._navNeighboringSpheresByDist = this.neighboringSpheresForLazyLoadingOrderedByDistance().copy();
-                // Remove first one (closest). To make sure any movement is to a new
-                // sphere, not the one where you already are.
-                this._navNeighboringSpheresByDist.removeFirst();
-                // Keep only four points. So I guess paths can't be too bifurcated.
-                this._navNeighboringSpheresByDist = this._navNeighboringSpheresByDist.firstFewPoints(Globals.get("numNeighboringCameraPosForNavigation")); // choose four close points
-                // Remove the points that are off in the same general direction
-                this._navNeighboringSpheresByDist = this._navNeighboringSpheresByDist.removePointsInSameGeneralDirection(this.position);
+                // // Start by considering all neighbors
+                // this._navNeighboringSpheresByDist = this.neighboringSpheresForLazyLoadingOrderedByDistance().copy();
+                // // Remove first one (closest). To make sure any movement is to a new
+                // // sphere, not the one where you already are.
+                // this._navNeighboringSpheresByDist.removeFirst();
+                // // Keep only four points. So I guess paths can't be too bifurcated.
+                // this._navNeighboringSpheresByDist = this._navNeighboringSpheresByDist.firstFewPoints(Globals.get("numNeighboringCameraPosForNavigation"));  // choose four close points
+                // // Remove the points that are off in the same general direction
+                // this._navNeighboringSpheresByDist = this._navNeighboringSpheresByDist.removePointsInSameGeneralDirection(this.position);
+                // Need to index camera points by associated spheres
+                var neighboringSpheresBySphereTexture = {};
+                for (let i = 0; i < this.neighboringSpheresForLazyLoadingOrderedByDistance().length(); i++) {
+                    let cameraPt = this.neighboringSpheresForLazyLoadingOrderedByDistance().get(i);
+                    let sphere = cameraPt.associatedViewerSphere;
+                    let textureName = sphere.textureFileName;
+                    neighboringSpheresBySphereTexture[textureName] = cameraPt;
+                }
+                // Now keep only the camera points that are neighbors.
+                this._navNeighboringSpheresByDist = new CameraPoints_1.CameraPoints();
+                let neighborsToConsider = Globals.get("nextMoves")[this.index];
+                for (let i = 0; i < neighborsToConsider.length; i++) {
+                    let neighborToConsider = neighborsToConsider[i];
+                    let textureName = SphereCollection.getByIndex(neighborToConsider).textureFileName;
+                    this._navNeighboringSpheresByDist.push(neighboringSpheresBySphereTexture[textureName]);
+                }
             }
             return this._navNeighboringSpheresByDist;
         }
