@@ -27,7 +27,7 @@ if not os.path.exists(frames_dir):
 config = {
     "desktop_resolution": 4096,  # 2048 too low res on my macbook
     "mobile_resolution": 1024,
-    "pngquant_exec": "/usr/local/bin/pngquant",  # Jacob's mac
+    # "pngquant_exec": "/usr/local/bin/pngquant",  # Jacob's mac
     "pngquant_exec": "/ihome/jdurrant/durrantj/programs/pngquant/pngquant",  # crc resources
     "mobile_quality": -1,  # Even 90 reduces file size substantially.
     "desktop_quality": -1

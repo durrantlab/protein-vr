@@ -1,5 +1,5 @@
 /* Things related to camera setup and movement. */
-define(["require", "exports", "../../config/Globals", "../Arrows", "../../Spheres/SphereCollection", "./Devices"], function (require, exports, Globals, Arrows, SphereCollection, Devices) {
+define(["require", "exports", "../../config/Globals", "../Arrows", "../../Spheres/SphereCollection", "./Devices", "../../Spheres/Material"], function (require, exports, Globals, Arrows, SphereCollection, Devices, Material_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var BABYLON;
@@ -36,7 +36,7 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         _endingCameraInMotion_ViewerSphere = firstSphere;
         // Setup first steps forward
         _cameraJustFinishedBeingInMotion(scene.activeCamera);
-        // Add blur post processes that can be turned on and off. Only if mobile.
+        // Add blur post processes that can be turned on and off. Only if not mobile.
         if (!isMobile) {
             let blurPipeline = new BABYLON.PostProcessRenderPipeline(engine, "blurPipeline");
             let kernel = 12.0;
@@ -107,8 +107,8 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // Get the time that's elapsed since this function was last called.
         // There's a refractoty period between movements... don't move unless
         // enough time has passed. This is needed because the camera automatically
-        // moves between camera points. While in motion, you can initiate another
-        // motion.
+        // moves between camera points. While in motion, you can't initiate
+        // another motion.
         let curTime = new Date().getTime();
         let deltaTime = curTime - _lastMovementTime;
         if (deltaTime < _msUntilNextMoveAllowed) {
@@ -121,11 +121,8 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
             _lastCameraRotationCheckTimestamp = curTime;
             let newCameraRotation = camera.rotation.clone();
             let dist = BABYLON.Vector3.Distance(newCameraRotation, _lastCameraRotation);
-            // console.log(dist);
-            // console.log(dist/engine.getFps());
             if (dist > 0.05) {
                 SphereCollection.setTimeOfLastMoveVar();
-                // console.log("substantial movement");
             }
             _lastCameraRotation = newCameraRotation;
         }
@@ -220,6 +217,15 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
                 goodAngleCameraPoints.sort("score");
                 newCameraPoint = goodAngleCameraPoints.firstPoint();
                 break;
+        }
+        // If the new viewer sphere doesn't have a texture, abort!
+        if (newCameraPoint.associatedViewerSphere.material.textureType === Material_1.TextureType.None) {
+            console.log("Aborted movement, texture not yet loaded...");
+            blur(false);
+            // Make sure everything hidden but present sphere.
+            SphereCollection.hideAll();
+            newCameraPoint.associatedViewerSphere.opacity(1.0);
+            return;
         }
         // Set values to govern next in-motion transition (old ending becomes new
         // starting. New ending is new picked sphere location).

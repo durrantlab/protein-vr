@@ -78,6 +78,13 @@ class SetupPanel(ParentPanel):
         if bpy.context.scene.cycles.blur_glossy < 2.0:
             msgs["Render Settings:"].append("Blur glossy < 2")
         
+        try:
+            if bpy.context.scene.render.layers[0].cycles.use_denoising == False:
+                msgs["Render Settings:"].append("Denoising = False")
+        except:
+            # Because denoising not supported in older versions of Blender.
+            pass
+        
         if len(bpy.data.cameras.keys()) > 0:
             camera_key = bpy.data.cameras.keys()[0]
             if bpy.data.cameras[camera_key].type != "PANO":

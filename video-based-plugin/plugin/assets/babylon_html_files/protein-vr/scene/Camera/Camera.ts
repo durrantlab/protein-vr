@@ -7,6 +7,7 @@ import { Sphere } from "../../Spheres/Sphere";
 import * as SphereCollection from "../../Spheres/SphereCollection";
 import * as Devices from "./Devices";
 import * as CameraPoints from "../../Spheres/CameraPoints";
+import { TextureType } from "../../Spheres/Material";
 
 var BABYLON: any;
 var isMobile: boolean;
@@ -54,7 +55,7 @@ export function setup(): void {
     // Setup first steps forward
     _cameraJustFinishedBeingInMotion(scene.activeCamera);
 
-    // Add blur post processes that can be turned on and off. Only if mobile.
+    // Add blur post processes that can be turned on and off. Only if not mobile.
     if (!isMobile) {
         let blurPipeline = new BABYLON.PostProcessRenderPipeline(engine, "blurPipeline");
         let kernel = 12.0;
@@ -139,8 +140,8 @@ export function update() {
     // Get the time that's elapsed since this function was last called.
     // There's a refractoty period between movements... don't move unless
     // enough time has passed. This is needed because the camera automatically
-    // moves between camera points. While in motion, you can initiate another
-    // motion.
+    // moves between camera points. While in motion, you can't initiate
+    // another motion.
     let curTime = new Date().getTime();
     let deltaTime = curTime - _lastMovementTime;
     if (deltaTime < _msUntilNextMoveAllowed) {
@@ -155,11 +156,8 @@ export function update() {
 
         let newCameraRotation = camera.rotation.clone();
         let dist = BABYLON.Vector3.Distance(newCameraRotation, _lastCameraRotation);
-        // console.log(dist);
-        // console.log(dist/engine.getFps());
         if (dist > 0.05) {  // tested by trial and error. Just little jiggles, not real movement.
             SphereCollection.setTimeOfLastMoveVar();
-            // console.log("substantial movement");
         }
         _lastCameraRotation = newCameraRotation;
     }
@@ -285,6 +283,18 @@ function _cameraPickDirectionAndStartInMotion(camera): void {
             goodAngleCameraPoints.sort("score");
             newCameraPoint = goodAngleCameraPoints.firstPoint();
             break;
+    }
+
+    // If the new viewer sphere doesn't have a texture, abort!
+    if (newCameraPoint.associatedViewerSphere.material.textureType === TextureType.None) {
+        console.log("Aborted movement, texture not yet loaded...");
+        blur(false);
+        
+        // Make sure everything hidden but present sphere.
+        SphereCollection.hideAll();
+        newCameraPoint.associatedViewerSphere.opacity(1.0);
+        
+        return;
     }
 
     // Set values to govern next in-motion transition (old ending becomes new

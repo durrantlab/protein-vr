@@ -89,6 +89,12 @@ class OBJECT_OT_FixProblems(ButtonParentClass):
         bpy.context.scene.cycles.sample_clamp_indirect = 2.5
         if bpy.context.scene.cycles.blur_glossy < 2.0:
             bpy.context.scene.cycles.blur_glossy = 2.0
+        
+        try:
+            bpy.context.scene.render.layers[0].cycles.use_denoising = True
+        except:
+            # Because denoising not available in older versions of blender.
+            pass
 
         # Go into Object mode
         Utils.switch_mode("OBJECT")
