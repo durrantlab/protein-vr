@@ -9,9 +9,10 @@ import os
 
 # Overwrite the output directory.
 output_dir = os.getcwd() + os.sep + "proteinvr_output" + os.sep
-if os.path.exists(output_dir):
-    os.system("rm -r " + output_dir)
-os.mkdir(output_dir)
+# if os.path.exists(output_dir):
+    # os.system("rm -r " + output_dir)
+if not os.path.exists(output_dir):
+    os.mkdir(output_dir)
 bpy.data.scenes["Scene"].proteinvr_output_dir = output_dir
 
 # Now press the render button
