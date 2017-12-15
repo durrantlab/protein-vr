@@ -110,8 +110,8 @@ export class Sphere {
         }
 
         this.material.loadTexture("frames/" + this.textureFileName, () => {
-        this.loadMesh();  // Mesh has never been loaded, so take care of that.
-            console.log(this.sphereMesh.visibility, this.sphereMesh.isVisible);
+            this.loadMesh();  // Mesh has never been loaded, so take care of that.
+            // console.log(this.sphereMesh.visibility, this.sphereMesh.isVisible);
         }, TextureType.Full);
         
         // For debugging...

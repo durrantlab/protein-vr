@@ -9,13 +9,14 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "../Sphe
         var engine = Globals.get("engine");
         var scene = new BABYLON.Scene(engine);
         Globals.set("scene", scene);
-        BABYLON.SceneLoader.Append("", "babylon.babylon", scene, () => {
+        let uniqID = window.uniqID;
+        BABYLON.SceneLoader.Append("", uniqID + ".babylon.babylon", scene, () => {
             window.scrollTo(0, 1); // supposed to autohide scroll bar.
             // Wait for textures and materials to be ready
             scene.executeWhenReady(() => {
                 // Make it so subsequent textures are stored in indexeddb. This is
                 // hackish, but it works.
-                scene.database = new BABYLON.Database('babylon.babylon', function () { });
+                scene.database = new BABYLON.Database(uniqID + '.babylon.babylon', function () { });
                 // Delay textures until needed. Cool, but too slow for our
                 // purposes here... Keep it commented out for now.
                 // newScene.useDelayedTextureLoading = true
@@ -97,7 +98,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "../Sphe
         skyboxSphere.isPickable = false;
         skyboxSphere.renderingGroupId = Globals_1.RenderingGroups.EnvironmentalSphere;
         let sphereMaterial2 = new Material_1.Material(true);
-        sphereMaterial2.loadTexture('skybox.png', () => {
+        sphereMaterial2.loadTexture(window.uniqID + '.skybox.png', () => {
             skyboxSphere.material = sphereMaterial2.material;
             Globals.set("skyboxSphere", skyboxSphere);
         }, Material_2.TextureType.Full);

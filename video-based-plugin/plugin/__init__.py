@@ -20,6 +20,7 @@ from mathutils import Vector
 import os
 import math
 from bpy.props import *
+import random
 
 from .DurBlend import Properties
 from .DurBlend import UI
@@ -81,6 +82,9 @@ class ProteinVR(PanelParentClass):
         bpy.types.Scene.proteinvr_mobile_bake_texture_size = self.prop_funcs.intProp("Mobile Texture Size", min=0, max=8192, default=1024, description="The size of the square texture to render fore use on mobile. Higher means higher resolution. Good to use power of 2. Recommended: 1024 for final render.")
         bpy.types.Scene.proteinvr_num_samples = self.prop_funcs.intProp("Number of Samples", min=1, max=10000, default=16, description="The number of rendering cycles. Higher means better quality.")
         bpy.types.Scene.proteinvr_jpeg_quality = self.prop_funcs.intProp("JPEG Quality", min=0, max=100, default=50, description="JPEG quality.")
+
+        bpy.types.Scene.proteinvr_uniq_id = self.prop_funcs.strProp("Unique Project ID", str(random.randrange(0,100000000)), description="A unique ID associated with this project. Different than any other project on the remote server.")
+
 
         # Garden Paths
         bpy.types.Scene.proteinvr_garden_paths = self.prop_funcs.strProp("Frames", "1-20; 21*-25*", description="The garden path segments. Format: path1_startframe-path1_endframe; path2_startframe-path2_endframe; etc.")

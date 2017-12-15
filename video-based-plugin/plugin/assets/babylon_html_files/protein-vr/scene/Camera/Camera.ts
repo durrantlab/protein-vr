@@ -97,14 +97,14 @@ export function blur(val: boolean) {
 
     switch(val) {
         case true:
-            console.log("Blurring");
+            // console.log("Blurring");
             scene.postProcessRenderPipelineManager.enableEffectInPipeline("blurPipeline", "horizontalBlurEffect", scene.activeCamera);
             scene.postProcessRenderPipelineManager.enableEffectInPipeline("blurPipeline", "verticalBlurEffect", scene.activeCamera);
             // scene.postProcessRenderPipelineManager.detachCamerasFromRenderPipeline("blurPipeline", scene.activeCamera);
             // scene.postProcessRenderPipelineManager.attachCamerasToRenderPipeline("blurPipeline", scene.activeCamera);        
             break;
         case false:
-            console.log("Unblurrng");
+            // console.log("Unblurrng");
             scene.postProcessRenderPipelineManager.disableEffectInPipeline("blurPipeline", "horizontalBlurEffect", scene.activeCamera);
             scene.postProcessRenderPipelineManager.disableEffectInPipeline("blurPipeline", "verticalBlurEffect", scene.activeCamera);
             break;

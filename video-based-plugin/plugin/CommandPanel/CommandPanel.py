@@ -114,6 +114,7 @@ class CommandPanel(ParentPanel):
         Messages.display_message("FRAMES_EXIST", self)
 
         if bpy.context.scene.proteinvr_use_existing_frames == False:
+            self.ui.scene_property("proteinvr_uniq_id")
             self.ui.scene_property("proteinvr_bake_texture_size")
             self.ui.scene_property("proteinvr_mobile_bake_texture_size")
             self.ui.scene_property("proteinvr_num_samples")

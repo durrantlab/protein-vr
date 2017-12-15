@@ -16,6 +16,7 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         "lastFrameIndex": undefined,
         "pngFileSizes": undefined,
         "nextMoves": undefined,
+        "uniqID": undefined,  // unique id associated with this project.
         // "triggers": undefined,
         // "viewerSpheres": undefined,  // A Spheres.SphereCollection.SphereCollection object.
         // "sphereMaterials": undefined,  // The materials associated with each viewer sphere.
@@ -138,7 +139,7 @@ export function delayExec(func: any, milestoneNames: string[], origFuncName: str
     for (let i=0; i<milestoneNames.length; i++) {
         let milestoneName = milestoneNames[i];
         if (!milestone(milestoneName)) {
-            console.log("Can't run function " + origFuncName + ": milestone " + milestoneName + " not yet met.");
+            // console.log("Can't run function " + origFuncName + ": milestone " + milestoneName + " not yet met.");
             setTimeout(() => {
                 delayExec(func, milestoneNames, origFuncName, This);
             }, 250)
@@ -147,7 +148,7 @@ export function delayExec(func: any, milestoneNames: string[], origFuncName: str
     }
 
     // If it gets here, you're ready to actually run the function.
-    console.log("Running function " + origFuncName);    
+    // console.log("Running function " + origFuncName);    
 
     // record that this has already been handled to avoid repeated function calls.
     (<any>window)._proteinvrGlobals["milestoneAttempted"].push(origFuncName);

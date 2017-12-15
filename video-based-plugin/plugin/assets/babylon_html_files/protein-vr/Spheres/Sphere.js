@@ -82,7 +82,7 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
             }
             this.material.loadTexture("frames/" + this.textureFileName, () => {
                 this.loadMesh(); // Mesh has never been loaded, so take care of that.
-                console.log(this.sphereMesh.visibility, this.sphereMesh.isVisible);
+                // console.log(this.sphereMesh.visibility, this.sphereMesh.isVisible);
             }, Material_2.TextureType.Full);
             // For debugging...
             // console.log("==========");

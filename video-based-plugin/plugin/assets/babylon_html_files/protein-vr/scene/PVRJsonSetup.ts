@@ -32,6 +32,7 @@ export function loadJSON(): void {
         Globals.set("firstFrameIndex", JSONData["firstFrameIndex"]);
         Globals.set("lastFrameIndex", JSONData["lastFrameIndex"]);
         Globals.set("nextMoves", JSONData["nextMoves"]);
+        Globals.set("uniqID", JSONData["uniqID"]);
         // Globals.set("triggers", );
         TriggerCollection.create(JSONData["triggers"]);
 

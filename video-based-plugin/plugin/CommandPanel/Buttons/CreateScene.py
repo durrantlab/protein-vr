@@ -148,6 +148,16 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 operator=self
             )
             return False
+        
+        # Figure out what unique id to use.
+        if self.scene.proteinvr_use_existing_frames:
+            # You need to figure out the unique id from the png files in the
+            # frames directory
+            self.uniq_id = os.path.basename(glob.glob(self.proteinvr_output_dir + "frames" + os.sep + "*.png")[0].split(".")[0])
+        else:
+            # Get it from the user-specified unique id
+            self.uniq_id = self.scene.proteinvr_uniq_id
+        print(self.uniq_id, "HHH")
 
         # Make sure self.proteinvr_output_dir exists
         if not os.path.exists(self.proteinvr_output_dir):
@@ -160,17 +170,50 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             os.mkdir(self.frame_dir)
 
         # Copy some files
-        shutil.copyfile(self.plugin_asset_dir + os.sep + "babylon.babylon", self.proteinvr_output_dir + "babylon.babylon")
-        shutil.copyfile(self.plugin_asset_dir + os.sep + "babylon.babylon.manifest", self.proteinvr_output_dir + "babylon.babylon.manifest")
-        
-        for path in glob.glob(self.plugin_asset_dir + "babylon_html_files" + os.sep + "*"):
-            target_path = self.proteinvr_output_dir + os.path.basename(path)
-            print(path, target_path)
-            if not os.path.exists(target_path):
-                if os.path.isdir(path):
-                    shutil.copytree(path, target_path)
-                else:
-                    shutil.copyfile(path, target_path)
+        # babylon.babylon copied separately because it must be renamed.
+        shutil.copyfile(self.plugin_asset_dir + os.sep + "babylon.babylon", self.proteinvr_output_dir + self.uniq_id + ".babylon.babylon")
+        shutil.copyfile(self.plugin_asset_dir + os.sep + "babylon.babylon.manifest", self.proteinvr_output_dir + self.uniq_id + ".babylon.babylon.manifest")
+
+        paths_to_copy = glob.glob(self.plugin_asset_dir + "babylon_html_files" + os.sep + "*")
+        while len(paths_to_copy) > 0:
+            path_to_copy = paths_to_copy[0]
+            target_path = self.proteinvr_output_dir + path_to_copy[len(self.plugin_asset_dir + "babylon_html_files") + 1:]
+
+            if os.path.isdir(path_to_copy):
+                # Trying to copy a directory. Add the directory contents to
+                # the list of things to copy
+                paths_to_copy.extend(glob.glob(path_to_copy + os.sep + "*"))
+
+                # Make sure the target directory exists
+                if not os.path.exists(target_path):
+                    os.mkdir(target_path)
+                
+                print("mkdir", target_path)
+            else:
+                # It's a file, so copy it over.
+                shutil.copyfile(path_to_copy, target_path)
+                print("copy", path_to_copy, target_path)
+            
+            # Remove it from the list.
+            paths_to_copy = paths_to_copy[1:]
+            
+        # for path in glob.glob(self.plugin_asset_dir + "babylon_html_files" + os.sep + "*"):
+        #     target_path = self.proteinvr_output_dir + os.path.basename(path)
+        #     print(path, target_path)
+        #     # if not os.path.exists(target_path):
+        #     if os.path.isdir(path):
+        #         shutil.copytree(path, target_path)
+        #     else:
+        #         shutil.copyfile(path, target_path)
+
+        # Define the unique id in the html file. I put it there so you
+        # wouldn't have to wait for data.json to load before loading other
+        # things, like babylon.babylon.
+        with open(self.proteinvr_output_dir + "index.html", 'r') as f:
+            html = f.read()
+        html = html.replace("UNIQUE_ID_HERE", self.uniq_id)
+        with open(self.proteinvr_output_dir + "index.html", 'w') as f:
+            f.write(html)
 
         return True
 
@@ -187,7 +230,8 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         self.extra_data = {
             "spheres": [],
             "clickableFiles": [],
-            "signs": []
+            "signs": [],
+            "uniqID": self.uniq_id
         }
         
         # Put objects into "render layer" categories.
@@ -354,7 +398,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             self.camera.keyframe_insert(data_path="rotation_euler", frame=this_frame)
 
             if not debug:
-                filename = self.frame_dir + "proteinvr_baked_texture" + str(this_frame) + ".png"
+                filename = self.frame_dir + self.uniq_id + ".proteinvr_baked_texture" + str(this_frame) + ".png"
                 print("FILENAME:", filename)
                 self._render_whatever_is_visible(filename)
 
@@ -376,7 +420,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # Show any environmental HDR texture
         self.scene.cycles.film_transparent = False
 
-        self._render_whatever_is_visible(self.proteinvr_output_dir + "skybox.png")  # TODO: Rename to skybox.png later...
+        self._render_whatever_is_visible(self.proteinvr_output_dir + self.uniq_id + ".skybox.png")
 
     def _save_as_obj(self, obj, filepath):
         """
@@ -423,7 +467,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         for obj in self.object_categories["MESH"]: 
             # Save the obj file.
-            filepath = self.proteinvr_output_dir + obj.name + "_mesh.obj"
+            filepath = self.proteinvr_output_dir + self.uniq_id + "." + obj.name + "_mesh.obj"
             self._save_as_obj(obj, filepath)
 
             # Search the node tree to find a texture
@@ -447,7 +491,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 img = texture_images[0]
 
                 # See https://blender.stackexchange.com/questions/3128/why-blender-throws-an-exception-when-saving-a-copy-of-image
-                filepath = self.proteinvr_output_dir + obj.name + "_mesh.png"
+                filepath = self.proteinvr_output_dir + self.uniq_id + "." + obj.name + "_mesh.png"
 
                 # Store current render settings
                 settings = bpy.context.scene.render.image_settings
@@ -484,14 +528,14 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         """
 
         # Save list of all rendered frames
-        frame_file_names = [os.path.basename(f) for f in glob.glob(self.frame_dir + "proteinvr_baked_texture*.png") if not ".small.png" in f]
-        def key(a): return int(a.replace("proteinvr_baked_texture", "").replace(".png", ""))
+        frame_file_names = [os.path.basename(f) for f in glob.glob(self.frame_dir + self.uniq_id + ".proteinvr_baked_texture*.png") if not ".small.png" in f]
+        def key(a): return int(a.replace(self.uniq_id + ".proteinvr_baked_texture", "").replace(".png", ""))
         frame_file_names.sort(key=key)
 
         # Also get the total size of the files.
         reg_file_size = 0
         small_file_size = 0
-        for filename in glob.glob(self.frame_dir + "proteinvr_baked_texture*.png"):
+        for filename in glob.glob(self.frame_dir + self.uniq_id + ".proteinvr_baked_texture*.png"):
             filesize = os.path.getsize(filename)
             if ".small.png" in filename:
                 small_file_size = small_file_size + filesize
@@ -556,7 +600,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # Export the shrinkwrapped proteinvr_clickable objects
         for obj in [o for o in bpy.data.objects if o.name.startswith("ProteinVR_tmp_")]:
             if obj.type == 'MESH':
-                filepath = self.proteinvr_output_dir + obj.name.replace("ProteinVR_tmp_", "proteinvr_clickable_") + ".obj"
+                filepath = self.proteinvr_output_dir + self.uniq_id + "." + obj.name.replace("ProteinVR_tmp_", "proteinvr_clickable_") + ".obj"
                 self._save_as_obj(obj, filepath)
                 self.extra_data["clickableFiles"].append(os.path.basename(filepath))
             
@@ -746,8 +790,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         if len(glob.glob(self.proteinvr_output_dir + "frames/*.png")) == 0:
             self._step_4_render_static_frames(debug)
-        
-        self._step_5_render_skybox_image()
+            self._step_5_render_skybox_image()  # So skybox only gets rendered if frames rendered.
 
         print("Why this if-statement logic? (BELOW) Why not just throw an error?")
 

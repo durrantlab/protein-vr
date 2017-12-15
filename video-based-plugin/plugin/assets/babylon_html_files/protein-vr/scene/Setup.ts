@@ -18,8 +18,9 @@ export function loadBabylonFile(): void {
     var engine = Globals.get("engine");
     var scene = new BABYLON.Scene(engine);
     Globals.set("scene", scene);
+    let uniqID = window.uniqID;
 
-    BABYLON.SceneLoader.Append("", "babylon.babylon", scene, () => {
+    BABYLON.SceneLoader.Append("", uniqID + ".babylon.babylon", scene, () => {
 
         window.scrollTo(0, 1);  // supposed to autohide scroll bar.
 
@@ -27,7 +28,7 @@ export function loadBabylonFile(): void {
         scene.executeWhenReady(() => {
             // Make it so subsequent textures are stored in indexeddb. This is
             // hackish, but it works.
-            scene.database = new BABYLON.Database('babylon.babylon', function()  {});            
+            scene.database = new BABYLON.Database(uniqID + '.babylon.babylon', function()  {});            
 
             // Delay textures until needed. Cool, but too slow for our
             // purposes here... Keep it commented out for now.
@@ -121,7 +122,7 @@ function _setupEnvironmentalSphere(radius): void {
     skyboxSphere.renderingGroupId = RenderingGroups.EnvironmentalSphere;
 
     let sphereMaterial2 = new Material(true);
-    sphereMaterial2.loadTexture('skybox.png', () => {
+    sphereMaterial2.loadTexture(window.uniqID + '.skybox.png', () => {
         skyboxSphere.material = sphereMaterial2.material;
         Globals.set("skyboxSphere", skyboxSphere);
     }, TextureType.Full);
