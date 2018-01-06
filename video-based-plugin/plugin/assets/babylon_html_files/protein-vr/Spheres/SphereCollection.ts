@@ -80,7 +80,7 @@ export function create(): void {
 export function removeExtraSphereTexturesAndMeshesFromMemory() {
     // Now check if there are too many spheres. If so, delete some that
     // are too far away.
-    let neighborPts = _currentSphere.neighboringSpheresForLazyLoadingOrderedByDistance();
+    let neighborPts = _currentSphere.neighboringSpheresOrderedByDistance();
     let lazyLoadCount = Globals.get("lazyLoadCount");
     if (spheresWithAssetsCount > lazyLoadCount) {
         for (let idx = neighborPts.length() - 1; idx > -1; idx--) {
@@ -112,6 +112,10 @@ export function getByIndex(idx: number): Sphere {
 
 export function getIndexOfCurrentSphere(): number {
     return _currentSphere.index;
+}
+
+export function getCurrentSphere() {
+    return _currentSphere;
 }
 
 export function count(): number {

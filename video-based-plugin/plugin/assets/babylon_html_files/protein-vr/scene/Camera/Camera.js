@@ -111,6 +111,7 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // another motion.
         let curTime = new Date().getTime();
         let deltaTime = curTime - _lastMovementTime;
+        // console.log(deltaTime, _msUntilNextMoveAllowed);
         if (deltaTime < _msUntilNextMoveAllowed) {
             // Not enough time has passed to allow another movement.
             _cameraCurrentlyInMotion = true;
@@ -136,6 +137,9 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
             // Run a function for first-time moving allowed.
             _cameraJustFinishedBeingInMotion(camera);
         }
+        // If you're not moving, it's okay to show the navigation looking spheres.
+        let currentSphere = SphereCollection.getCurrentSphere();
+        currentSphere.getOtherSphereLookingAt();
         // So it's time to pick a new destination. But don't even try if the user
         // doesn't want to move (i.e., no active keypress our mousedown.) Maybe
         // they're looking around, not moving.
@@ -158,6 +162,28 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         _firstRender = false; // It's no longer the first time rendering.
     }
     exports.update = update;
+    function _getCameraTarget(camera) {
+        if (Globals.get("cameraTypeToUse") === "show-desktop-vr") {
+            // A rigged camera. Average two looking vectors.
+            var leftCamera = camera.leftCamera;
+            var rightCamera = camera.rightCamera;
+            var vec1 = leftCamera.getTarget().subtract(leftCamera.position).normalize();
+            var vec2 = rightCamera.getTarget().subtract(rightCamera.position).normalize();
+            return vec1.add(vec2).scale(0.5).normalize();
+        }
+        else {
+            return camera.getTarget();
+        }
+    }
+    function lookingVector(camera = undefined) {
+        if (camera === undefined) {
+            camera = Globals.get("scene").activeCamera;
+        }
+        let targetPoint = _getCameraTarget(camera);
+        let lookingVec = targetPoint.subtract(camera.position).normalize();
+        return lookingVec;
+    }
+    exports.lookingVector = lookingVector;
     function _cameraPickDirectionAndStartInMotion(camera) {
         /*
         Start the moving process from one sphere to the next. This function is
@@ -178,7 +204,6 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // pick the direction you'll move (based on nearby points, direction of
         // camera, etc.)
         let focalPoint = camera.position;
-        let targetPoint = camera.getTarget();
         // Here needs to be a .copy(), because you might be changing the list
         // (eliinating ones with bad angles, for example, which you wouldn't do
         // when rending arrows).
@@ -187,7 +212,7 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         let newCameraPoint = _closeCameraPoints.firstPoint();
         let maxDist = _closeCameraPoints.data[_closeCameraPoints.data.length - 1].distance;
         // Assign angles
-        let lookingVec = targetPoint.subtract(focalPoint).normalize();
+        let lookingVec = lookingVector(camera);
         switch (Devices.keyPressedState) {
             case 83:
                 lookingVec = lookingVec.scale(-1);
@@ -234,6 +259,7 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // Calculate which direction to move.
         _nextMovementVec = newCameraPoint.position.subtract(_startingCameraInMotion_ViewerSphere.position);
         // Calculate timing variables to govern movement.
+        console.log(newCameraPoint.distance);
         _msUntilNextMoveAllowed = 1000 * newCameraPoint.distance / _speedInUnitsPerSecond;
         _lastMovementTime = (new Date).getTime();
     }

@@ -153,11 +153,10 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         if self.scene.proteinvr_use_existing_frames:
             # You need to figure out the unique id from the png files in the
             # frames directory
-            self.uniq_id = os.path.basename(glob.glob(self.proteinvr_output_dir + "frames" + os.sep + "*.png")[0].split(".")[0])
+            self.uniq_id = os.path.basename(glob.glob(self.proteinvr_output_dir + "frames" + os.sep + "*.png")[0]).split(".")[0]
         else:
             # Get it from the user-specified unique id
             self.uniq_id = self.scene.proteinvr_uniq_id
-        print(self.uniq_id, "HHH")
 
         # Make sure self.proteinvr_output_dir exists
         if not os.path.exists(self.proteinvr_output_dir):
@@ -267,11 +266,12 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         return True                
 
-    def _step_2_get_camerea_positions(self):
+    def _step_2_get_camera_positions(self):
         """
         Get the locations of the camera along the aniamted camera path.
         """
 
+        # Save the positions and mesh data.
         for this_frame in range(self.frame_start, self.frame_end + 1):
             self.set_frame(this_frame)
             this_camera_pos = self.camera.location.copy()
@@ -283,6 +283,19 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 ],
                 "mesh": None  # For now...
             })
+        
+        # It's important that two adjacent points don't have exactly the same
+        # coordinates. This can sometimes occur with interpolating between
+        # points that are already close to each other.
+        for i, pt in enumerate(self.extra_data["spheres"][:-2]):
+            next_pt = self.extra_data["spheres"][i+1]
+
+            if pt["position"] == next_pt["position"]:
+                # They are the same. Instead, average this point and the next
+                # next one.
+                next_next_pt = self.extra_data["spheres"][i+2]
+                new_pt = [round(0.5 * (x + y), 3) for x,y in zip(pt["position"], next_next_pt["position"])]
+                self.extra_data["spheres"][i+1]["position"] = new_pt
 
     def _get_animation_keyframes(self, obj):
         pos_loc_data = OrderedDict()
@@ -291,7 +304,14 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             self.set_frame(f)
             loc = obj.location
             rot = obj.rotation_euler
-            pos = (round(loc.x, 2), round(loc.y, 2), round(loc.z, 2), round(rot.x, 2), round(rot.y, 2), round(rot.z, 2)) # Storing location data
+            pos = (  # Storing location data
+                round(loc.x, 2), 
+                round(loc.y, 2), 
+                round(loc.z, 2),
+                round(rot.x, 2), 
+                round(rot.y, 2), 
+                round(rot.z, 2)
+            )
             new_pos_hash = self._list_of_nums_to_key(pos)
             if new_pos_hash != last_pos_hash:
                 pos_loc_data[f] = pos
@@ -387,12 +407,15 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
 
         self.camera.rotation_mode = 'XYZ'
 
+        # Camera angle must be constant throughout
+        #cam_angle = (self.camera.rotation_euler.x, self.camera.rotation_euler.y, self.camera.rotation_euler.z)
+
         for this_frame in range(self.frame_start, self.frame_end + 1):
             print("Frame", this_frame)
 
             self.set_frame(this_frame)
             this_camera_pos = self.camera.location.copy()
-            self.camera.rotation_euler.x = 1.5707963267948966
+            self.camera.rotation_euler.x = 1.5707963267948966 # -1.5707963267948966
             self.camera.rotation_euler.y = 0.0
             self.camera.rotation_euler.z = 0.0
             self.camera.keyframe_insert(data_path="rotation_euler", frame=this_frame)
@@ -484,6 +507,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             if len(texture_images) > 0:
                 print("=" * 15)
                 print("WARNING! More than one image node found in material for " + obj.name + ". Using " + str(texture_images[0]))
+                print("    ALL CHOICES: " + str([str(t) for t in texture_images]))
                 print("=" * 15)
 
             # Save that texture
@@ -785,7 +809,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             self.restore_ui_state()
             return {'FINISHED'}
 
-        self._step_2_get_camerea_positions()
+        self._step_2_get_camera_positions()
         self._step_3_store_animation_data_of_obj_in_mesh_list()
 
         if len(glob.glob(self.proteinvr_output_dir + "frames/*.png")) == 0:

@@ -105,16 +105,21 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Anima
         /*
         Loads objects that are animated.
         */
+        let uniqID = window.uniqID;
         let BABYLON = Globals.get("BABYLON");
         let scene = Globals.get("scene");
         let loader = new BABYLON.AssetsManager(scene);
         for (var objName in exports.JSONData["animations"]) {
             if (exports.JSONData["animations"].hasOwnProperty(objName)) {
-                let objFilename = objName + "_mesh.obj";
+                let objFilename = uniqID + "." + objName + "_mesh.obj";
                 let meshTask = loader.addMeshTask(objFilename + "_name", "", "", objFilename);
                 meshTask.onSuccess = function (task) {
                     let mesh = task.loadedMeshes[0]; // Why is this necessary?
                     mesh.scaling.z = -1.0;
+                    // Make the id easily accessible by updating id
+                    let newID = task.sceneFilename.substring(0, task.sceneFilename.length - 9);
+                    newID = newID.substring(uniqID.length + 1);
+                    mesh.id = newID;
                     // console.log(mesh);
                     mesh.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects; // In front of viewer sphere.
                     mesh.isPickable = false;
@@ -122,7 +127,10 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Anima
                     let mat = new BABYLON.StandardMaterial(mesh.name + "_material" + Math.random().toString(), scene);
                     mat.diffuseColor = new BABYLON.Color3(0, 0, 0);
                     mat.specularColor = new BABYLON.Color3(0, 0, 0);
-                    mat.emissiveTexture = new BABYLON.Texture(mesh.name + "_mesh.png", scene);
+                    // console.log(uniqID + "." + objName + "_mesh.png");
+                    let pngFilename = task.sceneFilename.substring(0, task.sceneFilename.length - 3) + "png";
+                    mat.emissiveTexture = new BABYLON.Texture(pngFilename, scene);
+                    // mat.emissiveTexture = new BABYLON.Texture(uniqID + "." + mesh.name + "_mesh.png", scene);
                     mat.diffuseTexture = null;
                     mat.backFaceCulling = false;
                     mesh.material = mat;
@@ -137,7 +145,6 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Anima
                     //     anim.updatePos();
                     // }, 10);
                     // window.anim = anim;
-                    // console.log(mesh);
                 };
             }
         }

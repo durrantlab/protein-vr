@@ -62,7 +62,7 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
     function removeExtraSphereTexturesAndMeshesFromMemory() {
         // Now check if there are too many spheres. If so, delete some that
         // are too far away.
-        let neighborPts = _currentSphere.neighboringSpheresForLazyLoadingOrderedByDistance();
+        let neighborPts = _currentSphere.neighboringSpheresOrderedByDistance();
         let lazyLoadCount = Globals.get("lazyLoadCount");
         if (exports.spheresWithAssetsCount > lazyLoadCount) {
             for (let idx = neighborPts.length() - 1; idx > -1; idx--) {
@@ -94,6 +94,10 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
         return _currentSphere.index;
     }
     exports.getIndexOfCurrentSphere = getIndexOfCurrentSphere;
+    function getCurrentSphere() {
+        return _currentSphere;
+    }
+    exports.getCurrentSphere = getCurrentSphere;
     function count() {
         /*
         Get the number of Sphere objects in this collection.

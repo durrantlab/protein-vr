@@ -1,4 +1,4 @@
-define(["require", "exports", "./Material", "./Material", "../config/Globals", "./CameraPoints", "./SphereCollection", "../Triggers/TriggerCollection"], function (require, exports, Material_1, Material_2, Globals, CameraPoints_1, SphereCollection, TriggerCollection) {
+define(["require", "exports", "./Material", "./Material", "../config/Globals", "./CameraPoints", "./SphereCollection", "../scene/Camera/Camera", "../Triggers/TriggerCollection"], function (require, exports, Material_1, Material_2, Globals, CameraPoints_1, SphereCollection, Camera, TriggerCollection) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class Sphere {
@@ -19,8 +19,9 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
             this.sphereMesh = null; // BABYLON.Mesh
             this.assetsLoaded = false; // assets are not loaded to begin with
             this.index = undefined;
-            this._neighboringSpheresForLazyLoadingByDist = undefined;
+            this._neighboringSpheresByDist = undefined;
             this._navNeighboringSpheresByDist = undefined;
+            this.__deltaVecsToOther = undefined;
             // Specify the meshFileName location and textureFileName location when
             // you create the sphere object, though it doesn't load them on object
             // creation.
@@ -162,7 +163,7 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
             // Trigger any triggers
             TriggerCollection.checkAll();
             // Make sure at least low-res neighbor textures loaded.
-            let neighborPts = this.neighboringSpheresForLazyLoadingOrderedByDistance();
+            let neighborPts = this.neighboringSpheresOrderedByDistance();
             // Here load the low-res for all of close neighbors (one swoop)
             for (let i = 0; i < Globals.get("lazyLoadCount"); i++) {
                 let cameraPt = neighborPts.get(i);
@@ -186,7 +187,7 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
             // Remove extra textures and meshes
             SphereCollection.removeExtraSphereTexturesAndMeshesFromMemory();
         }
-        neighboringSpheresForLazyLoadingOrderedByDistance() {
+        neighboringSpheresOrderedByDistance() {
             /*
             Provides a list containing information about other spheres, ordered by
             their distances from this one. Calculates this only one. Uses cache on
@@ -197,27 +198,28 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
             */
             // This list includes the positions of all other spheres. So could be
             // a long list.
-            if (this._neighboringSpheresForLazyLoadingByDist === undefined) {
+            if (this._neighboringSpheresByDist === undefined) {
                 // Let's get the points close to this sphere, since never before
                 // calculated. Includes even this sphere.
                 let tmp = SphereCollection;
-                this._neighboringSpheresForLazyLoadingByDist = new CameraPoints_1.CameraPoints();
+                this._neighboringSpheresByDist = new CameraPoints_1.CameraPoints();
                 for (let i = 0; i < SphereCollection.count(); i++) {
                     let cameraPos = SphereCollection.getByIndex(i).position;
                     let pos = cameraPos.clone();
                     let dist = pos.subtract(this.position).length();
-                    this._neighboringSpheresForLazyLoadingByDist.push({
+                    this._neighboringSpheresByDist.push({
                         distance: dist,
                         position: pos,
                         associatedViewerSphere: SphereCollection.getByIndex(i)
                     });
                 }
                 // Sort by distance
-                this._neighboringSpheresForLazyLoadingByDist.sort();
+                this._neighboringSpheresByDist.sort();
                 // Keep only the closest ones.
-                // this._neighboringSpheresForLazyLoadingByDist = this._neighboringSpheresForLazyLoadingByDist.firstFewPoints(Globals.get("lazyLoadCount"));
+                // Not doing this anymore...
+                // this._neighboringSpheresByDist = this._neighboringSpheresByDist.firstFewPoints(Globals.get("lazyLoadCount"));
             }
-            return this._neighboringSpheresForLazyLoadingByDist;
+            return this._neighboringSpheresByDist;
         }
         navigationNeighboringSpheresOrderedByDistance() {
             /*
@@ -235,7 +237,7 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
             // the scene.
             if (this._navNeighboringSpheresByDist === undefined) {
                 // // Start by considering all neighbors
-                // this._navNeighboringSpheresByDist = this.neighboringSpheresForLazyLoadingOrderedByDistance().copy();
+                // this._navNeighboringSpheresByDist = this.neighboringSpheresOrderedByDistance().copy();
                 // // Remove first one (closest). To make sure any movement is to a new
                 // // sphere, not the one where you already are.
                 // this._navNeighboringSpheresByDist.removeFirst();
@@ -243,10 +245,10 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
                 // this._navNeighboringSpheresByDist = this._navNeighboringSpheresByDist.firstFewPoints(Globals.get("numNeighboringCameraPosForNavigation"));  // choose four close points
                 // // Remove the points that are off in the same general direction
                 // this._navNeighboringSpheresByDist = this._navNeighboringSpheresByDist.removePointsInSameGeneralDirection(this.position);
-                // Need to index camera points by associated spheres
+                // Need to index camera points by associated spheres. So {textureName: Sphere}
                 var neighboringSpheresBySphereTexture = {};
-                for (let i = 0; i < this.neighboringSpheresForLazyLoadingOrderedByDistance().length(); i++) {
-                    let cameraPt = this.neighboringSpheresForLazyLoadingOrderedByDistance().get(i);
+                for (let i = 0; i < this.neighboringSpheresOrderedByDistance().length(); i++) {
+                    let cameraPt = this.neighboringSpheresOrderedByDistance().get(i);
                     let sphere = cameraPt.associatedViewerSphere;
                     let textureName = sphere.textureFileName;
                     neighboringSpheresBySphereTexture[textureName] = cameraPt;
@@ -259,8 +261,69 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
                     let textureName = SphereCollection.getByIndex(neighborToConsider).textureFileName;
                     this._navNeighboringSpheresByDist.push(neighboringSpheresBySphereTexture[textureName]);
                 }
+                console.log(this.index, Globals.get("nextMoves")[this.index]);
+                console.log(this._navNeighboringSpheresByDist);
             }
             return this._navNeighboringSpheresByDist;
+        }
+        _deltaVecsToOtherPts() {
+            // other_pt - this_point vector used for calculating which nav sphere
+            // user is looking at. No need to keep calculating this over and over.
+            // Just once, and cache.
+            if (this.__deltaVecsToOther === undefined) {
+                this.__deltaVecsToOther = [];
+                let neighboringPts = this.neighboringSpheresOrderedByDistance();
+                for (let i = 0; i < neighboringPts.length(); i++) {
+                    let neighborPt = neighboringPts.get(i).position;
+                    this.__deltaVecsToOther.push(neighborPt.subtract(this.position));
+                }
+            }
+            return this.__deltaVecsToOther;
+        }
+        getOtherSphereLookingAt() {
+            // Given the spheres current location and the direction of the camera,
+            // determine which other sphere comes closest.
+            // Useful site: https://answers.unity.com/questions/62644/distance-between-a-ray-and-a-point.html
+            let BABYLON = Globals.get("BABYLON");
+            let deltaVecsToOtherPts = this._deltaVecsToOtherPts();
+            let cameraLookingVector = Camera.lookingVector();
+            // Calculate the distances from each point and the looking vector
+            // coming out of the camera.
+            let distData = [];
+            // If there are so many other spheres that it slows down the render
+            // loop, consider just looking at the first 100 or so, since it's sorted
+            // by distance already.
+            for (let i = 0; i < deltaVecsToOtherPts.length; i++) {
+                let deltaVecToOtherPt = deltaVecsToOtherPts[i];
+                let dist = BABYLON.Vector3.Cross(cameraLookingVector, deltaVecToOtherPt).length();
+                distData.push([dist, i]);
+            }
+            // Sort by the distance.
+            // see https://stackoverflow.com/questions/17043068/how-to-sort-array-by-first-item-in-subarray
+            distData.sort(function (a, b) {
+                if (a[0] < b[0]) {
+                    return -1;
+                }
+                else if (a[0] > b[0]) {
+                    return 1;
+                }
+                else {
+                    return 0;
+                }
+            });
+            // Find the closest point that is > 3.0 away
+            for (let i = 0; i < distData.length; i++) {
+                let dist = distData[i][0];
+                let idx = distData[i][1];
+                if (dist > 3.0) {
+                    // Put the viewer sphere marker there.
+                    let destinationNeighborSphere = Globals.get("destinationNeighborSphere");
+                    let neighboringPts = this.neighboringSpheresOrderedByDistance();
+                    destinationNeighborSphere.position = neighboringPts.get(idx).position;
+                    destinationNeighborSphere.isVisible = true;
+                    break;
+                }
+            }
         }
     }
     exports.Sphere = Sphere;

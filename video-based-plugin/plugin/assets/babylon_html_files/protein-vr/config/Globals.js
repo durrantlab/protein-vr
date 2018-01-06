@@ -23,6 +23,7 @@ define(["require", "exports"], function (require, exports) {
             // "viewerSpheres": undefined,  // A Spheres.SphereCollection.SphereCollection object.
             // "sphereMaterials": undefined,  // The materials associated with each viewer sphere.
             "skyboxSphere": undefined,
+            "destinationNeighborSphere": undefined,
             "debug": false,
             "breakCaching": true,
             "mouseDownAdvances": true,

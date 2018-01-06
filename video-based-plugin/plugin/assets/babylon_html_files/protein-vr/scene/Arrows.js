@@ -75,6 +75,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Setup
             let neighboringCameraPointPosition = cameraPoints.get(i).position;
             let vec = neighboringCameraPointPosition.subtract(cameraPos).normalize().scale(4.0);
             arrowToUse.position = cameraPos.add(vec);
+            console.log(arrowToUse.position);
             // console.log(neighboringCameraPointPosition, cameraPos, vec, arrowToUse.position);
             // console.log(cameraPos, arrowToUse.position)
             arrowToUse.position.y = arrowToUse.position.y - 2.0;

@@ -46,6 +46,8 @@ define(["require", "exports", "../../config/Globals", "./CubicSpline"], function
             for (let i = firstFrameIndex; i <= lastFrameIndex; i++) {
                 framesToKeep.push(i);
                 let thisPosAndRot = (objAnimData[i] !== undefined) ? objAnimData[i] : lastPosAndRot;
+                // Be sure to convert to babylonjs space.
+                // ******** MOOSE
                 posAndRot.push(thisPosAndRot);
                 lastPosAndRot = thisPosAndRot;
             }

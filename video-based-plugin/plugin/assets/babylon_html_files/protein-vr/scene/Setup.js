@@ -30,7 +30,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "../Sphe
                 // Setup signs
                 Sign_1.setupAllSigns();
                 // window.debugit = scene.debugLayer;
-                // window.scene = scene;
+                window.scene = scene;
                 // scene.debugLayer.show();
                 scene.clearColor = new BABYLON.Color3(0, 0, 0);
                 // No built-in loading screen.
@@ -38,6 +38,20 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "../Sphe
                 if (Globals.get("debug")) {
                     scene.debugLayer.show();
                 }
+                // Add a sphere to the scene to mark where you're looking.
+                let destinationNeighborSphere = BABYLON.MeshBuilder.CreateSphere("destinationNeighborSphere", { diameter: 0.05 }, scene);
+                var destinationNeighborSphereMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
+                destinationNeighborSphereMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
+                destinationNeighborSphereMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0); // Make it shiny.
+                destinationNeighborSphereMaterial.emissiveColor = new BABYLON.Color3(1, 0, 1);
+                // destinationNeighborSphereMaterial.ambientColor = new BABYLON.Color3(0.23, 0.98, 0.53);
+                destinationNeighborSphere.material = destinationNeighborSphereMaterial;
+                destinationNeighborSphere.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects;
+                // Make it initially invisible.
+                destinationNeighborSphere.isVisible = false;
+                // Make the scene right handed.
+                // scene.useRightHandedSystem = true;
+                Globals.set("destinationNeighborSphere", destinationNeighborSphere);
                 Globals.milestone("BabylonSceneLoaded", true);
             });
         });
@@ -65,6 +79,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "../Sphe
         return theMesh;
     }
     exports.getMeshThatContainsStr = getMeshThatContainsStr;
+    var ROTATE_SPHERES = -0.5 * Math.PI;
     function _setupViewerSphereTemplate(scene, radius) {
         /*
         Sets up the initial viewer sphere. This will be cloned for each valid
@@ -79,7 +94,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "../Sphe
         viewerSphereTemplate.scaling = new BABYLON.Vector3(radius, radius, -radius);
         viewerSphereTemplate.isPickable = false;
         viewerSphereTemplate.renderingGroupId = Globals_1.RenderingGroups.ViewerSphere;
-        viewerSphereTemplate.rotation.y = 4.908738521234052; // To align export with scene. 281.25 degrees = 25/32*360
+        viewerSphereTemplate.rotation.y = ROTATE_SPHERES; //4.908738521234052;  // To align export with scene. 281.25 degrees = 25/32*360
         Globals.set("viewerSphereTemplate", viewerSphereTemplate);
     }
     function _setupEnvironmentalSphere(radius) {
@@ -94,7 +109,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "../Sphe
         let skyboxSphere = viewerSphereTemplate.clone("skyboxSphere");
         let slightlyBiggerRadius = radius * 1.05;
         skyboxSphere.scaling = new BABYLON.Vector3(slightlyBiggerRadius, slightlyBiggerRadius, -slightlyBiggerRadius);
-        skyboxSphere.rotation.y = 4.908738521234052; // To align export with scene. 281.25 degrees = 25/32*360
+        skyboxSphere.rotation.y = ROTATE_SPHERES; // 4.908738521234052;  // To align export with scene. 281.25 degrees = 25/32*360
         skyboxSphere.isPickable = false;
         skyboxSphere.renderingGroupId = Globals_1.RenderingGroups.EnvironmentalSphere;
         let sphereMaterial2 = new Material_1.Material(true);
