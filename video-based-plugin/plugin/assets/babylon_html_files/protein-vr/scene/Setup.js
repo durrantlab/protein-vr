@@ -39,19 +39,18 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "../Sphe
                     scene.debugLayer.show();
                 }
                 // Add a sphere to the scene to mark where you're looking.
-                let destinationNeighborSphere = BABYLON.MeshBuilder.CreateSphere("destinationNeighborSphere", { diameter: 0.05 }, scene);
-                var destinationNeighborSphereMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
-                destinationNeighborSphereMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
-                destinationNeighborSphereMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0); // Make it shiny.
-                destinationNeighborSphereMaterial.emissiveColor = new BABYLON.Color3(1, 0, 1);
-                // destinationNeighborSphereMaterial.ambientColor = new BABYLON.Color3(0.23, 0.98, 0.53);
-                destinationNeighborSphere.material = destinationNeighborSphereMaterial;
-                destinationNeighborSphere.renderingGroupId = Globals_1.RenderingGroups.VisibleObjects;
-                // Make it initially invisible.
-                destinationNeighborSphere.isVisible = false;
+                // (advanced navigation system)
+                // let destinationNeighborSphere = BABYLON.MeshBuilder.CreateSphere("destinationNeighborSphere", {diameter: 0.05}, scene);
+                // var destinationNeighborSphereMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
+                // destinationNeighborSphereMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
+                // destinationNeighborSphereMaterial.specularColor = new BABYLON.Color3(1.0, 1.0, 1.0);  // Make it shiny.
+                // destinationNeighborSphereMaterial.emissiveColor = new BABYLON.Color3(1, 0, 1);
+                // destinationNeighborSphere.material = destinationNeighborSphereMaterial;
+                // destinationNeighborSphere.renderingGroupId = RenderingGroups.VisibleObjects;
+                // destinationNeighborSphere.isVisible = false;  // Make it initially invisible.
+                // Globals.set("destinationNeighborSphere", destinationNeighborSphere);
                 // Make the scene right handed.
                 // scene.useRightHandedSystem = true;
-                Globals.set("destinationNeighborSphere", destinationNeighborSphere);
                 Globals.milestone("BabylonSceneLoaded", true);
             });
         });

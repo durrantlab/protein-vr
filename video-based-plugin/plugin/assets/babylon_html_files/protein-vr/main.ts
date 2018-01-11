@@ -161,7 +161,7 @@ export class Game {
                 // debugging easier.
                 
                 engine.switchFullscreen(
-                    UserVars.getParam("viewer") == UserVars.viewers["Screen"]
+                    UserVars.getParam("viewer") === UserVars.viewers["Screen"]
                 )
                 
                 // Start the render loop.

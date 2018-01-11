@@ -138,8 +138,9 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
             _cameraJustFinishedBeingInMotion(camera);
         }
         // If you're not moving, it's okay to show the navigation looking spheres.
-        let currentSphere = SphereCollection.getCurrentSphere();
-        currentSphere.getOtherSphereLookingAt();
+        // This is for advanced navigation system.
+        // let currentSphere: Sphere = SphereCollection.getCurrentSphere();
+        // currentSphere.getOtherSphereLookingAt();
         // So it's time to pick a new destination. But don't even try if the user
         // doesn't want to move (i.e., no active keypress our mousedown.) Maybe
         // they're looking around, not moving.
@@ -259,7 +260,7 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // Calculate which direction to move.
         _nextMovementVec = newCameraPoint.position.subtract(_startingCameraInMotion_ViewerSphere.position);
         // Calculate timing variables to govern movement.
-        console.log(newCameraPoint.distance);
+        // console.log(newCameraPoint.distance);
         _msUntilNextMoveAllowed = 1000 * newCameraPoint.distance / _speedInUnitsPerSecond;
         _lastMovementTime = (new Date).getTime();
     }

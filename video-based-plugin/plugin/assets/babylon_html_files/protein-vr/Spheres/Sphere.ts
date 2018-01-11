@@ -332,8 +332,8 @@ export class Sphere {
                 let textureName = SphereCollection.getByIndex(neighborToConsider).textureFileName;
                 this._navNeighboringSpheresByDist.push(neighboringSpheresBySphereTexture[textureName])
             }
-            console.log(this.index, Globals.get("nextMoves")[this.index]);
-            console.log(this._navNeighboringSpheresByDist);
+            // console.log(this.index, Globals.get("nextMoves")[this.index]);
+            // console.log(this._navNeighboringSpheresByDist);
         }
 
         return this._navNeighboringSpheresByDist;
@@ -359,6 +359,9 @@ export class Sphere {
 
         return this.__deltaVecsToOther;
     }
+
+    /*
+    // For advanced navigation system....
 
     public getOtherSphereLookingAt() {
         // Given the spheres current location and the direction of the camera,
@@ -399,7 +402,8 @@ export class Sphere {
         for (let i=0; i<distData.length; i++) {
             let dist = distData[i][0];
             let idx = distData[i][1];
-            if (dist > 3.0) {
+            // console.log(idx, dist);
+            if (dist > 1.0) {
                 // Put the viewer sphere marker there.
                 let destinationNeighborSphere = Globals.get("destinationNeighborSphere");
                 let neighboringPts = this.neighboringSpheresOrderedByDistance();
@@ -412,5 +416,6 @@ export class Sphere {
         }
 
     }
+    */
 
 }

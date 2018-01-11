@@ -1,4 +1,4 @@
-define(["require", "exports", "./Material", "./Material", "../config/Globals", "./CameraPoints", "./SphereCollection", "../scene/Camera/Camera", "../Triggers/TriggerCollection"], function (require, exports, Material_1, Material_2, Globals, CameraPoints_1, SphereCollection, Camera, TriggerCollection) {
+define(["require", "exports", "./Material", "./Material", "../config/Globals", "./CameraPoints", "./SphereCollection", "../Triggers/TriggerCollection"], function (require, exports, Material_1, Material_2, Globals, CameraPoints_1, SphereCollection, TriggerCollection) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class Sphere {
@@ -261,8 +261,8 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
                     let textureName = SphereCollection.getByIndex(neighborToConsider).textureFileName;
                     this._navNeighboringSpheresByDist.push(neighboringSpheresBySphereTexture[textureName]);
                 }
-                console.log(this.index, Globals.get("nextMoves")[this.index]);
-                console.log(this._navNeighboringSpheresByDist);
+                // console.log(this.index, Globals.get("nextMoves")[this.index]);
+                // console.log(this._navNeighboringSpheresByDist);
             }
             return this._navNeighboringSpheresByDist;
         }
@@ -279,51 +279,6 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
                 }
             }
             return this.__deltaVecsToOther;
-        }
-        getOtherSphereLookingAt() {
-            // Given the spheres current location and the direction of the camera,
-            // determine which other sphere comes closest.
-            // Useful site: https://answers.unity.com/questions/62644/distance-between-a-ray-and-a-point.html
-            let BABYLON = Globals.get("BABYLON");
-            let deltaVecsToOtherPts = this._deltaVecsToOtherPts();
-            let cameraLookingVector = Camera.lookingVector();
-            // Calculate the distances from each point and the looking vector
-            // coming out of the camera.
-            let distData = [];
-            // If there are so many other spheres that it slows down the render
-            // loop, consider just looking at the first 100 or so, since it's sorted
-            // by distance already.
-            for (let i = 0; i < deltaVecsToOtherPts.length; i++) {
-                let deltaVecToOtherPt = deltaVecsToOtherPts[i];
-                let dist = BABYLON.Vector3.Cross(cameraLookingVector, deltaVecToOtherPt).length();
-                distData.push([dist, i]);
-            }
-            // Sort by the distance.
-            // see https://stackoverflow.com/questions/17043068/how-to-sort-array-by-first-item-in-subarray
-            distData.sort(function (a, b) {
-                if (a[0] < b[0]) {
-                    return -1;
-                }
-                else if (a[0] > b[0]) {
-                    return 1;
-                }
-                else {
-                    return 0;
-                }
-            });
-            // Find the closest point that is > 3.0 away
-            for (let i = 0; i < distData.length; i++) {
-                let dist = distData[i][0];
-                let idx = distData[i][1];
-                if (dist > 3.0) {
-                    // Put the viewer sphere marker there.
-                    let destinationNeighborSphere = Globals.get("destinationNeighborSphere");
-                    let neighboringPts = this.neighboringSpheresOrderedByDistance();
-                    destinationNeighborSphere.position = neighboringPts.get(idx).position;
-                    destinationNeighborSphere.isVisible = true;
-                    break;
-                }
-            }
         }
     }
     exports.Sphere = Sphere;
