@@ -141,15 +141,28 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // This is for advanced navigation system.
         // let currentSphere: Sphere = SphereCollection.getCurrentSphere();
         // currentSphere.getOtherSphereLookingAt();
+        // Make sure the camera location doesn't depend on camera input.
+        // Especially useful for keeping the virtual joystick from wandering off.
+        camera.position = SphereCollection.getCurrentSphere().position.clone();
+        // If the left joystick is pressed, trigger move forward.
+        let leftTriggerDownState = false;
+        if (Globals.get("cameraTypeToUse") === "show-mobile-virtual-joystick") {
+            leftTriggerDownState = camera.inputs.attached.virtualJoystick._leftjoystick.pressed;
+        }
         // So it's time to pick a new destination. But don't even try if the user
         // doesn't want to move (i.e., no active keypress our mousedown.) Maybe
         // they're looking around, not moving.
         let result;
         if (Globals.get("mouseDownAdvances") === true) {
-            result = (Devices.mouseDownState === false) && (Devices.keyPressedState === undefined) && (_firstRender === false);
+            result = ((Devices.mouseDownState === false) &&
+                (Devices.keyPressedState === undefined) &&
+                (leftTriggerDownState === false) &&
+                (_firstRender === false));
         }
         else {
-            result = (Devices.keyPressedState === undefined) && (_firstRender === false);
+            result = ((Devices.keyPressedState === undefined) &&
+                (leftTriggerDownState === false) &&
+                (_firstRender === false));
         }
         if (result) {
             return;

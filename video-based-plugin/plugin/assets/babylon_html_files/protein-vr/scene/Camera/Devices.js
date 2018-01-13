@@ -12,7 +12,10 @@ define(["require", "exports", "../../config/Globals", "../../config/Globals"], f
         // Load the appropriate camera.
         switch (Globals.get("cameraTypeToUse")) {
             case "show-mobile-virtual-joystick":
-                _setupVirtualJoystick();
+                _setupVirtualJoystick(); // This would work great for fully 3D
+                // scene. But "forward" isn't just forward. It's change
+                // viewersphere. How to detect? You need to detect click.
+                // _setupVRDeviceOrientationFreeCamera();  // Doing this for now, because virtual joystick is lame for now.
                 break;
             case "show-desktop-screen":
                 scene.activeCamera.attachControl(canvas);
@@ -32,6 +35,16 @@ define(["require", "exports", "../../config/Globals", "../../config/Globals"], f
         _setupMouseAndKeyboard();
     }
     exports.setup = setup;
+    function _setupUniversalCamera() {
+        // I'm experimenting with a better camera for mobile devices.
+        let scene = Globals.get("scene");
+        let BABYLON = Globals.get("BABYLON");
+        let canvas = Globals.get("canvas");
+        // var camera = new BABYLON.VirtualJoysticksCamera("VJC", scene.activeCamera.position, scene);
+        var camera = new BABYLON.UniversalCamera("UniversalCamera", scene.activeCamera.position, scene);
+        camera.rotation = scene.activeCamera.rotation;
+        _makeCameraReplaceActiveCamera(camera);
+    }
     function _setupVirtualJoystick() {
         /*
         Sets up a virtual joystick. Good for users on phones who don't have
@@ -225,11 +238,26 @@ define(["require", "exports", "../../config/Globals", "../../config/Globals"], f
         Setup mouse clicking. Separate from above function to work with HTC Vive too (not bound until after initial click).
         */
         let scene = Globals.get("scene");
+        let jQuery = Globals.get("jQuery");
+        // Below works with everything but virtual joysticks
         scene.onPointerDown = function (evt, pickResult) {
             exports.mouseDownState = true;
         }.bind(this);
         scene.onPointerUp = function (evt, pickResult) {
             exports.mouseDownState = false;
         }.bind(this);
+        // This works with virtual joysticks on safari, for example.
+        // if (Globals.get("cameraTypeToUse") === "show-mobile-virtual-joystick") {
+        //     jQuery(document).ready(() => {
+        //         alert("okddd");
+        //         jQuery(window).mousedown(() => {
+        //             mouseDownState = true;
+        //             console.log("yo2");
+        //         });
+        //         jQuery(window).mouseup(() => {
+        //             mouseDownState = false;
+        //         });
+        //     })
+        // }
     }
 });

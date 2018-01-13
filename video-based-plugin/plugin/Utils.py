@@ -96,7 +96,11 @@ def garden_path_string_to_data():
         # Paths are separated by ;
         paths = [p.strip() for p in bpy.context.scene.proteinvr_garden_paths.split(";")]
 
-        scene = bpy.data.scenes["Scene"]
+        if len(bpy.data.scenes) != 1:
+            print("More than one scene!")
+            sdfsdf
+
+        scene = bpy.data.scenes[0] # ["Scene"]
         scene_frame_start = scene.frame_start
         scene_frame_end = scene.frame_end
 

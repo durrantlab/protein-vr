@@ -15,7 +15,10 @@ export function setup(): void {
     // Load the appropriate camera.
     switch (Globals.get("cameraTypeToUse")) {
         case "show-mobile-virtual-joystick":
-            _setupVirtualJoystick();
+            _setupVirtualJoystick();  // This would work great for fully 3D
+            // scene. But "forward" isn't just forward. It's change
+            // viewersphere. How to detect? You need to detect click.
+            // _setupVRDeviceOrientationFreeCamera();  // Doing this for now, because virtual joystick is lame for now.
             break;
         case "show-desktop-screen":
             scene.activeCamera.attachControl(canvas);
@@ -36,6 +39,18 @@ export function setup(): void {
     _setupMouseAndKeyboard();
 }
 
+function _setupUniversalCamera(): void {
+    // I'm experimenting with a better camera for mobile devices.
+    let scene = Globals.get("scene");
+    let BABYLON = Globals.get("BABYLON");
+    let canvas = Globals.get("canvas");
+
+    // var camera = new BABYLON.VirtualJoysticksCamera("VJC", scene.activeCamera.position, scene);
+    var camera = new BABYLON.UniversalCamera("UniversalCamera", scene.activeCamera.position, scene);
+    camera.rotation = scene.activeCamera.rotation;
+    
+    _makeCameraReplaceActiveCamera(camera);
+}
 function _setupVirtualJoystick(): void {
     /*
     Sets up a virtual joystick. Good for users on phones who don't have
@@ -280,7 +295,9 @@ function _setupMouseClick(): void {
     */
     
     let scene = Globals.get("scene");
+    let jQuery = Globals.get("jQuery");
 
+    // Below works with everything but virtual joysticks
     scene.onPointerDown = function (evt, pickResult) {
         mouseDownState = true;
     }.bind(this);
@@ -288,4 +305,19 @@ function _setupMouseClick(): void {
     scene.onPointerUp = function (evt, pickResult) {
         mouseDownState = false;
     }.bind(this);
+
+    // This works with virtual joysticks on safari, for example.
+    // if (Globals.get("cameraTypeToUse") === "show-mobile-virtual-joystick") {
+    //     jQuery(document).ready(() => {
+    //         alert("okddd");
+    //         jQuery(window).mousedown(() => {
+    //             mouseDownState = true;
+    //             console.log("yo2");
+    //         });
+    
+    //         jQuery(window).mouseup(() => {
+    //             mouseDownState = false;
+    //         });
+    //     })
+    // }
 }

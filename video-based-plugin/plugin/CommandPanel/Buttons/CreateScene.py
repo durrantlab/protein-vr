@@ -27,6 +27,7 @@ import numpy
 import random
 import subprocess
 from collections import OrderedDict
+import math
 
 obj_names = Utils.ObjNames()
 
@@ -74,7 +75,12 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         Saves the hide and hide_render properties of all objects. Also other
         properties.
         """
-        self.scene = bpy.data.scenes["Scene"]
+
+        if len(bpy.data.scenes) != 1:
+            print("More than one scene!")
+            sdfsdf
+
+        self.scene = bpy.data.scenes[0] # ["Scene"]
 
         self.visibility_states = {}
         for obj in bpy.data.objects:
@@ -114,6 +120,10 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
     #     else:
     #         print("WARNING: pngquant path not valid: " + self.scene.proteinvr_pngquant_path)        
 
+    def _is_power_of_two(self, val):
+        n = math.log(val)/math.log(2) # (2 ^ n)
+        return float(int(n)) == n
+
     def _step_0_existing_files_check_ok_and_copy(self):
         """
         Check to make sure the user-specified files exist. If so, start
@@ -149,6 +159,23 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             )
             return False
         
+        # Make sure the image dimensions a power of 2
+        if not self._is_power_of_two(self.scene.proteinvr_bake_texture_size):
+            Messages.send_message(
+                "BAD_TEXTURE_SIZE", 
+                "Texture sizes must be powers of two!",
+                operator=self
+            )
+            return False
+        if not self._is_power_of_two(self.scene.proteinvr_mobile_bake_texture_size):
+            Messages.send_message(
+                "BAD_MOBILE_TEXTURE_SIZE", 
+                "Texture sizes must be powers of two!",
+                operator=self
+            )
+            return False
+        
+
         # Figure out what unique id to use.
         if self.scene.proteinvr_use_existing_frames:
             # You need to figure out the unique id from the png files in the

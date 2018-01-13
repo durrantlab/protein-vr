@@ -13,7 +13,14 @@ output_dir = os.getcwd() + os.sep + "proteinvr_output" + os.sep
     # os.system("rm -r " + output_dir)
 if not os.path.exists(output_dir):
     os.mkdir(output_dir)
-bpy.data.scenes["Scene"].proteinvr_output_dir = output_dir
+
+
+if len(bpy.data.scenes) != 1:
+    print("More than one scene!")
+    sdfsdf
+
+# bpy.data.scenes["Scene"].proteinvr_output_dir = output_dir
+bpy.data.scenes[0].proteinvr_output_dir = output_dir
 
 # Now press the render button
 bpy.ops.proteinvr.create_scene()
