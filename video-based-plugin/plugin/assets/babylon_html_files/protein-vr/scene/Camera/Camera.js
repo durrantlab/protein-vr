@@ -59,6 +59,10 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
             blur(false);
         }
         Globals.milestone("CameraSetup", true);
+        // Debug. Periodically output what the current material is.
+        // setInterval(() => {
+        //     console.log(SphereCollection.getCurrentSphere().material.material);
+        // }, 5000);
     }
     exports.setup = setup;
     function blur(val) {
@@ -94,6 +98,7 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         /*
         Update the camera. This is run from the render loop (every frame).
         */
+        // console.log("1");
         if (_startingCameraInMotion_ViewerSphere === undefined) {
             // Not ready yet... PNG images probably not loaded.
             return;
@@ -112,12 +117,28 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         let curTime = new Date().getTime();
         let deltaTime = curTime - _lastMovementTime;
         // console.log(deltaTime, _msUntilNextMoveAllowed);
+        // console.log("2");
+        // console.log(deltaTime, "<", _msUntilNextMoveAllowed, "SS");
+        // If the distance is very short, _msUntilNextMoveAllowed could be very
+        // short, and deltaTime could always be less than it no matter what.
         if (deltaTime < _msUntilNextMoveAllowed) {
             // Not enough time has passed to allow another movement.
             _cameraCurrentlyInMotion = true;
             _whileCameraInMotion(deltaTime, camera);
             return;
         }
+        // Enough time has passed to allow another movement.
+        if (_cameraCurrentlyInMotion) {
+            // _cameraCurrentlyInMotion is still true, but enough time has passed
+            // that the camera should no longer be in motion. This must be the
+            // first time this function has been called since a refractory period ended. 
+            // So the camera isn't really in motion anymore.
+            _cameraCurrentlyInMotion = false;
+            // Run a function for first-time moving allowed.
+            _cameraJustFinishedBeingInMotion(camera);
+        }
+        // You're not translating, but are you look around much (within a
+        // tolerance)? This is used elsewhere to load in high-res tetures.
         if (curTime - _lastCameraRotationCheckTimestamp > _msBetweenCameraAngleChecks) {
             _lastCameraRotationCheckTimestamp = curTime;
             let newCameraRotation = camera.rotation.clone();
@@ -128,15 +149,6 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
             _lastCameraRotation = newCameraRotation;
         }
         // NOTE: If you get here, you're ready to move again.
-        if (_cameraCurrentlyInMotion) {
-            // _cameraCurrentlyInMotion is still true, but enough time has passed
-            // that the camera should no longer be in motion. This must be the
-            // first time this function has been called since a refractory period ended. 
-            // So the camera isn't really in motion anymore.
-            _cameraCurrentlyInMotion = false;
-            // Run a function for first-time moving allowed.
-            _cameraJustFinishedBeingInMotion(camera);
-        }
         // If you're not moving, it's okay to show the navigation looking spheres.
         // This is for advanced navigation system.
         // let currentSphere: Sphere = SphereCollection.getCurrentSphere();
@@ -144,14 +156,14 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // Make sure the camera location doesn't depend on camera input.
         // Especially useful for keeping the virtual joystick from wandering off.
         camera.position = SphereCollection.getCurrentSphere().position.clone();
+        // So it's time to pick a new destination. But don't even try if the user
+        // doesn't want to move (i.e., no active keypress our mousedown.) Maybe
+        // they're looking around, not moving.
         // If the left joystick is pressed, trigger move forward.
         let leftTriggerDownState = false;
         if (Globals.get("cameraTypeToUse") === "show-mobile-virtual-joystick") {
             leftTriggerDownState = camera.inputs.attached.virtualJoystick._leftjoystick.pressed;
         }
-        // So it's time to pick a new destination. But don't even try if the user
-        // doesn't want to move (i.e., no active keypress our mousedown.) Maybe
-        // they're looking around, not moving.
         let result;
         if (Globals.get("mouseDownAdvances") === true) {
             result = ((Devices.mouseDownState === false) &&
@@ -260,6 +272,8 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // If the new viewer sphere doesn't have a texture, abort!
         if (newCameraPoint.associatedViewerSphere.material.textureType === Material_1.TextureType.None) {
             console.log("Aborted movement, texture not yet loaded...");
+            // Try to load the texture.
+            newCameraPoint.associatedViewerSphere.loadAssets();
             blur(false);
             // Make sure everything hidden but present sphere.
             SphereCollection.hideAll();
@@ -274,7 +288,7 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         _nextMovementVec = newCameraPoint.position.subtract(_startingCameraInMotion_ViewerSphere.position);
         // Calculate timing variables to govern movement.
         // console.log(newCameraPoint.distance);
-        _msUntilNextMoveAllowed = 1000 * newCameraPoint.distance / _speedInUnitsPerSecond;
+        _msUntilNextMoveAllowed = Math.max(1000 * newCameraPoint.distance / _speedInUnitsPerSecond, 100);
         _lastMovementTime = (new Date).getTime();
     }
     function _whileCameraInMotion(deltaTime, camera) {
@@ -332,6 +346,7 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // Set the current sphere to this one.
         _endingCameraInMotion_ViewerSphere.setToCurrentSphere();
         // Make sure environmental sphere properly positioned.
+        console.log(Globals.get("skyboxSphere")); // *****
         Globals.get("skyboxSphere").position = camera.position;
     }
 });

@@ -1,4 +1,4 @@
-define(["require", "exports", "../config/Globals"], function (require, exports, Globals) {
+define(["require", "exports", "../config/Globals", "./SphereCollection"], function (require, exports, Globals, SphereCollection) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TextureType;
@@ -49,9 +49,6 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
                     filename = filename + "?" + Math.random().toString();
                 }
                 var assetsManager = new BABYLON.AssetsManager(scene);
-                // console.log("GGG", filename);
-                // filename = window.location.protocol + "//" + window.location.host + window.location.pathname + filename;
-                // console.log(filename);
                 assetsManager.addTextureTask("textureId" + Math.random().toString(), filename);
                 assetsManager.onTaskSuccess = (tasks) => {
                     // Get rid of old texture to free memory
@@ -62,7 +59,13 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
                     if (this._textureHasTransparency) {
                         this.material.opacityTexture = tasks.texture;
                     }
-                    // console.log(tasks.texture);
+                    console.log("=================");
+                    console.log("Material loaded: " + filename);
+                    try {
+                        console.log("Current material:" + SphereCollection.getCurrentSphere().textureFileName);
+                    }
+                    catch (err) {
+                    }
                     callBack();
                 };
                 assetsManager.load();

@@ -79,7 +79,6 @@ export class Sphere {
             // console.log("Mesh loaded: ", this.textureFileName);
 
             this.assetsLoaded = true;  // Assets have now been loaded. Because spheres are always loaded after textures.
-            SphereCollection.addToSpheresWithAssetsCount(1);
         }
 
         // Do this regardless. If texture updated, need to update material.
@@ -92,20 +91,17 @@ export class Sphere {
         // Upgrades the texture of this sphere if it's appropriate.
         if (this.material.textureType === TextureType.Full) {
             // Already maxed out;
-            // console.log("1");
             return;
         }
 
         if (!SphereCollection.hasEnoughTimePastSinceLastMove()) {
             // Not enough time has passed since the user sat still. Only load
             // if not much movement.
-            // console.log("3");
             return;
         }
 
         if (Globals.get("isMobile")) {
             // If it's mobile, you never want the high-res images.
-            // console.log("2");
             return;
         }
 
@@ -125,16 +121,38 @@ export class Sphere {
         // }
     }
 
+    public loadAssets(): void {
+        if (!this.assetsLoaded) {
+
+            let typeToLoad = TextureType.Mobile;
+
+            // If you're not on mobile, and if the full texture isn't very
+            // big, just load the full texture instead.
+            let pngFileSizes = Globals.get("pngFileSizes");
+            if (pngFileSizes !== undefined) {
+                // console.log("MOO", pngFileSizes[sphere.textureFileName]);
+                if (pngFileSizes[this.textureFileName] < 100) {  // 100 kb is arbitrary.
+                    typeToLoad = TextureType.Full;
+                }
+            }
+
+            this.material.loadTexture("frames/" + this.textureFileName, () => {
+                this.loadMesh();  // Mesh has never been loaded, so take care of that.
+            }, typeToLoad);
+        }
+    }
+
     public unloadAssets(): void {
         /*
         Unload the assets associated with this sphere (material and mesh) from
         memory. Probably as part of some lazy-loading scheme.
         */
 
-        this._unloadMesh();
-        this._unloadTexture();
-        this.assetsLoaded = false;
-        SphereCollection.addToSpheresWithAssetsCount(-1);
+        if (this.assetsLoaded) {
+            this._unloadMesh();
+            this._unloadTexture();
+            this.assetsLoaded = false;
+        }
     }
 
     private _unloadTexture(): void {
@@ -151,7 +169,6 @@ export class Sphere {
         }
 
         console.log("Material unloaded: ", this.textureFileName);
-
     }
 
     private _unloadMesh() {
@@ -167,7 +184,7 @@ export class Sphere {
             delete this.sphereMesh;
         }
 
-        console.log("Mesh unloaded: ", this.textureFileName);
+        // console.log("Mesh unloaded: ", this.textureFileName);
         
     }
 
@@ -212,35 +229,57 @@ export class Sphere {
 
         // Make sure at least low-res neighbor textures loaded.
         let neighborPts = this.neighboringSpheresOrderedByDistance();
+        let lazyLoadCount = Globals.get("lazyLoadCount");
         
         // Here load the low-res for all of close neighbors (one swoop)
-        for (let i=0; i<Globals.get("lazyLoadCount"); i++) {
+        for (let i=0; i<neighborPts.length(); i++) {
+            // for (let i=0; i<Globals.get("lazyLoadCount"); i++) {
             let cameraPt = neighborPts.get(i);
             let sphere: Sphere = cameraPt.associatedViewerSphere;
+            if (i < lazyLoadCount) {
+                // They need to be loaded, because it's within the lazy-load
+                // range.
 
-            if (!sphere.assetsLoaded) {
+                sphere.loadAssets();
 
-                let typeToLoad = TextureType.Mobile;
+                // if (!sphere.assetsLoaded) {
 
-                // If you're not on mobile, and if the full texture isn't very
-                // big, just load the full texture instead.
-                let pngFileSizes = Globals.get("pngFileSizes");
-                if (pngFileSizes !== undefined) {
-                    // console.log("MOO", pngFileSizes[sphere.textureFileName]);
-                    if (pngFileSizes[sphere.textureFileName] < 100) {  // 100 kb is arbitrary.
-                        typeToLoad = TextureType.Full;
-                    }
-                }
+                //     let typeToLoad = TextureType.Mobile;
 
-                sphere.material.loadTexture("frames/" + sphere.textureFileName, () => {
-                    sphere.loadMesh();  // Mesh has never been loaded, so take care of that.
-                }, typeToLoad);
+                //     // If you're not on mobile, and if the full texture isn't very
+                //     // big, just load the full texture instead.
+                //     let pngFileSizes = Globals.get("pngFileSizes");
+                //     if (pngFileSizes !== undefined) {
+                //         // console.log("MOO", pngFileSizes[sphere.textureFileName]);
+                //         if (pngFileSizes[sphere.textureFileName] < 100) {  // 100 kb is arbitrary.
+                //             typeToLoad = TextureType.Full;
+                //         }
+                //     }
 
+                //     sphere.material.loadTexture("frames/" + sphere.textureFileName, () => {
+                //         sphere.loadMesh();  // Mesh has never been loaded, so take care of that.
+                //     }, typeToLoad);
+                // }
+            } else {
+                // It needs to be unloaded, because it's outside the lazy-load
+                // range.
+                // if (sphere.assetsLoaded) {
+                sphere.unloadAssets();
+                // }
+            }
+        }
+
+        let output = "";
+        for (let i=0; i< SphereCollection.spheres.length; i++) {
+            if (i === SphereCollection.getIndexOfCurrentSphere()) {
+                output = output + "+";
+            } else {
+                output = output + (SphereCollection.spheres[i].assetsLoaded ? "1" : ".");
             }
         }
 
         // Remove extra textures and meshes
-        SphereCollection.removeExtraSphereTexturesAndMeshesFromMemory();
+        // SphereCollection.removeExtraSphereTexturesAndMeshesFromMemory();
     }
 
     private _neighboringSpheresByDist: CameraPoints = undefined;

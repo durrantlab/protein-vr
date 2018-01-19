@@ -2,7 +2,7 @@ import { Sphere } from "./Sphere";
 import * as Globals from "../config/Globals";
 import { JSONData } from "../scene/PVRJsonSetup";
 
-var _spheres: Sphere[] = [];
+export var spheres: Sphere[] = [];
 var _progressBarObj;
 
 // export var prevViewerSphere: Sphere;
@@ -18,8 +18,7 @@ export var hasEnoughTimePastSinceLastMove = () => {
     return (timePassed > 1000)
 }
 
-export var spheresWithAssetsCount: number = 0;  // read only outside this file
-export var addToSpheresWithAssetsCount = (val: number) => { spheresWithAssetsCount = spheresWithAssetsCount + val; }
+// export var spheresWithAssetsCount: number = 0;  // read only outside this file
 
 export function create(): void {
     /*
@@ -52,16 +51,17 @@ export function create(): void {
         let meshFilename = sphereDatum["mesh"];  // filename of mesh
         let sphere = new Sphere(textureFilename, meshFilename, position);
         sphere.index = i;
-        _spheres.push(sphere);
+        spheres.push(sphere);
     }
 
     // The initial sphere is the first one
-    _spheres[0].setToCurrentSphere();
+    spheres[0].setToCurrentSphere();
 
     // Start updating the loading progress bar
-    let jQuery = Globals.get("jQuery");
-    _progressBarObj = jQuery("#loading-progress-bar .progress-bar");
-    _startUpdatingAssetLoadBar();
+    // No more progress bar.
+    // let jQuery = Globals.get("jQuery");
+    // _progressBarObj = jQuery("#loading-progress-bar .progress-bar");
+    // _startUpdatingAssetLoadBar();
 
     // Periodically check current sphere to make sure has best appropriate
     // texture resolution
@@ -77,25 +77,28 @@ export function create(): void {
     // _currentSphere.loadNextUnloadedAsset();
 // }
 
-export function removeExtraSphereTexturesAndMeshesFromMemory() {
-    // Now check if there are too many spheres. If so, delete some that
-    // are too far away.
-    let neighborPts = _currentSphere.neighboringSpheresOrderedByDistance();
-    let lazyLoadCount = Globals.get("lazyLoadCount");
-    if (spheresWithAssetsCount > lazyLoadCount) {
-        for (let idx = neighborPts.length() - 1; idx > -1; idx--) {
-            let cameraPt = neighborPts.get(idx);
-            let sphere = cameraPt.associatedViewerSphere;
-            if (sphere.assetsLoaded) {
-                sphere.unloadAssets();
-            }
+// export function removeExtraSphereTexturesAndMeshesFromMemory() {
+//     // Now check if there are too many spheres. If so, delete some that
+//     // are too far away.
 
-            if (spheresWithAssetsCount <= lazyLoadCount) {
-                break;
-            }
-        }
-    }
-}
+//     PROBLEM.
+
+//     let neighborPts = _currentSphere.neighboringSpheresOrderedByDistance();
+//     let lazyLoadCount = Globals.get("lazyLoadCount");
+//     if (spheresWithAssetsCount > lazyLoadCount) {
+//         for (let idx = neighborPts.length() - 1; idx > -1; idx--) {
+//             let cameraPt = neighborPts.get(idx);
+//             let sphere = cameraPt.associatedViewerSphere;
+//             if (sphere.assetsLoaded) {
+//                 sphere.unloadAssets();
+//             }
+
+//             if (spheresWithAssetsCount <= lazyLoadCount) {
+//                 break;
+//             }
+//         }
+//     }
+// }
 
 export function getByIndex(idx: number): Sphere {
     /*
@@ -107,7 +110,7 @@ export function getByIndex(idx: number): Sphere {
     :rtype: :class:`Sphere`
     */
 
-    return _spheres[idx];
+    return spheres[idx];
 }
 
 export function getIndexOfCurrentSphere(): number {
@@ -126,7 +129,7 @@ export function count(): number {
     :rtype: :class:`number`
     */
 
-    return _spheres.length;
+    return spheres.length;
 }
 
 export function hideAll() {
@@ -134,46 +137,47 @@ export function hideAll() {
     Hide all spheres. Helper function.
     */
 
-    for (let i = 0; i < _spheres.length; i++) {
-        let viewerSphere = _spheres[i];
+    for (let i = 0; i < spheres.length; i++) {
+        let viewerSphere = spheres[i];
         if (viewerSphere.assetsLoaded === true) {
             viewerSphere.opacity(0.0);            
         }
     }
 }
 
-function _startUpdatingAssetLoadBar(): void {
-    /*
-    Updates the loading bar in the UI depending on the number of textures that
-    have been loaded. Assuming the textures will take longer to load than
-    meshes, so focusing on the bottle neck.
-    */
+// No longer any load bar.
+// function _startUpdatingAssetLoadBar(): void {
+//     /*
+//     Updates the loading bar in the UI depending on the number of textures that
+//     have been loaded. Assuming the textures will take longer to load than
+//     meshes, so focusing on the bottle neck.
+//     */
 
-    // Might as well put this here, since it's related to the loading of
-    // sphere materials.
+//     // Might as well put this here, since it's related to the loading of
+//     // sphere materials.
 
-    let numTexturesLoaded = Globals.get("numFrameTexturesLoaded");
-    let numTexturesTotal = count();
+//     let numTexturesLoaded = Globals.get("numFrameTexturesLoaded");
+//     let numTexturesTotal = count();
 
-    // Updating the progress bar.
-    let progressVal = Math.round(100 * numTexturesLoaded / numTexturesTotal);
-    _progressBarObj.css("width", Math.min(progressVal, 100).toString() + "%");
+//     // Updating the progress bar.
+//     let progressVal = Math.round(100 * numTexturesLoaded / numTexturesTotal);
+//     _progressBarObj.css("width", Math.min(progressVal, 100).toString() + "%");
 
-    if ((numTexturesTotal === undefined) || (progressVal < 100)) {
-        setTimeout(() => {
-            _startUpdatingAssetLoadBar();
-        }, 10);
-    } else {
-        let jQuery = Globals.get("jQuery");
+//     if ((numTexturesTotal === undefined) || (progressVal < 100)) {
+//         setTimeout(() => {
+//             _startUpdatingAssetLoadBar();
+//         }, 10);
+//     } else {
+//         let jQuery = Globals.get("jQuery");
         
-        // Start game button now enabled. Removed this because lazy loading.
-        // jQuery("#start-game").prop("disabled", false);
+//         // Start game button now enabled. Removed this because lazy loading.
+//         // jQuery("#start-game").prop("disabled", false);
     
-        // Hide material-load progress bar.
-        jQuery("#loading-progress-bar").slideUp();
+//         // Hide material-load progress bar.
+//         jQuery("#loading-progress-bar").slideUp();
     
-        // Change the loading-panel title
-        jQuery("#loading-title").html("Game Loaded");
-    }
-}
+//         // Change the loading-panel title
+//         jQuery("#loading-title").html("Game Loaded");
+//     }
+// }
 

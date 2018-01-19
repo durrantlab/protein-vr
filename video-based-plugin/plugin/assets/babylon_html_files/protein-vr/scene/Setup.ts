@@ -140,6 +140,7 @@ function _setupEnvironmentalSphere(radius): void {
     skyboxSphere.renderingGroupId = RenderingGroups.EnvironmentalSphere;
 
     let sphereMaterial2 = new Material(true);
+    Globals.set("skyboxSphere", skyboxSphere);  // to make sure the object t least exists. Material comes later.
     sphereMaterial2.loadTexture(window.uniqID + '.skybox.png', () => {
         skyboxSphere.material = sphereMaterial2.material;
         Globals.set("skyboxSphere", skyboxSphere);

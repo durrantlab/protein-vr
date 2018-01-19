@@ -50,13 +50,15 @@ export class Game {
         if (Globals.get("debug")) { isMobile = true; }
         Globals.set("isMobile", isMobile);
 
-        if (isMobile) {
-            // Show mobile_data_warning_panel if it is mobile.
-            this._showDataUseWarningPanel(isMobile);
-        } else {
-            // Proceed with loading the game.
-            this._loadGame(isMobile);
-        }
+        // Ignore below for now. We're not going to show this screen.
+        // if (isMobile) {
+        //     // Show mobile_data_warning_panel if it is mobile.
+        //     this._showDataUseWarningPanel(isMobile);
+        // } else {
+        //     // Proceed with loading the game.
+        //     this._loadGame(isMobile);
+        // }
+        this._loadGame(isMobile);
     }
     
     private _loadGame(isMobile: boolean) {
@@ -166,7 +168,7 @@ export class Game {
                 
                 // Start the render loop.
                 this._startRenderLoop();
-                engine.resize();                
+                engine.resize();
             });
         });
     }

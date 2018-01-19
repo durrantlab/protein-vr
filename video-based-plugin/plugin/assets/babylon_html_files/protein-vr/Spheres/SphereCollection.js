@@ -1,7 +1,7 @@
 define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJsonSetup"], function (require, exports, Sphere_1, Globals, PVRJsonSetup_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var _spheres = [];
+    exports.spheres = [];
     var _progressBarObj;
     // export var prevViewerSphere: Sphere;
     // export var nextViewerSphere: Sphere;
@@ -13,8 +13,7 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
         let timePassed = new Date().getTime() - _timeOfLastMove;
         return (timePassed > 1000);
     };
-    exports.spheresWithAssetsCount = 0; // read only outside this file
-    exports.addToSpheresWithAssetsCount = (val) => { exports.spheresWithAssetsCount = exports.spheresWithAssetsCount + val; };
+    // export var spheresWithAssetsCount: number = 0;  // read only outside this file
     function create() {
         /*
         If dependencies have loaded, creates a collection of Sphere objects. Also
@@ -39,14 +38,15 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
             let meshFilename = sphereDatum["mesh"]; // filename of mesh
             let sphere = new Sphere_1.Sphere(textureFilename, meshFilename, position);
             sphere.index = i;
-            _spheres.push(sphere);
+            exports.spheres.push(sphere);
         }
         // The initial sphere is the first one
-        _spheres[0].setToCurrentSphere();
+        exports.spheres[0].setToCurrentSphere();
         // Start updating the loading progress bar
-        let jQuery = Globals.get("jQuery");
-        _progressBarObj = jQuery("#loading-progress-bar .progress-bar");
-        _startUpdatingAssetLoadBar();
+        // No more progress bar.
+        // let jQuery = Globals.get("jQuery");
+        // _progressBarObj = jQuery("#loading-progress-bar .progress-bar");
+        // _startUpdatingAssetLoadBar();
         // Periodically check current sphere to make sure has best appropriate
         // texture resolution
         setInterval(() => {
@@ -59,25 +59,25 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
     // function _loadNextSphere() {
     // _currentSphere.loadNextUnloadedAsset();
     // }
-    function removeExtraSphereTexturesAndMeshesFromMemory() {
-        // Now check if there are too many spheres. If so, delete some that
-        // are too far away.
-        let neighborPts = _currentSphere.neighboringSpheresOrderedByDistance();
-        let lazyLoadCount = Globals.get("lazyLoadCount");
-        if (exports.spheresWithAssetsCount > lazyLoadCount) {
-            for (let idx = neighborPts.length() - 1; idx > -1; idx--) {
-                let cameraPt = neighborPts.get(idx);
-                let sphere = cameraPt.associatedViewerSphere;
-                if (sphere.assetsLoaded) {
-                    sphere.unloadAssets();
-                }
-                if (exports.spheresWithAssetsCount <= lazyLoadCount) {
-                    break;
-                }
-            }
-        }
-    }
-    exports.removeExtraSphereTexturesAndMeshesFromMemory = removeExtraSphereTexturesAndMeshesFromMemory;
+    // export function removeExtraSphereTexturesAndMeshesFromMemory() {
+    //     // Now check if there are too many spheres. If so, delete some that
+    //     // are too far away.
+    //     PROBLEM.
+    //     let neighborPts = _currentSphere.neighboringSpheresOrderedByDistance();
+    //     let lazyLoadCount = Globals.get("lazyLoadCount");
+    //     if (spheresWithAssetsCount > lazyLoadCount) {
+    //         for (let idx = neighborPts.length() - 1; idx > -1; idx--) {
+    //             let cameraPt = neighborPts.get(idx);
+    //             let sphere = cameraPt.associatedViewerSphere;
+    //             if (sphere.assetsLoaded) {
+    //                 sphere.unloadAssets();
+    //             }
+    //             if (spheresWithAssetsCount <= lazyLoadCount) {
+    //                 break;
+    //             }
+    //         }
+    //     }
+    // }
     function getByIndex(idx) {
         /*
         Given an index, return the associated sphere.
@@ -87,7 +87,7 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
         :returns: An Sphere object.
         :rtype: :class:`Sphere`
         */
-        return _spheres[idx];
+        return exports.spheres[idx];
     }
     exports.getByIndex = getByIndex;
     function getIndexOfCurrentSphere() {
@@ -105,47 +105,47 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
         :returns: The number of objects.
         :rtype: :class:`number`
         */
-        return _spheres.length;
+        return exports.spheres.length;
     }
     exports.count = count;
     function hideAll() {
         /*
         Hide all spheres. Helper function.
         */
-        for (let i = 0; i < _spheres.length; i++) {
-            let viewerSphere = _spheres[i];
+        for (let i = 0; i < exports.spheres.length; i++) {
+            let viewerSphere = exports.spheres[i];
             if (viewerSphere.assetsLoaded === true) {
                 viewerSphere.opacity(0.0);
             }
         }
     }
     exports.hideAll = hideAll;
-    function _startUpdatingAssetLoadBar() {
-        /*
-        Updates the loading bar in the UI depending on the number of textures that
-        have been loaded. Assuming the textures will take longer to load than
-        meshes, so focusing on the bottle neck.
-        */
-        // Might as well put this here, since it's related to the loading of
-        // sphere materials.
-        let numTexturesLoaded = Globals.get("numFrameTexturesLoaded");
-        let numTexturesTotal = count();
-        // Updating the progress bar.
-        let progressVal = Math.round(100 * numTexturesLoaded / numTexturesTotal);
-        _progressBarObj.css("width", Math.min(progressVal, 100).toString() + "%");
-        if ((numTexturesTotal === undefined) || (progressVal < 100)) {
-            setTimeout(() => {
-                _startUpdatingAssetLoadBar();
-            }, 10);
-        }
-        else {
-            let jQuery = Globals.get("jQuery");
-            // Start game button now enabled. Removed this because lazy loading.
-            // jQuery("#start-game").prop("disabled", false);
-            // Hide material-load progress bar.
-            jQuery("#loading-progress-bar").slideUp();
-            // Change the loading-panel title
-            jQuery("#loading-title").html("Game Loaded");
-        }
-    }
 });
+// No longer any load bar.
+// function _startUpdatingAssetLoadBar(): void {
+//     /*
+//     Updates the loading bar in the UI depending on the number of textures that
+//     have been loaded. Assuming the textures will take longer to load than
+//     meshes, so focusing on the bottle neck.
+//     */
+//     // Might as well put this here, since it's related to the loading of
+//     // sphere materials.
+//     let numTexturesLoaded = Globals.get("numFrameTexturesLoaded");
+//     let numTexturesTotal = count();
+//     // Updating the progress bar.
+//     let progressVal = Math.round(100 * numTexturesLoaded / numTexturesTotal);
+//     _progressBarObj.css("width", Math.min(progressVal, 100).toString() + "%");
+//     if ((numTexturesTotal === undefined) || (progressVal < 100)) {
+//         setTimeout(() => {
+//             _startUpdatingAssetLoadBar();
+//         }, 10);
+//     } else {
+//         let jQuery = Globals.get("jQuery");
+//         // Start game button now enabled. Removed this because lazy loading.
+//         // jQuery("#start-game").prop("disabled", false);
+//         // Hide material-load progress bar.
+//         jQuery("#loading-progress-bar").slideUp();
+//         // Change the loading-panel title
+//         jQuery("#loading-title").html("Game Loaded");
+//     }
+// }

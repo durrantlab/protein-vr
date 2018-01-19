@@ -112,6 +112,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "../Sphe
         skyboxSphere.isPickable = false;
         skyboxSphere.renderingGroupId = Globals_1.RenderingGroups.EnvironmentalSphere;
         let sphereMaterial2 = new Material_1.Material(true);
+        Globals.set("skyboxSphere", skyboxSphere); // to make sure the object t least exists. Material comes later.
         sphereMaterial2.loadTexture(window.uniqID + '.skybox.png', () => {
             skyboxSphere.material = sphereMaterial2.material;
             Globals.set("skyboxSphere", skyboxSphere);
