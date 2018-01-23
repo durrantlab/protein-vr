@@ -288,7 +288,8 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         _nextMovementVec = newCameraPoint.position.subtract(_startingCameraInMotion_ViewerSphere.position);
         // Calculate timing variables to govern movement.
         // console.log(newCameraPoint.distance);
-        _msUntilNextMoveAllowed = Math.max(1000 * newCameraPoint.distance / _speedInUnitsPerSecond, 100);
+        // _msUntilNextMoveAllowed = Math.max(1000 * newCameraPoint.distance / _speedInUnitsPerSecond, 100);
+        _msUntilNextMoveAllowed = 1000 * newCameraPoint.distance / _speedInUnitsPerSecond;
         _lastMovementTime = (new Date).getTime();
     }
     function _whileCameraInMotion(deltaTime, camera) {

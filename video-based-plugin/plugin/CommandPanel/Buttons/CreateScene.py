@@ -398,10 +398,24 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # self._compress_png(self.scene.render.filepath)
 
         if self.scene.proteinvr_mobile_bake_texture_size != 0:
-            self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
-            self.scene.render.filepath = filename + ".small.png"
-            bpy.ops.render.render(write_still=True)
-            # self._compress_png(self.scene.render.filepath)                    
+            full_render_of_mobile_texture = False
+            if full_render_of_mobile_texture:
+                # Render the mobile texture de novo
+                self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
+                self.scene.render.filepath = filename + ".small.png"
+                bpy.ops.render.render(write_still=True)
+                # self._compress_png(self.scene.render.filepath)
+            else:
+                # Create the mobile texture by resizing the rendered full
+                # texture.
+                # print([i.name for i in bpy.data.images])
+
+                # Note that the downside here is that all these images get loaded into memory...
+                img = bpy.data.images.load(filename, check_existing=False)
+                img.scale(self.scene.proteinvr_mobile_bake_texture_size, self.scene.proteinvr_mobile_bake_texture_size)
+                img.filepath_raw = filename + ".small.png"
+                img.file_format = 'PNG'
+                img.save()
         else:
             print("WARNING: Skipping the mobile textures...")
 
@@ -437,6 +451,14 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # Camera angle must be constant throughout
         #cam_angle = (self.camera.rotation_euler.x, self.camera.rotation_euler.y, self.camera.rotation_euler.z)
 
+        # Camera movement must be constant (not interpolated via bezier)
+        # https://blender.stackexchange.com/questions/27157/how-to-change-to-constant-interpolation-mode-from-a-python-script
+        fcurves = self.camera.animation_data.action.fcurves
+        for fcurve in fcurves:
+            for kf in fcurve.keyframe_points:
+                kf.interpolation = 'LINEAR'
+
+        # Loop through the frames and render.
         for this_frame in range(self.frame_start, self.frame_end + 1):
             print("Frame", this_frame)
 
