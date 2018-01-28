@@ -31,7 +31,7 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         "cameraTypeToUse": "show-desktop-screen",  // Camera type (VR headsert vs. screen, etc.)
         "signData": [],  // Data about signs. Work in progress.
         "lazyLoadViewerSpheres": true,  // Whether or not to lazy load textures/materials.
-        "lazyLoadCount": 10, // Number of viewer spheres to lazy load at a time
+        "lazyLoadCount": 20, // Number of viewer spheres to lazy load at a time
         // "lazyLoadedSpheres": [], // An array which will contain all spheres which have had their assets loaded, used for removing unwanted assets from memory
         "meshesWithAnimations": [],  // A list of all the meshes that have associated PVR meshes
         "loadingMilestones": {}, // Flags used to tell different steps in the loading process whether or not they can proceed. Cleaner than promises, I think.

@@ -33,7 +33,7 @@ define(["require", "exports"], function (require, exports) {
             "cameraTypeToUse": "show-desktop-screen",
             "signData": [],
             "lazyLoadViewerSpheres": true,
-            "lazyLoadCount": 10,
+            "lazyLoadCount": 20,
             // "lazyLoadedSpheres": [], // An array which will contain all spheres which have had their assets loaded, used for removing unwanted assets from memory
             "meshesWithAnimations": [],
             "loadingMilestones": {},

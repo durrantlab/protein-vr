@@ -112,6 +112,7 @@ function _loadClickableFiles(): void {
 
     // Load extra obj files
     let loader = new BABYLON.AssetsManager(scene);
+    loader.useDefaultLoadingScreen = false;
     let objFilenames = JSONData["clickableFiles"];
     for (let i=0; i<objFilenames.length;i++) {
         let objFilename = objFilenames[i];
@@ -139,6 +140,7 @@ function _loadAnimatedObjects(): void {
     let BABYLON = Globals.get("BABYLON");
     let scene = Globals.get("scene");
     let loader = new BABYLON.AssetsManager(scene);
+    loader.useDefaultLoadingScreen = false;
     for (var objName in JSONData["animations"]) {
         if (JSONData["animations"].hasOwnProperty(objName)) {
             let objFilename = uniqID + "." + objName + "_mesh.obj";

@@ -94,11 +94,27 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
     var _startingCameraInMotion_ViewerSphere;
     var _endingCameraInMotion_ViewerSphere;
     var _cameraCurrentlyInMotion = false;
+    var _troublesLoading = false;
     function update() {
         /*
         Update the camera. This is run from the render loop (every frame).
         */
         // console.log("1");
+        // console.log(SphereCollection.getCurrentSphere().material.material);
+        // window.currentSphere = SphereCollection.getCurrentSphere();
+        // if (SphereCollection.getCurrentSphere().sphereMesh === null) {
+        //     // console.log(SphereCollection.getCurrentSphere().sphereMesh.isVisible);
+        //     console.log("prob!");
+        //     _troublesLoading = true;
+        //     // let t = SphereCollection.getCurrentSphere();
+        //     // debugger;
+        //     return;
+        // }
+        // if (_troublesLoading) {
+        //     _troublesLoading = false;
+        //     SphereCollection.getCurrentSphere().sphereMesh.isVisible = true;
+        //     // console.log(SphereCollection.getCurrentSphere().sphereMesh.isVisible);
+        // }
         if (_startingCameraInMotion_ViewerSphere === undefined) {
             // Not ready yet... PNG images probably not loaded.
             return;
@@ -270,14 +286,19 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
                 break;
         }
         // If the new viewer sphere doesn't have a texture, abort!
-        if (newCameraPoint.associatedViewerSphere.material.textureType === Material_1.TextureType.None) {
+        // Same if it doesn't have a sphere mesh or something.
+        let nextCamAssociatedViewerSphere = newCameraPoint.associatedViewerSphere;
+        if ((nextCamAssociatedViewerSphere.material.textureType === Material_1.TextureType.None) ||
+            (!nextCamAssociatedViewerSphere.assetsLoaded)) {
+            // (SphereCollection.getCurrentSphere().sphereMesh !== null)) {
             console.log("Aborted movement, texture not yet loaded...");
             // Try to load the texture.
-            newCameraPoint.associatedViewerSphere.loadAssets();
+            // newCameraPoint.associatedViewerSphere.loadAssets();
             blur(false);
             // Make sure everything hidden but present sphere.
-            SphereCollection.hideAll();
-            newCameraPoint.associatedViewerSphere.opacity(1.0);
+            // SphereCollection.hideAll();
+            // newCameraPoint.associatedViewerSphere.opacity(1.0);
+            _msUntilNextMoveAllowed = 0; // allow movement in a bit.
             return;
         }
         // Set values to govern next in-motion transition (old ending becomes new
@@ -290,6 +311,11 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // console.log(newCameraPoint.distance);
         // _msUntilNextMoveAllowed = Math.max(1000 * newCameraPoint.distance / _speedInUnitsPerSecond, 100);
         _msUntilNextMoveAllowed = 1000 * newCameraPoint.distance / _speedInUnitsPerSecond;
+        // Put limits on time between frames. It should never be more than 0.5
+        // sec, independent of units per sec.
+        if (_msUntilNextMoveAllowed > 500) {
+            _msUntilNextMoveAllowed = 500;
+        }
         _lastMovementTime = (new Date).getTime();
     }
     function _whileCameraInMotion(deltaTime, camera) {
@@ -313,6 +339,15 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         let skyboxSphere = Globals.get("skyboxSphere");
         skyboxSphere.position = camera.position;
     }
+    // The point at which the destination sphere starts to fade in.
+    let _transitionPt1 = 0.05;
+    // The point at which the current sphere starts to fade out. This is also
+    // the point where the destination sphere is fully opaque.
+    let _transitionPt2 = 0.1; // Good for this to be hard-coded eventually.
+    // The point at whch the current sphere has finished fading out.
+    let _transitionPt3 = 0.8;
+    let _transitionDelta1 = _transitionPt2 - _transitionPt1;
+    let _transitionDelta2 = (_transitionPt2 - _transitionPt3);
     function _updateInterpolatedPositionWhileInMotion(timeRatio, camera) {
         /*
         Function that determines sphere visibility and camera location as the
@@ -326,10 +361,13 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         */
         // This is separate from the _whileCameraInMotion function because it is
         // also called elsewhere.
-        let transitionPt = 0.05; // Good for this to be hard-coded eventually.
-        _endingCameraInMotion_ViewerSphere.opacity(Math.min(timeRatio / transitionPt, 1.0));
-        _startingCameraInMotion_ViewerSphere.opacity(1.0 - timeRatio); //  / (1 - transitionPt);
+        // Make sure camera you're transitioning to is always fully visible (but
+        // hidden behind current sphere, which starts out visible too.)
+        // _endingCameraInMotion_ViewerSphere.opacity(1.0);
+        _endingCameraInMotion_ViewerSphere.opacity(Math.max(0.0, Math.min(1.0, (timeRatio - _transitionPt1) / _transitionDelta1)));
+        _startingCameraInMotion_ViewerSphere.opacity(Math.max(0.0, Math.min(1.0, (timeRatio - _transitionPt3) / _transitionDelta2))); //  / (1 - transitionPt);
         camera.position = _startingCameraInMotion_ViewerSphere.position.add(_nextMovementVec.scale(timeRatio));
+        // console.log(camera.position.x, _startingCameraInMotion_ViewerSphere.position.x, _endingCameraInMotion_ViewerSphere.position.x);
     }
     function _cameraJustFinishedBeingInMotion(camera) {
         /*
@@ -338,6 +376,7 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
     
         :param ??? camera: The BABYLON camera.
         */
+        // console.log("=======");
         // Unblur the camera.
         blur(false);
         // Make sure completed transition to full visibility.
@@ -347,7 +386,7 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // Set the current sphere to this one.
         _endingCameraInMotion_ViewerSphere.setToCurrentSphere();
         // Make sure environmental sphere properly positioned.
-        console.log(Globals.get("skyboxSphere")); // *****
+        // console.log(Globals.get("skyboxSphere"));  // *****
         Globals.get("skyboxSphere").position = camera.position;
     }
 });

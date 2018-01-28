@@ -56,6 +56,7 @@ export class Material {
             }
     
             var assetsManager = new BABYLON.AssetsManager(scene);
+            assetsManager.useDefaultLoadingScreen = false;
             assetsManager.addTextureTask("textureId" + Math.random().toString(), filename);   
             assetsManager.onTaskSuccess = (tasks) => {
                 // Get rid of old texture to free memory
@@ -68,16 +69,20 @@ export class Material {
                     this.material.opacityTexture = tasks.texture;
                 }
 
-                console.log("=================");
-                console.log("Material loaded: " + filename);
-                try {
-                    console.log("Current material:" + SphereCollection.getCurrentSphere().textureFileName);
-                } catch(err) {
-
-                }
+                // console.log("=================");
+                // console.log("Material loaded: " + filename);
+                // try {
+                //     console.log("Current material:" + SphereCollection.getCurrentSphere().textureFileName);
+                // } catch(err) {
+                
+                // }
 
                 callBack();
             }
+            // assetsManager.onTaskError = (tasks) => {
+            //     alert("ERROR!");
+            //     debugger;
+            // }
             assetsManager.load();
 
             return true;  // because it changed

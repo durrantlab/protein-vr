@@ -1,4 +1,4 @@
-define(["require", "exports", "../config/Globals", "./SphereCollection"], function (require, exports, Globals, SphereCollection) {
+define(["require", "exports", "../config/Globals"], function (require, exports, Globals) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TextureType;
@@ -49,6 +49,7 @@ define(["require", "exports", "../config/Globals", "./SphereCollection"], functi
                     filename = filename + "?" + Math.random().toString();
                 }
                 var assetsManager = new BABYLON.AssetsManager(scene);
+                assetsManager.useDefaultLoadingScreen = false;
                 assetsManager.addTextureTask("textureId" + Math.random().toString(), filename);
                 assetsManager.onTaskSuccess = (tasks) => {
                     // Get rid of old texture to free memory
@@ -59,15 +60,18 @@ define(["require", "exports", "../config/Globals", "./SphereCollection"], functi
                     if (this._textureHasTransparency) {
                         this.material.opacityTexture = tasks.texture;
                     }
-                    console.log("=================");
-                    console.log("Material loaded: " + filename);
-                    try {
-                        console.log("Current material:" + SphereCollection.getCurrentSphere().textureFileName);
-                    }
-                    catch (err) {
-                    }
+                    // console.log("=================");
+                    // console.log("Material loaded: " + filename);
+                    // try {
+                    //     console.log("Current material:" + SphereCollection.getCurrentSphere().textureFileName);
+                    // } catch(err) {
+                    // }
                     callBack();
                 };
+                // assetsManager.onTaskError = (tasks) => {
+                //     alert("ERROR!");
+                //     debugger;
+                // }
                 assetsManager.load();
                 return true; // because it changed
             }

@@ -129,7 +129,7 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
                 this.material.unloadTextureFromMemory();
                 // delete this.material;
             }
-            console.log("Material unloaded: ", this.textureFileName);
+            // console.log("Material unloaded: ", this.textureFileName);
         }
         _unloadMesh() {
             /*

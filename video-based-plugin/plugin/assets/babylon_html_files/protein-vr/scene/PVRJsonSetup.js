@@ -86,6 +86,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Anima
         let scene = Globals.get("scene");
         // Load extra obj files
         let loader = new BABYLON.AssetsManager(scene);
+        loader.useDefaultLoadingScreen = false;
         let objFilenames = exports.JSONData["clickableFiles"];
         for (let i = 0; i < objFilenames.length; i++) {
             let objFilename = objFilenames[i];
@@ -109,6 +110,7 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Anima
         let BABYLON = Globals.get("BABYLON");
         let scene = Globals.get("scene");
         let loader = new BABYLON.AssetsManager(scene);
+        loader.useDefaultLoadingScreen = false;
         for (var objName in exports.JSONData["animations"]) {
             if (exports.JSONData["animations"].hasOwnProperty(objName)) {
                 let objFilename = uniqID + "." + objName + "_mesh.obj";
