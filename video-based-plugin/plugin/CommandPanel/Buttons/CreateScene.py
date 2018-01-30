@@ -304,9 +304,12 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
             this_camera_pos = self.camera.location.copy()
             self.extra_data["spheres"].append({
                 "position": [
-                    round(this_camera_pos.x, 3), 
-                    round(this_camera_pos.y, 3), 
-                    round(this_camera_pos.z, 3)
+                    # round(this_camera_pos.x, 3), 
+                    # round(this_camera_pos.y, 3), 
+                    # round(this_camera_pos.z, 3)
+                    round(this_camera_pos.x, 6), 
+                    round(this_camera_pos.y, 6), 
+                    round(this_camera_pos.z, 6)
                 ],
                 "mesh": None  # For now...
             })

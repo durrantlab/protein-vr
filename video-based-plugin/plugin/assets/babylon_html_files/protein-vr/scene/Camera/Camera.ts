@@ -50,6 +50,7 @@ export function setup(): void {
     scene.activeCamera.position = firstSphere.position.clone();
     _nextMovementVec = new BABYLON.Vector3(0,0,0);
     _startingCameraInMotion_ViewerSphere = firstSphere;
+    _startingCameraInMotion_Position = _startingCameraInMotion_ViewerSphere.position.clone();
     _endingCameraInMotion_ViewerSphere = firstSphere;
 
     // Setup first steps forward
@@ -120,10 +121,12 @@ var _speedInUnitsPerSecond: number = 1;
 var _lastMovementTime: number = (new Date).getTime();
 var _msUntilNextMoveAllowed: number = 0;
 var _nextMovementVec: any;  // BABYLON.Vector3
+var _startingCameraInMotion_Position: any;  // BABYLON.Vector3 
 var _startingCameraInMotion_ViewerSphere: Sphere;
 var _endingCameraInMotion_ViewerSphere: Sphere;
 var _cameraCurrentlyInMotion: boolean = false;
 var _troublesLoading: boolean = false;
+var _ticksWhileMoving: number = 0;
 
 export function update() {
     /* 
@@ -179,7 +182,17 @@ export function update() {
         // Not enough time has passed to allow another movement.
         _cameraCurrentlyInMotion = true;
         _whileCameraInMotion(deltaTime, camera);
+        _ticksWhileMoving = _ticksWhileMoving + 1;  // Add to tick counter.
         return;
+    }
+
+    console.log("made it here", deltaTime, _msUntilNextMoveAllowed);
+
+    // Problem: if the distance is small enough, _msUntilNextMoveAllowed is
+    // less than deltaTime after the first move frame, so it never sets
+    // _cameraCurrentlyInMotion true. Fix that here.
+    if (_ticksWhileMoving === 0) {
+        _cameraCurrentlyInMotion = true;
     }
 
     // Enough time has passed to allow another movement.
@@ -193,6 +206,9 @@ export function update() {
         
         // Run a function for first-time moving allowed.
         _cameraJustFinishedBeingInMotion(camera);
+
+        // Restart the tick counter.
+        _ticksWhileMoving = 0;
     }
 
     // You're not translating, but are you look around much (within a
@@ -385,6 +401,10 @@ function _cameraPickDirectionAndStartInMotion(camera): void {
     _startingCameraInMotion_ViewerSphere = _endingCameraInMotion_ViewerSphere;
     _endingCameraInMotion_ViewerSphere = newCameraPoint.associatedViewerSphere;
 
+    // Keep track of where to move from. You can't just use the starting
+    // sphere, because that will track the camera until it disappears.
+    _startingCameraInMotion_Position = _startingCameraInMotion_ViewerSphere.position.clone();
+
     // Calculate which direction to move.
     _nextMovementVec = newCameraPoint.position.subtract(_startingCameraInMotion_ViewerSphere.position);
 
@@ -399,7 +419,10 @@ function _cameraPickDirectionAndStartInMotion(camera): void {
         _msUntilNextMoveAllowed = 500;
     }
 
-    _lastMovementTime = (new Date).getTime()
+    _lastMovementTime = (new Date).getTime();
+
+    console.log("starting", newCameraPoint.position, _startingCameraInMotion_ViewerSphere.position, newCameraPoint.distance); // , _msUntilNextMoveAllowed, _nextMovementVec);
+
 }
 
 function _whileCameraInMotion(deltaTime: number, camera: any): void {
@@ -414,6 +437,9 @@ function _whileCameraInMotion(deltaTime: number, camera: any): void {
 
     // Still in auto-moving phase. So auto-move here.
     let timeRatio = deltaTime / _msUntilNextMoveAllowed;
+
+    // console.log(timeRatio);
+
     // let sigmoidalVal = 1.0/(1.0 + Math.exp(-(20 * timeRatio - 10)))
     // let sinVal = 0.5 + 0.5 * Math.sin(Math.PI * (timeRatio - 0.5));
     _updateInterpolatedPositionWhileInMotion(timeRatio, camera);
@@ -429,14 +455,14 @@ function _whileCameraInMotion(deltaTime: number, camera: any): void {
 
 
 // The point at which the destination sphere starts to fade in.
-let _transitionPt1 = 0.05;
+let _transitionPt1 = 0.35; //0.05;  // This is really scene specific. This seems like a good compromise.
 
 // The point at which the current sphere starts to fade out. This is also
 // the point where the destination sphere is fully opaque.
-let _transitionPt2 = 0.1;  // Good for this to be hard-coded eventually.
+let _transitionPt2 = 0.75; //0.1;  // Good for this to be hard-coded eventually.
 
 // The point at whch the current sphere has finished fading out.
-let _transitionPt3 = 0.8;
+let _transitionPt3 = 0.99; //0.8;
 
 let _transitionDelta1 = _transitionPt2 - _transitionPt1;
 let _transitionDelta2 = (_transitionPt2 - _transitionPt3)
@@ -479,7 +505,14 @@ function _updateInterpolatedPositionWhileInMotion(timeRatio: number, camera: any
             )
         )
     ); //  / (1 - transitionPt);
-    camera.position = _startingCameraInMotion_ViewerSphere.position.add(_nextMovementVec.scale(timeRatio));
+
+    camera.position = _startingCameraInMotion_Position.add(_nextMovementVec.scale(timeRatio));
+
+    // _startingCameraInMotion_ViewerSphere must track the camera until it
+    // disappears. It's position is reset elsewhere (when done moving).
+    _startingCameraInMotion_ViewerSphere.sphereMesh.position = camera.position;
+
+    // The current viewer sphere needs to be moving with you!!!
 
     // console.log(camera.position.x, _startingCameraInMotion_ViewerSphere.position.x, _endingCameraInMotion_ViewerSphere.position.x);
 }
@@ -494,11 +527,20 @@ function _cameraJustFinishedBeingInMotion(camera): void {
 
     // console.log("=======");
 
+    // console.log("ending");
+
+
     // Unblur the camera.
     blur(false);            
             
     // Make sure completed transition to full visibility.
     _updateInterpolatedPositionWhileInMotion(1.0, camera);
+
+
+    // Reset the positions of the spheres. Because the starting sphere was
+    // tracking the camera.
+    _endingCameraInMotion_ViewerSphere.resetSphereMeshPosition();
+    _startingCameraInMotion_ViewerSphere.resetSphereMeshPosition();
 
     // Set up new navigation arrows for new position.
     Arrows.update(

@@ -457,4 +457,8 @@ export class Sphere {
     }
     */
 
+    public resetSphereMeshPosition(): void {
+        this.sphereMesh.position = this.position.clone();
+    }
+
 }

@@ -317,6 +317,66 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
             }
             return this.__deltaVecsToOther;
         }
+        /*
+        // For advanced navigation system....
+    
+        public getOtherSphereLookingAt() {
+            // Given the spheres current location and the direction of the camera,
+            // determine which other sphere comes closest.
+    
+            // Useful site: https://answers.unity.com/questions/62644/distance-between-a-ray-and-a-point.html
+    
+            let BABYLON = Globals.get("BABYLON");
+    
+            let deltaVecsToOtherPts = this._deltaVecsToOtherPts();
+            let cameraLookingVector = Camera.lookingVector();
+            
+            // Calculate the distances from each point and the looking vector
+            // coming out of the camera.
+            let distData: any[] = [];
+            // If there are so many other spheres that it slows down the render
+            // loop, consider just looking at the first 100 or so, since it's sorted
+            // by distance already.
+            for (let i=0; i<deltaVecsToOtherPts.length; i++) {
+                let deltaVecToOtherPt = deltaVecsToOtherPts[i];
+                let dist = BABYLON.Vector3.Cross(cameraLookingVector, deltaVecToOtherPt).length();
+                distData.push([dist, i]);
+            }
+    
+            // Sort by the distance.
+            // see https://stackoverflow.com/questions/17043068/how-to-sort-array-by-first-item-in-subarray
+            distData.sort(function(a: number, b: number): number {
+                if (a[0] < b[0]) {
+                    return -1;
+                } else if (a[0] > b[0]) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
+    
+            // Find the closest point that is > 3.0 away
+            for (let i=0; i<distData.length; i++) {
+                let dist = distData[i][0];
+                let idx = distData[i][1];
+                // console.log(idx, dist);
+                if (dist > 1.0) {
+                    // Put the viewer sphere marker there.
+                    let destinationNeighborSphere = Globals.get("destinationNeighborSphere");
+                    let neighboringPts = this.neighboringSpheresOrderedByDistance();
+            
+                    destinationNeighborSphere.position = neighboringPts.get(idx).position;
+                    destinationNeighborSphere.isVisible = true;
+    
+                    break;
+                }
+            }
+    
+        }
+        */
+        resetSphereMeshPosition() {
+            this.sphereMesh.position = this.position.clone();
+        }
     }
     exports.Sphere = Sphere;
 });
