@@ -6,6 +6,7 @@ import * as Globals from "./config/Globals";
 import * as PVRJsonSetup from "./scene/PVRJsonSetup";
 import * as Camera from "./scene/Camera/Camera";
 import * as SphereCollection from "./Spheres/SphereCollection";
+import * as Utils from "./Utils";
 
 declare var BABYLON;
 declare var jQuery;
@@ -164,15 +165,42 @@ export class Game {
                 
                 engine.switchFullscreen(
                     UserVars.getParam("viewer") === UserVars.viewers["Screen"]
-                )
+                );
                 
                 // Start the render loop.
                 this._startRenderLoop();
                 engine.resize();
             });
+
+            this._autoAdvanceIfNeeded(jQuery);
         });
     }
 
+    private _autoAdvanceIfNeeded(jQuery): void {
+        // If there are parameters in the url, auto advance.
+        let viewer = Utils.userParam("viewer");
+        console.log(viewer);
+        if (viewer !== null) {
+            // The user specified, so auto advance.
+            let waitForCamera = setInterval(() => {
+                // Make sure the camera exists. Keep trying until it does.
+                let scene = Globals.get("scene");
+                if (scene === undefined) { return; }
+
+                let camera = scene.activeCamera;
+                if (camera === undefined) { return; }
+
+                let loadingPanel = jQuery("#loading_panel");
+                if (loadingPanel.css("display") === "none") { return; }
+                if (loadingPanel.css("opacity") < 1) { return; }
+
+                jQuery("#start-game").click();
+                clearInterval(waitForCamera);
+                jQuery("body").css("visibility", "visible");
+            }, 0);
+        }
+    } // ****
+    
     private _startRenderLoop(): void {
         /*
         Start the function that runs with every frame.

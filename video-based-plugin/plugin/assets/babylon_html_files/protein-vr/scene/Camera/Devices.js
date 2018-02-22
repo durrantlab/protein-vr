@@ -1,4 +1,4 @@
-define(["require", "exports", "../../config/Globals", "../../config/Globals"], function (require, exports, Globals, Globals_1) {
+define(["require", "exports", "../../config/Globals", "../../config/Globals", "../../Utils"], function (require, exports, Globals, Globals_1, Utils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.mouseDownState = false;
@@ -155,6 +155,8 @@ define(["require", "exports", "../../config/Globals", "../../config/Globals"], f
             scene.activeCamera.attachControl(canvas, true);
             // In case they want to look through desktop VR but navigate with mouse?
             _setupMouseClick();
+            // Make it full screen if possible
+            fullscreenIfNecessary();
         };
         // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
         // var rightBox = BABYLON.Mesh.CreateBox("sphere1", 0.1, scene);
@@ -221,9 +223,13 @@ define(["require", "exports", "../../config/Globals", "../../config/Globals"], f
         scene.activeCamera.keysRight = [];
         window.addEventListener("keydown", function (evt) {
             exports.keyPressedState = evt.keyCode;
+            // Make it full screen if possible
+            fullscreenIfNecessary();
         }.bind(this));
         window.addEventListener("keyup", function (evt) {
             exports.keyPressedState = undefined;
+            // Make it full screen if possible
+            fullscreenIfNecessary();
         }.bind(this));
         // Add extra keys
         // Additional control keys.
@@ -242,9 +248,13 @@ define(["require", "exports", "../../config/Globals", "../../config/Globals"], f
         // Below works with everything but virtual joysticks
         scene.onPointerDown = function (evt, pickResult) {
             exports.mouseDownState = true;
+            // Make it full screen if possible
+            fullscreenIfNecessary();
         }.bind(this);
         scene.onPointerUp = function (evt, pickResult) {
             exports.mouseDownState = false;
+            // Make it full screen if possible
+            fullscreenIfNecessary();
         }.bind(this);
         // This works with virtual joysticks on safari, for example.
         // if (Globals.get("cameraTypeToUse") === "show-mobile-virtual-joystick") {
@@ -259,5 +269,21 @@ define(["require", "exports", "../../config/Globals", "../../config/Globals"], f
         //         });
         //     })
         // }
+    }
+    var _urlSaysFullScreen = undefined;
+    function fullscreenIfNecessary() {
+        // Is it not full screen but it should be?
+        let engine = Globals.get("engine");
+        if (_urlSaysFullScreen === undefined) {
+            if (Utils.userParam("fullscreen") === "true") {
+                _urlSaysFullScreen = true;
+            }
+            else {
+                _urlSaysFullScreen = false;
+            }
+        }
+        if ((_urlSaysFullScreen) && (engine.isFullscreen === false)) {
+            engine.switchFullscreen(true);
+        }
     }
 });

@@ -1,7 +1,7 @@
 /**
  * Module to create/store/maintain system variables
  */
-define(["require", "exports", "./Globals"], function (require, exports, Globals) {
+define(["require", "exports", "./Globals", "../Utils"], function (require, exports, Globals, Utils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     // Setting up user parameters
@@ -136,6 +136,18 @@ define(["require", "exports", "./Globals"], function (require, exports, Globals)
             if (["scenePath"].indexOf(key) === -1) {
                 let val = stringToEnumVal(localStorageParams[key]);
                 userVars[key] = val;
+            }
+        }
+        // Finally, what's in the url overwrites EVERYTHING
+        let urlViewer = Utils.userParam("viewer");
+        if (urlViewer !== null) {
+            switch (urlViewer) {
+                case "screen":
+                    userVars["viewer"] = viewers["Screen"];
+                    break;
+                case "vrheadset":
+                    userVars["viewer"] = viewers["VRHeadset"];
+                    break;
             }
         }
         // Save to local storage what you've got so far.

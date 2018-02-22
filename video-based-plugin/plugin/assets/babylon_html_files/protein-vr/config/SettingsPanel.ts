@@ -1,5 +1,6 @@
 import * as UserVars from "./UserVars";
 import * as Globals from "./Globals";
+import * as Utils from "../Utils";
 
 declare var PVRGlobals;
 
@@ -17,8 +18,15 @@ export function allowUserToModifySettings() { //: any {
 
     let jQuery = Globals.get("jQuery");
 
+    // Check if the viewer is specified in the url (to auto advance)
+    let viewer = Utils.userParam("viewer");
+
     // Add div to contain all settings.
-    jQuery("body").append(`<div id="settings_panel"></div>`)
+    if (viewer !== null) {
+        jQuery("body").css("visibility", "hidden");
+    }
+    
+    jQuery("body").append(`<div id="settings_panel"></div>`);
     let settingsPanel = jQuery("#settings_panel");
 
     // Make the settings panel fluid using bootstrap class
@@ -119,6 +127,18 @@ export function allowUserToModifySettings() { //: any {
     
     // Set default or previously saved values on the GUI.
     this.setGUIState();
+
+    if (viewer !== null) {
+        // Viewer is specified in url, so auto advance
+        _autoAdvance(jQuery);
+    }
+}
+
+function _autoAdvance(jQuery) {
+    // In some circumstances, you might want to skip this scene. For example,
+    // if the URL says what the settings should be.
+    
+    jQuery("#user_settings_continue_button").click();
 }
 
 function panel(title: string, html: string): string {

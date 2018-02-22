@@ -1,4 +1,4 @@
-define(["require", "exports", "./UserVars", "./Globals"], function (require, exports, UserVars, Globals) {
+define(["require", "exports", "./UserVars", "./Globals", "../Utils"], function (require, exports, UserVars, Globals, Utils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function allowUserToModifySettings() {
@@ -9,7 +9,12 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
             return;
         }
         let jQuery = Globals.get("jQuery");
+        // Check if the viewer is specified in the url (to auto advance)
+        let viewer = Utils.userParam("viewer");
         // Add div to contain all settings.
+        if (viewer !== null) {
+            jQuery("body").css("visibility", "hidden");
+        }
         jQuery("body").append(`<div id="settings_panel"></div>`);
         let settingsPanel = jQuery("#settings_panel");
         // Make the settings panel fluid using bootstrap class
@@ -101,8 +106,17 @@ define(["require", "exports", "./UserVars", "./Globals"], function (require, exp
         });
         // Set default or previously saved values on the GUI.
         this.setGUIState();
+        if (viewer !== null) {
+            // Viewer is specified in url, so auto advance
+            _autoAdvance(jQuery);
+        }
     }
     exports.allowUserToModifySettings = allowUserToModifySettings;
+    function _autoAdvance(jQuery) {
+        // In some circumstances, you might want to skip this scene. For example,
+        // if the URL says what the settings should be.
+        jQuery("#user_settings_continue_button").click();
+    }
     function panel(title, html) {
         /*
         Return the HTML for a simple bootstrap panel.

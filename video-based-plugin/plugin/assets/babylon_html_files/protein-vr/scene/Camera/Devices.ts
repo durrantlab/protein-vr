@@ -1,5 +1,6 @@
 import * as Globals from "../../config/Globals";
 import { RenderingGroups } from "../../config/Globals";
+import * as Utils from "../../Utils";
 
 export var mouseDownState: boolean = false;
 export var keyPressedState: number = undefined;
@@ -192,6 +193,9 @@ export function _setupWebVRFreeCamera(): void {
 
         // In case they want to look through desktop VR but navigate with mouse?
         _setupMouseClick();
+
+        // Make it full screen if possible
+        fullscreenIfNecessary();
     }
 
     // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
@@ -274,10 +278,16 @@ function _setupMouseAndKeyboard(): void {
 
     window.addEventListener("keydown", function(evt) {
         keyPressedState = evt.keyCode;
+
+        // Make it full screen if possible
+        fullscreenIfNecessary();
     }.bind(this));
     
     window.addEventListener("keyup", function(evt) {
         keyPressedState = undefined;
+
+        // Make it full screen if possible
+        fullscreenIfNecessary();
     }.bind(this));
 
     // Add extra keys
@@ -300,10 +310,16 @@ function _setupMouseClick(): void {
     // Below works with everything but virtual joysticks
     scene.onPointerDown = function (evt, pickResult) {
         mouseDownState = true;
+
+        // Make it full screen if possible
+        fullscreenIfNecessary();
     }.bind(this);
 
     scene.onPointerUp = function (evt, pickResult) {
         mouseDownState = false;
+
+        // Make it full screen if possible
+        fullscreenIfNecessary();
     }.bind(this);
 
     // This works with virtual joysticks on safari, for example.
@@ -320,4 +336,21 @@ function _setupMouseClick(): void {
     //         });
     //     })
     // }
+}
+
+var _urlSaysFullScreen: boolean = undefined;
+function fullscreenIfNecessary() {
+    // Is it not full screen but it should be?
+    let engine = Globals.get("engine");
+    if (_urlSaysFullScreen === undefined) {
+        if (Utils.userParam("fullscreen") === "true") {
+            _urlSaysFullScreen = true;
+        } else {
+            _urlSaysFullScreen = false;
+        }
+    }
+
+    if ((_urlSaysFullScreen) && (engine.isFullscreen === false)) {
+        engine.switchFullscreen(true);
+    }
 }

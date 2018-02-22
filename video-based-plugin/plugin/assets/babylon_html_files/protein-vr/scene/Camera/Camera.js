@@ -64,6 +64,7 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // setInterval(() => {
         //     console.log(SphereCollection.getCurrentSphere().material.material);
         // }, 5000);
+        // If there's something in the url, the auto advance (parameters in url)
     }
     exports.setup = setup;
     function blur(val) {
@@ -95,9 +96,9 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
     var _startingCameraInMotion_Position; // BABYLON.Vector3 
     var _startingCameraInMotion_ViewerSphere;
     var _endingCameraInMotion_ViewerSphere;
-    var _cameraCurrentlyInMotion = false;
+    // var _cameraCurrentlyInMotion: boolean = false;
     var _troublesLoading = false;
-    var _ticksWhileMoving = 0;
+    var _currentlyMoving = false;
     function update() {
         /*
         Update the camera. This is run from the render loop (every frame).
@@ -123,7 +124,6 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
             return;
         }
         let scene = Globals.get("scene");
-        let engine = Globals.get("engine");
         let camera = scene.activeCamera;
         // if (newCameraRotation.equalsWithEpsilon(_lastCameraRotation, 0.3)) {  // Allow for about 10 degree deviation (0.3 when you do the math). Because with VR headset there will always be a little movement.
         //     _lastCameraRotation = newCameraRotation;
@@ -138,31 +138,22 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // console.log(deltaTime, _msUntilNextMoveAllowed);
         // console.log("2");
         // console.log(deltaTime, "<", _msUntilNextMoveAllowed, "SS");
-        // If the distance is very short, _msUntilNextMoveAllowed could be very
-        // short, and deltaTime could always be less than it no matter what.
-        if (deltaTime < _msUntilNextMoveAllowed) {
-            // Not enough time has passed to allow another movement.
-            _cameraCurrentlyInMotion = true;
-            _whileCameraInMotion(deltaTime, camera);
-            _ticksWhileMoving = _ticksWhileMoving + 1; // Add to tick counter.
-            return;
-        }
-        console.log("made it here", deltaTime, _msUntilNextMoveAllowed);
-        // Problem: if the distance is small enough, _msUntilNextMoveAllowed is
-        // less than deltaTime after the first move frame, so it never sets
-        // _cameraCurrentlyInMotion true. Fix that here.
-        console.log(_ticksWhileMoving);
-        // Enough time has passed to allow another movement.
-        if (_cameraCurrentlyInMotion) {
-            // _cameraCurrentlyInMotion is still true, but enough time has passed
-            // that the camera should no longer be in motion. This must be the
-            // first time this function has been called since a refractory period ended. 
-            // So the camera isn't really in motion anymore.
-            _cameraCurrentlyInMotion = false;
-            // Run a function for first-time moving allowed.
-            _cameraJustFinishedBeingInMotion(camera);
-            // Restart the tick counter.
-            _ticksWhileMoving = 0;
+        if (_currentlyMoving) {
+            if (deltaTime < _msUntilNextMoveAllowed) {
+                // Not enough time has passed to allow another movement.
+                // _cameraCurrentlyInMotion = true;
+                _whileCameraInMotion(deltaTime, camera);
+                return;
+            }
+            else {
+                // Enough time has passed that the camera should no longer be in
+                // motion. This must be the first time this function has been
+                // called since a refractory period ended. 
+                // So the camera isn't really in motion anymore.
+                // _cameraCurrentlyInMotion = false;
+                // Run a function for first-time moving allowed.
+                _cameraJustFinishedBeingInMotion(camera); // This sets _currentlyMoving to false
+            }
         }
         // You're not translating, but are you look around much (within a
         // tolerance)? This is used elsewhere to load in high-res tetures.
@@ -302,8 +293,9 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         if ((nextCamAssociatedViewerSphere.material.textureType === Material_1.TextureType.None) ||
             (!nextCamAssociatedViewerSphere.assetsLoaded)) {
             // (SphereCollection.getCurrentSphere().sphereMesh !== null)) {
-            console.log("Aborted movement, texture not yet loaded...");
+            console.log("** Aborted movement, texture not yet loaded...");
             // Try to load the texture.
+            nextCamAssociatedViewerSphere.loadAssets();
             // newCameraPoint.associatedViewerSphere.loadAssets();
             blur(false);
             // Make sure everything hidden but present sphere.
@@ -330,8 +322,13 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         if (_msUntilNextMoveAllowed > 500) {
             _msUntilNextMoveAllowed = 500;
         }
+        // Make sure not too fast, too. Need to give time to buffer.
+        if (_msUntilNextMoveAllowed < 50) {
+            _msUntilNextMoveAllowed = 50;
+        }
         _lastMovementTime = (new Date).getTime();
-        console.log("starting", newCameraPoint.position, _startingCameraInMotion_ViewerSphere.position, newCameraPoint.distance); // , _msUntilNextMoveAllowed, _nextMovementVec);
+        // console.log("starting", newCameraPoint.position, _startingCameraInMotion_ViewerSphere.position, newCameraPoint.distance); // , _msUntilNextMoveAllowed, _nextMovementVec);
+        _currentlyMoving = true;
     }
     function _whileCameraInMotion(deltaTime, camera) {
         /*
@@ -385,7 +382,12 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         camera.position = _startingCameraInMotion_Position.add(_nextMovementVec.scale(timeRatio));
         // _startingCameraInMotion_ViewerSphere must track the camera until it
         // disappears. It's position is reset elsewhere (when done moving).
-        _startingCameraInMotion_ViewerSphere.sphereMesh.position = camera.position;
+        // console.log(_startingCameraInMotion_ViewerSphere.sphereMesh, camera);
+        if (_startingCameraInMotion_ViewerSphere.sphereMesh !== null) {
+            _startingCameraInMotion_ViewerSphere.sphereMesh.position = camera.position;
+        } /* else {
+            console.log("_startingCameraInMotion_ViewerSphere.sphereMesh.position === null!!!");
+        }*/
         // The current viewer sphere needs to be moving with you!!!
         // console.log(camera.position.x, _startingCameraInMotion_ViewerSphere.position.x, _endingCameraInMotion_ViewerSphere.position.x);
     }
@@ -413,5 +415,6 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
         // Make sure environmental sphere properly positioned.
         // console.log(Globals.get("skyboxSphere"));  // *****
         Globals.get("skyboxSphere").position = camera.position;
+        _currentlyMoving = false;
     }
 });

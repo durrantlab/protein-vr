@@ -5,6 +5,7 @@
 // import * as Core from "../Core/Core";
 import * as SettingsPanel from "./SettingsPanel";
 import * as Globals from "./Globals";
+import * as Utils from "../Utils";
 
 // The interface
 interface userVarsInterface {
@@ -168,6 +169,19 @@ export function setupDefaults(): void {
         if (["scenePath"].indexOf(key) === -1) {  // Some parameters should never be overwritten from localstorage
             let val = stringToEnumVal(localStorageParams[key]);
             userVars[key] = val;
+        }
+    }
+
+    // Finally, what's in the url overwrites EVERYTHING
+    let urlViewer = Utils.userParam("viewer");
+    if (urlViewer !== null) {
+        switch (urlViewer) {
+            case "screen":
+                userVars["viewer"] = viewers["Screen"];
+                break;
+            case "vrheadset":
+                userVars["viewer"] = viewers["VRHeadset"];
+                break;
         }
     }
 

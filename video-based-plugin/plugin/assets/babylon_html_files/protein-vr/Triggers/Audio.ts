@@ -19,6 +19,8 @@ export class AudioTrigger {
             return;
         }
 
+        // console.log(frameIdx, this._frameIdx, "DDD");
+
         if (frameIdx === this._frameIdx) {
             // It matches, and it's never played before.
             // Note that this sound is not spatialized.

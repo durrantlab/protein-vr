@@ -14,6 +14,7 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
             if (this._mp3File === "") {
                 return;
             }
+            // console.log(frameIdx, this._frameIdx, "DDD");
             if (frameIdx === this._frameIdx) {
                 // It matches, and it's never played before.
                 // Note that this sound is not spatialized.

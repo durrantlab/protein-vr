@@ -1,6 +1,7 @@
 import * as Globals from "../config/Globals";
 import * as SphereCollection from "../Spheres/SphereCollection";
 import { AudioTrigger } from "./Audio";
+import { WebsiteTrigger } from "./Website";
 
 var _triggers: any[] = [];
 
@@ -11,7 +12,9 @@ export function create(triggers) {
         let cmd: string = trigger[1];
         if (cmd.toUpperCase().slice(-4) === ".MP3") {
             _triggers.push(new AudioTrigger(frameIdx, cmd));
-        } // HERE DO ONES THAT START WITH HTTP LATER...
+        } else if (cmd.toUpperCase().slice(0,4) === "HTTP") {
+            _triggers.push(new WebsiteTrigger(frameIdx, cmd));
+        }
     }
 }
 

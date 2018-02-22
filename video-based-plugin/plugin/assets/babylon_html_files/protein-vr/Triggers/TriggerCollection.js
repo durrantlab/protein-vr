@@ -1,4 +1,4 @@
-define(["require", "exports", "../Spheres/SphereCollection", "./Audio"], function (require, exports, SphereCollection, Audio_1) {
+define(["require", "exports", "../Spheres/SphereCollection", "./Audio", "./Website"], function (require, exports, SphereCollection, Audio_1, Website_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var _triggers = [];
@@ -9,7 +9,10 @@ define(["require", "exports", "../Spheres/SphereCollection", "./Audio"], functio
             let cmd = trigger[1];
             if (cmd.toUpperCase().slice(-4) === ".MP3") {
                 _triggers.push(new Audio_1.AudioTrigger(frameIdx, cmd));
-            } // HERE DO ONES THAT START WITH HTTP LATER...
+            }
+            else if (cmd.toUpperCase().slice(0, 4) === "HTTP") {
+                _triggers.push(new Website_1.WebsiteTrigger(frameIdx, cmd));
+            }
         }
     }
     exports.create = create;

@@ -1,4 +1,4 @@
-define(["require", "exports", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup", "./scene/Camera/Camera", "./Spheres/SphereCollection"], function (require, exports, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup, Camera, SphereCollection) {
+define(["require", "exports", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup", "./scene/Camera/Camera", "./Spheres/SphereCollection", "./Utils"], function (require, exports, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup, Camera, SphereCollection, Utils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Globals.set("jQuery", jQuery);
@@ -125,8 +125,38 @@ define(["require", "exports", "./config/UserVars", "./config/SettingsPanel", "./
                     this._startRenderLoop();
                     engine.resize();
                 });
+                this._autoAdvanceIfNeeded(jQuery);
             });
         }
+        _autoAdvanceIfNeeded(jQuery) {
+            // If there are parameters in the url, auto advance.
+            let viewer = Utils.userParam("viewer");
+            console.log(viewer);
+            if (viewer !== null) {
+                // The user specified, so auto advance.
+                let waitForCamera = setInterval(() => {
+                    // Make sure the camera exists. Keep trying until it does.
+                    let scene = Globals.get("scene");
+                    if (scene === undefined) {
+                        return;
+                    }
+                    let camera = scene.activeCamera;
+                    if (camera === undefined) {
+                        return;
+                    }
+                    let loadingPanel = jQuery("#loading_panel");
+                    if (loadingPanel.css("display") === "none") {
+                        return;
+                    }
+                    if (loadingPanel.css("opacity") < 1) {
+                        return;
+                    }
+                    jQuery("#start-game").click();
+                    clearInterval(waitForCamera);
+                    jQuery("body").css("visibility", "visible");
+                }, 0);
+            }
+        } // ****
         _startRenderLoop() {
             /*
             Start the function that runs with every frame.

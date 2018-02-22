@@ -375,7 +375,9 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
         }
         */
         resetSphereMeshPosition() {
-            this.sphereMesh.position = this.position.clone();
+            if (this.sphereMesh !== null) {
+                this.sphereMesh.position = this.position.clone();
+            }
         }
     }
     exports.Sphere = Sphere;
