@@ -2,7 +2,7 @@ import * as Globals from "../config/Globals";
 import * as SphereCollection from "./SphereCollection";
 
 export enum TextureType {
-    None, Mobile, Full
+    None, Transition, Mobile, Full
 }
 
 export class Material {
@@ -34,6 +34,11 @@ export class Material {
 
         // Use the TextureType specified
         switch(pickTextureType) {
+            case TextureType.Transition:
+                // Load the very low-res texture, for transitions
+                filename = textureFileName + ".transition.png";
+                this.textureType = TextureType.Transition;
+                break;
             case TextureType.Mobile:
                 // Load the low-res texture
                 filename = textureFileName + ".small.png";

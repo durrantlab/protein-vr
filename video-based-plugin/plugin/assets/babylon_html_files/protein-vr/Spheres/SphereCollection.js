@@ -6,7 +6,10 @@ define(["require", "exports", "./Sphere", "../config/Globals", "../scene/PVRJson
     // export var prevViewerSphere: Sphere;
     // export var nextViewerSphere: Sphere;
     var _currentSphere = undefined;
-    exports.setCurrentSphereVar = (val) => { _currentSphere = val; };
+    exports.setCurrentSphereVar = (val) => {
+        _currentSphere = val;
+        console.log("CURRENT SPHERE:", val);
+    };
     var _timeOfLastMove = 0;
     exports.setTimeOfLastMoveVar = () => { _timeOfLastMove = new Date().getTime(); };
     exports.hasEnoughTimePastSinceLastMove = () => {

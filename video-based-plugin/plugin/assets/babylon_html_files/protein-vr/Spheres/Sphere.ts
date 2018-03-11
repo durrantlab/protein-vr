@@ -101,14 +101,19 @@ export class Sphere {
         }
 
         if (Globals.get("isMobile")) {
-            // If it's mobile, you never want the high-res images.
-            return;
+            // It's mobile, so try to upgrade to a mobile texture.
+            this.material.loadTexture("frames/" + this.textureFileName, () => {
+                this.loadMesh();  // Mesh has never been loaded, so take care of that.
+                // console.log(this.sphereMesh.visibility, this.sphereMesh.isVisible);
+            }, TextureType.Mobile);
+        } else {
+            // It's full, so try to load full texture.
+            this.material.loadTexture("frames/" + this.textureFileName, () => {
+                this.loadMesh();  // Mesh has never been loaded, so take care of that.
+                // console.log(this.sphereMesh.visibility, this.sphereMesh.isVisible);
+            }, TextureType.Full);
         }
 
-        this.material.loadTexture("frames/" + this.textureFileName, () => {
-            this.loadMesh();  // Mesh has never been loaded, so take care of that.
-            // console.log(this.sphereMesh.visibility, this.sphereMesh.isVisible);
-        }, TextureType.Full);
         
         // For debugging...
         // console.log("==========");
@@ -124,7 +129,8 @@ export class Sphere {
     public loadAssets(): void {
         if (!this.assetsLoaded) {
 
-            let typeToLoad = TextureType.Mobile;
+            // let typeToLoad = TextureType.Mobile;
+            let typeToLoad = TextureType.Transition;
 
             // If you're not on mobile, and if the full texture isn't very
             // big, just load the full texture instead.

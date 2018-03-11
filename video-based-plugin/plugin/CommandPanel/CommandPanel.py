@@ -122,6 +122,9 @@ class CommandPanel(ParentPanel):
             self.ui.scene_property("proteinvr_mobile_bake_texture_size")
             Messages.display_message("BAD_MOBILE_TEXTURE_SIZE", self)
 
+            self.ui.scene_property("proteinvr_transition_bake_texture_size")
+            Messages.display_message("BAD_TRANSITION_TEXTURE_SIZE", self)
+
             self.ui.scene_property("proteinvr_num_samples")
             # self.ui.scene_property("proteinvr_pngquant_path")
             # Messages.display_message("PNGQUANT_ERROR", self)

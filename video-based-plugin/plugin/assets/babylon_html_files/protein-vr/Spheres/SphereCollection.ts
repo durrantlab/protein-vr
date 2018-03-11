@@ -9,7 +9,10 @@ var _progressBarObj;
 // export var nextViewerSphere: Sphere;
 
 var _currentSphere: Sphere = undefined;
-export var setCurrentSphereVar = (val: Sphere) => { _currentSphere = val; }
+export var setCurrentSphereVar = (val: Sphere) => { 
+    _currentSphere = val;
+    console.log("CURRENT SPHERE:", val);
+}
 
 var _timeOfLastMove: number = 0;
 export var setTimeOfLastMoveVar = () => { _timeOfLastMove = new Date().getTime(); }

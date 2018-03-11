@@ -74,13 +74,19 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
                 return;
             }
             if (Globals.get("isMobile")) {
-                // If it's mobile, you never want the high-res images.
-                return;
+                // It's mobile, so try to upgrade to a mobile texture.
+                this.material.loadTexture("frames/" + this.textureFileName, () => {
+                    this.loadMesh(); // Mesh has never been loaded, so take care of that.
+                    // console.log(this.sphereMesh.visibility, this.sphereMesh.isVisible);
+                }, Material_2.TextureType.Mobile);
             }
-            this.material.loadTexture("frames/" + this.textureFileName, () => {
-                this.loadMesh(); // Mesh has never been loaded, so take care of that.
-                // console.log(this.sphereMesh.visibility, this.sphereMesh.isVisible);
-            }, Material_2.TextureType.Full);
+            else {
+                // It's full, so try to load full texture.
+                this.material.loadTexture("frames/" + this.textureFileName, () => {
+                    this.loadMesh(); // Mesh has never been loaded, so take care of that.
+                    // console.log(this.sphereMesh.visibility, this.sphereMesh.isVisible);
+                }, Material_2.TextureType.Full);
+            }
             // For debugging...
             // console.log("==========");
             // for (let i=0; i<Globals.get("lazyLoadCount"); i++) {
@@ -92,7 +98,8 @@ define(["require", "exports", "./Material", "./Material", "../config/Globals", "
         }
         loadAssets() {
             if (!this.assetsLoaded) {
-                let typeToLoad = Material_2.TextureType.Mobile;
+                // let typeToLoad = TextureType.Mobile;
+                let typeToLoad = Material_2.TextureType.Transition;
                 // If you're not on mobile, and if the full texture isn't very
                 // big, just load the full texture instead.
                 let pngFileSizes = Globals.get("pngFileSizes");

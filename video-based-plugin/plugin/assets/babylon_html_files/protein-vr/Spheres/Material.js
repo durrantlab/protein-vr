@@ -4,8 +4,9 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
     var TextureType;
     (function (TextureType) {
         TextureType[TextureType["None"] = 0] = "None";
-        TextureType[TextureType["Mobile"] = 1] = "Mobile";
-        TextureType[TextureType["Full"] = 2] = "Full";
+        TextureType[TextureType["Transition"] = 1] = "Transition";
+        TextureType[TextureType["Mobile"] = 2] = "Mobile";
+        TextureType[TextureType["Full"] = 3] = "Full";
     })(TextureType = exports.TextureType || (exports.TextureType = {}));
     class Material {
         constructor(textureHasTransparency = false) {
@@ -29,6 +30,11 @@ define(["require", "exports", "../config/Globals"], function (require, exports, 
             let filename = "";
             // Use the TextureType specified
             switch (pickTextureType) {
+                case TextureType.Transition:
+                    // Load the very low-res texture, for transitions
+                    filename = textureFileName + ".transition.png";
+                    this.textureType = TextureType.Transition;
+                    break;
                 case TextureType.Mobile:
                     // Load the low-res texture
                     filename = textureFileName + ".small.png";

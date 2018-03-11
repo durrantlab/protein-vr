@@ -174,6 +174,13 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 operator=self
             )
             return False
+        if not self._is_power_of_two(self.scene.proteinvr_transition_bake_texture_size):
+            Messages.send_message(
+                "BAD_TRANSITION_TEXTURE_SIZE", 
+                "Texture sizes must be powers of two!",
+                operator=self
+            )
+            return False
         
 
         # Figure out what unique id to use.
@@ -401,24 +408,37 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # self._compress_png(self.scene.render.filepath)
 
         if self.scene.proteinvr_mobile_bake_texture_size != 0:
-            full_render_of_mobile_texture = False
-            if full_render_of_mobile_texture:
-                # Render the mobile texture de novo
-                self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
-                self.scene.render.filepath = filename + ".small.png"
-                bpy.ops.render.render(write_still=True)
-                # self._compress_png(self.scene.render.filepath)
-            else:
-                # Create the mobile texture by resizing the rendered full
-                # texture.
-                # print([i.name for i in bpy.data.images])
+            # full_render_of_mobile_texture = False
+            # if full_render_of_mobile_texture:
+            #     # Render the mobile texture de novo
+            #     self.scene.render.resolution_percentage = int(100.0 * self.scene.proteinvr_mobile_bake_texture_size / self.scene.proteinvr_bake_texture_size)
+            #     self.scene.render.filepath = filename + ".small.png"
+            #     bpy.ops.render.render(write_still=True)
+            #     # self._compress_png(self.scene.render.filepath)
 
-                # Note that the downside here is that all these images get loaded into memory...
-                img = bpy.data.images.load(filename, check_existing=False)
-                img.scale(self.scene.proteinvr_mobile_bake_texture_size, self.scene.proteinvr_mobile_bake_texture_size)
-                img.filepath_raw = filename + ".small.png"
-                img.file_format = 'PNG'
-                img.save()
+            # Create the mobile texture by resizing the rendered full
+            # texture.
+            # print([i.name for i in bpy.data.images])
+
+            # Note that the downside here is that all these images get loaded into memory...
+            img = bpy.data.images.load(filename, check_existing=False)
+            img.scale(self.scene.proteinvr_mobile_bake_texture_size, self.scene.proteinvr_mobile_bake_texture_size)
+            img.filepath_raw = filename + ".small.png"
+            img.file_format = 'PNG'
+            img.save()
+        else:
+            print("WARNING: Skipping the mobile textures...")
+
+        if self.scene.proteinvr_transition_bake_texture_size != 0:
+            # Create the transition texture by resizing the rendered full
+            # texture.
+
+            # Note that the downside here is that all these images get loaded into memory...
+            img = bpy.data.images.load(filename, check_existing=False)
+            img.scale(self.scene.proteinvr_transition_bake_texture_size, self.scene.proteinvr_transition_bake_texture_size)
+            img.filepath_raw = filename + ".transition.png"
+            img.file_format = 'PNG'
+            img.save()                
         else:
             print("WARNING: Skipping the mobile textures...")
 
@@ -604,7 +624,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         """
 
         # Save list of all rendered frames
-        frame_file_names = [os.path.basename(f) for f in glob.glob(self.frame_dir + self.uniq_id + ".proteinvr_baked_texture*.png") if not ".small.png" in f]
+        frame_file_names = [os.path.basename(f) for f in glob.glob(self.frame_dir + self.uniq_id + ".proteinvr_baked_texture*.png") if not ".small.png" in f and not ".transition.png" in f]
         def key(a): return int(a.replace(self.uniq_id + ".proteinvr_baked_texture", "").replace(".png", ""))
         frame_file_names.sort(key=key)
 
@@ -774,6 +794,7 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
         # Make a dictionary to store path points. Store some frame-neighbor
         # data. 
         frame_neighbors = {}
+        print("hi")
         for start_frame, end_frame in path_data:
             for frame in range(start_frame, end_frame + 1):
                 frame_neighbors[frame] = []
