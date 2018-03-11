@@ -24,3 +24,4 @@ bpy.data.scenes[0].proteinvr_output_dir = output_dir
 
 # Now press the render button
 bpy.ops.proteinvr.create_scene()
+
