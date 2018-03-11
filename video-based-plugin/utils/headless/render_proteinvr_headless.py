@@ -22,6 +22,9 @@ if len(bpy.data.scenes) != 1:
 # bpy.data.scenes["Scene"].proteinvr_output_dir = output_dir
 bpy.data.scenes[0].proteinvr_output_dir = output_dir
 
+# Make sure Use existing frames not clicked
+bpy.data.scenes[0].proteinvr_use_existing_frames = False
+
 # Now press the render button
 bpy.ops.proteinvr.create_scene()
 
