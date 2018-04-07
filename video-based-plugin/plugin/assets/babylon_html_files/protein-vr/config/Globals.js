@@ -37,7 +37,8 @@ define(["require", "exports"], function (require, exports) {
             // "lazyLoadedSpheres": [], // An array which will contain all spheres which have had their assets loaded, used for removing unwanted assets from memory
             "meshesWithAnimations": [],
             "loadingMilestones": {},
-            "milestoneAttempted": [] // Where or not a given function that will end in a milestone complete has been run at least once. To prevent milestones from running multiple times.
+            "milestoneAttempted": [],
+            "cameraInitialAngle": [] // The initial camera angle. Useful for some cameras.
         };
     }
     function get(key) {

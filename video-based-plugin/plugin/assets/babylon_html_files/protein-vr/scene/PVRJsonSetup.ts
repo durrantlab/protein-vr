@@ -32,6 +32,13 @@ export function loadJSON(): void {
         Globals.set("firstFrameIndex", JSONData["firstFrameIndex"]);
         Globals.set("lastFrameIndex", JSONData["lastFrameIndex"]);
         Globals.set("nextMoves", JSONData["nextMoves"]);
+        
+        if (JSONData["cameraInitialAngle"] !== undefined) {
+            Globals.set("cameraInitialAngle", JSONData["cameraInitialAngle"]);
+        } else {
+            Globals.set("cameraInitialAngle", [0.0, 0.0, 0.0]);
+        }
+        
         Globals.set("uniqID", JSONData["uniqID"]);
         // Globals.set("triggers", );
         TriggerCollection.create(JSONData["triggers"]);

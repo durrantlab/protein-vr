@@ -35,7 +35,8 @@ if ((<any>window)._proteinvrGlobals === undefined) {
         // "lazyLoadedSpheres": [], // An array which will contain all spheres which have had their assets loaded, used for removing unwanted assets from memory
         "meshesWithAnimations": [],  // A list of all the meshes that have associated PVR meshes
         "loadingMilestones": {}, // Flags used to tell different steps in the loading process whether or not they can proceed. Cleaner than promises, I think.
-        "milestoneAttempted": [] // Where or not a given function that will end in a milestone complete has been run at least once. To prevent milestones from running multiple times.
+        "milestoneAttempted": [], // Where or not a given function that will end in a milestone complete has been run at least once. To prevent milestones from running multiple times.
+        "cameraInitialAngle": []  // The initial camera angle. Useful for some cameras.
     }
 }
 

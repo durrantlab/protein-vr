@@ -7,6 +7,7 @@ import * as PVRJsonSetup from "./scene/PVRJsonSetup";
 import * as Camera from "./scene/Camera/Camera";
 import * as SphereCollection from "./Spheres/SphereCollection";
 import * as Utils from "./Utils";
+import * as Devices from "./scene/Camera/Devices";
 
 declare var BABYLON;
 declare var jQuery;
@@ -87,7 +88,9 @@ export class Game {
             this._resizeWindow();  // resize canvas when browser resized.
             let engine = new BABYLON.Engine(Globals.get("canvas"), true);
             Globals.set("engine", engine);  // second boolean is whether built-in smoothing will be used.
-                            
+
+            window.engine = engine;  // for debugging.
+
             // Note that these functions are all "smart" in that they won't
             // run unless previous milestones are met. I thought this was
             // better than callbacks, and using promises got ackward too.
@@ -163,9 +166,9 @@ export class Game {
                 // TODO: Uncomment the below. No full screen for now to make
                 // debugging easier.
                 
-                engine.switchFullscreen(
-                    UserVars.getParam("viewer") === UserVars.viewers["Screen"]
-                );
+                if (UserVars.getParam("viewer") === UserVars.viewers["Screen"]) {
+                    Devices.goFullScreen(engine);
+                }
                 
                 // Start the render loop.
                 this._startRenderLoop();

@@ -19,6 +19,7 @@ define(["require", "exports", "../../config/Globals", "../../config/Globals", ".
                 break;
             case "show-desktop-screen":
                 scene.activeCamera.attachControl(canvas);
+                _setInitialCameraAngle(scene.activeCamera);
                 break;
             case "show-mobile-vr":
                 _setupVRDeviceOrientationFreeCamera();
@@ -55,6 +56,7 @@ define(["require", "exports", "../../config/Globals", "../../config/Globals", ".
         let canvas = Globals.get("canvas");
         var camera = new BABYLON.VirtualJoysticksCamera("VJC", scene.activeCamera.position, scene);
         camera.rotation = scene.activeCamera.rotation;
+        _setInitialCameraAngle(camera);
         _makeCameraReplaceActiveCamera(camera);
     }
     function _setupVRDeviceOrientationFreeCamera() {
@@ -63,6 +65,7 @@ define(["require", "exports", "../../config/Globals", "../../config/Globals", ".
         have google cardboard.
         */
         let scene = Globals.get("scene");
+        let engine = Globals.get("engine");
         let BABYLON = Globals.get("BABYLON");
         // I feel like I should have to do the below... Why don't the defaults work?
         var metrics = BABYLON.VRCameraMetrics.GetDefault();
@@ -70,6 +73,14 @@ define(["require", "exports", "../../config/Globals", "../../config/Globals", ".
         // Add VR camera here (google cardboard). 
         let camera = new BABYLON.VRDeviceOrientationFreeCamera("deviceOrientationCamera", scene.activeCamera.position, scene, false, // compensate distortion. False = good anti-aliasing.
         metrics);
+        console.log(camera);
+        // camera._onPointerMove = function (e) {
+        //     console.log("moo hi");
+        // }
+        jQuery("html").click(() => {
+            // Sometimes it doesn't go full screen on mobile...
+            goFullScreen(engine);
+        });
         _makeCameraReplaceActiveCamera(camera);
     }
     function _setupWebVRFreeCamera() {
@@ -272,7 +283,8 @@ define(["require", "exports", "../../config/Globals", "../../config/Globals", ".
     }
     var _urlSaysFullScreen = undefined;
     function fullscreenIfNecessary() {
-        // Is it not full screen but it should be?
+        // Is it not full screen but it should be? This is the one that makes it
+        // go full screen based on the url.
         let engine = Globals.get("engine");
         if (_urlSaysFullScreen === undefined) {
             if (Utils.userParam("fullscreen") === "true") {
@@ -283,7 +295,30 @@ define(["require", "exports", "../../config/Globals", "../../config/Globals", ".
             }
         }
         if ((_urlSaysFullScreen) && (engine.isFullscreen === false)) {
-            engine.switchFullscreen(true);
+            goFullScreen(engine);
         }
+    }
+    function goFullScreen(engine) {
+        engine.switchFullscreen(true);
+        if (Globals.get("cameraTypeToUse") !== "show-mobile-virtual-joystick") {
+            // The below makes safari desktop work.
+            // It doens't effect chrome desktop.
+            // It messes up the virtual joystick.
+            // Gets it to work in safari desktop, but breaks mobile virtual joy
+            // sticks. Good for mobile VR headset because makes bar go away.
+            engine.isPointerLock = true;
+        }
+        // engine.isFullscreen
+        jQuery("html").css("cursor", "none"); // Important for safari
+    }
+    exports.goFullScreen = goFullScreen;
+    function _setInitialCameraAngle(camera) {
+        // Sets the angle on the specified camera to the same angle as the first
+        // frame in Blender prior to export. Not used for cameras that determine
+        // their orientation based on position.
+        let cameraInitialAngle = Globals.get("cameraInitialAngle");
+        camera.rotation.x = cameraInitialAngle[0];
+        camera.rotation.y = cameraInitialAngle[1];
+        camera.rotation.z = cameraInitialAngle[2];
     }
 });

@@ -141,7 +141,12 @@ function _setupEnvironmentalSphere(radius): void {
 
     let sphereMaterial2 = new Material(true);
     Globals.set("skyboxSphere", skyboxSphere);  // to make sure the object t least exists. Material comes later.
-    sphereMaterial2.loadTexture(window.uniqID + '.skybox.png', () => {
+    
+    let skyboxFilename = window.uniqID + '.skybox.png';
+    if (Globals.get("isMobile")) {
+        skyboxFilename = window.uniqID + '.skybox.png.small.png';
+    }
+    sphereMaterial2.loadTexture(skyboxFilename, () => {
         skyboxSphere.material = sphereMaterial2.material;
         Globals.set("skyboxSphere", skyboxSphere);
     }, TextureType.Full);

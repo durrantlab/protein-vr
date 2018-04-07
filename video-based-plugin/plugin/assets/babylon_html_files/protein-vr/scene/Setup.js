@@ -113,7 +113,11 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "../Sphe
         skyboxSphere.renderingGroupId = Globals_1.RenderingGroups.EnvironmentalSphere;
         let sphereMaterial2 = new Material_1.Material(true);
         Globals.set("skyboxSphere", skyboxSphere); // to make sure the object t least exists. Material comes later.
-        sphereMaterial2.loadTexture(window.uniqID + '.skybox.png', () => {
+        let skyboxFilename = window.uniqID + '.skybox.png';
+        if (Globals.get("isMobile")) {
+            skyboxFilename = window.uniqID + '.skybox.png.small.png';
+        }
+        sphereMaterial2.loadTexture(skyboxFilename, () => {
             skyboxSphere.material = sphereMaterial2.material;
             Globals.set("skyboxSphere", skyboxSphere);
         }, Material_2.TextureType.Full);

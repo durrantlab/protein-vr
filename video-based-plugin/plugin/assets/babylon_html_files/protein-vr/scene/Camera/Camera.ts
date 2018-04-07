@@ -97,8 +97,8 @@ export function setup(): void {
 }
 
 export function blur(val: boolean) {
-    if (isMobile) {
-        // No blur effect if it's mobile.
+    if ((isMobile) && (val)) {
+        // No blur effect if it's mobile. So never turn it on.
         return;
     }
 
@@ -556,3 +556,4 @@ function _cameraJustFinishedBeingInMotion(camera): void {
 
     _currentlyMoving = false;
 }
+

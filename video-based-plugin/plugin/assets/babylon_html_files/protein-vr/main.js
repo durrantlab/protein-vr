@@ -1,4 +1,4 @@
-define(["require", "exports", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup", "./scene/Camera/Camera", "./Spheres/SphereCollection", "./Utils"], function (require, exports, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup, Camera, SphereCollection, Utils) {
+define(["require", "exports", "./config/UserVars", "./config/SettingsPanel", "./scene/Setup", "./config/Globals", "./scene/PVRJsonSetup", "./scene/Camera/Camera", "./Spheres/SphereCollection", "./Utils", "./scene/Camera/Devices"], function (require, exports, UserVars, SettingsPanel, SceneSetup, Globals, PVRJsonSetup, Camera, SphereCollection, Utils, Devices) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     Globals.set("jQuery", jQuery);
@@ -59,6 +59,7 @@ define(["require", "exports", "./config/UserVars", "./config/SettingsPanel", "./
                 this._resizeWindow(); // resize canvas when browser resized.
                 let engine = new BABYLON.Engine(Globals.get("canvas"), true);
                 Globals.set("engine", engine); // second boolean is whether built-in smoothing will be used.
+                window.engine = engine; // for debugging.
                 // Note that these functions are all "smart" in that they won't
                 // run unless previous milestones are met. I thought this was
                 // better than callbacks, and using promises got ackward too.
@@ -120,7 +121,9 @@ define(["require", "exports", "./config/UserVars", "./config/SettingsPanel", "./
                     canvas.focus(); // to make sure keypresses work.
                     // TODO: Uncomment the below. No full screen for now to make
                     // debugging easier.
-                    engine.switchFullscreen(UserVars.getParam("viewer") === UserVars.viewers["Screen"]);
+                    if (UserVars.getParam("viewer") === UserVars.viewers["Screen"]) {
+                        Devices.goFullScreen(engine);
+                    }
                     // Start the render loop.
                     this._startRenderLoop();
                     engine.resize();

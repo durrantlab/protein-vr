@@ -21,6 +21,12 @@ define(["require", "exports", "../config/Globals", "../config/Globals", "./Anima
             Globals.set("firstFrameIndex", exports.JSONData["firstFrameIndex"]);
             Globals.set("lastFrameIndex", exports.JSONData["lastFrameIndex"]);
             Globals.set("nextMoves", exports.JSONData["nextMoves"]);
+            if (exports.JSONData["cameraInitialAngle"] !== undefined) {
+                Globals.set("cameraInitialAngle", exports.JSONData["cameraInitialAngle"]);
+            }
+            else {
+                Globals.set("cameraInitialAngle", [0.0, 0.0, 0.0]);
+            }
             Globals.set("uniqID", exports.JSONData["uniqID"]);
             // Globals.set("triggers", );
             TriggerCollection.create(exports.JSONData["triggers"]);

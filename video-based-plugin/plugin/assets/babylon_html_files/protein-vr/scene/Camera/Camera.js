@@ -68,8 +68,8 @@ define(["require", "exports", "../../config/Globals", "../Arrows", "../../Sphere
     }
     exports.setup = setup;
     function blur(val) {
-        if (isMobile) {
-            // No blur effect if it's mobile.
+        if ((isMobile) && (val)) {
+            // No blur effect if it's mobile. So never turn it on.
             return;
         }
         let scene = Globals.get("scene");

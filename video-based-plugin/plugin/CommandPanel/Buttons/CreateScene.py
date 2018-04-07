@@ -333,6 +333,23 @@ class OBJECT_OT_CreateScene(ButtonParentClass):
                 next_next_pt = self.extra_data["spheres"][i+2]
                 new_pt = [round(0.5 * (x + y), 3) for x,y in zip(pt["position"], next_next_pt["position"])]
                 self.extra_data["spheres"][i+1]["position"] = new_pt
+        
+        # Now get the rotation angle of the camera in the first frame. Ticky
+        # because this vector is different in Blender and babylonjs, but I
+        # think I found the formula.
+
+        # Start by making sure the camera angle is XYZ euler.
+        self.camera.rotation_mode = 'XYZ'
+
+        # Now get the blender angle.
+        self.set_frame(self.frame_start)
+        camera_angle_in_blender = self.camera.rotation_euler.copy()
+        camera_angle_babylon = [
+            numpy.pi/2 - camera_angle_in_blender.x, 
+            -camera_angle_in_blender.z, 
+            camera_angle_in_blender.y
+        ]
+        self.extra_data["cameraInitialAngle"] = camera_angle_babylon
 
     def _get_animation_keyframes(self, obj):
         pos_loc_data = OrderedDict()
