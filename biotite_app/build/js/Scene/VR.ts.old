@@ -1,0 +1,101 @@
+// import { scene } from "./Vars";
+// import { params } from "./VR/Load";
+// import * as NavTargetMesh from "./VR/NavTargetMesh";
+
+// Includes VR setup and the camera (created using VRHelper). This is meant to
+// be entirely self contained. Drop it into any scene, and it will make VR
+// work.
+
+declare var BABYLON;
+declare var jQuery;
+
+
+
+
+/**************************** EXTERNAL FUNCTIONS ****************************/
+
+
+
+/**
+ * A function to include in the render loop. Updates the position of the
+ * navTargetMesh in non-VR mode. Also determines whether the nav sphere should
+ * be visible. Run this within the render loop.
+ * @returns void
+ */
+// export function includeInRenderLoop(): void {
+//     if (navMode === NavMode.NoVR) {
+//         // params.navTargetMesh.isVisible = false;
+//         const pt = setStarePointInfo();
+//         if ((pt !== undefined) && (pt !== null)) {
+//             params.navTargetMesh.isVisible = true;
+//             params.navTargetMesh.position = pt;
+//         } else {
+//             params.navTargetMesh.isVisible = false;
+//         }
+//     } else {
+//         setStarePointInfo();
+//     }
+// }
+
+
+
+
+
+/************************** MESH CREATION FUNCTIONS **************************/
+
+/**
+ * Makes a debug sphere to track the position of the gaze.
+ * @returns void
+ */
+// function trackDebugSphere(): void {
+//     const debuggerMesh = BABYLON.Mesh.CreateSphere("debugmsh", 4, 1, params.scene);
+//     debuggerMesh.id = "hihihi";
+//     const myMaterial = new BABYLON.StandardMaterial("mat", params.scene);
+//     myMaterial.diffuseColor = new BABYLON.Color3(1, 1, 0);
+//     debuggerMesh.material = myMaterial;
+
+//     setInterval(() => {
+//         const pt = Navigation.setStarePointInfo();
+//         if ((pt !== undefined) && (pt !== null)) {
+//             debuggerMesh.position = pt;
+//             // console.log(navMode, pt);
+//         }
+//     }, 2000);
+// }
+
+/***************************** STARE NAVIGATION *****************************/
+
+/**
+ * Sets up teleportation for the VR camera. Note that this is really nice in
+ * VR, but I don't think I can trigger it elsewhere. So we need to create our
+ * own.
+ * @returns void
+ */
+/*
+function setupCannedVRTeleportation(): void {
+    // Enable teleportation.
+    vrHelper.teleportationEnabled = true;
+
+    // Which mesh will be the ground (what you can use to teleport)?
+    vrHelper.enableTeleportation({floorMeshName: params.floorMeshName});
+
+    // The default teleportation mesh (that shows where you'll teleport) is
+    // pretty cool. But you can optionally pass a different mesh if you want.
+    if (params.teleportationTargetMesh !== undefined) {
+        vrHelper.teleportationTarget = params.teleportationTargetMesh;
+    }
+}
+*/
+
+
+
+
+/***************************** OPTIMIZATIONS *****************************/
+
+
+
+
+// TODO
+// Trigger transport with mouse click and keyboard too. Also, voice commands.
+// https://github.com/sdkcarlos/artyom.js
+// https://github.com/TalAter/annyang

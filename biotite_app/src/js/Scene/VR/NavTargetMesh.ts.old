@@ -1,0 +1,72 @@
+import * as Navigation from "./Navigation";
+import * as Vars from "./Vars";
+
+declare var BABYLON;
+
+// This module controls the navigation target mesh (where looking or pointing
+// with controllers).
+
+export let navTrgtMeshBeingTracked;   // Which mesh is being used to track the
+                                      // nav. Changes depending on nav state.
+export function setNavTrgtMeshBeingTracked(mesh) { navTrgtMeshBeingTracked = mesh; }
+
+// export let navTrgtMeshBeingTrackedBigger;    // A bigger version of the above.
+// export function setNavTrgtMeshBeingTrackedBigger(mesh) { navTrgtMeshBeingTrackedBigger = mesh; }
+
+export function setup() {
+    // Make sure params.navTargetMesh is defined. This is the mesh that
+    // appears where the user is looking (or pointing with controllers).
+    if (Vars.vars.navTargetMesh === undefined) {
+        Vars.vars.navTargetMesh = makeEmptyMesh();
+    }
+    Vars.vars.navTargetMesh.id = "navTargetMesh";
+    Vars.vars.navTargetMesh.scaling = new BABYLON.Vector3(0.25, 0.25, 0.25);
+    navTrgtMeshBeingTracked = Vars.vars.navTargetMesh;
+    // navTrgtMeshBeingTrackedBigger = Vars.vars.navTargetMesh.clone();
+    // navTrgtMeshBeingTrackedBigger.scaling = new BABYLON.Vector3(4, 4, 4);
+    // navTrgtMeshBeingTrackedBigger.position.y = -10000;
+    // navTrgtMeshBeingTrackedBigger.isVisible = false;
+
+    // Also there should always be a marker on the floor where you're staring
+    // or pointing with controllers.
+    Vars.vars.scene.registerBeforeRender(updateNavTargetMeshPosition);
+}
+
+function updateNavTargetMeshPosition() {
+    if (Vars.vars.navMode === Navigation.NavMode.NoVR) {
+        // params.navTargetMesh.isVisible = false;
+        // const pt = Navigation.setStarePointInfo();
+        let pt = Navigation.curStarePointInfo;
+        if ((pt !== undefined) && (pt !== null)) {
+            Vars.vars.navTargetMesh.isVisible = true;
+            Vars.vars.navTargetMesh.position = pt;
+        } else {
+            Vars.vars.navTargetMesh.isVisible = false;
+        }
+    } else {
+        // Navigation.setStarePointInfo();
+    }
+}
+
+/**
+ * A placeholder mesh. Not technically empty, but pretty close.
+ * @param  {*} scene The BABYLON scene.
+ * @returns * The custom mesh (almost an empty).
+ */
+function makeEmptyMesh(): any {
+    const customMesh = new BABYLON.Mesh("navTargetMesh", Vars.vars.scene);
+
+    const positions = [0, 0, 0];
+    const indices = [0];
+
+    const vertexData = new BABYLON.VertexData();
+
+    vertexData.positions = positions;
+    vertexData.indices = indices;
+
+    vertexData.applyToMesh(customMesh);
+
+    customMesh.isVisible = false;
+
+    return customMesh;
+}

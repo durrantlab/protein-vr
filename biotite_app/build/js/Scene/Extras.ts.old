@@ -1,0 +1,149 @@
+import * as Vars from "./Vars";
+import * as VR from "./VR";
+
+declare var BABYLON;
+declare var jQuery;
+
+export function setup() {
+    // const ground = BABYLON.Mesh.CreateGround("ground", 35, 35, 2, Vars.scene);
+    // const myMaterial = new BABYLON.StandardMaterial("myMaterial", Vars.scene);
+    // myMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
+    // myMaterial.specularColor = new BABYLON.Color3(0.5, 0.6, 0.87);
+    // myMaterial.emissiveColor = new BABYLON.Color3(1, 1, 1);
+    // myMaterial.ambientColor = new BABYLON.Color3(0.23, 0.98, 0.53);
+
+    // ground.material = myMaterial;
+
+    // Load in obj; files; and; apply; appropriate; textures.
+    jQuery.getJSON("scene_info.json", (data) => {
+        // Make UVs work
+        BABYLON.OBJFileLoader.OPTIMIZE_WITH_UV = true;
+
+        // Go through each of the protein meshes.
+        for (let idx in data["objIDs"]) {
+            if (data["objIDs"].hasOwnProperty(idx)) {
+
+                // Load the mesh.
+                let loader = BABYLON.SceneLoader.LoadAssetContainerAsync(
+                    "./", data["objIDs"][idx] + ".gltf", Vars.scene,
+                ).then((container) => {
+                    // Get the meshes.
+                    for (let idx2 in container.meshes) {
+                        if (container.meshes.hasOwnProperty(idx2)) {
+                            let idxInt2 = parseInt(idx2, 10);
+                            let mesh = container.meshes[idxInt2];
+
+                            // Remove existing mesh
+                            if (mesh.material !== undefined) {
+                                mesh.material.dispose();
+                                mesh.material = null;
+                            }
+
+                            // Make sure not alpha blended.
+                            mesh.hasVertexAlpha = false;
+                            mesh.visibility = true;
+
+                            // Create new material
+                            let mat = new BABYLON.StandardMaterial("molMat" + idx2, Vars.scene);
+                            mat.diffuseColor = new BABYLON.Color3(1, 1, 1);
+                            mat.specularColor = new BABYLON.Color3(0, 0, 0);
+                            mat.opacityTexture = null;
+                            mat.emissiveTexture = null;
+
+                            // mat.diffuseTexture.hasAlpha = false;
+                            let texName = data["objIDs"][idx] + ".png";
+                            let tex = new BABYLON.Texture(  // lightmapTexture
+                                texName, Vars.scene,
+                            );
+                            tex.vScale = -1;
+
+                            if ((data["objIDs"][idx].toLowerCase().indexOf("shadowcatcher") !== -1) || (
+                                    data["objIDs"][idx].toLowerCase().indexOf("shadow_catcher") !== -1)) {
+                                // So it's a shadow catcher.
+                                mat.opacityTexture = tex;
+                                mat.emissiveColor = new BABYLON.Color3(0, 0, 0);
+                            } else {
+                                // It's not a shadow catcher.
+                                mat.emissiveTexture = tex;
+                            }
+
+                            mat.disableLighting = true;
+
+                            mat.sideOrientation = BABYLON.Material.ClockWiseSideOrientation;
+
+                            mat.backFaceCulling = false;
+
+                            // Add it to the mesh
+                            mesh.material = mat;
+
+                                // mat.useLightmapAsShadowmap = false;
+
+                                // materialPlane.ambientTexture = new BABYLON.Texture("textures/grass.jpg", scene);
+
+                                // mesh.material.disableLighting = true;
+                                // mesh.material.emissiveColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+                            // }
+
+                            // let materials = container.materials;
+
+                            // // Add a new texture material.
+                            // let mat = new BABYLON.StandardMaterial(
+                            //     data["objIDs"][idx] + "_tex", Vars.scene,
+                            // );
+
+                            // mat.diffuseColor = new BABYLON.Color3(0, 0, 0);
+                            // mat.specularColor = new BABYLON.Color3(0, 0, 0);
+                            // mat.emissiveTexture = new BABYLON.Texture(
+                            //     data["objIDs"][idx] + ".png", Vars.scene,
+                            // );
+                            // mat.diffuseTexture = null;
+
+                            // meshes[0].material = mat;
+
+                            // This is required to position correctly.
+                            mesh.scaling.z = -1;
+                            if (idxInt2 > 0) {
+                                mesh.scaling.x = -1;
+                            }
+                            // console.log(mesh);
+                        }
+                    }
+
+                    // Add the object to the scene.
+                    container.addAllToScene();
+                });
+            }
+        }
+    });
+
+    // // Load the mesh.
+    // BABYLON.SceneLoader.LoadAssetContainerAsync(
+    //     "./", "untitled.gltf", Vars.scene,
+    // ).then((container) => {
+    //     // debugger;
+    //     // Get the meshes.
+    //     let meshes = container.meshes;
+    //     // let materials = container.materials;
+
+    //     // Add a new texture material.
+    //     // let mat = new BABYLON.StandardMaterial(
+    //     //     data["objIDs"][idx] + "_tex", Vars.scene,
+    //     // );
+
+    //     // mat.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    //     // mat.specularColor = new BABYLON.Color3(0, 0, 0);
+    //     // mat.emissiveTexture = new BABYLON.Texture(
+    //     //     data["objIDs"][idx] + ".png", Vars.scene,
+    //     // );
+    //     // mat.diffuseTexture = null;
+
+    //     // meshes[0].material = mat;
+
+    //     // This is required to position correctly.
+    //     meshes[0].scaling.z = -1;
+
+    //     // Add the object to the scene.
+    //     container.addAllToScene();
+    // });
+
+}
