@@ -1,4 +1,4 @@
-define(["require", "exports", "./Vars", "./VR/Vars"], function (require, exports, Vars, VRVars) {
+define(["require", "exports", "./Vars", "./VR/CommonCamera", "./VR/Vars"], function (require, exports, Vars, CommonCamera, VRVars) {
     "use strict";
     exports.__esModule = true;
     var visibilityInfo = {}; // The button states.
@@ -39,7 +39,7 @@ define(["require", "exports", "./Vars", "./VR/Vars"], function (require, exports
         panel.blockLayout = false;
         mainMenuAnchor = new BABYLON.TransformNode(""); // this can be a mesh, too
         var camera = Vars.scene.activeCamera;
-        // mainMenuAnchor.position = camera.position.clone();
+        // mainMenuAnchor.position = Navigation.getCameraPosition();
         // mainMenuAnchor.rotation.y = camera.rotation.y + Math.PI * 0.5;
         panel.linkToTransformNode(mainMenuAnchor);
         updateMainMenuButtons();
@@ -64,8 +64,8 @@ define(["require", "exports", "./Vars", "./VR/Vars"], function (require, exports
             // Update main menu
             mainMenuVisible = !mainMenuVisible;
             updateMainMenuButtons();
-            mainMenuAnchor.position = camera.position.clone();
-            mainMenuAnchor.rotation.y = camera.rotation.y + Math.PI * 0.5;
+            mainMenuAnchor.position.copyFrom(CommonCamera.getCameraPosition());
+            mainMenuAnchor.rotation.y = camera.rotation.y + Math.PI * 0.5; // TODO: What about if VR camera?
             // Update floor button.
             text.text = mainMenuVisible ? "Hide Menu" : "Show Menu";
             buttonToggle.content.dispose();
@@ -79,9 +79,9 @@ define(["require", "exports", "./Vars", "./VR/Vars"], function (require, exports
         var offset = -VRVars.vars.cameraHeight + 0.1;
         ;
         Vars.renderLoopFuncs.push(function () {
-            mainMenuAnchorToggle.position = camera.position.clone();
+            mainMenuAnchorToggle.position.copyFrom(CommonCamera.getCameraPosition());
             mainMenuAnchorToggle.position.y = mainMenuAnchorToggle.position.y + offset;
-            mainMenuAnchorToggle.rotation.y = camera.rotation.y;
+            mainMenuAnchorToggle.rotation.y = camera.rotation.y; // TODO: What about VR camera.
         });
     }
     function updateMainMenuButtons() {

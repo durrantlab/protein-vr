@@ -3,13 +3,16 @@ define(["require", "exports", "./Extras", "./Lights", "./Vars", "./VR/Load"], fu
     exports.__esModule = true;
     function load() {
         Vars.setup();
-        // algorithmScene(() => {
         babylonScene(function () {
+            var navMeshToUse = BABYLON.Mesh.CreateSphere("navTargetMesh", 4, 0.1, Vars.scene);
+            var navMeshMat = new BABYLON.StandardMaterial("myMaterial", Vars.scene);
+            navMeshMat.diffuseColor = new BABYLON.Color3(1, 0, 1);
+            navMeshToUse.material = navMeshMat;
             VRLoad.setup({
                 canvas: Vars.canvas,
                 engine: Vars.engine,
-                floorMeshName: "ground",
-                navTargetMesh: BABYLON.Mesh.CreateSphere("navTargetMesh", 4, 0.1, Vars.scene),
+                groundMeshName: "ground",
+                navTargetMesh: navMeshToUse,
                 scene: Vars.scene
             });
             // Load extra objects

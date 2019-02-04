@@ -1,4 +1,6 @@
 import * as Vars from "./Vars";
+import * as CommonCamera from "./VR/CommonCamera";
+import * as Navigation from "./VR/Navigation";
 // import * as VR from "./VR";
 import * as VRVars from "./VR/Vars";
 
@@ -47,7 +49,7 @@ function setupMainMenu(data) {
 
     mainMenuAnchor = new BABYLON.TransformNode(""); // this can be a mesh, too
     let camera = Vars.scene.activeCamera;
-    // mainMenuAnchor.position = camera.position.clone();
+    // mainMenuAnchor.position = Navigation.getCameraPosition();
     // mainMenuAnchor.rotation.y = camera.rotation.y + Math.PI * 0.5;
     panel.linkToTransformNode(mainMenuAnchor);
 
@@ -76,8 +78,8 @@ function setupMainMenuToggleButton() {
         // Update main menu
         mainMenuVisible = !mainMenuVisible;
         updateMainMenuButtons();
-        mainMenuAnchor.position = camera.position.clone();
-        mainMenuAnchor.rotation.y = camera.rotation.y + Math.PI * 0.5;
+        mainMenuAnchor.position.copyFrom(CommonCamera.getCameraPosition());
+        mainMenuAnchor.rotation.y = camera.rotation.y + Math.PI * 0.5;  // TODO: What about if VR camera?
 
         // Update floor button.
         text.text = mainMenuVisible ? "Hide Menu" : "Show Menu";
@@ -93,9 +95,9 @@ function setupMainMenuToggleButton() {
     // Update button position with each turn of the render loop.
     let offset = -VRVars.vars.cameraHeight + 0.1; ;
     Vars.renderLoopFuncs.push(() => {
-        mainMenuAnchorToggle.position = camera.position.clone();
+        mainMenuAnchorToggle.position.copyFrom(CommonCamera.getCameraPosition());
         mainMenuAnchorToggle.position.y = mainMenuAnchorToggle.position.y + offset;
-        mainMenuAnchorToggle.rotation.y = camera.rotation.y;
+        mainMenuAnchorToggle.rotation.y = camera.rotation.y;  // TODO: What about VR camera.
     });
 }
 

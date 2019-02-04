@@ -7,20 +7,20 @@ declare var BABYLON;
 declare var jQuery;
 
 let nonVRCamera;
-let lastCameraPosAboveFloorMesh;
+let lastCameraPosAboveGroundMesh = new BABYLON.Vector3(0, 0, 0);
 
 /**
  * Sets up the nonVR camera (not everyone has a VR headset).
  */
 export function setup() {
-    lastCameraPosAboveFloorMesh = null;
+    // lastCameraPosAboveGroundMesh = null;
     // const timeOfLastCameraPosCheck = null;
 
     setupNonVRCameraObj();
 
     // Periodically check the camera position, must be over the floor.
-    // setInterval(keepCameraOverFloorMesh, 1);
-    Vars.vars.scene.registerBeforeRender(keepCameraOverFloorMesh);
+    // setInterval(fixPointHeightAboveGround, 1);
+    // Vars.vars.scene.registerBeforeRender(fixPointHeightAboveGround);
 }
 
 function setupNonVRCameraObj() {
@@ -44,7 +44,7 @@ function setupNonVRCameraObj() {
     // radius.
     nonVRCamera.ellipsoid = new BABYLON.Vector3(1.0, 0.5 * Vars.vars.cameraHeight, 1.0);
 
-    // Turn on collisions as appropriate. Note that floorMesh collisions are
+    // Turn on collisions as appropriate. Note that groundMesh collisions are
     // enabled in Navigation.
     // scene.workerCollisions = true;
     Vars.vars.scene.collisionsEnabled = true;
@@ -61,63 +61,4 @@ function setupNonVRCameraObj() {
     // Position the camera on the floor. See
     // http://www.html5gamedevs.com/topic/30837-gravity-camera-stops-falling/
     nonVRCamera._updatePosition();
-}
-
-function ptProjectedToFloor(pt) {
-    const ray = new BABYLON.Ray(
-        pt, new BABYLON.Vector3(0, -1, 0), 50,
-    );
-    const pickingInfo = Vars.vars.scene.pickWithRay(ray, (mesh) => {
-        return (mesh.id === Vars.vars.floorMesh.id);
-    });
-    return pickingInfo;
-}
-
-/**
- * A function to make sure the camera is always over the floor mesh.
- */
-function keepCameraOverFloorMesh() {
-    // Don't check if recently checked.
-    // const nowTime = new Date().getTime();
-    // if (nowTime - timeOfLastCameraPosCheck < 100) {
-    //     return;
-    // }
-    // timeOfLastCameraPosCheck = nowTime;
-
-    // Every once in a while, check if you're over the floor mesh. Cast a ray
-    // directly down from the camera.
-    const activeCameraPos = Vars.vars.scene.activeCamera.position;
-
-    // Check if the ray hit the floor.
-    if (ptProjectedToFloor(activeCameraPos).hit) {
-        // It hit the floor. Save the current camera coordiantes.
-        lastCameraPosAboveFloorMesh = activeCameraPos.clone();
-    } else {
-        // It's not over the floor anymore. Move the camera to the last
-        // place that was above the floor. Do it axis by axis to allow for
-        // sliding along walls.
-
-        // let pt = new BABYLON.Vector3(
-            // lastCameraPosAboveFloorMesh.x, lastCameraPosAboveFloorMesh.y, activeCameraPos.z
-        // );
-        // if (ptProjectedToFloor(pt).hit) {
-        //     activeCameraPos = pt.clone();
-        // }
-
-        // pt = new BABYLON.Vector3(
-            // activeCameraPos.x, lastCameraPosAboveFloorMesh.y, lastCameraPosAboveFloorMesh.z
-        // );
-        // if (ptProjectedToFloor(pt).hit) {
-        //     activeCameraPos = pt.clone();
-        // }
-
-        // pt = new BABYLON.Vector3(
-            // lastCameraPosAboveFloorMesh.x, activeCameraPos.y, lastCameraPosAboveFloorMesh.z
-        // );
-        // if (ptProjectedToFloor(pt).hit) {
-        //     activeCameraPos = pt.clone();
-        // }
-
-        Vars.vars.scene.activeCamera.position = lastCameraPosAboveFloorMesh.clone();
-    }
 }

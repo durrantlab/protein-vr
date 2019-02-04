@@ -1,5 +1,6 @@
 import * as GUI from "./GUI";
 import * as Vars from "./Vars";
+import * as Pickables from "./VR/Pickables";
 
 declare var BABYLON;
 declare var jQuery;
@@ -127,6 +128,9 @@ function setupMesh(mesh, objID, shadowQuality, uniqIntID) {
 
     // Make it so it casts a shadow.
     shadowGenerator.getShadowMap().renderList.push(mesh);
+
+    // Make it pickable
+    Pickables.addPickableMolecule(mesh);
 }
 
 function setupShadowCatchers() {

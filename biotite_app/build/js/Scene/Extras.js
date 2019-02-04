@@ -1,4 +1,4 @@
-define(["require", "exports", "./GUI", "./Vars"], function (require, exports, GUI, Vars) {
+define(["require", "exports", "./GUI", "./Vars", "./VR/Pickables"], function (require, exports, GUI, Vars, Pickables) {
     "use strict";
     exports.__esModule = true;
     function setup() {
@@ -100,6 +100,8 @@ define(["require", "exports", "./GUI", "./Vars"], function (require, exports, GU
         }
         // Make it so it casts a shadow.
         exports.shadowGenerator.getShadowMap().renderList.push(mesh);
+        // Make it pickable
+        Pickables.addPickableMolecule(mesh);
     }
     function setupShadowCatchers() {
         // Go through and find the shdow catchers

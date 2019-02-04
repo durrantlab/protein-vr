@@ -5,8 +5,8 @@ import * as Navigation from "./Navigation";
 export interface IVRSetup {
     scene: any;
     engine: any;
-    floorMeshName: string;  // The name of the floor mesh
-    floorMesh?: any;  // The actual mesh
+    groundMeshName: string;  // The name of the floor mesh
+    groundMesh?: any;  // The actual mesh
     canvas: any;
     // teleportationTargetMesh?: any;  // The mesh that appears when you teleport.
                                     // Leaving it undefined uses the default
