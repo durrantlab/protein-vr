@@ -3,6 +3,7 @@
 // import * as NavTargetMesh from "./NavTargetMesh";
 import * as CommonCamera from "./CommonCamera";
 import * as Navigation from "./Navigation";
+import * as NonVRCamera from "./NonVRCamera";
 import * as Pickables from "./Pickables";
 import * as Vars from "./Vars";
 import * as VRCamera from "./VRCamera";
@@ -60,6 +61,16 @@ export function setup() {
         cancelStareIfFarAway();
         Vars.vars.navTargetMesh.position.copyFrom(curStarePt);
         // fixPointHeightAboveGround();
+
+
+        // const ray = new BABYLON.Ray(
+        //     Vars.vars.scene.activeCamera.position,
+        //     new BABYLON.Vector3(0, -1, 0), 50,
+        // );
+        // const pickingInfo = Vars.vars.scene.pickWithRay(ray, (mesh) => {
+        //     return (mesh.id === Vars.vars.groundMesh.id);
+        // });
+        // console.log(Vars.vars.cameraHeight, pickingInfo.distance);
 
         // if (Pickables.curPickedMesh === undefined) {
             // console.log(undefined);
@@ -187,6 +198,7 @@ export function actOnStareTrigger() {
             break;
         case Pickables.PickableCategory.Molecule:
             // It's a molecule, so increase the height.
+            grow();
             break;
         default:
             // None.
@@ -199,7 +211,7 @@ export function actOnStareTrigger() {
  * @param  {IStarePointInf} starePt The location to transport to (BABYLON.Vector3).
  * @returns void
  */
-function teleport(newLoc = undefined): void {
+function teleport(newLoc = undefined, callBack = () => { return; }): void {
     currentlyTeleporting = true;
 
     // Hide the bigger nav mesh. It will appear again elsewhere.
@@ -213,8 +225,12 @@ function teleport(newLoc = undefined): void {
         BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
     );
 
+    // The start location.
+    let startLoc = CommonCamera.getCameraPosition();
+
     // Get the new location.
     if (newLoc === undefined) {
+        // If it's not defined, use the current stare point.
         newLoc = new BABYLON.Vector3(
             curStarePt.x,
             curStarePt.y + Vars.vars.cameraHeight,
@@ -223,29 +239,12 @@ function teleport(newLoc = undefined): void {
     }
 
     // Correct if VR camera.
-    newLoc = newLoc.subtract(
-        CommonCamera.getVecFromEyeToCamera(),
-    );
-
-
-    // Adjust for eye-to-camera distance if VR.
-    // newLoc.subtractInPlace(CommonCamera.getVecFromEyeToCamera());
-    // newLoc.addInPlace(CommonCamera.getVecFromEyeToCamera());
-
-    // newLoc = fixPointHeightAboveGround(newLoc);
-
-    // console.log(curStarePt, newLoc);
-
-    // Vars.vars.scene.getCameraPosition() = newLoc;
-    // getCameraPosition() = newLoc.clone();
-
-    // CommonCamera.setCameraPosition(newLoc);
-
-    // return;
+    let eyeToCamVec = CommonCamera.getVecFromEyeToCamera();
+    newLoc = newLoc.subtract(eyeToCamVec);
+    startLoc = startLoc.subtract(eyeToCamVec);
 
     // Animate to new location.
     let animationSteps = 11;
-    const startLoc = CommonCamera.getCameraPosition();
     const animationCameraTeleportationKeys = [
         { frame: 0, value: startLoc },
         { frame: animationSteps, value: newLoc },
@@ -258,25 +257,56 @@ function teleport(newLoc = undefined): void {
 
     Vars.vars.scene.beginAnimation(activeCamera, 0, animationSteps, false, 1, () => {
         // Animation finished callback.
-
         currentlyTeleporting = false;
         VRCamera.vrHelper.gazeTrackerMesh.isVisible = true;
+
         // Erase animation
         activeCamera.animations = [];
+
+        callBack();
     });
 }
 
-// function decideWhichClickAction(dist: number, newLoc: any) {
+/**
+ * Grow to a given height.
+ * @param  {number} newHeight The new height.
+ * @returns void
+ */
+function grow(newHeight: number = undefined): void {
+    if (newHeight === undefined) {
+        newHeight = distToPtProjectedToGround(curStarePt).distance;
+    }
 
-//     if ((currentlyTeleporting) || (dist > 5)) {
-//         // NavTargetMesh.navTrgtMeshBeingTrackedBigger.isVisible = false;
-//         clickAction = ClickAction.None;
-//     } else {
-//         // NavTargetMesh.navTrgtMeshBeingTrackedBigger.isVisible = true;
-//         // NavTargetMesh.navTrgtMeshBeingTrackedBigger.position = newLoc;
-//         clickAction = ClickAction.Teleport;
-//     }
-// }
+    // Set the new height.
+    let deltaHeight = newHeight - Vars.vars.cameraHeight;
+    Vars.vars.cameraHeight = newHeight;
+
+    // Get the point immediately below the current camera location.
+    // const ray = new BABYLON.Ray(
+        // CommonCamera.getCameraPosition(), new BABYLON.Vector3(0, -1, 0), 50,
+    // );
+    // const pickingInfo = Vars.vars.scene.pickWithRay(ray, (mesh) => {
+        // return (mesh.id === Vars.vars.groundMesh.id);
+    // });
+
+    let newPt = CommonCamera.getCameraPosition().clone();
+    newPt.y = newPt.y + deltaHeight;
+    teleport(newPt, () => {
+        // Make sure the collision elipsoid surrounding the non-VR camera
+        // matches the new height.
+        NonVRCamera.setCameraElipsoid();
+    });
+
+    // let ptBelowCamera = distToPtProjectedToGround(
+    //     CommonCamera.getCameraPosition(),
+    // ).pickedPoint;
+
+    // ptBelowCamera
+
+    // console.log(ptBelowCamera);
+    // debugger;
+
+}
 
 /**
  * A function to make sure the camera is always over the floor mesh.
@@ -323,12 +353,12 @@ function teleport(newLoc = undefined): void {
 //     // }
 // }
 
-// function ptProjectedToGround(pt) {
-//     const ray = new BABYLON.Ray(
-//         pt, new BABYLON.Vector3(0, -1, 0), 50,
-//     );
-//     const pickingInfo = Vars.vars.scene.pickWithRay(ray, (mesh) => {
-//         return (mesh.id === Vars.vars.groundMesh.id);
-//     });
-//     return pickingInfo;
-// }
+function distToPtProjectedToGround(pt) {
+    const ray = new BABYLON.Ray(
+        pt, new BABYLON.Vector3(0, -1, 0), 50,
+    );
+    const pickingInfo = Vars.vars.scene.pickWithRay(ray, (mesh) => {
+        return (mesh.id === Vars.vars.groundMesh.id);
+    });
+    return pickingInfo;
+}

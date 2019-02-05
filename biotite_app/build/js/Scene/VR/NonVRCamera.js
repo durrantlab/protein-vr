@@ -32,7 +32,7 @@ define(["require", "exports", "./Vars"], function (require, exports, Vars) {
         nonVRCamera.applyGravity = true;
         // Enable collision detection. Note that the second paramerter is a
         // radius.
-        nonVRCamera.ellipsoid = new BABYLON.Vector3(1.0, 0.5 * Vars.vars.cameraHeight, 1.0);
+        setCameraElipsoid();
         // Turn on collisions as appropriate. Note that groundMesh collisions are
         // enabled in Navigation.
         // scene.workerCollisions = true;
@@ -47,4 +47,9 @@ define(["require", "exports", "./Vars"], function (require, exports, Vars) {
         // http://www.html5gamedevs.com/topic/30837-gravity-camera-stops-falling/
         nonVRCamera._updatePosition();
     }
+    function setCameraElipsoid() {
+        // Depends on camera height.
+        nonVRCamera.ellipsoid = new BABYLON.Vector3(1.0, 0.5 * Vars.vars.cameraHeight, 1.0);
+    }
+    exports.setCameraElipsoid = setCameraElipsoid;
 });

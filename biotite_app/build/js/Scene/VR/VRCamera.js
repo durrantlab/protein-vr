@@ -2,7 +2,6 @@
 define(["require", "exports", "./Navigation", "./Pickables", "./Vars"], function (require, exports, Navigation, Pickables, Vars) {
     "use strict";
     exports.__esModule = true;
-    console.log("Multiple triggers per click?");
     // this module.
     var trigRefractPrdInMS = 500;
     var lastTriggerTime = 0;

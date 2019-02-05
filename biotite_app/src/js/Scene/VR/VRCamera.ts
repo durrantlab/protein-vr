@@ -4,8 +4,6 @@ import * as Navigation from "./Navigation";
 import * as Pickables from "./Pickables";
 import * as Vars from "./Vars";
 
-console.log("Multiple triggers per click?");
-
 declare let BABYLON;
 
 export let vrHelper;  // So it can be accessed everywhere in
