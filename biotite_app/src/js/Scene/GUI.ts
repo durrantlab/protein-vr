@@ -1,62 +1,128 @@
 import * as Vars from "./Vars";
 import * as CommonCamera from "./VR/CommonCamera";
-import * as Navigation from "./VR/Navigation";
-// import * as VR from "./VR";
+// DEBUGG import * as Optimizations from "./VR/Optimizations";
+import * as Pickables from "./VR/Pickables";
+// DEBUGG import * as VRPoints from "./VR/Points";
 import * as VRVars from "./VR/Vars";
+// DEBUGG import * as VRVoiceCommands from "./VR/VoiceCommands";
 
 declare var BABYLON;
 
-let visibilityInfo = {};  // The button states.
-let mainMenuVisible = false;
+// let visibilityInfo = {};  // The button states.
+let allButtons = [];
+// let mainMenuVisible = false;
+let mainMenuGUI3DManager;
 let mainMenuAnchor;
+let clickSound: any;
 
-export function setupGUI(data) {
+/**
+ * Load the 3D GUI.
+ * @param  {Object<string,*>} data The data from scene_info.json.
+ * @returns void
+ */
+export function setup(data): void {
     setupMainMenu(data);
     setupMainMenuToggleButton();
+
+    clickSound = new BABYLON.Sound(
+        "click-button", "assets/staple-public-domain.mp3",
+        VRVars.vars.scene, null,
+        { loop: false, autoplay: false, spatialSound: true, volume: 0.1 },
+    );
 }
 
-function setupMainMenu(data) {
-    // Set up the main menu
-    let manager = new BABYLON.GUI.GUI3DManager(Vars.scene);
+/**
+ * Setup the main menu.
+ * @param  {Object<string,*>} data The data from scene_info.json.
+ * @returns void
+ */
+function setupMainMenu(data): void {
+    // Get the descriptions
+    // DEBUGG VRVoiceCommands.setMoleculeNameInfos(data);
+
+    // Set up the main menu TODO: Can you use just one GUI3DManage, with
+    // multiple panels? If so, redundancy here.
+    mainMenuGUI3DManager = new BABYLON.GUI.GUI3DManager(Vars.scene);
 
     let panel = new BABYLON.GUI.CylinderPanel();
     // var panel = new BABYLON.GUI.SpherePanel();
     panel.radius = 3;
     panel.margin = 0.1;
 
-    manager.addControl(panel);
+    mainMenuGUI3DManager.addControl(panel);
     panel.blockLayout = true;
 
-    for (let idx in data["objIDs"]) {
-        if (data["objIDs"].hasOwnProperty(idx)) {
-            let objID = data["objIDs"][idx];
+    // DEBUGG
+    /* for (let key in VRVoiceCommands.moleculeNameInfos) {
+        if (VRVoiceCommands.moleculeNameInfos.hasOwnProperty(key)) {
+            let inf = VRVoiceCommands.moleculeNameInfos[key];
+            let desc = inf.description;
 
-            // let button = new BABYLON.GUI.Button3D("click me");
-            let button = new BABYLON.GUI.HolographicButton("click me");
-            panel.addControl(button);
-
-            visibilityInfo[objID] = [button, true];
-
-            button.onPointerClickObservable.add((e) => {
-                let newVisVal = !visibilityInfo[objID][1];
-                visibilityInfo[objID][1] = newVisVal;
-                Vars.scene.getMeshByName(objID).isVisible = newVisVal;
-                updateMainMenuButtons();
-            });
+            allButtons.push(
+                new ButtonWrapper({
+                    clickFunc: (buttonWrapper) => {
+                        VRVoiceCommands.showOrHideModel(
+                            inf.modelName,
+                            inf.representation,
+                            !buttonWrapper.value,
+                        );
+                    },
+                    default: false,
+                    falseTxt: desc + "\n(Hide)",
+                    initFunc: (buttonWrapper) => {
+                        buttonWrapper.isVisible(false);  // Buttons start off hidden.
+                    },
+                    name: "menu-visible-button-" + inf.modelName.replace(/ /g, "").replace(/\n/g, ""),
+                    panel,
+                    trueTxt: desc + "\n(Show)",
+                }),
+            );
+            // window.but = but;
         }
-    }
+    } */
+    nonVisibiliyButtons(panel, data);
+
     panel.blockLayout = false;
 
     mainMenuAnchor = new BABYLON.TransformNode(""); // this can be a mesh, too
-    let camera = Vars.scene.activeCamera;
-    // mainMenuAnchor.position = Navigation.getCameraPosition();
-    // mainMenuAnchor.rotation.y = camera.rotation.y + Math.PI * 0.5;
     panel.linkToTransformNode(mainMenuAnchor);
-
-    updateMainMenuButtons();
 }
 
-function setupMainMenuToggleButton() {
+/**
+ * Sets up some additional buttons (like audio, tactile feedback, etc).
+ * @param  {*}                panel  The panel to add the buttons to.
+ * @param  {Object<string,*>} data   The data from scene_info.json.
+ * @returns void
+ */
+function nonVisibiliyButtons(panel: any, data: any): void {
+    // Turn on speech synthesis.
+    allButtons.push(
+        new ButtonWrapper({
+            clickFunc: (buttonWrapper) => {
+                // TODO:
+                if (buttonWrapper.value) {
+                    // DEBUGG VRVoiceCommands.setup(data);
+                } else {
+                    // DEBUGG VRVoiceCommands.stopVoiceCommands();
+                }
+            },
+            default: false,
+            falseTxt: "Audio Commands\n(On)",
+            initFunc: (buttonWrapper) => {
+                buttonWrapper.isVisible(false);  // No audio to begin.
+            },
+            name: "menu-audio-commands-button",
+            panel,
+            trueTxt: "Audio Commands\n(Off)",
+        }),
+    );
+}
+
+/**
+ * Setup the toggle button on the floor that turns the main menu on and off.
+ * @returns void
+ */
+function setupMainMenuToggleButton(): void {
     // Also set up a manager at your feet. This turns the main manager on and
     // off.
     let managerToggle = new BABYLON.GUI.GUI3DManager(Vars.scene);
@@ -64,27 +130,28 @@ function setupMainMenuToggleButton() {
     managerToggle.addControl(panelToggle);
 
     // Set up the button
-    let buttonToggle = new BABYLON.GUI.HolographicButton("Toggle Menu");
-    panelToggle.addControl(buttonToggle);
-    let text = new BABYLON.GUI.TextBlock();
-    text.text = "Show Menu";
-    text.color = "white";
-    text.resizeToFit = true;
-    buttonToggle.content = text;
-
-    // Make button clickable.
     let camera = Vars.scene.activeCamera;
-    buttonToggle.onPointerClickObservable.add((e) => {
-        // Update main menu
-        mainMenuVisible = !mainMenuVisible;
-        updateMainMenuButtons();
-        mainMenuAnchor.position.copyFrom(CommonCamera.getCameraPosition());
-        mainMenuAnchor.rotation.y = camera.rotation.y + Math.PI * 0.5;  // TODO: What about if VR camera?
+    let menuVisibleButton = new ButtonWrapper({
+        clickFunc: (buttonWrapper) => {
+            // Update main-menu button visibility
+            // mainMenuGUI3DManager.isVisible = ! mainMenuGUI3DManager.isVisible; *****
+            for (let i in allButtons) {
+                if (allButtons.hasOwnProperty(i)) {
+                    let iInt = parseInt(i, 10);
+                    allButtons[iInt].isVisible(buttonWrapper.value);
+                }
+            }
 
-        // Update floor button.
-        text.text = mainMenuVisible ? "Hide Menu" : "Show Menu";
-        buttonToggle.content.dispose();
-        buttonToggle.content = text;
+            // mainMenuVisible = !mainMenuVisible;
+            mainMenuAnchor.position.copyFrom(CommonCamera.getCameraPosition());
+            mainMenuAnchor.rotation.y = CommonCamera.getCameraRotationY(); //  + Math.PI * 0.5;
+            // camera.rotation.y + Math.PI * 0.5;  // TODO: What about if VR camera?
+        },
+        default: false,
+        falseTxt: "Show Menu",
+        name: "menu-visible-button",
+        panel: panelToggle,
+        trueTxt: "Hide Menu",
     });
 
     // Set up the button anchor and move/rotate it.
@@ -93,34 +160,151 @@ function setupMainMenuToggleButton() {
     mainMenuAnchorToggle.rotation.x = Math.PI * 0.5;
 
     // Update button position with each turn of the render loop.
-    let offset = -VRVars.vars.cameraHeight + 0.1; ;
-    Vars.renderLoopFuncs.push(() => {
-        mainMenuAnchorToggle.position.copyFrom(CommonCamera.getCameraPosition());
-        mainMenuAnchorToggle.position.y = mainMenuAnchorToggle.position.y + offset;
-        mainMenuAnchorToggle.rotation.y = camera.rotation.y;  // TODO: What about VR camera.
+    // let offset = -VRVars.vars.cameraHeight + 0.1; ;
+    Vars.scene.registerBeforeRender(() => {
+        // DEBUGG mainMenuAnchorToggle.position.copyFrom(VRPoints.groundPointBelowCamera);
+        // DEBUGG mainMenuAnchorToggle.position.y = mainMenuAnchorToggle.position.y + 0.1;
+        // DEBUGG mainMenuAnchorToggle.rotation.y = CommonCamera.getCameraRotationY();
+        // camera.rotation.y;  // TODO: What about VR camera.
     });
 }
 
-function updateMainMenuButtons() {
-    for (let objID in visibilityInfo) {
-        if (visibilityInfo.hasOwnProperty(objID)) {
-            let button = visibilityInfo[objID][0];
-            let visibilityState = visibilityInfo[objID][1];
+// function updateMainMenuButtons() {
+//     for (let objID in visibilityInfo) {
+//         if (visibilityInfo.hasOwnProperty(objID)) {
+//             let button = visibilityInfo[objID][0];
+//             let visibilityState = visibilityInfo[objID][1];
 
-            let txtStr = objID.replace(/.sdf/g, "").replace(/.pdb/g, "");
-            txtStr = txtStr.replace(/.wrl/g, "");
-            txtStr = txtStr.replace(/_/g, "\n");
-            txtStr += "\n(" + (visibilityState ? "Hide" : "Show") + ")";
+//             let txtStr = objID.replace(/.sdf/g, "").replace(/.pdb/g, "");
+//             txtStr = txtStr.replace(/.wrl/g, "");
+//             txtStr = txtStr.replace(/_/g, "\n");
+//             txtStr += "\n(" + (visibilityState ? "Hide" : "Show") + ")";
 
-            let text = new BABYLON.GUI.TextBlock();
-            text.text = txtStr;
-            text.color = "white";
-            // text.fontSize = 24;
-            text.resizeToFit = true;
-            button.content.dispose();
-            button.content = text;
+//             let text = new BABYLON.GUI.TextBlock();
+//             text.text = txtStr;
+//             text.color = "white";
+//             // text.fontSize = 24;
+//             text.resizeToFit = true;
+//             button.content.dispose();
+//             button.content = text;
 
-            button.isVisible = mainMenuVisible;
+//             button.isVisible = mainMenuVisible;
+//         }
+//     }
+// }
+
+interface IButtonWrapper {
+    panel: any;
+    trueTxt: string;
+    falseTxt: string;
+    default: boolean;
+    name: string;
+    clickFunc: any;
+    initFunc?: any;
+}
+
+class ButtonWrapper {
+    public button: any;
+    private value: boolean;
+    private textBlock: any;
+    private trueTxt: string;
+    private falseTxt: string;
+    private clickFunc;
+    private containingMesh: any;
+
+    /**
+     * The constructor.
+     * @param  {Object<string,*>} params
+     * @constructor
+     */
+    constructor(params: IButtonWrapper) {
+        // Make the button
+        this.button = new BABYLON.GUI.HolographicButton(params.name);
+        params.panel.addControl(this.button);
+
+        // Make a text block
+        this.textBlock = new BABYLON.GUI.TextBlock();
+        this.textBlock.color = "white";
+        this.textBlock.resizeToFit = true;
+
+        // Save the value and text, etc.
+        this.value = params.default;
+        this.trueTxt = params.trueTxt;
+        this.falseTxt = params.falseTxt;
+        this.clickFunc = params.clickFunc;
+
+        // Update the text.
+        this.updateTxt();
+
+        // Make the button clickable.
+        this.button.onPointerClickObservable.add((e) => {
+            this.toggled();
+        });
+
+        // Make a mesh that surrounds the button. It actually triggers the
+        // click.
+        this.containingMesh = BABYLON.Mesh.CreateSphere(
+            params.name + "-container-mesh", 2, VRVars.BUTTON_SPHERE_RADIUS, Vars.scene,
+        );
+        this.containingMesh.position = this.button.node.absolutePosition;
+        this.containingMesh.visibility = 0;
+
+        // Add a clicking function to the mesh.
+        this.containingMesh.clickFunc = () => {
+            this.toggled();
+        };
+
+        // Add the mesh to the list of ones that are pickable.
+        Pickables.addPickableButton(this.containingMesh);
+
+        if (params.initFunc !== undefined) {
+            params.initFunc(this);
         }
+    }
+
+    /**
+     * Determines if this button is visible.
+     * @param  {boolean} [val=] Whether this button is visible.
+     * @returns void
+     */
+    public isVisible(val?: boolean): void {
+        if (val === undefined) {
+            // A getter
+            return this.button.isVisible;
+        } else {
+            // A setter. Note that this doesn't affect visibility on meshes
+            // (they could be entirely transparent).
+            this.button.isVisible = val;
+            this.containingMesh.isVisible = val;
+        }
+    }
+
+    /**
+     * Sets the text on this button.
+     * @returns void
+     */
+    private updateTxt(): void {
+        this.textBlock.text = this.value ? this.trueTxt : this.falseTxt;
+        this.button.content.dispose();
+        this.button.content = this.textBlock;
+    }
+
+    /**
+     * Toggle whether this button is visible.
+     * @returns void
+     */
+    private toggled(): void {
+        // Play the sound.
+        clickSound.setPosition(this.containingMesh.position.clone());
+        clickSound.play();
+
+        // Switch value.
+        this.value = !this.value;
+
+        // Fire the user-defined trigger.
+        this.clickFunc(this);
+
+        // Update the text.
+        this.updateTxt();
     }
 }

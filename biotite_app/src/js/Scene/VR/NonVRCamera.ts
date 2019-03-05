@@ -1,6 +1,6 @@
 // This sets up the non vr camera. Not everyone has a vr headset.
 
-import * as Navigation from "./Navigation";
+// DEBUGG import * as Navigation from "./Navigation";
 import * as Vars from "./Vars";
 
 declare var BABYLON;
@@ -11,23 +11,18 @@ let lastCameraPosAboveGroundMesh = new BABYLON.Vector3(0, 0, 0);
 
 /**
  * Sets up the nonVR camera (not everyone has a VR headset).
+ * @returns void
  */
-export function setup() {
-    // lastCameraPosAboveGroundMesh = null;
-    // const timeOfLastCameraPosCheck = null;
-
+export function setup(): void {
     setupNonVRCameraObj();
-
-    // Periodically check the camera position, must be over the floor.
-    // setInterval(fixPointHeightAboveGround, 1);
-    // Vars.vars.scene.registerBeforeRender(fixPointHeightAboveGround);
 }
 
-function setupNonVRCameraObj() {
+/**
+ * Sets up the camera object.
+ * @returns void
+ */
+function setupNonVRCameraObj(): void {
     // The VRHelper already created a camera. Need to set it up.
-    // nonVRCamera = new BABYLON.FreeCamera("nonVRCamera",
-    //                                      new BABYLON.Vector3(0, params.cameraHeight, 0),
-    //                                      params.scene);
     nonVRCamera = Vars.vars.scene.activeCamera;
 
     // Enable navigation via both WASD and the arrows keys.
@@ -63,7 +58,11 @@ function setupNonVRCameraObj() {
     nonVRCamera._updatePosition();
 }
 
-export function setCameraElipsoid() {
+/**
+ * Sets up the collision elipsoid around the non-VR camera.
+ * @returns void
+ */
+export function setCameraElipsoid(): void {
     // Depends on camera height.
     nonVRCamera.ellipsoid = new BABYLON.Vector3(1.0, 0.5 * Vars.vars.cameraHeight, 1.0);
 }

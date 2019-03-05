@@ -1,5 +1,5 @@
 import * as SceneLoader from "./Scene/Load";
 
-export function start() {
+export function start(): void {
     SceneLoader.load();
 }

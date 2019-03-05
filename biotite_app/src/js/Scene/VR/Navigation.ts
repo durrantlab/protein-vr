@@ -4,22 +4,21 @@
 import * as CommonCamera from "./CommonCamera";
 import * as Navigation from "./Navigation";
 import * as NonVRCamera from "./NonVRCamera";
+import * as Optimizations from "./Optimizations";
 import * as Pickables from "./Pickables";
+import * as Points from "./Points";
 import * as Vars from "./Vars";
 import * as VRCamera from "./VRCamera";
 
 declare var BABYLON;
 declare var jQuery;
 
-// enum ClickAction { None, Teleport, GrowHeight }
-// let clickAction: ClickAction = ClickAction.Teleport;
-
-export enum NavMode { VRWithControllers, VRNoControllers, NoVR }
-
-// interface IStarePointInf {
-//     point: any;  // BABYLON.Vector3
-//     targetMesh: any;  // The mesh you're staring at.
-// }
+export const enum NavMode {
+    // Note: const enum needed for closure-compiler compatibility.
+    VRWithControllers = 1,
+    VRNoControllers = 2,
+    NoVR = 3,
+}
 
 // ***** TODO: WORK ON THIS:
 // export let interactingObjs = [];
@@ -27,169 +26,64 @@ export enum NavMode { VRWithControllers, VRNoControllers, NoVR }
 
 let currentlyTeleporting = false;
 
-export let curStarePt = new BABYLON.Vector3(0, 0, 0);  // : IStarePointInf;
-export function setCurStarePt(pt) {
-    curStarePt.copyFrom(pt);
-}
-
-export let pointWayOffScreen = new BABYLON.Vector3(-1000, 1000, 1000);
-
-// When using a VR camera, the vrHelper automatically positions
-// vrCameraGazeTrackerMesh at the stare location. Putting it here because it's
-// navigation relevant.
-// export let vrCameraGazeTrackerMesh;
-// export function setVRCameraGazeTrackerMesh(val) { vrCameraGazeTrackerMesh = val; }
-
-export function setup() {
+/**
+ * Setup the navigation system.
+ * @returns void
+ */
+export function setup(): void {
     // Allways collide with a floor mesh, which must be hidden.
     Vars.vars.groundMesh = Vars.vars.scene.getMeshByID(Vars.vars.groundMeshName);
     if (Vars.vars.groundMesh === null) { alert("No mesh named " + Vars.vars.groundMeshName); }
     Vars.vars.groundMesh.checkCollisions = true;
     Vars.vars.groundMesh.visibility = 0;
+    Optimizations.optimizeMeshPicking(Vars.vars.groundMesh);
+    Pickables.makeMeshMouseClickable({
+        callBack: actOnStareTrigger,
+        mesh: Vars.vars.groundMesh,
+    });
 
     // Initially, no VR.
     Vars.vars.navMode = Navigation.NavMode.NoVR;
-    // Vars.vars.navMode = Navigation.NavMode.VRNoControllers;
 
     // Setup triggers.
-    setupTriggers();
+    // DEBUGG setupTriggers();
 
-    // Constantly update the stare point info. Also, position the tracking
-    // mesh.
-    Vars.vars.scene.registerBeforeRender(() => {
-        setStarePointInfo();
-        cancelStareIfFarAway();
-        Vars.vars.navTargetMesh.position.copyFrom(curStarePt);
-        // fixPointHeightAboveGround();
-
-
-        // const ray = new BABYLON.Ray(
-        //     Vars.vars.scene.activeCamera.position,
-        //     new BABYLON.Vector3(0, -1, 0), 50,
-        // );
-        // const pickingInfo = Vars.vars.scene.pickWithRay(ray, (mesh) => {
-        //     return (mesh.id === Vars.vars.groundMesh.id);
-        // });
-        // console.log(Vars.vars.cameraHeight, pickingInfo.distance);
-
-        // if (Pickables.curPickedMesh === undefined) {
-            // console.log(undefined);
-        // } else {
-            // console.log(Pickables.curPickedMesh.name);
-            // console.log(curStarePt, Vars.vars.navTargetMesh.position.clone());
-        // }
-    });
-
-    // setInterval(() => {
-        // console.log(curStarePt, Vars.vars.navTargetMesh.position.clone(), vrCameraGazeTrackerMesh.position);
-        // console.log(Pickables.curPickedMesh.name);
-    // }, 2000);
+    // Keep track up critical points in the scene (like stare points).
+    // DEBUGG Points.setup();
 }
 
-function setupTriggers() {
+/**
+ * Sets up additional triggers.
+ * @returns void
+ */
+function setupTriggers(): void {
     // Space always triggers
-    jQuery("body").keypress((e) => {
+    let body = jQuery("body");
+    body.keypress((e) => {
         if (e.charCode === 32) {
             // Space bar
             actOnStareTrigger();
         }
     });
 
-    // TODO: Click should trigger too?
+    // Mouse clicks are handled elsewhere...
 }
+
+let lastTrigger: number = 0;
 
 /**
- * Gets the point on the floor where the user is looking (or pointing with
- * controllers).
- * @returns IStarePointInf The point and target. Target is null if if not
- *                         looking/pointing at anything.
+ * Triggers an action, based on the mesh you're currently looking at.
+ * @returns void
  */
-export function setStarePointInfo() {
-    // This function runs with ever turn of the render loop. Set's information
-    // about what you're looking/pointing at. Info saved to curStarePt
-    let ray;
-
-    if (Vars.vars.navMode === NavMode.NoVR) {
-        // No VR yet. So it's outside the realm of the VRHelper. Calculate
-        // it using the looking direction.
-
-        // Get a ray extending out in the direction of the stare.
-        ray = Vars.vars.scene.activeCamera.getForwardRay();
-    } else if ((Vars.vars.navMode === NavMode.VRNoControllers) ||
-               (Vars.vars.navMode === NavMode.VRWithControllers)) {
-        // No controllers yet. So tracking the params.navTargetMesh.
-        // newLoc = NavTargetMesh.navTrgtMeshBeingTracked.position.clone();
-        // dist = BABYLON.Vector3.Distance(getCameraPosition(), newLoc);
-        // decideWhichClickAction(dist, newLoc);
-        // return newLoc;
-
-        // Find the valid gazetracker mesh.
-        let gazeTrackerMesh;
-        if (Vars.vars.navMode === NavMode.VRWithControllers) {
-            gazeTrackerMesh = VRCamera.vrHelper.rightControllerGazeTrackerMesh;
-            if (!gazeTrackerMesh) { gazeTrackerMesh = VRCamera.vrHelper.leftControllerGazeTrackerMesh; }
-        } else if (Vars.vars.navMode === NavMode.VRNoControllers) {
-            gazeTrackerMesh = VRCamera.vrHelper.gazeTrackerMesh;
-        }
-        if (!gazeTrackerMesh) {
-            console.log("error!");
-            return;
-        }
-
-        if (!gazeTrackerMesh.isVisible) {
-            setCurStarePt(pointWayOffScreen);
-        } else {
-            setCurStarePt(gazeTrackerMesh.absolutePosition);
-        }
-
-        // Construct a ray from the camera to the stare obj
-        let camPos = CommonCamera.getCameraPosition();
-        ray = new BABYLON.Ray(camPos, curStarePt.subtract(camPos));
+export function actOnStareTrigger(): void {
+    // There is a refractory period to prevent rapid trigger fires.
+    let curTime = new Date().getTime();
+    if (curTime - lastTrigger < 250) {
+        return;
     } else {
-        console.log("Unexpected error.");
+        lastTrigger = curTime;
     }
 
-    setPickPointAndObjInScene(ray);
-}
-
-function setPickPointAndObjInScene(ray, updatePos = true) {
-    // Determines where that ray intersects the floor.
-    const pickingInfo = Vars.vars.scene.pickWithRay(ray, (mesh) => {
-        return Pickables.checkIfMeshPickable(mesh);
-    });
-
-    // Get the results.
-    // if (pickingInfo.pickedMesh) {
-        // console.log(pickingInfo.pickedMesh.name);
-    // }
-
-    if (pickingInfo.hit) {
-        // It does hit the floor. Return the point.
-        if (updatePos) { setCurStarePt(pickingInfo.pickedPoint); }
-        Pickables.setCurPickedMesh(pickingInfo.pickedMesh);
-    } else {
-        // It doesn't hit the floor, so return null.
-        setCurStarePt(pointWayOffScreen);
-        Pickables.setCurPickedMesh(undefined);
-    }
-}
-
-function cancelStareIfFarAway() {
-    if (curStarePt === undefined) {
-        setCurStarePt(pointWayOffScreen);
-        Pickables.setCurPickedMesh(undefined);
-    } else {
-        let dist = BABYLON.Vector3.Distance(
-            CommonCamera.getCameraPosition(), curStarePt,
-        );
-        if (dist > 10) {
-            setCurStarePt(pointWayOffScreen);
-            Pickables.setCurPickedMesh(undefined);
-        }
-    }
-}
-
-export function actOnStareTrigger() {
     // Click, space, or something. You need to decide how to act.
     switch (Pickables.getCategoryOfCurMesh()) {
         case Pickables.PickableCategory.Ground:
@@ -200,6 +94,10 @@ export function actOnStareTrigger() {
             // It's a molecule, so increase the height.
             grow();
             break;
+        case Pickables.PickableCategory.Button:
+            // It's a button. Click function is attached to the mesh (see
+            // GUI.ts).
+            Pickables.curPickedMesh.clickFunc();
         default:
             // None.
             break;
@@ -208,14 +106,20 @@ export function actOnStareTrigger() {
 
 /**
  * Teleport to a given location.
- * @param  {IStarePointInf} starePt The location to transport to (BABYLON.Vector3).
+ * @param  {*}          [newLoc=undefined] The new location. Uses stare point
+ *                                         if no location given.
+ * @param  {function()} [callBack=]        The callback function once teleport
+ *                                         is done.
  * @returns void
  */
-function teleport(newLoc = undefined, callBack = () => { return; }): void {
+function teleport(newLoc = undefined, callBack = undefined): void {
     currentlyTeleporting = true;
 
+    if (callBack === undefined) {
+        callBack = () => { return; };
+    }
+
     // Hide the bigger nav mesh. It will appear again elsewhere.
-    // NavTargetMesh.navTrgtMeshBeingTrackedBigger.isVisible = false;
     VRCamera.vrHelper.gazeTrackerMesh.isVisible = false;
 
     // Animate the transition to the new location.
@@ -232,9 +136,9 @@ function teleport(newLoc = undefined, callBack = () => { return; }): void {
     if (newLoc === undefined) {
         // If it's not defined, use the current stare point.
         newLoc = new BABYLON.Vector3(
-            curStarePt.x,
-            curStarePt.y + Vars.vars.cameraHeight,
-            curStarePt.z,
+            Points.curStarePt.x,
+            Points.curStarePt.y + Vars.vars.cameraHeight,
+            Points.curStarePt.z,
         );
     }
 
@@ -244,10 +148,9 @@ function teleport(newLoc = undefined, callBack = () => { return; }): void {
     startLoc = startLoc.subtract(eyeToCamVec);
 
     // Animate to new location.
-    let animationSteps = 11;
     const animationCameraTeleportationKeys = [
-        { frame: 0, value: startLoc },
-        { frame: animationSteps, value: newLoc },
+        { "frame": 0, "value": startLoc },
+        { "frame": Vars.TRANSPORT_DURATION, "value": newLoc },
     ];
     animationCameraTeleportation.setKeys(animationCameraTeleportationKeys);
 
@@ -255,7 +158,7 @@ function teleport(newLoc = undefined, callBack = () => { return; }): void {
     activeCamera.animations = [];
     activeCamera.animations.push(animationCameraTeleportation);
 
-    Vars.vars.scene.beginAnimation(activeCamera, 0, animationSteps, false, 1, () => {
+    Vars.vars.scene.beginAnimation(activeCamera, 0, Vars.TRANSPORT_DURATION, false, 1, () => {
         // Animation finished callback.
         currentlyTeleporting = false;
         VRCamera.vrHelper.gazeTrackerMesh.isVisible = true;
@@ -268,97 +171,59 @@ function teleport(newLoc = undefined, callBack = () => { return; }): void {
 }
 
 /**
- * Grow to a given height.
- * @param  {number} newHeight The new height.
+ * Teleport and grow. Fires if you click on a molecular mesh.
  * @returns void
  */
-function grow(newHeight: number = undefined): void {
-    if (newHeight === undefined) {
-        newHeight = distToPtProjectedToGround(curStarePt).distance;
+function grow(): void {
+    // let ptBelowStarePt = Points.groundPointPickingInfo(Points.curStarePt).pickedPoint;
+    let ptBelowStarePt = Points.groundPointBelowStarePt;
+
+    // Get the vector form the stare point to the camera.
+    let cameraPos = CommonCamera.getCameraPosition();
+    let vecStarePtCamera = Points.curStarePt.subtract(cameraPos);
+    let vecStarePtDist = vecStarePtCamera.length();
+
+    let newPt;
+    if (0.1 * vecStarePtDist < Vars.MIN_DIST_TO_MOL_ON_TELEPORT) {
+        // Teleporting 90% of the way would put you too close to the target.
+        newPt = Points.curStarePt.subtract(
+            vecStarePtCamera.normalize().scale(
+                Vars.MIN_DIST_TO_MOL_ON_TELEPORT,
+            ),
+        );
+    } else if (0.1 * vecStarePtDist > Vars.MAX_DIST_TO_MOL_ON_TELEPORT) {
+        // Teleporting 90% of the way would put you too far from the target.
+        newPt = Points.curStarePt.subtract(
+            vecStarePtCamera.normalize().scale(
+                Vars.MAX_DIST_TO_MOL_ON_TELEPORT,
+            ),
+        );
+    } else if (0.1 * vecStarePtDist < Vars.MAX_DIST_TO_MOL_ON_TELEPORT) {
+        // Teleporting 90% of the way would put you in the sweet spot. Do
+        // that.
+        newPt = cameraPos.add(
+            vecStarePtCamera.scale(0.9),
+        );
     }
 
-    // Set the new height.
-    let deltaHeight = newHeight - Vars.vars.cameraHeight;
-    Vars.vars.cameraHeight = newHeight;
+    // Now tweak the height to match the point exactly (not on the line
+    // between camera and point).
+    newPt.y = Points.curStarePt.y;
 
-    // Get the point immediately below the current camera location.
-    // const ray = new BABYLON.Ray(
-        // CommonCamera.getCameraPosition(), new BABYLON.Vector3(0, -1, 0), 50,
-    // );
-    // const pickingInfo = Vars.vars.scene.pickWithRay(ray, (mesh) => {
-        // return (mesh.id === Vars.vars.groundMesh.id);
-    // });
+    // You need to make sure the new point isn't within the button sphere at
+    // your feet. If not, you could get trapped.
+    if (newPt.y - ptBelowStarePt.y < 0.5 * Vars.BUTTON_SPHERE_RADIUS + 0.1) {
+        newPt.y = ptBelowStarePt.y + 0.5 * Vars.BUTTON_SPHERE_RADIUS + 0.1;
+    }
 
-    let newPt = CommonCamera.getCameraPosition().clone();
-    newPt.y = newPt.y + deltaHeight;
+    // Set the new height. 0.01 is important so elipse doesn't get caught on
+    // new ground.
+    Vars.vars.cameraHeight = Points.curStarePt.y - ptBelowStarePt.y;
+    // debugger;
+
     teleport(newPt, () => {
         // Make sure the collision elipsoid surrounding the non-VR camera
         // matches the new height.
         NonVRCamera.setCameraElipsoid();
     });
-
-    // let ptBelowCamera = distToPtProjectedToGround(
-    //     CommonCamera.getCameraPosition(),
-    // ).pickedPoint;
-
-    // ptBelowCamera
-
-    // console.log(ptBelowCamera);
-    // debugger;
-
-}
-
-/**
- * A function to make sure the camera is always over the floor mesh.
- */
-// function fixPointHeightAboveGround(pt) {
-//     // Don't check if recently checked.
-//     // const nowTime = new Date().getTime();
-//     // if (nowTime - timeOfLastCameraPosCheck < 100) {
-//     //     return;
-//     // }
-//     // timeOfLastCameraPosCheck = nowTime;
-
-//     // Every once in a while, check if you're over the floor mesh. Cast a ray
-//     // directly down from the camera.
-//     // const activeCameraPos = Navigation.getCameraPosition();
-//     // const ray = new BABYLON.Ray(activeCameraPos, new BABYLON.Vector3(0, -1, 0), 50);
-//     const ray = new BABYLON.Ray(pt, new BABYLON.Vector3(0, -1, 0), 50);
-
-//     // Look for hits on the ground.
-//     const pickingInfo = Vars.vars.scene.pickWithRay(ray, (mesh) => {
-//         return (mesh.id === Vars.vars.groundMesh.id);
-//     });
-
-//     // If there's a hit on the ground...
-//     if (pickingInfo.hit) {
-//         // Calculate the distance.
-//         // let dist = BABYLON.Vector3.Distance();
-//         let deltaHeight = pickingInfo.distance - Vars.vars.cameraHeight;
-//         let newPt = pt.clone();
-//         newPt.y = newPt.y - deltaHeight;
-//         // Vars.vars.scene.activeCamera.position.y = Vars.vars.scene.activeCamera.position.y - deltaHeight;
-//     }
-
-//     return pt;
-
-//     // Check if the ray hit the floor.
-//     // if (ptProjectedToGround(activeCameraPos).hit) {
-//         // It hit the floor. Save the current camera coordiantes.
-//         // lastCameraPosAboveGroundMesh.copyFrom(activeCameraPos);
-//     // }
-//     // else {
-//         // TODO: VR camera?
-//         // Vars.vars.scene.activeCamera.position.copyFrom(lastCameraPosAboveGroundMesh);
-//     // }
-// }
-
-function distToPtProjectedToGround(pt) {
-    const ray = new BABYLON.Ray(
-        pt, new BABYLON.Vector3(0, -1, 0), 50,
-    );
-    const pickingInfo = Vars.vars.scene.pickWithRay(ray, (mesh) => {
-        return (mesh.id === Vars.vars.groundMesh.id);
-    });
-    return pickingInfo;
 }

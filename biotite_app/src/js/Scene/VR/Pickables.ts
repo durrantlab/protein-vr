@@ -1,39 +1,93 @@
 // This module includes functions to manage which meshes in the scene are
 // pickable.
 
+import * as Navigation from "./Navigation";
+import * as Optimizations from "./Optimizations";
 import * as Vars from "./Vars";
+
+declare var BABYLON;
 
 let pickableMeshes = [];
 let pickableButtons = [];
 let pickableMolecules = [];
 
-export enum PickableCategory {
-    None, Ground, Button, Molecule,
+export const enum PickableCategory {
+    // Note: const enum needed for closure-compiler compatibility.
+    None = 1,
+    Ground = 2,
+    Button = 3,
+    Molecule = 4,
 }
 
+/**
+ * Sets the currently picked mesh.
+ * @param  {*} mesh The mesh.
+ */
+export function setCurPickedMesh(mesh: any) { curPickedMesh = mesh; }
 export let curPickedMesh;
-export function setCurPickedMesh(mesh) {
-    curPickedMesh = mesh;
-}
 
-export function setup() {
+/**
+ * Sets up the pickables.
+ * @returns void
+ */
+export function setup(): void {
     pickableMeshes.push(Vars.vars.groundMesh);
 }
 
-export function addPickableButton(mesh) {
+/**
+ * Adds a mesh to the list of pickable buttons.
+ * @param  {*} mesh The mesh.
+ * @returns void
+ */
+export function addPickableButton(mesh: any): void {
     pickableMeshes.push(mesh);
     pickableButtons.push(mesh);
+    Optimizations.optimizeMeshPicking(mesh);
+    makeMeshMouseClickable({
+        mesh,
+        callBack: () => {
+            // Here click the button rather than acting on the stare point
+            // (default).
+            mesh.clickFunc();
+        },
+    });
 }
 
-export function addPickableMolecule(mesh) {
+/**
+ * Adds a mesh to the list of pickable molecule meshes.
+ * @param  {*} mesh The mesh.
+ * @returns void
+ */
+export function addPickableMolecule(mesh: any): void {
     pickableMeshes.push(mesh);
     pickableMolecules.push(mesh);
+    Optimizations.optimizeMeshPicking(mesh);
+    makeMeshMouseClickable({mesh});
 }
 
-export function checkIfMeshPickable(mesh) {
+/**
+ * Determines if a given mesh is pickable.
+ * @param  {*} mesh The mesh.
+ * @returns boolean True if it is pickable. False otherwise.
+ */
+export function checkIfMeshPickable(mesh: any): boolean {
+    // Floor is always pickable, even if not visible.
+    if (mesh.id === Vars.vars.groundMesh.id) { return true; }
+
+    // If not visible, then not pickable. Note that something could be
+    // entirely transparent (visibility is 0), but it will still intercept the
+    // stare point. This is by design.
+    if (!mesh.isVisible) { return false; }
+    // if (mesh.visibility === 0) { return false; }
+
+    // Otherwise, pick only if in the list.
     return pickableMeshes.indexOf(mesh) !== -1;
 }
 
+/**
+ * Get the cstegory of the currently selected mesh.
+ * @returns *
+ */
 export function getCategoryOfCurMesh(): PickableCategory {
     if (curPickedMesh === undefined) {
         return PickableCategory.None;
@@ -46,4 +100,33 @@ export function getCategoryOfCurMesh(): PickableCategory {
     } else {
         return PickableCategory.None;
     }
+}
+
+interface IMakeMeshClickableParams {
+    mesh: any;
+    callBack?: any;
+    scene?: any;
+}
+
+/**
+ * Make it so a given mesh can be clicked with the mouse.
+ * @param  {Object<string,*>} params The parameters. See interface above.
+ * @returns void
+ */
+export function makeMeshMouseClickable(params: IMakeMeshClickableParams): void {
+    if (params.callBack === undefined) {
+        params.callBack = Navigation.actOnStareTrigger;
+    }
+
+    if (params.scene === undefined) {
+        params.scene = Vars.vars.scene;
+    }
+
+    params.mesh.actionManager = new BABYLON.ActionManager(params.scene);
+    params.mesh.actionManager.registerAction(
+        new BABYLON.ExecuteCodeAction(
+            BABYLON.ActionManager.OnPickTrigger,
+            () => { params.callBack(); },
+        ),
+    );
 }

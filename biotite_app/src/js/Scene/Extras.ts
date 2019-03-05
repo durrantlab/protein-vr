@@ -1,13 +1,19 @@
 import * as GUI from "./GUI";
 import * as Vars from "./Vars";
+import * as Optimizations from "./VR/Optimizations";
 import * as Pickables from "./VR/Pickables";
+// DEBUGG import * as VRVoiceCommands from "./VR/VoiceCommands";
 
 declare var BABYLON;
 declare var jQuery;
 
 export let shadowGenerator;
 
-export function setup() {
+/**
+ * Load in the extra molecule meshes.
+ * @returns void
+ */
+export function setup(): void {
     // Set up the shadow generator.
     setupShadowGenerator();
 
@@ -50,19 +56,21 @@ export function setup() {
         Promise.all(loaderPromises).then(() => {
             // Give it a bit to let one render cycle go through. Hackish,
             // admittedly.
-            setTimeout(updateEnvironmentShadows, 1000);
-
-            // "ShadowCatcher",
-            // ["baked__Ceiling", "baked__Wall.001", "baked__floor",
-            // "ground"].map((m) => {Vars.scene.getMeshByName(m).visibility = 0;
-            // return 0; }); "";
+            setTimeout(Optimizations.updateEnvironmentShadows, 1000);
         });
 
-        GUI.setupGUI(data);
+        GUI.setup(data);
+
+        // // Activate voice commands.
+        // VRVoiceCommands.setup(data);
     });
 }
 
-function setupShadowGenerator() {
+/**
+ * Setup the shadow generator that casts a shadow from the molecule meshes.
+ * @returns void
+ */
+function setupShadowGenerator(): void {
     // Set up the shadow generator.
     shadowGenerator = new BABYLON.ShadowGenerator(4096, Vars.scene.lights[0]);
     // shadowGenerator.usePoissonSampling = true;  // Good but slow.
@@ -70,10 +78,18 @@ function setupShadowGenerator() {
     shadowGenerator.blurScale = 7;  // Good for surfaces and ribbon.
     shadowGenerator.setDarkness(0.9625);
     shadowGenerator.blurBoxOffset = 5;
-    // window.shadowGenerator = shadowGenerator;
 }
 
-function setupMesh(mesh, objID, shadowQuality, uniqIntID) {
+/**
+ * Sets up a molecule mesh.
+ * @param  {*}      mesh           The mesh.
+ * @param  {string} objID          A string identifying this mesh.
+ * @param  {*}      shadowQuality  The shadow quality. Like "Skip".
+ * @param  {number} uniqIntID      A unique numerical id that identifies this
+ *                                 mesh.
+ * @returns void
+ */
+function setupMesh(mesh: any, objID: string, shadowQuality: string, uniqIntID: number): void {
     if (mesh.material !== undefined) {
         if (shadowQuality !== "Skip") {
             // So using shadows baked from blender.
@@ -110,6 +126,9 @@ function setupMesh(mesh, objID, shadowQuality, uniqIntID) {
 
             // Add it to the mesh
             mesh.material = mat;
+
+            // Freeze the material (improves optimization).
+            Optimizations.freezeMeshProps(mesh);
         } else {
             // Not using baked shadows. Add a small emission color so the dark
             // side of the protein isn't too dark. Is this like ambient
@@ -117,6 +136,11 @@ function setupMesh(mesh, objID, shadowQuality, uniqIntID) {
             mesh.material.emissiveColor = new BABYLON.Color3(0.01, 0.01, 0.01);
             // let ssao = new BABYLON.SSAORenderingPipeline("ssaopipeline", Vars.scene, 0.75);
 
+            // Enable transparency (for fading in and out).
+            // mesh.material.transparencyMode = BABYLON.PBRMaterial.PBRMATERIAL_ALPHABLEND;
+
+            // Freeze the material (improves optimization).
+            Optimizations.freezeMeshProps(mesh);
         }
     }
 
@@ -133,7 +157,11 @@ function setupMesh(mesh, objID, shadowQuality, uniqIntID) {
     Pickables.addPickableMolecule(mesh);
 }
 
-function setupShadowCatchers() {
+/**
+ * Sets up the shadow-catcher mesh.
+ * @returns void
+ */
+function setupShadowCatchers(): void {
     // Go through and find the shdow catchers
     for (let idx in Vars.scene.meshes) {
         if (Vars.scene.meshes.hasOwnProperty(idx)) {
@@ -152,12 +180,3 @@ function setupShadowCatchers() {
         }
     }
 }
-
-export function updateEnvironmentShadows() {
-    // Update the shadows. They are frozen otherwise.
-    Vars.scene.lights[0].autoUpdateExtends = true;
-    shadowGenerator.getShadowMap().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
-    Vars.scene.lights[0].autoUpdateExtends = false;
-}
-
-// window.updateEnvironmentShadows = updateEnvironmentShadows;

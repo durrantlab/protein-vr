@@ -2,17 +2,14 @@
 
 import * as Navigation from "./Navigation";
 
+declare var BABYLON;
+
 export interface IVRSetup {
     scene: any;
     engine: any;
     groundMeshName: string;  // The name of the floor mesh
     groundMesh?: any;  // The actual mesh
     canvas: any;
-    // teleportationTargetMesh?: any;  // The mesh that appears when you teleport.
-                                    // Leaving it undefined uses the default
-                                    // mesh, which is pretty cool. Only
-                                    // visible when you press down the forward
-                                    // button on the controller.
     navTargetMesh?: any;            // The mesh that appears where you're
                                     // gazing. Always on, even during
                                     // teleportation. This is also used to
@@ -24,19 +21,35 @@ export interface IVRSetup {
 
 }
 
+// Variables that can change.
 export let vars: IVRSetup;
+
+// Also some constants
+export const TRANSPORT_DURATION = 11;
+export const MAX_DIST_TO_MOL_ON_TELEPORT = 1.0;
+export const MIN_DIST_TO_MOL_ON_TELEPORT = 0.5;
+export const MAX_VERTS_PER_SUBMESH = 2000;  // This is kind of an arbitrary number.
+export const BUTTON_SPHERE_RADIUS = 1.2;  // the radius of the spheres around buttons used to detect clicks.
 
 /**
  * Modifies the parameters, adding in default values where values are missing,
  * for example. Also saves the updated params to the module-level params
  * variable.
- * @param  {*} initParams The initial parameters.
+ * @param  {Object<string,*>} initParams The initial parameters.
  */
 export function setup(initParams: IVRSetup): void {
     // Make sure params.cameraHeight is defined.
-    if (initParams.cameraHeight === undefined) {
-        initParams.cameraHeight = 2;
-    }
+    // DEBUGG
+    /* if (initParams.cameraHeight === undefined) {
+        // Calculate the camera height from it's position.
+        const ray = new BABYLON.Ray(
+            initParams.scene.activeCamera.position, new BABYLON.Vector3(0, -1, 0), 50,
+        );
+        const pickingInfo = initParams.scene.pickWithRay(ray, (mesh) => {
+            return (mesh.name === "ground");
+        });
+        initParams.cameraHeight = pickingInfo.distance;
+    } */
 
     // For debugging
     window.scene = initParams.scene;

@@ -14,10 +14,10 @@ require.config({
     //         deps: ['jquery']
     //     }
     // },
-    urlArgs: "bust=" + (new Date()).getTime(),  // prevent caching for debugging.
+    "urlArgs": "bust=" + (new Date()).getTime(),  // prevent caching for debugging.
 });
 
 // This require function starts the app
 require(["Game"], (Game) => {
-    new Game.start("renderCanvas");
+    Game.start("renderCanvas");
 });

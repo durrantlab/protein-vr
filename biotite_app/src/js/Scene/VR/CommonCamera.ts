@@ -1,14 +1,22 @@
 // These functions include camera functions common to all kinds of cameras.
 
 import * as Navigation from "./Navigation";
+import * as Points from "./Points";
 import * as Vars from "./Vars";
 import * as VRCamera from "./VRCamera";
 
 declare var BABYLON;
 
+let forwardVec = new BABYLON.Vector3(1, 0, 0);
+let upVec = new BABYLON.Vector3(1, 0, 0);
+
 // let activeCamPos = new BABYLON.Vector3(0, 0, 0);
 
-export function getCameraPosition() {
+/**
+ * Gets the location of the camera. If VR camera, gets the left eye.
+ * @returns * The camera location.
+ */
+export function getCameraPosition(): any {
     // If it's a VR camera, you need to make an adjustment.
     let activeCam = Vars.vars.scene.activeCamera;
     let activeCamPos = activeCam.position.clone();
@@ -18,20 +26,7 @@ export function getCameraPosition() {
 
         // VR camera, so get eye position.
         if (activeCam.leftCamera) {
-            // Adapted from BABYLON.js code (teleportCamera func in
-            // vrExperienceHelper.ts). You need to adjust the new location a
-            // bit if you're using a new camera. It's because the actual
-            // location of your eye might differ from the location of the
-            // camera.
-            // deltaVec.copyFrom(activeCam.leftCamera.globalPosition);
-            // deltaVec.subtractInPlace(activeCamPos);
-
-            // deltaVec.copyFrom(getVecFromEyeToCamera());
-            // activeCamPos.addInPlace(
-                // getVecFromEyeToCamera(),
-            // );
             activeCamPos.copyFrom(activeCam.leftCamera.globalPosition);
-
         } else {
             console.log("Prob here");
         }
@@ -40,7 +35,13 @@ export function getCameraPosition() {
     return activeCamPos;
 }
 
-export function setCameraPosition(pt) {
+/**
+ * Sets the camera location. Accounts for difference between eye and camera
+ * pos if VR camera.
+ * @param  {*} pt The new location.
+ * @returns void
+ */
+export function setCameraPosition(pt): void {
     // Not ever tested... not sure it works...
     let activeCam = VRCamera.vrHelper.webVRCamera;
 
@@ -51,27 +52,55 @@ export function setCameraPosition(pt) {
                (Vars.vars.navMode === Navigation.NavMode.VRWithControllers)) {
         // A VR camera. Need to account for the fact that the eye might not be
         // at the same place as the camera.
-
-        // deltaVec.copyFrom(activeCam.leftCamera.globalPosition);
-        // deltaVec.subtractInPlace(activeCamPos);
-        // activeCam.position.copyFrom(
-            // activeCamPos.subtract(getVecFromEyeToCamera()),  // or minus???
-        // );
-
         activeCam.position.copyFrom(
             pt.subtract(
                 getVecFromEyeToCamera(),
             ),
         );
-        // let activeCamPos = activeCam.position.clone();
-
-        // activeCamPos.copyFrom;
-
     }
 }
 
-// let deltaVec = new BABYLON.Vector3(0, 0, 0);
-export function getVecFromEyeToCamera() {
+/**
+ * Gets the camera rotation
+ * @returns * The rotation.
+ */
+export function getCameraRotationY(): any {
+    if ((Vars.vars.navMode === Navigation.NavMode.VRNoControllers) ||
+        (Vars.vars.navMode === Navigation.NavMode.VRWithControllers)) {
+
+        // Complicated in the case of a VR camera.
+        let groundPtVec = Points.groundPointBelowStarePt.subtract(Points.groundPointBelowCamera);
+        let angle = BABYLON.Vector3.GetAngleBetweenVectors(groundPtVec, forwardVec, upVec);
+
+        if (groundPtVec.z < 0) {
+            angle = -angle;
+        }
+
+        // Make sure the angle is between 0 and 2 * Math.PI
+        while (angle < 0) {
+            angle = angle + 2 * Math.PI;
+        }
+        while (angle > 2 * Math.PI) {
+            angle = angle - 2 * Math.PI;
+        }
+
+        angle = angle + Math.PI * 0.5;
+
+        return angle;
+    } else {
+        // This is much simplier with a non-VR camera.
+        let activeCam = Vars.vars.scene.activeCamera;
+        let activeCamRot = activeCam.rotation.clone();
+        return activeCamRot.y;  // + Math.PI * 0.5;
+    }
+}
+
+/**
+ * Gets the vector from the camera location to the eye location. For a VR
+ * camera, these can be different.
+ * @returns * The vector.
+ */
+export function getVecFromEyeToCamera(): any {
     if (Vars.vars.navMode === Navigation.NavMode.NoVR) {
         // Not in VR mode? Then there is no eye.
         return new BABYLON.Vector3(0, 0, 0);
@@ -80,12 +109,6 @@ export function getVecFromEyeToCamera() {
     let activeCam = VRCamera.vrHelper.webVRCamera;
     let leftEyePos = activeCam.leftCamera.globalPosition;
     let deltaVec = leftEyePos.subtract(activeCam.position);
-
-    // deltaVec.copyFrom(
-    // return activeCam.leftCamera.globalPosition.subtract(
-        // activeCam.position.clone(),
-    // );
-    // );
 
     return deltaVec;
 }

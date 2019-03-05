@@ -5,7 +5,11 @@ import * as Navigation from "./Navigation";
 import * as Pickables from "./Pickables";
 import * as UI from "./UI";
 
-export function setup() {
+/**
+ * Sets up general things that apply generally, regardless of the camera.
+ * @returns void
+ */
+export function setup(): void {
     // Set up the floor mesh (hidden).
     Navigation.setup();
 

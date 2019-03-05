@@ -11,18 +11,21 @@ export let vrHelper;  // So it can be accessed everywhere in
 const trigRefractPrdInMS = 500;
 let lastTriggerTime = 0;
 
-let emptyVRGazeTarget;  // A (nearly) empty mesh, to keep track of position of gaze.
-
-export function setup() {
+/**
+ * Sets up the VR camera.
+ * @returns void
+ */
+export function setup(): void {
     // Create the vr helper. See http://doc.babylonjs.com/how_to/webvr_helper
+    debugger;
     vrHelper = Vars.vars.scene.createDefaultVRExperience({
-        createDeviceOrientationCamera: true,  // Because using already created
+        "createDeviceOrientationCamera": true,  // Because using already created
                                               // one.
     });
 
     // Setup different trigger VR functions (changes state, etc.)
     setupEnterAndExitVRCallbacks();
-    setupEnterAndExitControllersCallbacks();
+    // DEBUGG setupEnterAndExitControllersCallbacks();
 }
 
 /**
@@ -32,30 +35,33 @@ export function setup() {
  */
 function setupEnterAndExitVRCallbacks(): void {
     vrHelper.onEnteringVRObservable.add((a, b) => {
+        // debugger;
+
         // Not sure what a and b are. Both are objects.
 
         // Update navMode
-        Vars.vars.navMode = Navigation.NavMode.VRNoControllers;
+        // DEBUGG Vars.vars.navMode = Navigation.NavMode.VRNoControllers;
 
         // Setup teleportation. If uncommented, this is the one that comes
         // with BABYLON.js.
         // setupCannedVRTeleportation();
 
-        setupGazeTracker();
+        // DEBUGG setupGazeTracker();
 
         // Reset selected mesh.
-        Pickables.setCurPickedMesh(undefined);
+        // DEBUGG Pickables.setCurPickedMesh(undefined);
 
-        window.vrHelper = vrHelper;
+        // DEBUGG window.vrHelper = vrHelper;
     });
 
-    vrHelper.onExitingVRObservable.add(() => {
+    // DEBUGG
+    /* vrHelper.onExitingVRObservable.add(() => {
         // Update navMode
         Vars.vars.navMode = Navigation.NavMode.NoVR;
 
         // Reset selected mesh.
         Pickables.setCurPickedMesh(undefined);
-    });
+    }); */
 
 
     // vrHelper.onNewMeshPicked.add((pickingInfo) => {
@@ -80,32 +86,12 @@ function setupEnterAndExitVRCallbacks(): void {
 function setupEnterAndExitControllersCallbacks(): void {
     // onControllersAttachedObservable doesn't work. I'd prefer that one...
     vrHelper.webVRCamera.onControllerMeshLoadedObservable.add((webVRController) => {
-    // vrHelper.webVRCamera.onControllerMeshLoaded.add((webVRController) => {
         // Update navMode
         Vars.vars.navMode = Navigation.NavMode.VRWithControllers;
 
         console.log("controller loaded");
 
         setupGazeTracker();
-
-        // vrHelper.onNewMeshSelected.add((mesh) => {
-            // Mesh has been selected
-            // console.log(mesh.name);
-        // });
-
-        // Update the mesh being tracked. Keep trying until you can get the
-        // mesh.
-        // const setNewNavTrgtMeshBeingTracked = () => {
-        //     console.log(Vars.vars.scene.getMeshByID("gazeTracker.navTargetMesh"));
-        //     // NavTargetMesh.setNavTrgtMeshBeingTracked(Vars.vars.scene.getMeshByID("gazeTracker.navTargetMesh"));
-        //     // if ((NavTargetMesh.navTrgtMeshBeingTracked === undefined) ||
-        //     //     (NavTargetMesh.navTrgtMeshBeingTracked === null)) {
-
-        //     //     // Try to get it again in a second.
-        //     //     setTimeout(setNewNavTrgtMeshBeingTracked, 1000);
-        //     // }
-        // };
-        // setNewNavTrgtMeshBeingTracked();
 
         console.log("Isnt there on pickable or something");
 
@@ -127,8 +113,7 @@ function setupEnterAndExitControllersCallbacks(): void {
 
 /**
  * A placeholder mesh. Not technically empty, but pretty close.
- * @param  {*} scene The BABYLON scene.
- * @returns * The custom mesh (almost an empty).
+ * @returns {*} The custom mesh (almost an empty).
  */
 function makeEmptyMesh(): any {
     const customMesh = new BABYLON.Mesh("vrNavTargetMesh", Vars.vars.scene);
@@ -140,26 +125,22 @@ function makeEmptyMesh(): any {
     vertexData.applyToMesh(customMesh);
     customMesh.isVisible = false;
 
-    // const customMesh = BABYLON.Mesh.CreateSphere("sphere1", 5, 0.1, Vars.vars.scene);
-
     return customMesh;
 }
 
-function setupGazeTracker() {
+/**
+ * Sets up the VR gaze tracking mesh.
+ * @returns void
+ */
+function setupGazeTracker(): void {
     vrHelper.raySelectionPredicate = (mesh) => {
+        // if (!mesh.isVisible) {
+        //     return false;
+        // }
         return Pickables.checkIfMeshPickable(mesh);
     };
 
     // Make an invisible mesh that will be positioned at location of gaze.
-    // if (emptyVRGazeTarget === undefined) { emptyVRGazeTarget = makeEmptyMesh(); }
-    // emptyVRGazeTarget = BABYLON.Mesh.CreateSphere("sphere1", 4, 0.1, Vars.vars.scene);
-    // emptyVRGazeTarget = makeEmptyMesh();
-    // Navigation.setVRCameraGazeTrackerMesh(emptyVRGazeTarget);
-
-    // The navTargetMesh follows the gaze now.
-    // vrHelper.gazeTrackerMesh = Navigation.vrCameraGazeTrackerMesh;
-    // vrHelper.gazeTrackerMesh = BABYLON.Mesh.CreateSphere("sphere1", 4, 0.1, Vars.vars.scene);
-
     vrHelper.gazeTrackerMesh = makeEmptyMesh();
     vrHelper.updateGazeTrackerScale = false;  // Babylon 3.3 preview.
     vrHelper.displayGaze = true;  // Does need to be true. Otherwise, position not updated.

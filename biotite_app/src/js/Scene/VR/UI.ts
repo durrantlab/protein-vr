@@ -4,11 +4,19 @@ import * as Vars from "./Vars";
 
 declare var jQuery;
 
-export function setup() {
+/**
+ * Sets up the 2D button that can be used to launch VR.
+ * @returns void
+ */
+export function setup(): void {
     addRunModeButtons();
 }
 
-function addRunModeButtons() {
+/**
+ * Adds the 2D button to the DOM, makes it clickable.
+ * @returns void
+ */
+function addRunModeButtons(): void {
     // Adds some additional buttons to the UI. Source:
     // https://iconmonstr.com/fullscreen-thin-svg/
     jQuery("body").append(`
