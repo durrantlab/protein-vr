@@ -1,9 +1,9 @@
 // This module includes functions to manage which meshes in the scene are
 // pickable.
 
+import * as Vars from "../Vars";
 import * as Navigation from "./Navigation";
 import * as Optimizations from "./Optimizations";
-import * as Vars from "./Vars";
 
 declare var BABYLON;
 
@@ -31,7 +31,7 @@ export let curPickedMesh;
  * @returns void
  */
 export function setup(): void {
-    pickableMeshes.push(Vars.vars.groundMesh);
+    pickableMeshes.push(Vars.vrVars.groundMesh);
 }
 
 /**
@@ -72,7 +72,7 @@ export function addPickableMolecule(mesh: any): void {
  */
 export function checkIfMeshPickable(mesh: any): boolean {
     // Floor is always pickable, even if not visible.
-    if (mesh.id === Vars.vars.groundMesh.id) { return true; }
+    if (mesh.id === Vars.vrVars.groundMesh.id) { return true; }
 
     // If not visible, then not pickable. Note that something could be
     // entirely transparent (visibility is 0), but it will still intercept the
@@ -85,13 +85,13 @@ export function checkIfMeshPickable(mesh: any): boolean {
 }
 
 /**
- * Get the cstegory of the currently selected mesh.
+ * Get the category of the currently selected mesh.
  * @returns *
  */
 export function getCategoryOfCurMesh(): PickableCategory {
     if (curPickedMesh === undefined) {
         return PickableCategory.None;
-    } else if (curPickedMesh === Vars.vars.groundMesh) {
+    } else if (curPickedMesh === Vars.vrVars.groundMesh) {
         return PickableCategory.Ground;
     } else if (pickableButtons.indexOf(curPickedMesh) !== -1) {
         return PickableCategory.Button;
@@ -119,14 +119,24 @@ export function makeMeshMouseClickable(params: IMakeMeshClickableParams): void {
     }
 
     if (params.scene === undefined) {
-        params.scene = Vars.vars.scene;
+        params.scene = Vars.scene;
     }
 
     params.mesh.actionManager = new BABYLON.ActionManager(params.scene);
     params.mesh.actionManager.registerAction(
         new BABYLON.ExecuteCodeAction(
             BABYLON.ActionManager.OnPickTrigger,
-            () => { params.callBack(); },
+            () => {
+                // If it's in VR mode, there are no mouse clicks. This is
+                // important to prevent a double click with controllers.
+                if (Vars.vrVars.navMode !== Navigation.NavMode.NoVR) {
+                    // TODO: What about phones? Still clickable? May need to
+                    // modify above.
+                    return;
+                }
+
+                params.callBack();
+            },
         ),
     );
 }

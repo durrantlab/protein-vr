@@ -1,10 +1,9 @@
 import * as Vars from "./Vars";
 import * as CommonCamera from "./VR/CommonCamera";
-// DEBUGG import * as Optimizations from "./VR/Optimizations";
+import * as Optimizations from "./VR/Optimizations";
 import * as Pickables from "./VR/Pickables";
-// DEBUGG import * as VRPoints from "./VR/Points";
-import * as VRVars from "./VR/Vars";
-// DEBUGG import * as VRVoiceCommands from "./VR/VoiceCommands";
+import * as VRPoints from "./VR/Points";
+import * as VRVoiceCommands from "./VR/VoiceCommands";
 
 declare var BABYLON;
 
@@ -14,6 +13,7 @@ let allButtons = [];
 let mainMenuGUI3DManager;
 let mainMenuAnchor;
 let clickSound: any;
+let cylinderPanelMainMenu: any;
 
 /**
  * Load the 3D GUI.
@@ -26,7 +26,7 @@ export function setup(data): void {
 
     clickSound = new BABYLON.Sound(
         "click-button", "assets/staple-public-domain.mp3",
-        VRVars.vars.scene, null,
+        Vars.scene, null,
         { loop: false, autoplay: false, spatialSound: true, volume: 0.1 },
     );
 }
@@ -38,22 +38,18 @@ export function setup(data): void {
  */
 function setupMainMenu(data): void {
     // Get the descriptions
-    // DEBUGG VRVoiceCommands.setMoleculeNameInfos(data);
+    VRVoiceCommands.setMoleculeNameInfos(data);
 
     // Set up the main menu TODO: Can you use just one GUI3DManage, with
     // multiple panels? If so, redundancy here.
     mainMenuGUI3DManager = new BABYLON.GUI.GUI3DManager(Vars.scene);
 
-    let panel = new BABYLON.GUI.CylinderPanel();
-    // var panel = new BABYLON.GUI.SpherePanel();
-    panel.radius = 3;
-    panel.margin = 0.1;
+    cylinderPanelMainMenu = new BABYLON.GUI.CylinderPanel();
+    // var cylinderPanelMainMenu = new BABYLON.GUI.SpherePanel();
+    mainMenuGUI3DManager.addControl(cylinderPanelMainMenu);
+    cylinderPanelMainMenu.blockLayout = true;
 
-    mainMenuGUI3DManager.addControl(panel);
-    panel.blockLayout = true;
-
-    // DEBUGG
-    /* for (let key in VRVoiceCommands.moleculeNameInfos) {
+    for (let key in VRVoiceCommands.moleculeNameInfos) {
         if (VRVoiceCommands.moleculeNameInfos.hasOwnProperty(key)) {
             let inf = VRVoiceCommands.moleculeNameInfos[key];
             let desc = inf.description;
@@ -66,6 +62,12 @@ function setupMainMenu(data): void {
                             inf.representation,
                             !buttonWrapper.value,
                         );
+
+                        // For reasons I don't understand, the radius on this
+                        // cylinder (set below) doesn't take. Put it here to
+                        // too make sure.
+                        // cylinderPanelMainMenu.radius = Vars.MENU_RADIUS;
+                        // cylinderPanelMainMenu.margin = Vars.MENU_MARGIN;
                     },
                     default: false,
                     falseTxt: desc + "\n(Hide)",
@@ -73,19 +75,26 @@ function setupMainMenu(data): void {
                         buttonWrapper.isVisible(false);  // Buttons start off hidden.
                     },
                     name: "menu-visible-button-" + inf.modelName.replace(/ /g, "").replace(/\n/g, ""),
-                    panel,
+                    panel: cylinderPanelMainMenu,
                     trueTxt: desc + "\n(Show)",
                 }),
             );
             // window.but = but;
         }
-    } */
-    nonVisibiliyButtons(panel, data);
+    }
+    nonVisibiliyButtons(cylinderPanelMainMenu, data);
 
-    panel.blockLayout = false;
+    cylinderPanelMainMenu.blockLayout = false;
 
     mainMenuAnchor = new BABYLON.TransformNode(""); // this can be a mesh, too
-    panel.linkToTransformNode(mainMenuAnchor);
+    cylinderPanelMainMenu.linkToTransformNode(mainMenuAnchor);
+
+    // Set radius and such.
+    setInterval(() => {
+        cylinderPanelMainMenu.radius = Vars.MENU_RADIUS;
+        cylinderPanelMainMenu.margin = Vars.MENU_MARGIN;
+    }, 1000);
+    window["cylinderPanelMainMenu"] = cylinderPanelMainMenu;
 }
 
 /**
@@ -101,9 +110,9 @@ function nonVisibiliyButtons(panel: any, data: any): void {
             clickFunc: (buttonWrapper) => {
                 // TODO:
                 if (buttonWrapper.value) {
-                    // DEBUGG VRVoiceCommands.setup(data);
+                    VRVoiceCommands.setup(data);
                 } else {
-                    // DEBUGG VRVoiceCommands.stopVoiceCommands();
+                    VRVoiceCommands.stopVoiceCommands();
                 }
             },
             default: false,
@@ -162,10 +171,14 @@ function setupMainMenuToggleButton(): void {
     // Update button position with each turn of the render loop.
     // let offset = -VRVars.vars.cameraHeight + 0.1; ;
     Vars.scene.registerBeforeRender(() => {
-        // DEBUGG mainMenuAnchorToggle.position.copyFrom(VRPoints.groundPointBelowCamera);
-        // DEBUGG mainMenuAnchorToggle.position.y = mainMenuAnchorToggle.position.y + 0.1;
-        // DEBUGG mainMenuAnchorToggle.rotation.y = CommonCamera.getCameraRotationY();
+        mainMenuAnchorToggle.position.copyFrom(VRPoints.groundPointBelowCamera);
+        mainMenuAnchorToggle.position.y = mainMenuAnchorToggle.position.y + 0.1;
+        mainMenuAnchorToggle.rotation.y = CommonCamera.getCameraRotationY();
         // camera.rotation.y;  // TODO: What about VR camera.
+
+        // console.log(new Date().getTime(), Vars.scene.activeCamera.id, Vars.scene.activeCamera);
+        // console.log(Vars.vrHelper.currentVRCamera.id, Vars.vrHelper.currentVRCamera);
+        // console.log(Vars.vrHelper.currentVRCamera.rotation, Vars.vrHelper.currentVRCamera.rotationQuaternion);
     });
 }
 
@@ -236,15 +249,15 @@ class ButtonWrapper {
         // Update the text.
         this.updateTxt();
 
-        // Make the button clickable.
-        this.button.onPointerClickObservable.add((e) => {
-            this.toggled();
-        });
+        // Make the button clickable. No. It is the sphere that will trigger this...
+        // this.button.onPointerClickObservable.add((e) => {
+            // this.toggled();
+        // });
 
         // Make a mesh that surrounds the button. It actually triggers the
         // click.
         this.containingMesh = BABYLON.Mesh.CreateSphere(
-            params.name + "-container-mesh", 2, VRVars.BUTTON_SPHERE_RADIUS, Vars.scene,
+            params.name + "-container-mesh", 2, Vars.BUTTON_SPHERE_RADIUS, Vars.scene,
         );
         this.containingMesh.position = this.button.node.absolutePosition;
         this.containingMesh.visibility = 0;

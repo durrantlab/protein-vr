@@ -1,8 +1,8 @@
 // These functions include camera functions common to all kinds of cameras.
 
+import * as Vars from "../Vars";
 import * as Navigation from "./Navigation";
 import * as Points from "./Points";
-import * as Vars from "./Vars";
 import * as VRCamera from "./VRCamera";
 
 declare var BABYLON;
@@ -18,11 +18,11 @@ let upVec = new BABYLON.Vector3(1, 0, 0);
  */
 export function getCameraPosition(): any {
     // If it's a VR camera, you need to make an adjustment.
-    let activeCam = Vars.vars.scene.activeCamera;
+    let activeCam = Vars.scene.activeCamera;
     let activeCamPos = activeCam.position.clone();
 
-    if ((Vars.vars.navMode === Navigation.NavMode.VRNoControllers) ||
-        (Vars.vars.navMode === Navigation.NavMode.VRWithControllers)) {
+    if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
+        (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
 
         // VR camera, so get eye position.
         if (activeCam.leftCamera) {
@@ -43,13 +43,13 @@ export function getCameraPosition(): any {
  */
 export function setCameraPosition(pt): void {
     // Not ever tested... not sure it works...
-    let activeCam = VRCamera.vrHelper.webVRCamera;
+    let activeCam = Vars.vrHelper.webVRCamera;
 
-    if (Vars.vars.navMode === Navigation.NavMode.NoVR) {
+    if (Vars.vrVars.navMode === Navigation.NavMode.NoVR) {
         // A regular camera. Just move it there.
         activeCam.position.copyFrom(pt);
-    } else if ((Vars.vars.navMode === Navigation.NavMode.VRNoControllers) ||
-               (Vars.vars.navMode === Navigation.NavMode.VRWithControllers)) {
+    } else if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
+               (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
         // A VR camera. Need to account for the fact that the eye might not be
         // at the same place as the camera.
         activeCam.position.copyFrom(
@@ -65,8 +65,8 @@ export function setCameraPosition(pt): void {
  * @returns * The rotation.
  */
 export function getCameraRotationY(): any {
-    if ((Vars.vars.navMode === Navigation.NavMode.VRNoControllers) ||
-        (Vars.vars.navMode === Navigation.NavMode.VRWithControllers)) {
+    if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
+        (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
 
         // Complicated in the case of a VR camera.
         let groundPtVec = Points.groundPointBelowStarePt.subtract(Points.groundPointBelowCamera);
@@ -89,7 +89,7 @@ export function getCameraRotationY(): any {
         return angle;
     } else {
         // This is much simplier with a non-VR camera.
-        let activeCam = Vars.vars.scene.activeCamera;
+        let activeCam = Vars.scene.activeCamera;
         let activeCamRot = activeCam.rotation.clone();
         return activeCamRot.y;  // + Math.PI * 0.5;
     }
@@ -101,14 +101,21 @@ export function getCameraRotationY(): any {
  * @returns * The vector.
  */
 export function getVecFromEyeToCamera(): any {
-    if (Vars.vars.navMode === Navigation.NavMode.NoVR) {
+    if (Vars.vrVars.navMode === Navigation.NavMode.NoVR) {
         // Not in VR mode? Then there is no eye.
         return new BABYLON.Vector3(0, 0, 0);
     }
 
-    let activeCam = VRCamera.vrHelper.webVRCamera;
-    let leftEyePos = activeCam.leftCamera.globalPosition;
-    let deltaVec = leftEyePos.subtract(activeCam.position);
+    // Note that some VR cameras don't track position, only orientation.
+    // Google cardboard is an example.
+    let activeCam = Vars.vrHelper.webVRCamera;
+    let deltaVec;
+    if (activeCam.leftCamera) {
+        let leftEyePos = activeCam.leftCamera.globalPosition;
+        deltaVec = leftEyePos.subtract(activeCam.position);
+    } else {
+        deltaVec = new BABYLON.Vector3(0, 0, 0);
+    }
 
     return deltaVec;
 }

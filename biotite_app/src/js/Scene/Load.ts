@@ -1,8 +1,8 @@
-// DEBUGG import * as Extras from "./Extras";
+import * as Extras from "./Extras";
 import * as Vars from "./Vars";
 import * as VRLoad from "./VR/Load";
-// DEBUGG import * as Optimizations from "./VR/Optimizations";
-// DEBUGG import * as Pickables from "./VR/Pickables";
+import * as Optimizations from "./VR/Optimizations";
+import * as Pickables from "./VR/Pickables";
 
 declare var BABYLON;
 
@@ -20,20 +20,15 @@ export function load(): void {
         navMeshToUse.material = navMeshMat;
 
         VRLoad.setup({
-            canvas: Vars.canvas,
-            engine: Vars.engine,
             groundMeshName: "ground",
             navTargetMesh: navMeshToUse,
-            scene: Vars.scene,
         });
 
         // Load extra objects
-        // DEBUGG Extras.setup();
+        Extras.setup();
 
         // Register a render loop to repeatedly render the scene
         Vars.engine.runRenderLoop(() => {
-            console.log(Vars.scene.activeCamera.id);
-            window.camera = Vars.scene.activeCamera;
             Vars.scene.render();
         });
     });
@@ -50,17 +45,28 @@ export function load(): void {
  * @returns void
  */
 function babylonScene(callBackFunc): void {
-    BABYLON.SceneLoader.Load("scene/", "scene.babylon", Vars.engine, (newScene) => {
-        // Wait for textures and shaders to be ready
-        newScene.executeWhenReady(() => {
+    Vars.engine.displayLoadingUI();
+    Vars.engine.loadingUIText = "Loading the main scene...";
+
+    // TODO: Use LoadAssetContainerAsync instead?
+    BABYLON.SceneLoader.LoadAssetContainer("scene/", "scene.babylon", Vars.scene, (container) => {
+        Vars.scene.executeWhenReady(() => {
+            container.addAllToScene();
+
+            // There should be only one camera at this point, because the VR
+            // stuff is in the callback. Make that that one camera is the
+            // active one.
+            Vars.scene.activeCamera =  Vars.scene.cameras[0];
+
             // Attach camera to canvas inputs
-            newScene.activeCamera.attachControl(Vars.canvas);
-            Vars.setScene(newScene);
+            // Vars.scene.activeCamera.attachControl(Vars.canvas);
+
+            // Make sure camera can see objects that are very close.
+            Vars.scene.activeCamera.minZ = 0;
 
             // Delete all the lights but the first one that has the substring
             // shadowlight or shadow_light.
-            // DEBUGG
-            /*let foundFirstShadowLight = false;
+            let foundFirstShadowLight = false;
             let indexToUse = 0;
             while (Vars.scene.lights.length > 1) {
                 let light = Vars.scene.lights[indexToUse];
@@ -84,23 +90,19 @@ function babylonScene(callBackFunc): void {
                     indexToUse++;
                 }
             }
-            */
 
             // Remove some meshes used only for scene construction. In the
             // perfect world, these wouldn't even be included in the babylon
             // file.
-            // DEBUGG (BELOW)
-            /*  for (let meshIdx in Vars.scene.meshes) {
+            for (let meshIdx in Vars.scene.meshes) {
                 if (Vars.scene.meshes[meshIdx].name === "protein_box") {
                     Vars.scene.meshes[meshIdx].dispose();
                 }
             }
-            */
 
             // Optimize and make meshes clickable. Also, make sure all meshes
             // are emmissive.
-            // DEBUGG (BELOW)
-            /* for (let meshIdx in Vars.scene.meshes) {
+            for (let meshIdx in Vars.scene.meshes) {
                 if (Vars.scene.meshes[meshIdx].material) {
                     let mesh = Vars.scene.meshes[meshIdx];
 
@@ -128,11 +130,14 @@ function babylonScene(callBackFunc): void {
                         scene: Vars.scene,
                     });
                 }
-            } */
+            }
 
             callBackFunc();
         });
     }, (progress) => {
-        console.log(progress);
+        if (progress["lengthComputable"]) {
+            let percent = Math.round(100 * progress["loaded"] / progress["total"]);
+            Vars.engine.loadingUIText = "Loading the main scene... " + percent.toString() + "%";
+        }
     });
 }

@@ -1,6 +1,5 @@
 ///<reference path="external/require/require.d.ts" />
 
-declare var jQuery;
 declare var MobileDetect;
 
 require.config({

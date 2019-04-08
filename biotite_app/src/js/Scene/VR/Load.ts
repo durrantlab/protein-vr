@@ -1,7 +1,7 @@
-// DEBUGG import * as General from "./General";
-// DEBUGG import * as NonVRCamera from "./NonVRCamera";
-// DEBUGG import * as Optimizations from "./Optimizations";
-import * as Vars from "./Vars";
+import * as Vars from "../Vars";
+import * as General from "./General";
+import * as NonVRCamera from "./NonVRCamera";
+import * as Optimizations from "./Optimizations";
 import * as VRCamera from "./VRCamera";
 
 declare var BABYLON;
@@ -13,19 +13,19 @@ declare var BABYLON;
 export function setup(initParams: Vars.IVRSetup) {
     // Set up the parameters (filling in missing values, for example). Also
     // saves the modified params to the params module variable.
-    Vars.setup(initParams);
+    Vars.setupVR(initParams);
 
     // Setup the general things that apply regardless of the mode used.
-    // DEBUGG General.setup();
+    General.setup();
 
     // Setup the VR camera
     VRCamera.setup();
 
     // Setup the default (nonVR) camera.
-    // DEBUGG NonVRCamera.setup();
+    NonVRCamera.setup();
 
     // Optimize the scene to make it run better.
-    // DEBUGG Optimizations.setup();
+    Optimizations.setup();
 
     // For debugging...
     // trackDebugSphere();

@@ -3,6 +3,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no">
 
         <title>TITLEHERE</title>
         <meta name="description" content="ProteinVR Scene">
@@ -12,17 +13,22 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
             <![endif]-->
 
-        </head>
+        <!-- <script src="//console.re/connector.js" data-channel="PROTEINVR-TEST" id="consolerescript"></script> -->
+    </head>
 
-        <body>
-            <canvas id="renderCanvas" touch-action="none" style="touch-action: none;"></canvas>
-            <script src="js/babylon/babylon.3.3.full.preview.js"></script>
-            <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
-            <!-- <script src="js/babylon/babylon4.custom.js"></script> -->
-            <script src="js/jquery/jquery-3.3.1.min.js"></script>
-            <!-- <script src="js/annyang.min.js"></script> -->
-            <!-- <script src="js/fuse.min.js"></script> -->
-            <script src="lodash.min.js"></script>>
-            <link rel="stylesheet" type="text/css" href="style.css">
+    <body>
+        <!-- <script src="js/external/externals.js"></script> -->
+
+        <div id="container">
+            <canvas id="renderCanvas" touch-action="none"></canvas>
+            <div id="capture-clicks"></div>
+        </div>
+
+        <!-- <script src="js/babylon/babylon.3.3.full.preview.js"></script> -->
+        <!-- <script src="js/babylon/babylon4.custom.js"></script> -->
+        <!-- <script src="js/annyang.min.js"></script> -->
+        <!-- <script src="js/fuse.min.js"></script> -->
+        <script src="lodash.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="style.css">
     </body>
 </html>

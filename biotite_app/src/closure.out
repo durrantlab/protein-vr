@@ -1,0 +1,29 @@
+utilities/custom_extern.js:81: WARNING - name jQuery is not defined in the externs.
+jQuery.prototype.fileinput = function(s) {};
+^^^^^^
+
+utilities/custom_extern.js:82: WARNING - name jQuery is not defined in the externs.
+jQuery.Event.key = function() {};
+^^^^^^
+
+utilities/custom_extern.js:83: WARNING - name jQuery is not defined in the externs.
+jQuery.prototype.DataTable = function(a) {};
+^^^^^^
+
+utilities/custom_extern.js:84: WARNING - name jQuery is not defined in the externs.
+jQuery.prototype.draggable = function(a) {};
+^^^^^^
+
+utilities/custom_extern.js:85: WARNING - name jQuery is not defined in the externs.
+jQuery.prototype.makeCssInline = function() {};  /** custom added */
+^^^^^^
+
+utilities/custom_extern.js:87: WARNING - name jQuery is not defined in the externs.
+jQuery.modal = function(a) {};
+^^^^^^
+
+utilities/custom_extern.js:81: ERROR - variable jQuery is undeclared
+jQuery.prototype.fileinput = function(s) {};
+^^^^^^
+
+1 error(s), 6 warning(s)

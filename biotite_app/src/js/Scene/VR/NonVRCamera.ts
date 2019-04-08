@@ -1,10 +1,9 @@
 // This sets up the non vr camera. Not everyone has a vr headset.
 
-// DEBUGG import * as Navigation from "./Navigation";
-import * as Vars from "./Vars";
+import * as Vars from "../Vars";
+import * as Navigation from "./Navigation";
 
 declare var BABYLON;
-declare var jQuery;
 
 let nonVRCamera;
 let lastCameraPosAboveGroundMesh = new BABYLON.Vector3(0, 0, 0);
@@ -23,7 +22,7 @@ export function setup(): void {
  */
 function setupNonVRCameraObj(): void {
     // The VRHelper already created a camera. Need to set it up.
-    nonVRCamera = Vars.vars.scene.activeCamera;
+    nonVRCamera = Vars.scene.activeCamera;
 
     // Enable navigation via both WASD and the arrows keys.
     nonVRCamera.keysUp = [87, 38];
@@ -32,7 +31,7 @@ function setupNonVRCameraObj(): void {
     nonVRCamera.keysRight = [68, 39];
 
     // Turn on gravity
-    Vars.vars.scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
+    Vars.scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
     nonVRCamera.applyGravity = true;
 
     // Enable collision detection. Note that the second paramerter is a
@@ -42,7 +41,7 @@ function setupNonVRCameraObj(): void {
     // Turn on collisions as appropriate. Note that groundMesh collisions are
     // enabled in Navigation.
     // scene.workerCollisions = true;
-    Vars.vars.scene.collisionsEnabled = true;
+    Vars.scene.collisionsEnabled = true;
     nonVRCamera.checkCollisions = true;
 
     // Slow the camera.
@@ -51,7 +50,7 @@ function setupNonVRCameraObj(): void {
     // Make sure orientation is default
     // nonVRCamera.rotation = new BABYLON.Vector3(0, 0, 0);
 
-    nonVRCamera.attachControl(Vars.vars.canvas, true);
+    nonVRCamera.attachControl(Vars.canvas, true);
 
     // Position the camera on the floor. See
     // http://www.html5gamedevs.com/topic/30837-gravity-camera-stops-falling/
@@ -64,5 +63,5 @@ function setupNonVRCameraObj(): void {
  */
 export function setCameraElipsoid(): void {
     // Depends on camera height.
-    nonVRCamera.ellipsoid = new BABYLON.Vector3(1.0, 0.5 * Vars.vars.cameraHeight, 1.0);
+    nonVRCamera.ellipsoid = new BABYLON.Vector3(1.0, 0.5 * Vars.vrVars.cameraHeight, 1.0);
 }

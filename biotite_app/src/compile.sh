@@ -7,15 +7,19 @@ tsc --target ES5 --alwaysStrict --module amd js/Game.ts
 r.js -o build.js
 
 # Closure compile
-# --formatting=PRETTY_PRINT
-# java -jar utilities/closure-compiler-v20180506.jar --compilation_level=ADVANCED_OPTIMIZATIONS \
-#      --externs='utilities/jquery-1.9.js' --externs='utilities/twitter-bootstrap-2.1.1-externs.js' \
-#      --externs='utilities/custom_extern.js' --js_output_file='lodash.min2.js' 'lodash.min.js' \
-#      --formatting=PRETTY_PRINT \
-#      2> closure.out
+#export formatting="--formatting=PRETTY_PRINT"
+export formatting=""
 
-# # Rename it
+# --externs='utilities/jquery-1.9.js' --externs='utilities/twitter-bootstrap-2.1.1-externs.js'
+
+# java -jar utilities/closure-compiler-v20180506.jar --compilation_level=ADVANCED_OPTIMIZATIONS \
+#     --externs='utilities/custom_extern.js' --js_output_file='lodash.min2.js' 'lodash.min.js' \
+#     ${formatting} 2> closure.out
 # mv lodash.min2.js lodash.min.js
+
+# Combine it with the externals.
+cat js/external/externals.js lodash.min.js > tmptmp
+mv tmptmp lodash.min.js
 
 # Remove existing build directory
 echo "Recreating build directory..."

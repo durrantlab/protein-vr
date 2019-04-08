@@ -4,26 +4,77 @@ TO DO
 Pending
 -------
 
-Closure compiler. Need to check in VR modes.
-
-Need to get it working on phones
-
-Other selection types (hydrophobic).
-
 Test with other VR headsets (in the proteinatorium)
-
-Why two Vars.ts?
-
-Code could be refactored a bit...
+    Check on iPhones and things too.
 
 Would be good to have second light that doesn't cast shadow.
 
 https://doc.babylonjs.com/how_to/interactions
 
-Optimizations working? FPS seems still to be high on phone.
+STill getting stuck in nav sphere sometimes.
+
+Good to also generate low-res scene? Maybe with flag in url?
+
+Use new voice system from bugmebot. It's better. But doesn't work on phones... ???
+
+Option to make VR scenes discoverable.
+
+Can't simplify gltf. Colors now work, but number of vertexes doesn't chang.e
+
+Download option. That way you can run it even without internet connection.
+
+Help menu too? Button on front?
+
+Other selection types (hydrophobic).
+
+Need skyboxes.
+
+Setup scenes for presentations.
+
+fix protein VR on Google cardboard
+
+Need indication of loading in the beginning.
+
+Need to be able to go forward and backward even if not pointing at an object.
+
+Why does VR camera not match camera from babylon?
 
 Done or Ignore
 --------------
+
+Would be good to be able to turn off menu system. In scene_info.json.
+
+Store scene proportions way too big. Scale down by half?
+
+Redo optimization. Include get rid of surfaces.
+
+Manifest system back? Good for caching.
+
+Oculus Go controller pad doesn't work.
+    Oculus Go prob: https://forum.babylonjs.com/t/oculus-go-createdefaultvrexperience-and-onpadstatechangedobservable/1944
+
+Remnind me to fix trigger issue
+
+Make "Sorry, I didn't understand" go away. Because people might be having a
+conversation.
+
+Need way to turn with clicker. Oculus Go turning head alot makes people sick.
+
+Not respecting blender camera any more.
+
+Need to get it working on phones
+
+1. Check if it still turns blue when you click it (not sure).
+
+Closure compiler. Need to check in VR modes.
+
+Combine babylonjs js into one file, host locally.
+
+Code could be refactored a bit...
+
+Optimizations working? FPS seems still to be high on phone.
+
+Why two Vars.ts?
 
 Additional 3D scenes (environments).
 

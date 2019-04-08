@@ -1,17 +1,17 @@
 // This module handles all things navigation related.
 
 // import * as NavTargetMesh from "./NavTargetMesh";
+import { jQuery } from "../jQuery";
+import * as Vars from "../Vars";
 import * as CommonCamera from "./CommonCamera";
 import * as Navigation from "./Navigation";
 import * as NonVRCamera from "./NonVRCamera";
 import * as Optimizations from "./Optimizations";
 import * as Pickables from "./Pickables";
 import * as Points from "./Points";
-import * as Vars from "./Vars";
 import * as VRCamera from "./VRCamera";
 
 declare var BABYLON;
-declare var jQuery;
 
 export const enum NavMode {
     // Note: const enum needed for closure-compiler compatibility.
@@ -32,24 +32,27 @@ let currentlyTeleporting = false;
  */
 export function setup(): void {
     // Allways collide with a floor mesh, which must be hidden.
-    Vars.vars.groundMesh = Vars.vars.scene.getMeshByID(Vars.vars.groundMeshName);
-    if (Vars.vars.groundMesh === null) { alert("No mesh named " + Vars.vars.groundMeshName); }
-    Vars.vars.groundMesh.checkCollisions = true;
-    Vars.vars.groundMesh.visibility = 0;
-    Optimizations.optimizeMeshPicking(Vars.vars.groundMesh);
+    Vars.vrVars.groundMesh = Vars.scene.getMeshByID(Vars.vrVars.groundMeshName);
+    if (Vars.vrVars.groundMesh === null) { alert("No mesh named " + Vars.vrVars.groundMeshName); }
+    Vars.vrVars.groundMesh.checkCollisions = true;
+    Vars.vrVars.groundMesh.visibility = 0;
+    Optimizations.optimizeMeshPicking(Vars.vrVars.groundMesh);
     Pickables.makeMeshMouseClickable({
         callBack: actOnStareTrigger,
-        mesh: Vars.vars.groundMesh,
+        mesh: Vars.vrVars.groundMesh,
     });
 
     // Initially, no VR.
-    Vars.vars.navMode = Navigation.NavMode.NoVR;
+    Vars.vrVars.navMode = Navigation.NavMode.NoVR;
 
     // Setup triggers.
-    // DEBUGG setupTriggers();
+    setupTriggers();
 
     // Keep track up critical points in the scene (like stare points).
-    // DEBUGG Points.setup();
+    Points.setup();
+
+    // Create a div to intercept clicks if needed. Add clear div over canvas.
+    setupCaptureClicksOutsideBabylon();
 }
 
 /**
@@ -120,7 +123,7 @@ function teleport(newLoc = undefined, callBack = undefined): void {
     }
 
     // Hide the bigger nav mesh. It will appear again elsewhere.
-    VRCamera.vrHelper.gazeTrackerMesh.isVisible = false;
+    Vars.vrHelper.gazeTrackerMesh.isVisible = false;
 
     // Animate the transition to the new location.
     const animationCameraTeleportation = new BABYLON.Animation(
@@ -137,7 +140,7 @@ function teleport(newLoc = undefined, callBack = undefined): void {
         // If it's not defined, use the current stare point.
         newLoc = new BABYLON.Vector3(
             Points.curStarePt.x,
-            Points.curStarePt.y + Vars.vars.cameraHeight,
+            Points.curStarePt.y + Vars.vrVars.cameraHeight,
             Points.curStarePt.z,
         );
     }
@@ -154,14 +157,14 @@ function teleport(newLoc = undefined, callBack = undefined): void {
     ];
     animationCameraTeleportation.setKeys(animationCameraTeleportationKeys);
 
-    const activeCamera = Vars.vars.scene.activeCamera;
+    const activeCamera = Vars.scene.activeCamera;
     activeCamera.animations = [];
     activeCamera.animations.push(animationCameraTeleportation);
 
-    Vars.vars.scene.beginAnimation(activeCamera, 0, Vars.TRANSPORT_DURATION, false, 1, () => {
+    Vars.scene.beginAnimation(activeCamera, 0, Vars.TRANSPORT_DURATION, false, 1, () => {
         // Animation finished callback.
         currentlyTeleporting = false;
-        VRCamera.vrHelper.gazeTrackerMesh.isVisible = true;
+        Vars.vrHelper.gazeTrackerMesh.isVisible = true;
 
         // Erase animation
         activeCamera.animations = [];
@@ -218,7 +221,7 @@ function grow(): void {
 
     // Set the new height. 0.01 is important so elipse doesn't get caught on
     // new ground.
-    Vars.vars.cameraHeight = Points.curStarePt.y - ptBelowStarePt.y;
+    Vars.vrVars.cameraHeight = Points.curStarePt.y - ptBelowStarePt.y;
     // debugger;
 
     teleport(newPt, () => {
@@ -226,4 +229,61 @@ function grow(): void {
         // matches the new height.
         NonVRCamera.setCameraElipsoid();
     });
+}
+
+let captureClicksDiv = undefined;
+let currentlyCapturingClicks = false;
+
+/**
+ * Setup the ability to capture clicks.
+ * @returns void
+ */
+function setupCaptureClicksOutsideBabylon(): void {
+    // Unfortunately, when you click on phones it takes away control from the
+    // orientation sensor. Babylon.js claims to have fixed this, but I don't
+    // think it is fixed: https://github.com/BabylonJS/Babylon.js/pull/6042
+    // I'm going to detect if it's currently reading from the orientation
+    // sensor and throw up a div to capture clicks if it is. A hackish
+    // solution that works.
+
+    // Setup div to intercept clicks if needed. Add clear div over canvas.
+    captureClicksDiv = jQuery("#capture-clicks");
+
+    // Make it clickable.
+    captureClicksDiv.click(() => {
+        actOnStareTrigger();
+    });
+
+    Vars.scene.registerBeforeRender(() => {
+        checkCaptureClicksOutsideBabylon();
+    });
+}
+
+/**
+ * Checks if you should currently be capturing clicks. TODO: Should you be
+ * checking this with every render? I don't know that it can change, so maybe
+ * you just need to check it once?
+ * @returns void
+ */
+function checkCaptureClicksOutsideBabylon(): void {
+    let deviceOrientation = Vars.scene.activeCamera.inputs.attached.deviceOrientation;
+    let deviceBeingOriented;
+
+    if (!deviceOrientation) {
+        // On htc vive, deviceOrientation does not exist.
+        deviceBeingOriented = false;
+    } else {
+        // Check other devices (whether in browser or in cardboard, etc).
+        deviceBeingOriented = (deviceOrientation._alpha !== 0) ||
+                              (deviceOrientation._beta !== 0) ||
+                              (deviceOrientation._gamma !== 0);
+    }
+
+    if (deviceBeingOriented && !currentlyCapturingClicks) {
+        currentlyCapturingClicks = true;
+        captureClicksDiv.show();
+    } else if (!deviceBeingOriented && currentlyCapturingClicks) {
+        currentlyCapturingClicks = false;
+        captureClicksDiv.hide();
+    }
 }

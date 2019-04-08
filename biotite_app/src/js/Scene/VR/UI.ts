@@ -1,8 +1,7 @@
 // Sets up tweaks to the UI.
 
-import * as Vars from "./Vars";
-
-declare var jQuery;
+import { jQuery } from "../jQuery";
+import * as Vars from "../Vars";
 
 /**
  * Sets up the 2D button that can be used to launch VR.
@@ -46,7 +45,7 @@ function addRunModeButtons(): void {
 
     const fullScreenButton = jQuery("#fullscreen-button");
     fullScreenButton.click(() => {
-        Vars.vars.engine.switchFullscreen(true);
-        jQuery("canvas").focus();  // So keypress will work.
+        Vars.engine.switchFullscreen(true);
+        jQuery("#renderCanvas").focus();  // So keypress will work.
     });
 }
