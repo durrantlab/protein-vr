@@ -71,55 +71,6 @@ export function setup(): void {
         if (Vars.vrVars.menuActive) {
             GUI.setup(data);
         }
-
-
-        return;
-
-        // Go through each of the protein meshes.
-        // let c = [];
-        // for (let idx in data["objIDs"]) {
-        //     if (data["objIDs"].hasOwnProperty(idx)) {
-        //         let objID = data["objIDs"][idx];
-
-        //         // Load the mesh.
-        //         let loader = BABYLON.SceneLoader.LoadAssetContainerAsync(
-        //             "./", objID + ".gltf", Vars.scene,
-        //         ).then((container) => {
-        //             // Get the meshes.
-        //             for (let uniqStrID in container.meshes) {
-        //                 if (container.meshes.hasOwnProperty(uniqStrID)) {
-        //                     let uniqIntID = parseInt(uniqStrID, 10);
-        //                     let mesh = container.meshes[uniqIntID];
-
-        //                     setupMesh(
-        //                         mesh, objID, data["shadowQuality"], uniqIntID,
-        //                     );
-        //                 }
-        //             }
-
-        //             // Add the object to the scene.
-        //             container.addAllToScene();
-        //         });
-
-        //         loaderPromises.push(loader);
-        //     }
-        // }
-
-        // setupShadowCatchers();
-
-        // Promise.all(loaderPromises).then(() => {
-        //     // Give it a bit to let one render cycle go through. Hackish,
-        //     // admittedly.
-        //     setTimeout(Optimizations.updateEnvironmentShadows, 1000);
-        // });
-
-        // if (Vars.vrVars.menuActive) {
-        //     GUI.setup(data);
-        // }
-
-        // Activate voice commands. Delete below? I think it's done
-        // elsewhere now.
-        // VRVoiceCommands.setup(data);
     });
 }
 
