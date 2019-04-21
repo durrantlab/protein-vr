@@ -24,4 +24,4 @@ webapp-compiled
 scoria
 *.cache
 #build
-web/**
+**/web/*
