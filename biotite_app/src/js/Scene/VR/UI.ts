@@ -49,3 +49,16 @@ function addRunModeButtons(): void {
         jQuery("#renderCanvas").focus();  // So keypress will work.
     });
 }
+
+/**
+ * A function to activate debug mode.
+ * @returns void
+ */
+function debugMode(): void {
+    Vars.scene.debugLayer.show();
+    setTimeout(() => {
+        document.getElementById("inspector-host").style.zIndex = "15";
+        document.getElementById("scene-explorer-host").style.zIndex = "15";
+    }, 500);
+}
+window["debugMode"] = debugMode;

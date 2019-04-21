@@ -23,24 +23,36 @@ Can't simplify gltf. Colors now work, but number of vertexes doesn't chang.e
 
 Download option. That way you can run it even without internet connection.
 
-Help menu too? Button on front?
-
 Other selection types (hydrophobic).
-
-Need skyboxes.
 
 Setup scenes for presentations.
 
 fix protein VR on Google cardboard
+    Note that this doesn't happen in the playground.
+    Also, doesn't matter whether you closure compile externals.js.
 
-Need indication of loading in the beginning.
+Why does VR camera not match camera from babylon in initial orientation?
 
-Need to be able to go forward and backward even if not pointing at an object.
-
-Why does VR camera not match camera from babylon?
+Help menu too? Button on front?
+    Dedicate to Karen Curto.
 
 Done or Ignore
 --------------
+
+Need skyboxes.
+
+Click (no VR) on Android: I think it works, but need to check consistency.
+Phone ran out of power.
+
+Can you detect max fps and adjust accordingly?
+
+Need to be able to go forward and backward even if not pointing at an object.
+    Disable teleportation on larger sphere.
+    Also hide tracker mesh if touching sphere.
+
+Need to make sure always over ground, even when simpler navigation.
+
+Need indication of loading in the beginning.
 
 Would be good to be able to turn off menu system. In scene_info.json.
 

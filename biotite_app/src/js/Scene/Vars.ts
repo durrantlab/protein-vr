@@ -36,6 +36,8 @@ export const PAD_MOVE_SPEED = 0.01;
 export const VR_CONTROLLER_TRIGGER_DELAY_TIME = 500;  // time to wait between triggers.
 export const VR_CONTROLLER_PAD_ROTATION_DELAY_TIME = 750;  // time to wait between triggers.
 export const VR_CONTROLLER_PAD_RATIO_OF_MIDDLE_FOR_CAMERA_RESET = 0.1;
+export const MAX_TELEPORT_DIST = 15;
+export const TRANSPARENT_FLOOR_ALPHA = 0.02;
 
 // Variables that can change.
 export let vrVars: IVRSetup;
@@ -50,7 +52,7 @@ export function setup(): void {
     // Generate the BABYLON 3D engine
     engine = new BABYLON.Engine(canvas, true);
 
-    if (false) {  // true means use manifest files.
+    if (true) {  // true means use manifest files.
         BABYLON.Database.IDBStorageEnabled = true;
     } else {
         engine.enableOfflineSupport = false;
@@ -70,7 +72,16 @@ export function setup(): void {
  */
 export function setupVR(initParams: IVRSetup): void {
     // Create the vr helper. See http://doc.babylonjs.com/how_to/webvr_helper
-    vrHelper = scene.createDefaultVRExperience();
+    let params = {
+        // "createDeviceOrientationCamera": false,  // This makes phone ignore motion sensor. No good.
+    };
+    if (scene.getEngine().getCaps().multiview) {
+        // Much faster according to
+        // https://doc.babylonjs.com/how_to/multiview, but not supported in
+        // all browsers.
+        params["useMultiview"] = true;
+    }
+    vrHelper = scene.createDefaultVRExperience(params);
 
     // Make sure params.cameraHeight is defined.
     if (initParams.cameraHeight === undefined) {

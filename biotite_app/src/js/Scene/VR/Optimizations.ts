@@ -53,9 +53,14 @@ export function setup(): void {
  */
 function getNumVertices(mesh: any): number|null {
     // First, get the number of vertexes.
-    let vertexData = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
-    if (vertexData === null) { return null; }  // Something like __root__
-    let numVertexes = vertexData.length / 3;
+    let numVertexes;
+    if (mesh !== undefined) {
+        let vertexData = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+        if (vertexData === null) { return null; }  // Something like __root__
+        numVertexes = vertexData.length / 3;
+    } else {
+        numVertexes = 0;
+    }
     return numVertexes;
 }
 
@@ -125,7 +130,7 @@ function sceneOptimizerParameters(): any {
     // See https://doc.babylonjs.com/how_to/how_to_use_sceneoptimizer
     // The goal here is to maintain a frame rate of 60. Check every two
     // seconds. Very similar to HighDegradationAllowed
-    let result = new BABYLON.SceneOptimizerOptions(50, 2000);
+    let result = new BABYLON.SceneOptimizerOptions(25, 2000);
 
     let priority = 0;
     result.optimizations.push(new BABYLON.ShadowsOptimization(priority));
@@ -134,27 +139,29 @@ function sceneOptimizerParameters(): any {
     result.optimizations.push(new BABYLON.LensFlaresOptimization(priority));
     result.optimizations.push(new BABYLON.PostProcessesOptimization(priority));
     result.optimizations.push(new BABYLON.ParticlesOptimization(priority));
+    result.optimizations.push(new ReportOptimizationChange(priority));
 
     // Next priority
     priority++;
     result.optimizations.push(new RemoveSurfaces(priority));  // Remove surfaces
-
-    // Next priority
-    priority++;
-    result.optimizations.push(new SimplifyMeshes(priority, 500));  // Simplify meshes.
+    result.optimizations.push(new ReportOptimizationChange(priority));
 
     // Next priority
     priority++;
     result.optimizations.push(new BABYLON.TextureOptimization(priority, 512));
+    result.optimizations.push(new ReportOptimizationChange(priority));
 
     // Next priority
     priority++;
     result.optimizations.push(new BABYLON.RenderTargetsOptimization(priority));
     result.optimizations.push(new BABYLON.TextureOptimization(priority, 256));
+    result.optimizations.push(new ReportOptimizationChange(priority));
 
     // Next priority
     priority++;
     result.optimizations.push(new BABYLON.HardwareScalingOptimization(priority, 4));
+    result.optimizations.push(new SimplifyMeshes(priority, 500));  // Simplify meshes.
+    result.optimizations.push(new ReportOptimizationChange(priority));
 
     return result;
 }
@@ -169,6 +176,29 @@ function removeMeshEntirely(mesh: any): void {
         mesh.dispose();
     }
     mesh = null;
+}
+
+/**
+ * Remove the surface mesh (it takes a lot of resources).
+ * @param  {number} priority The priority of this optimization.
+ * @returns void
+ */
+function ReportOptimizationChange(priority: number): void {
+    if (typeof priority === "undefined") {
+        priority = 0;
+    }
+
+    this["priority"] = priority;
+    this["apply"] = (scene) => {
+        console.log("Optimization priority:", this["priority"]);
+        console.log("FPS:", Vars.engine.getFps());
+        console.log("");
+        return true;
+    };
+
+    this["getDescription"] = () => {
+        return "Reports the current priority. For debugging.";
+    };
 }
 
 /**

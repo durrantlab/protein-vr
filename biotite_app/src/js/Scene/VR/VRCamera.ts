@@ -110,4 +110,6 @@ export function setupGazeTracker(): void {
     Vars.vrHelper.displayGaze = true;  // Does need to be true. Otherwise, position not updated.
 
     Vars.vrHelper.enableInteractions();
+
+    // window.vrHelper = Vars.vrHelper;
 }

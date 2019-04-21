@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title>Test</title>
+        <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=no">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        
+        <link rel="manifest" href="./manifest.json">
+                
+        <style>
+            html, body, #renderCanvas {
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            #renderCanvas {
+                /* width: 100%;
+                height: 100%; */
+                touch-action: none;
+            }
+        </style>
+    </head>
+
+    <body>
+        <canvas id="renderCanvas" touch-action="none"></canvas>
+
+        <script src="js/babylon.max.js"></script>
+
+        <script>
+            // Basic setup
+            var canvas = document.getElementById("renderCanvas");
+            var engine = new BABYLON.Engine(canvas, true);
+            var scene = new BABYLON.Scene(engine);
+            var camera = new BABYLON.FreeCamera("camera", new BABYLON.Vector3(0, 0, -10), scene);
+
+            // Make a material
+            var material = new BABYLON.StandardMaterial("mat", scene);
+            material.diffuseColor = new BABYLON.Color3(0, 0, 0);
+            material.specularColor = new BABYLON.Color3(0, 0, 0);
+            material.diffuseTexture = null;
+            material.emissiveTexture = new BABYLON.Texture("skybox.png", scene);
+
+            // Make a box with that material
+            var box = BABYLON.Mesh.CreateBox("box", 2, scene);
+            box.rotation.x = -0.2;
+            box.rotation.y = -0.4;
+            box.material = material;
+
+            // Resize the engine
+            engine.resize();
+                        
+            // Start the render loop
+            engine.runRenderLoop(() => { 
+                scene.render(); 
+            });
+
+            // Watch for browser/canvas resize events
+            window.addEventListener("resize", () => {
+                engine.resize();
+            });
+        </script>
+    </body>
+
+</html>

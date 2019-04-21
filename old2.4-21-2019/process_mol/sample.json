@@ -1,0 +1,42 @@
+{
+    "info": {
+        "bottom_pt": [1.49399, -0.196802, -0.017723],
+        "front_pt": [44.531731, -12.565748, 16.628504],
+        "dimens": [5.0, 5.0, 5.0]
+    },
+    "visSpecification":{
+        "biotite_logo.pdb":{
+            "compoundLines":false,
+            "compoundSticks":true,
+            "compoundSurface":false,
+            "proteinLines":false,
+            "proteinRibbon":true,
+            "proteinSticks":false,
+            "proteinSurface":false,
+            "proteinSurroundingSticks":false,
+            "visible":true
+        },
+        "1xdn.pdb":{
+            "compoundLines":false,
+            "compoundSticks":true,
+            "compoundSurface":false,
+            "proteinLines":false,
+            "proteinRibbon":true,
+            "proteinSticks":false,
+            "proteinSurface":false,
+            "proteinSurroundingSticks":false,
+            "visible":true
+        },
+        "SMILES_C1CCCC1.sdf":{
+            "compoundLines":false,
+            "compoundSticks":true,
+            "compoundSurface":false,
+            "proteinLines":false,
+            "proteinRibbon":true,
+            "proteinSticks":false,
+            "proteinSurface":false,
+            "proteinSurroundingSticks":false,
+            "visible":true
+        }
+    }
+}

@@ -31,11 +31,15 @@ let currentlyTeleporting = false;
  * @returns void
  */
 export function setup(): void {
-    // Allways collide with a floor mesh, which must be hidden.
+    // Allways collide with a floor mesh.
     Vars.vrVars.groundMesh = Vars.scene.getMeshByID(Vars.vrVars.groundMeshName);
     if (Vars.vrVars.groundMesh === null) { alert("No mesh named " + Vars.vrVars.groundMeshName); }
     Vars.vrVars.groundMesh.checkCollisions = true;
+
+    // The ground should generally be hidden. There's a chance it could be
+    // turned into glass too. See Extras.ts.
     Vars.vrVars.groundMesh.visibility = 0;
+
     Optimizations.optimizeMeshPicking(Vars.vrVars.groundMesh);
     Pickables.makeMeshMouseClickable({
         callBack: actOnStareTrigger,
@@ -52,7 +56,41 @@ export function setup(): void {
     Points.setup();
 
     // Create a div to intercept clicks if needed. Add clear div over canvas.
-    setupCaptureClicksOutsideBabylon();
+    setupCaptureMouseClicksOutsideBabylon();
+
+    // Constantly monitor the position of the camera. If it's no longer over
+    // the floor, move it back to its previous position.
+    keepCameraOverFloor();
+}
+
+let lastCameraPt;
+
+/**
+ * Check and make sure the camera is over the ground. If not, move it back so
+ * it is over the ground.
+ * @returns void
+ */
+function keepCameraOverFloor(): void {
+    // lastCameraPt = Vars.scene.activeCamera.position.clone();
+    lastCameraPt = CommonCamera.getCameraPosition();
+    Vars.scene.registerBeforeRender(() => {
+        // let cameraPt = Vars.scene.activeCamera.position.clone();
+        let cameraPt = CommonCamera.getCameraPosition();  // cloned pt.
+        let groundPointBelowCamera = Points.groundPointPickingInfo(cameraPt);
+        if (groundPointBelowCamera.pickedMesh === null) {
+            // You're not above the ground! This shouldn't happen, but it can
+            // occasionally. Return the camera to its previous position. One
+            // example is if you're using the controllers on a HTC vive to
+            // navigate (forward/backward).
+
+            // console.log("Reverting camera position..");
+            // Vars.scene.activeCamera.position = lastCameraPt;
+            CommonCamera.setCameraPosition(lastCameraPt);
+        } else {
+            lastCameraPt = cameraPt;
+        }
+        // console.log(groundPointBelowCamera);
+    });
 }
 
 /**
@@ -87,10 +125,13 @@ export function actOnStareTrigger(): void {
         lastTrigger = curTime;
     }
 
+    console.log("hi");
+
     // Click, space, or something. You need to decide how to act.
     switch (Pickables.getCategoryOfCurMesh()) {
         case Pickables.PickableCategory.Ground:
             // It's the ground, so teleport there.
+            console.log("teleport");
             teleport();
             break;
         case Pickables.PickableCategory.Molecule:
@@ -222,7 +263,6 @@ function grow(): void {
     // Set the new height. 0.01 is important so elipse doesn't get caught on
     // new ground.
     Vars.vrVars.cameraHeight = Points.curStarePt.y - ptBelowStarePt.y;
-    // debugger;
 
     teleport(newPt, () => {
         // Make sure the collision elipsoid surrounding the non-VR camera
@@ -231,14 +271,14 @@ function grow(): void {
     });
 }
 
-let captureClicksDiv = undefined;
-let currentlyCapturingClicks = false;
+let captureMouseClicksDiv = undefined;
+let currentlyCapturingMouseClicks = false;
 
 /**
  * Setup the ability to capture clicks.
  * @returns void
  */
-function setupCaptureClicksOutsideBabylon(): void {
+function setupCaptureMouseClicksOutsideBabylon(): void {
     // Unfortunately, when you click on phones it takes away control from the
     // orientation sensor. Babylon.js claims to have fixed this, but I don't
     // think it is fixed: https://github.com/BabylonJS/Babylon.js/pull/6042
@@ -247,15 +287,20 @@ function setupCaptureClicksOutsideBabylon(): void {
     // solution that works.
 
     // Setup div to intercept clicks if needed. Add clear div over canvas.
-    captureClicksDiv = jQuery("#capture-clicks");
+    captureMouseClicksDiv = jQuery("#capture-clicks");
+    // captureMouseClicksDiv = jQuery("#renderCanvas");
 
     // Make it clickable.
-    captureClicksDiv.click(() => {
+    captureMouseClicksDiv.click(() => {
+        console.log("clicked!");
         actOnStareTrigger();
     });
+    // captureMouseClicksDiv.on("pointerdown", () => {
+    //     alert("hello!");
+    // });
 
     Vars.scene.registerBeforeRender(() => {
-        checkCaptureClicksOutsideBabylon();
+        checkCaptureMouseClicksOutsideBabylon();
     });
 }
 
@@ -265,7 +310,7 @@ function setupCaptureClicksOutsideBabylon(): void {
  * you just need to check it once?
  * @returns void
  */
-function checkCaptureClicksOutsideBabylon(): void {
+function checkCaptureMouseClicksOutsideBabylon(): void {
     let deviceOrientation = Vars.scene.activeCamera.inputs.attached.deviceOrientation;
     let deviceBeingOriented;
 
@@ -279,11 +324,11 @@ function checkCaptureClicksOutsideBabylon(): void {
                               (deviceOrientation._gamma !== 0);
     }
 
-    if (deviceBeingOriented && !currentlyCapturingClicks) {
-        currentlyCapturingClicks = true;
-        captureClicksDiv.show();
-    } else if (!deviceBeingOriented && currentlyCapturingClicks) {
-        currentlyCapturingClicks = false;
-        captureClicksDiv.hide();
+    if (deviceBeingOriented && !currentlyCapturingMouseClicks) {
+        currentlyCapturingMouseClicks = true;
+        captureMouseClicksDiv.show();
+    } else if (!deviceBeingOriented && currentlyCapturingMouseClicks) {
+        currentlyCapturingMouseClicks = false;
+        captureMouseClicksDiv.hide();
     }
 }

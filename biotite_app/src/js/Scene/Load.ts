@@ -136,7 +136,8 @@ function babylonScene(callBackFunc): void {
         });
     }, (progress) => {
         if (progress["lengthComputable"]) {
-            let percent = Math.round(100 * progress["loaded"] / progress["total"]);
+            // Only to 90 to not give the impression that it's done loading.
+            let percent = Math.round(90 * progress["loaded"] / progress["total"]);
             Vars.engine.loadingUIText = "Loading the main scene... " + percent.toString() + "%";
         }
     });

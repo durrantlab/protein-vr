@@ -31,6 +31,11 @@ export function setup(): void {
         cancelStareIfFarAway();
         Vars.vrVars.navTargetMesh.position.copyFrom(curStarePt);
 
+        // Hide Vars.vrVars.navTargetMesh if it's on padNavSphereAroundCamera.
+        if (Pickables.curPickedMesh !== undefined) {
+            Vars.vrVars.navTargetMesh.isVisible = Pickables.curPickedMesh !== Pickables.padNavSphereAroundCamera;
+        }
+
         // Also the point on the ground below the camera should be updated
         // every turn of the render loop (to position the menu button).
         let pickedGroundPt = groundPointPickingInfo(CommonCamera.getCameraPosition()).pickedPoint;
@@ -81,7 +86,8 @@ export function setStarePointInfo(): void {
 
         // Construct a ray from the camera to the stare obj
         let camPos = CommonCamera.getCameraPosition();
-        ray = new BABYLON.Ray(camPos, curStarePt.subtract(camPos), 1000);
+        // ray = new BABYLON.Ray(camPos, curStarePt.subtract(camPos), 1000);
+        ray = new BABYLON.Ray(camPos, curStarePt.subtract(camPos));
     } else {
         console.log("Unexpected error.");
     }
@@ -115,17 +121,18 @@ function cancelStareIfFarAway(): void {
  * @returns void
  */
 function setPickPointAndObjInScene(ray, updatePos = true): void {
-    // Determines where that ray intersects the floor.
+    // Determines where the specified ray intersects a pickable object.
     const pickingInfo = Vars.scene.pickWithRay(ray, (mesh) => {
         return Pickables.checkIfMeshPickable(mesh);
     });
 
-    if (pickingInfo.hit) {
-        // It does hit the floor. Return the point.
+    if ((pickingInfo.hit) && (pickingInfo.distance < Vars.MAX_TELEPORT_DIST)) {
+        // It does hit the floor or some other pickable object. Return the
+        // point.
         if (updatePos) { setCurStarePt(pickingInfo.pickedPoint); }
         Pickables.setCurPickedMesh(pickingInfo.pickedMesh);
     } else {
-        // It doesn't hit the floor, so return null.
+        // It doesn't hit the floor or is too far away, so return null.
         setCurStarePt(pointWayOffScreen);
         Pickables.setCurPickedMesh(undefined);
     }

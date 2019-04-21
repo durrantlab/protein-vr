@@ -29,4 +29,6 @@ export function setup(initParams: Vars.IVRSetup) {
 
     // For debugging...
     // trackDebugSphere();
+
+    window.Vars = Vars;
 }

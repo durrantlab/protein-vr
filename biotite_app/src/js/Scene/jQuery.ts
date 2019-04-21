@@ -39,19 +39,26 @@ class JQueryObj {
     public click(callBack) {
         if (this.element) {
             // I assume below passes event.
-            this.element.addEventListener("click", callBack);
+            // this.element.addEventListener("click", callBack);
+            this.on("click", callBack);
         }
     }
 
     public show() {
         if (this.element) {
-            this.element.style.display = "";
+            this.element.style.display = "inline-block";  // I think this is what jQuery does.
         }
     }
 
     public hide() {
         if (this.element) {
             this.element.style.display = "none";
+        }
+    }
+
+    public on(eventName: string, callBack) {
+        if (this.element) {
+            this.element.addEventListener(eventName, callBack);
         }
     }
 

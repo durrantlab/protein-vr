@@ -2,6 +2,7 @@
 // pickable.
 
 import * as Vars from "../Vars";
+import * as CommonCamera from "./CommonCamera";
 import * as Navigation from "./Navigation";
 import * as Optimizations from "./Optimizations";
 
@@ -11,12 +12,16 @@ let pickableMeshes = [];
 let pickableButtons = [];
 let pickableMolecules = [];
 
+// A sphere placed around the camera to aid navigation.
+export let padNavSphereAroundCamera;
+
 export const enum PickableCategory {
     // Note: const enum needed for closure-compiler compatibility.
     None = 1,
     Ground = 2,
     Button = 3,
     Molecule = 4,
+    padNavSphereAroundCamera = 5,
 }
 
 /**
@@ -97,6 +102,8 @@ export function getCategoryOfCurMesh(): PickableCategory {
         return PickableCategory.Button;
     } else if (pickableMolecules.indexOf(curPickedMesh) !== -1) {
         return PickableCategory.Molecule;
+    } else if (curPickedMesh === padNavSphereAroundCamera) {
+        return PickableCategory.padNavSphereAroundCamera;
     } else {
         return PickableCategory.None;
     }
@@ -122,6 +129,10 @@ export function makeMeshMouseClickable(params: IMakeMeshClickableParams): void {
         params.scene = Vars.scene;
     }
 
+    if (params.mesh === undefined) {
+        return;
+    }
+
     params.mesh.actionManager = new BABYLON.ActionManager(params.scene);
     params.mesh.actionManager.registerAction(
         new BABYLON.ExecuteCodeAction(
@@ -139,4 +150,37 @@ export function makeMeshMouseClickable(params: IMakeMeshClickableParams): void {
             },
         ),
     );
+}
+
+/**
+ * Places a cube around the canmera so you can navegate even when not pointing
+ * at a molecule or anything. Good for pad-based navigation, but not
+ * teleportation.
+ * @returns void
+ */
+export function makePadNavigationSphereAroundCamera(): void {
+    padNavSphereAroundCamera = BABYLON.Mesh.CreateSphere(
+        "padNavSphereAroundCamera",
+        4, Vars.MAX_TELEPORT_DIST - 1.0, Vars.scene,
+    );
+    padNavSphereAroundCamera.flipFaces(true);
+
+    let mat = new BABYLON.StandardMaterial("padNavSphereAroundCameraMat", Vars.scene);
+    mat.diffuseColor = new BABYLON.Color3(1, 1, 1);
+    mat.specularColor = new BABYLON.Color3(0, 0, 0);
+    mat.opacityTexture = null;
+    padNavSphereAroundCamera.material = mat;
+
+    padNavSphereAroundCamera.visibility = 0.0;  // It's an invisible sphere.
+
+    // Doing it this way so follows camera even if camera changes.
+    Vars.scene.registerBeforeRender(() => {
+        padNavSphereAroundCamera.position = CommonCamera.getCameraPosition();
+    });
+
+    // It needs to be pickable
+    pickableMeshes.push(padNavSphereAroundCamera);
+
+    // Pretend like it's a molecule. Teleportation will be disabled elsewhere.
+    // addPickableMolecule(padNavSphereAroundCamera);
 }

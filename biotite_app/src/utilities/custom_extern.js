@@ -78,6 +78,7 @@ function GoldenLayoutItem(a, b) {};
 GoldenLayoutItem.parent = function() {};
 GoldenLayoutItem.parent.setActiveContentItem = function(s) {};
 
+var jQuery;
 jQuery.prototype.fileinput = function(s) {};
 jQuery.Event.key = function() {};
 jQuery.prototype.DataTable = function(a) {};
@@ -147,6 +148,8 @@ BABYLON.SceneLoader = function() {};
 BABYLON.SceneLoader.LoadAssetContainerAsync = function(a,b,c) {};
 BABYLON.SceneLoader.Load = function(a,b,c,d,e) {};
 BABYLON.SceneLoader.LoadAssetContainer = function(a, b, c, d, e) {};
+BABYLON.MeshBuilder;
+BABYLON.MeshBuilder.CreateBox = function(a, b, c) {};
 
 /**
  * @constructor
@@ -301,6 +304,7 @@ BABYLON.Mesh.simplify = function(a,b,c,d) {};
 BABYLON.Mesh.dispose = function() {};
 BABYLON.Mesh.getLODLevels = function() {};
 BABYLON.Mesh.removeLODLevel = function(a) {};
+BABYLON.Mesh.flipFaces = function(a) {};
 
 /**
  * @constructor
@@ -348,6 +352,7 @@ BABYLON.Engine.prototype.enableOfflineSupport;
 BABYLON.Engine.prototype.switchFullscreen = function(a) {};
 BABYLON.Engine.prototype.displayLoadingUI = function() {};
 BABYLON.Engine.prototype.loadingUIText;
+BABYLON.Engine.prototype.getFps = function() {};
 
 /**
  * @constructor

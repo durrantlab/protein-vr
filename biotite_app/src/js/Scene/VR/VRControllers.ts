@@ -1,6 +1,7 @@
 import * as Vars from "../Vars";
 import * as CommonCamera from "./CommonCamera";
 import * as Navigation from "./Navigation";
+import * as Pickables from "./Pickables";
 import * as Points from "./Points";
 import * as VRCamera from "./VRCamera";
 
@@ -19,6 +20,10 @@ let padPressed = false;
  * @returns void
  */
 export function setup(): void {
+    // Put a cube around the camera. This is to receive picker for pad-based
+    // navigation, even if you're not pointing at a protein.
+    Pickables.makePadNavigationSphereAroundCamera();
+
     // onControllersAttachedObservable doesn't work. I'd prefer that one...
     Vars.vrHelper.webVRCamera.onControllerMeshLoadedObservable.add((webVRController) => {
         // Update navMode
@@ -33,7 +38,6 @@ export function setup(): void {
 
         console.log("Isnt there on pickable or something");
 
-        console.log(webVRController);
         setupTrigger(webVRController);
         setupPad(webVRController);
     });
@@ -56,10 +60,10 @@ function setupTrigger(webVRController: any): void {
         }
 
         const curTime = new Date().getTime();
-        console.log(curTime, lastTriggerTime, curTime - lastTriggerTime, Vars.VR_CONTROLLER_TRIGGER_DELAY_TIME);
+        // console.log(curTime, lastTriggerTime, curTime - lastTriggerTime, Vars.VR_CONTROLLER_TRIGGER_DELAY_TIME);
         if (curTime - lastTriggerTime > Vars.VR_CONTROLLER_TRIGGER_DELAY_TIME) {
             // Enough time has passed...
-            console.log("triggered");
+            // console.log("triggered");
             lastTriggerTime = curTime;
             Navigation.actOnStareTrigger();
         }
@@ -101,15 +105,7 @@ function setupPad(webVRController: any): void {
     //     console.re.log("DEBUG: onMenuButtonStateChangedObservable");
     // });
 
-    // console.re.log("moo3");
-    // debugger;
-    // console.re.log(JSON.stringify(webVRController));
-    // window.webVRController = webVRController;
-
     webVRController.onPadValuesChangedObservable.add((state) => {
-        // console.re.log("moo4");
-        // console.re.log(JSON.stringify(state));
-        // console.re.log(state);
         // If it's not a press right in the middle, then save the y value for
         // moving foward/backward.
         padMoveSpeedFactor = state["y"];

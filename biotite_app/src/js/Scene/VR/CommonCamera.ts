@@ -42,14 +42,15 @@ export function getCameraPosition(): any {
  * @returns void
  */
 export function setCameraPosition(pt): void {
-    // Not ever tested... not sure it works...
-    let activeCam = Vars.vrHelper.webVRCamera;
-
     if (Vars.vrVars.navMode === Navigation.NavMode.NoVR) {
         // A regular camera. Just move it there.
+        let activeCam = Vars.scene.activeCamera;
         activeCam.position.copyFrom(pt);
     } else if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
                (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
+        // Not ever tested... not sure it works...
+        let activeCam = Vars.vrHelper.webVRCamera;
+
         // A VR camera. Need to account for the fact that the eye might not be
         // at the same place as the camera.
         activeCam.position.copyFrom(

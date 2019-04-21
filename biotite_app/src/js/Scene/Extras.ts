@@ -33,7 +33,6 @@ export function setup(): void {
                 let objID = data["objIDs"][idx];
                 let meshTask = assetsManager.addMeshTask(objID, "", "./", objID + ".gltf");
                 meshTask.onSuccess = (task) => {
-                    // console.log(task);
                     // Get the meshes.
                     for (let uniqStrID in task.loadedMeshes) {
                         if (task.loadedMeshes.hasOwnProperty(uniqStrID)) {
@@ -45,8 +44,6 @@ export function setup(): void {
                             );
                         }
                     }
-
-                    // task.loadedMeshes[0].position = BABYLON.Vector3.Zero();
                 };
             }
         }
@@ -59,6 +56,32 @@ export function setup(): void {
 
         assetsManager.onFinish = (tasks) => {
             setupShadowCatchers();
+
+            // Make sure the camera can see far enough.
+            Vars.scene.activeCamera.maxZ = 250;
+
+            // Do you need to make the ground glass instead of invisible? See
+            // scene_info.json, which can have transparentGround: true.
+            if ((data["transparentGround"] !== undefined) && (data["transparentGround"] === true)) {
+                Vars.vrVars.groundMesh.visibility = 1;
+                let transparentGround = new BABYLON.StandardMaterial("transparentGround", Vars.scene);
+
+                transparentGround.diffuseColor = new BABYLON.Color3(1, 1, 1);
+                transparentGround.specularColor = new BABYLON.Color3(0, 0, 0);
+                transparentGround.emissiveColor = new BABYLON.Color3(0, 0, 0);
+                transparentGround.alpha = Vars.TRANSPARENT_FLOOR_ALPHA;
+                // transparentGround.ambientColor = new BABYLON.Color3(0.23, 0.98, 0.53);
+
+                Vars.vrVars.groundMesh.material = transparentGround;
+
+                // let glass = new BABYLON.PBRMaterial("glass", Vars.scene);
+                // glass.reflectionTexture = hdrTexture;
+                // glass.refractionTexture = hdrTexture;
+                // glass.linkRefractionWithTransparency = true;
+                // glass.indexOfRefraction = 0.52;
+                // glass.alpha = 0; // Fully refractive material
+                // Vars.vrVars.groundMesh.material = glass;
+            }
 
             // Give it a bit to let one render cycle go through. Hackish,
             // admittedly.
