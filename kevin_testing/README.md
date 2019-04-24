@@ -12,6 +12,11 @@ revisit that), but you can still test the scenes for things like scale.
 
 Export your scene to `kevin_testing/web/scene/scene.babylon`
 
+To export quickly (without having to wait), turn down the settings on the
+Babylon.js exporter. Click on each object, then click on the `Object data` tab
+(three dots connected into a triangle), scroll down to the `Babylon.js ver
+5.6.X subpanel`, then the `Procedural Texture/Cycles Baking` sub-subpanel.
+
 Browser Testing
 ---------------
 

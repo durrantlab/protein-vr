@@ -14,6 +14,8 @@ export function load(): void {
     Vars.setup();
 
     babylonScene(() => {
+        Vars.determineCameraHeightFromActiveCamera();
+
         let navMeshToUse = BABYLON.Mesh.CreateSphere("navTargetMesh", 4, 0.1, Vars.scene);
         let navMeshMat = new BABYLON.StandardMaterial("myMaterial", Vars.scene);
         navMeshMat.diffuseColor = new BABYLON.Color3(1, 0, 1);
@@ -29,7 +31,11 @@ export function load(): void {
 
         // Register a render loop to repeatedly render the scene
         Vars.engine.runRenderLoop(() => {
-            Vars.scene.render();
+            // try {
+                Vars.scene.render();
+            // }  catch {
+                // console.log("ERROR!");
+            // }
         });
     });
 

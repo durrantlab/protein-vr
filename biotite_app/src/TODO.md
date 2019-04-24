@@ -28,8 +28,14 @@ Other selection types (hydrophobic).
 Setup scenes for presentations.
 
 fix protein VR on Google cardboard
-    Note that this doesn't happen in the playground.
-    Also, doesn't matter whether you closure compile externals.js.
+* Note that this doesn't happen in the playground.
+* Also, doesn't matter whether you closure compile externals.js.
+* Also, doesn't seem to be gazetracker or registerbeforerenders.
+* When you catch the error at render(), it never recovers. So it's not that
+  something hasn't loaded yet.
+* Try recreating in playground, but loading same scene. Perhaps its a problem
+  with the scene? You've tried very hard to eliminate functions. I think now
+  you should try to rebuild from the ground up, to id the error.
 
 Why does VR camera not match camera from babylon in initial orientation?
 

@@ -11,6 +11,9 @@ declare var BABYLON;
  * @param {Object<string,*>} initParams The parameters.
  */
 export function setup(initParams: Vars.IVRSetup) {
+    // Setup the default (nonVR) camera.
+    NonVRCamera.setup();
+
     // Set up the parameters (filling in missing values, for example). Also
     // saves the modified params to the params module variable.
     Vars.setupVR(initParams);
@@ -20,9 +23,6 @@ export function setup(initParams: Vars.IVRSetup) {
 
     // Setup the VR camera
     VRCamera.setup();
-
-    // Setup the default (nonVR) camera.
-    NonVRCamera.setup();
 
     // Optimize the scene to make it run better.
     Optimizations.setup();

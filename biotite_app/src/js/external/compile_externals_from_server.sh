@@ -1,16 +1,19 @@
 # Download the files
-curl -o t https://code.jquery.com/pep/0.4.3/pep.min.js
-curl -o t2 https://preview.babylonjs.com/babylon.js
-curl -o t3 https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js
-curl -o t4 https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js
-curl -o t5 https://preview.babylonjs.com/gui/babylon.gui.min.js
-# curl -o t6 https://code.jquery.com/jquery-3.3.1.min.js
+curl -o tmp.1.pep.min.js https://code.jquery.com/pep/0.4.3/pep.min.js
+curl -o tmp.2.babylon.js https://preview.babylonjs.com/babylon.js
+curl -o tmp.3.babylonjs.loaders.min.js https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js
+curl -o tmp.4.babylonjs.materials.min.js https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js  # For shadowonly material.
+curl -o tmp.5.babylon.gui.min.js https://preview.babylonjs.com/gui/babylon.gui.min.js  # Needed for GUI3DManagser
+
+# Old ones not used anymore.
+# curl -o tmp.6.jquery-3.3.1.min.js https://code.jquery.com/jquery-3.3.1.min.js
 
 # Concatonate and delete originals
-# cat t t2 t3 t4 t5 t6 > externals.js
-# rm t t2 t3 t4 t5 t6
-cat t t2 t3 t4 t5 > externals.js
-rm t t2 t3 t4 t5
+cat tmp.1.pep.min.js tmp.2.babylon.js tmp.3.babylonjs.loaders.min.js \
+    tmp.4.babylonjs.materials.min.js \
+    tmp.5.babylon.gui.min.js \
+    > externals.js
+rm tmp.*.js
 
 # Closure compiler
 java -jar ../../utilities/closure-compiler-v20180506.jar --compilation_level=SIMPLE_OPTIMIZATIONS \

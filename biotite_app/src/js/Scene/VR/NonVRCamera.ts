@@ -30,9 +30,10 @@ function setupNonVRCameraObj(): void {
     nonVRCamera.keysLeft = [65, 37];
     nonVRCamera.keysRight = [68, 39];
 
-    // Turn on gravity
-    Vars.scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
-    nonVRCamera.applyGravity = true;
+    // Turn on gravity. Note: Turning this on causes problems, and it doesn't
+    // seem to be necessary.
+    // Vars.scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
+    // nonVRCamera.applyGravity = true;
 
     // Enable collision detection. Note that the second paramerter is a
     // radius.
@@ -63,5 +64,5 @@ function setupNonVRCameraObj(): void {
  */
 export function setCameraElipsoid(): void {
     // Depends on camera height.
-    nonVRCamera.ellipsoid = new BABYLON.Vector3(1.0, 0.5 * Vars.vrVars.cameraHeight, 1.0);
+    nonVRCamera.ellipsoid = new BABYLON.Vector3(1.0, 0.5 * Vars.cameraHeight, 1.0);
 }

@@ -13,7 +13,7 @@ export interface IVRSetup {
                                     // teleportation. This is also used to
                                     // determine the location of the gaze. If
                                     // not set, an empty is used for tracking.
-    cameraHeight?: number;          // For some nav states (NoVR), you need to
+    // cameraHeight?: number;          // For some nav states (NoVR), you need to
                                     // define the height.
     navMode?: Navigation.NavMode;
     menuActive?: boolean;
@@ -23,6 +23,7 @@ export let canvas;
 export let engine;
 export let scene;
 export let vrHelper;
+export let cameraHeight;
 
 // Also some constants
 export const TRANSPORT_DURATION = 11;
@@ -37,7 +38,7 @@ export const VR_CONTROLLER_TRIGGER_DELAY_TIME = 500;  // time to wait between tr
 export const VR_CONTROLLER_PAD_ROTATION_DELAY_TIME = 750;  // time to wait between triggers.
 export const VR_CONTROLLER_PAD_RATIO_OF_MIDDLE_FOR_CAMERA_RESET = 0.1;
 export const MAX_TELEPORT_DIST = 15;
-export const TRANSPARENT_FLOOR_ALPHA = 0.02;
+export const TRANSPARENT_FLOOR_ALPHA = 1.0;  // 0.02;
 
 // Variables that can change.
 export let vrVars: IVRSetup;
@@ -65,6 +66,34 @@ export function setup(): void {
 }
 
 /**
+ * Determines the camera height from the active camera.
+ * @returns void
+ */
+export function determineCameraHeightFromActiveCamera(): void {
+    // Get the camera height. But I don't think this variable is every
+    // actually used anywhere...
+    if (cameraHeight === undefined) {
+        // Calculate the camera height from it's position.
+        const ray = new BABYLON.Ray(
+            scene.activeCamera.position, new BABYLON.Vector3(0, -1, 0), 50,
+        );
+        const pickingInfo = scene.pickWithRay(ray, (mesh) => {
+            return (mesh.name === "ground");
+        });
+        cameraHeight = pickingInfo.distance;
+    }
+}
+
+/**
+ * Sets the camera height.
+ * @param  {number} height  The height.
+ * @returns void
+ */
+export function setCameraHeight(height: number): void {
+    cameraHeight = height;
+}
+
+/**
  * Modifies the parameters, adding in default values where values are missing,
  * for example. Also saves the updated params to the module-level params
  * variable.
@@ -83,22 +112,9 @@ export function setupVR(initParams: IVRSetup): void {
     }
     vrHelper = scene.createDefaultVRExperience(params);
 
-    // Make sure params.cameraHeight is defined.
-    if (initParams.cameraHeight === undefined) {
-        // Calculate the camera height from it's position.
-        const ray = new BABYLON.Ray(
-            scene.activeCamera.position, new BABYLON.Vector3(0, -1, 0), 50,
-        );
-        const pickingInfo = scene.pickWithRay(ray, (mesh) => {
-            return (mesh.name === "ground");
-        });
-        initParams.cameraHeight = pickingInfo.distance;
-    }
-
     // Save the parameter to params (module-level variable).
     vrVars = initParams;
 
     // Whether the menu system is active. True by default.
     vrVars.menuActive = true;
-
 }

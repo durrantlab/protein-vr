@@ -181,7 +181,7 @@ function teleport(newLoc = undefined, callBack = undefined): void {
         // If it's not defined, use the current stare point.
         newLoc = new BABYLON.Vector3(
             Points.curStarePt.x,
-            Points.curStarePt.y + Vars.vrVars.cameraHeight,
+            Points.curStarePt.y + Vars.cameraHeight,
             Points.curStarePt.z,
         );
     }
@@ -262,7 +262,7 @@ function grow(): void {
 
     // Set the new height. 0.01 is important so elipse doesn't get caught on
     // new ground.
-    Vars.vrVars.cameraHeight = Points.curStarePt.y - ptBelowStarePt.y;
+    Vars.setCameraHeight(Points.curStarePt.y - ptBelowStarePt.y);
 
     teleport(newPt, () => {
         // Make sure the collision elipsoid surrounding the non-VR camera

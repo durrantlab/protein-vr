@@ -25,8 +25,6 @@ export function setup(): void {
  */
 function setupEnterAndExitVRCallbacks(): void {
     Vars.vrHelper.onEnteringVRObservable.add((a, b) => {
-        // debugger;
-
         // Not sure what a and b are. Both are objects.
 
         // Update navMode
