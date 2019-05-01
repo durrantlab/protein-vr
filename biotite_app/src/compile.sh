@@ -11,15 +11,14 @@ r.js -o build.js
 export formatting=""
 
 # --externs='utilities/jquery-1.9.js' --externs='utilities/twitter-bootstrap-2.1.1-externs.js'
-
-# java -jar utilities/closure-compiler-v20180506.jar --compilation_level=ADVANCED_OPTIMIZATIONS \
-#     --externs='utilities/custom_extern.js' --js_output_file='lodash.min2.js' 'lodash.min.js' \
-#     ${formatting} 2> closure.out
-# mv lodash.min2.js lodash.min.js
+java -jar utilities/closure-compiler-v20180506.jar --compilation_level=ADVANCED_OPTIMIZATIONS \
+    --externs='utilities/custom_extern.js' --js_output_file='lodash.min2.js' 'lodash.min.js' \
+    ${formatting} 2> closure.out
+mv lodash.min2.js lodash.min.js
 
 # Combine it with the externals.
-cat js/external/externals.js lodash.min.js > tmptmp
-mv tmptmp lodash.min.js
+# cat js/external/externals.js lodash.min.js > tmptmp
+# mv tmptmp lodash.min.js
 
 # Remove existing build directory
 echo "Recreating build directory..."
@@ -50,4 +49,4 @@ rm -rf /Users/jdurrant/Documents/Work/durrant_git/online-app-suite/src/js/api/se
 rsync -rv --exclude="babylon_scenes" ../build/* /Users/jdurrant/Documents/Work/durrant_git/online-app-suite/src/js/api/server_apps/apps/CreateVRScene/support/browser/
 
 # Process is done
-#say -v Samantha "beep"
+say -v Samantha "beep"

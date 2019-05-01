@@ -13,18 +13,30 @@ declare var BABYLON;
 export function load(): void {
     Vars.setup();
 
+    // Remove the initial loading screen.
+    document.getElementById("loading-container").outerHTML = "";
+
+    // Because of this error, you need to setup VR before loading the babylon
+    // scene:
+    // https://forum.babylonjs.com/t/createdefaultvrexperience-android-chrome-vr-mode-change-material-unusual-error/2738/4
+
+    // Essentially a placeholder camera...
+    let camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), Vars.scene);
+
+    // You'll need a navigation mesh.
+    let navMeshToUse = BABYLON.Mesh.CreateSphere("navTargetMesh", 4, 0.1, Vars.scene);
+    let navMeshMat = new BABYLON.StandardMaterial("myMaterial", Vars.scene);
+    navMeshMat.diffuseColor = new BABYLON.Color3(1, 0, 1);
+    navMeshToUse.material = navMeshMat;
+
+    // Setup the VR here.
+    VRLoad.setup({
+        groundMeshName: "ground",
+        navTargetMesh: navMeshToUse,
+    });
+
     babylonScene(() => {
         Vars.determineCameraHeightFromActiveCamera();
-
-        let navMeshToUse = BABYLON.Mesh.CreateSphere("navTargetMesh", 4, 0.1, Vars.scene);
-        let navMeshMat = new BABYLON.StandardMaterial("myMaterial", Vars.scene);
-        navMeshMat.diffuseColor = new BABYLON.Color3(1, 0, 1);
-        navMeshToUse.material = navMeshMat;
-
-        VRLoad.setup({
-            groundMeshName: "ground",
-            navTargetMesh: navMeshToUse,
-        });
 
         // Load extra objects
         Extras.setup();
@@ -113,7 +125,7 @@ function babylonScene(callBackFunc): void {
                     let mesh = Vars.scene.meshes[meshIdx];
 
                     // It needs to be emmisive (so always baked).
-                    if (mesh.material.emissiveTexture === undefined) {
+                    if ((mesh.material.emissiveTexture === undefined) || (mesh.material.emissiveTexture === null)) {
                         mesh.material.emissiveTexture = mesh.material.diffuseTexture;
 
                         // Below seems important to comment out. .clone()

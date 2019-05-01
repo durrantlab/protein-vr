@@ -38,7 +38,7 @@ export const VR_CONTROLLER_TRIGGER_DELAY_TIME = 500;  // time to wait between tr
 export const VR_CONTROLLER_PAD_ROTATION_DELAY_TIME = 750;  // time to wait between triggers.
 export const VR_CONTROLLER_PAD_RATIO_OF_MIDDLE_FOR_CAMERA_RESET = 0.1;
 export const MAX_TELEPORT_DIST = 15;
-export const TRANSPARENT_FLOOR_ALPHA = 1.0;  // 0.02;
+export const TRANSPARENT_FLOOR_ALPHA = 0.05;  // 0.02;
 
 // Variables that can change.
 export let vrVars: IVRSetup;

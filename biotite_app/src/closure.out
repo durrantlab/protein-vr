@@ -48,104 +48,124 @@ lodash.min.js:437: WARNING - Function define: called with 2 argument(s). Functio
 define("external/almond", function(){});
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-lodash.min.js:465: WARNING - unreachable code
-        if (false) { // true means use manifest files.
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lodash.min.js:469: WARNING - unreachable code
+        else {
+             ^
 
-lodash.min.js:615: WARNING - assignment to property onload of Element
+lodash.min.js:648: WARNING - assignment to property onload of Element
 found   : function(?, ?): undefined
 required: (function((Event|null)): ?|null)
         script.onload = script.onreadystatechange = function (_, isAbort) {
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-lodash.min.js:627: WARNING - actual parameter 1 of Node.prototype.insertBefore does not match formal parameter
+lodash.min.js:660: WARNING - actual parameter 1 of Node.prototype.insertBefore does not match formal parameter
 found   : (Element|undefined)
 required: (Node|null)
         prior.parentNode.insertBefore(script, prior);
                                       ^^^^^^
 
-lodash.min.js:824: WARNING - cannot instantiate non-constructor
+lodash.min.js:856: WARNING - cannot instantiate non-constructor
+        result.optimizations.push(new ReportOptimizationChange(priority));
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+lodash.min.js:859: WARNING - cannot instantiate non-constructor
         result.optimizations.push(new RemoveSurfaces(priority)); // Remove surfaces
                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-lodash.min.js:827: WARNING - cannot instantiate non-constructor
+lodash.min.js:860: WARNING - cannot instantiate non-constructor
+        result.optimizations.push(new ReportOptimizationChange(priority));
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+lodash.min.js:864: WARNING - cannot instantiate non-constructor
+        result.optimizations.push(new ReportOptimizationChange(priority));
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+lodash.min.js:869: WARNING - cannot instantiate non-constructor
+        result.optimizations.push(new ReportOptimizationChange(priority));
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+lodash.min.js:873: WARNING - cannot instantiate non-constructor
         result.optimizations.push(new SimplifyMeshes(priority, 500)); // Simplify meshes.
                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-lodash.min.js:933: WARNING - restricted index type
+lodash.min.js:874: WARNING - cannot instantiate non-constructor
+        result.optimizations.push(new ReportOptimizationChange(priority));
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+lodash.min.js:991: WARNING - restricted index type
 found   : string
 required: number
                     var mesh = meshesToConsider[meshIdx][1];
                                                 ^^^^^^^
 
-lodash.min.js:934: WARNING - restricted index type
+lodash.min.js:992: WARNING - restricted index type
 found   : string
 required: number
                     var decimationLvel = meshesToConsider[meshIdx][2];
                                                           ^^^^^^^
 
-lodash.min.js:1445: WARNING - Function BABYLON.Ray: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+lodash.min.js:1524: WARNING - Function BABYLON.Ray: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
             ray = new BABYLON.Ray(camPos, exports.curStarePt.subtract(camPos));
                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-lodash.min.js:2916: WARNING - Function require: called with 2 argument(s). Function requires at least 5 argument(s) and no more than 5 argument(s).
+lodash.min.js:2974: WARNING - Function require: called with 2 argument(s). Function requires at least 5 argument(s) and no more than 5 argument(s).
 require(["Game"], function (Game) {
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-lodash.min.js:2920: WARNING - Function define: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+lodash.min.js:2978: WARNING - Function define: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
 define("Start", function(){});
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-utilities/custom_extern.js:412: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
+utilities/custom_extern.js:421: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
 BABYLON.Scene.prototype.WebVRController.onTriggerStateChangedObservable = function() {};
                         ^^^^^^^^^^^^^^^
 
-utilities/custom_extern.js:413: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
+utilities/custom_extern.js:422: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
 BABYLON.Scene.prototype.WebVRController.onTriggerStateChangedObservable.add = function(a) {};
                         ^^^^^^^^^^^^^^^
 
-utilities/custom_extern.js:414: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
+utilities/custom_extern.js:423: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
 BABYLON.Scene.prototype.WebVRController.onPadStateChangedObservable = function() {};
                         ^^^^^^^^^^^^^^^
 
-utilities/custom_extern.js:415: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
+utilities/custom_extern.js:424: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
 BABYLON.Scene.prototype.WebVRController.onPadStateChangedObservable.add = function(a) {};
                         ^^^^^^^^^^^^^^^
 
-utilities/custom_extern.js:416: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
+utilities/custom_extern.js:425: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
 BABYLON.Scene.prototype.WebVRController.onPadValuesChangedObservable = function() {};
                         ^^^^^^^^^^^^^^^
 
-utilities/custom_extern.js:417: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
+utilities/custom_extern.js:426: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
 BABYLON.Scene.prototype.WebVRController.onPadValuesChangedObservable.add = function(a) {};
                         ^^^^^^^^^^^^^^^
 
-utilities/custom_extern.js:419: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
+utilities/custom_extern.js:429: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
 BABYLON.Scene.prototype.WebVRController.onMainButtonStateChangedObservable= function() {};
                         ^^^^^^^^^^^^^^^
 
-utilities/custom_extern.js:420: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
+utilities/custom_extern.js:430: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
 BABYLON.Scene.prototype.WebVRController.onMainButtonStateChangedObservable.add = function(a) {};
                         ^^^^^^^^^^^^^^^
 
-utilities/custom_extern.js:422: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
+utilities/custom_extern.js:432: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
 BABYLON.Scene.prototype.WebVRController.onSecondaryButtonStateChangedObservable= function() {};
                         ^^^^^^^^^^^^^^^
 
-utilities/custom_extern.js:423: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
+utilities/custom_extern.js:433: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
 BABYLON.Scene.prototype.WebVRController.onSecondaryButtonStateChangedObservable.add = function(a) {};
                         ^^^^^^^^^^^^^^^
 
-utilities/custom_extern.js:425: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
+utilities/custom_extern.js:435: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
 BABYLON.Scene.prototype.WebVRController.onMenuButtonStateChangedObservable= function() {};
                         ^^^^^^^^^^^^^^^
 
-utilities/custom_extern.js:426: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
+utilities/custom_extern.js:436: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
 BABYLON.Scene.prototype.WebVRController.onMenuButtonStateChangedObservable.add = function(a) {};
                         ^^^^^^^^^^^^^^^
 
-utilities/custom_extern.js:429: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
+utilities/custom_extern.js:439: WARNING - Property WebVRController never defined on BABYLON.Scene.prototype
 BABYLON.Scene.prototype.WebVRController.pad;
                         ^^^^^^^^^^^^^^^
 
-0 error(s), 33 warning(s), 67.0% typed
+0 error(s), 38 warning(s), 67.1% typed

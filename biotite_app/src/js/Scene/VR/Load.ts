@@ -14,12 +14,12 @@ export function setup(initParams: Vars.IVRSetup) {
     // Setup the default (nonVR) camera.
     NonVRCamera.setup();
 
+    // Setup the general things that apply regardless of the mode used.
+    General.setup();
+
     // Set up the parameters (filling in missing values, for example). Also
     // saves the modified params to the params module variable.
     Vars.setupVR(initParams);
-
-    // Setup the general things that apply regardless of the mode used.
-    General.setup();
 
     // Setup the VR camera
     VRCamera.setup();

@@ -41,6 +41,10 @@ Why does VR camera not match camera from babylon in initial orientation?
 
 Help menu too? Button on front?
     Dedicate to Karen Curto.
+    Troubleshooting
+        Chrome: Go to chrome://flags, turn on WebVR. Even if it works, it could work better...
+
+Slight ticjk up after 90%
 
 Done or Ignore
 --------------

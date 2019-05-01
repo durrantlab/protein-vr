@@ -356,6 +356,11 @@ BABYLON.Engine.prototype.getFps = function() {};
 
 /**
  * @constructor
+*/
+BABYLON.FreeCamera = function(a,b,c) {};
+
+/**
+ * @constructor
  */
 BABYLON.Scene = function(a) {};
 
@@ -378,6 +383,7 @@ BABYLON.Scene.prototype.activeCamera.checkCollisions;
 BABYLON.Scene.prototype.activeCamera.speed;
 BABYLON.Scene.prototype.activeCamera.ellipsoid;
 BABYLON.Scene.prototype.activeCamera.minZ;
+BABYLON.Scene.prototype.activeCamera.maxZ;
 BABYLON.Scene.prototype.activeCamera.inputs;
 BABYLON.Scene.prototype.activeCamera.inputs.attached;
 BABYLON.Scene.prototype.activeCamera.inputs.attached.deviceOrientation;
@@ -409,14 +415,17 @@ BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLo
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLoadedObservable.add = function(a) {};
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.rotationQuaternion;
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.rotationQuaternion.toEulerAngles = function() {};
-
+BABYLON.Scene.prototype.getEngine = function() {};
+BABYLON.Scene.prototype.getEngine.getCaps = function() {};
+BABYLON.Scene.prototype.getEngine.getCaps.multiview;
 BABYLON.Scene.prototype.WebVRController.onTriggerStateChangedObservable = function() {};
 BABYLON.Scene.prototype.WebVRController.onTriggerStateChangedObservable.add = function(a) {};
 BABYLON.Scene.prototype.WebVRController.onPadStateChangedObservable = function() {};
 BABYLON.Scene.prototype.WebVRController.onPadStateChangedObservable.add = function(a) {};
 BABYLON.Scene.prototype.WebVRController.onPadValuesChangedObservable = function() {};
 BABYLON.Scene.prototype.WebVRController.onPadValuesChangedObservable.add = function(a) {};
-
+BABYLON.Scene.prototype.debugLayer;
+BABYLON.Scene.prototype.debugLayer.show = function() {};
 BABYLON.Scene.prototype.WebVRController.onMainButtonStateChangedObservable= function() {};
 BABYLON.Scene.prototype.WebVRController.onMainButtonStateChangedObservable.add = function(a) {};
 
