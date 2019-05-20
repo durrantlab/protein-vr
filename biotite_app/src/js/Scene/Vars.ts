@@ -39,6 +39,7 @@ export const VR_CONTROLLER_PAD_ROTATION_DELAY_TIME = 750;  // time to wait betwe
 export const VR_CONTROLLER_PAD_RATIO_OF_MIDDLE_FOR_CAMERA_RESET = 0.1;
 export const MAX_TELEPORT_DIST = 15;
 export const TRANSPARENT_FLOOR_ALPHA = 0.05;  // 0.02;
+export const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;  // IOS doesn't support a lot of features!
 
 // Variables that can change.
 export let vrVars: IVRSetup;
@@ -103,6 +104,7 @@ export function setupVR(initParams: IVRSetup): void {
     // Create the vr helper. See http://doc.babylonjs.com/how_to/webvr_helper
     let params = {
         // "createDeviceOrientationCamera": false,  // This makes phone ignore motion sensor. No good.
+        "createDeviceOrientationCamera": true,
     };
     if (scene.getEngine().getCaps().multiview) {
         // Much faster according to
@@ -111,6 +113,13 @@ export function setupVR(initParams: IVRSetup): void {
         params["useMultiview"] = true;
     }
     vrHelper = scene.createDefaultVRExperience(params);
+
+    // Hide the vrHelper icon initially.
+    document.getElementById("babylonVRiconbtn").style.opacity = "0.0";  // Non IE;
+    document.getElementById("babylonVRiconbtn").style.filter = "alpha(opacity=0)";  // IE;
+
+    window["vrHelper"] = vrHelper;
+    // console.log(window.vrHelper);
 
     // Save the parameter to params (module-level variable).
     vrVars = initParams;

@@ -327,8 +327,14 @@ function checkCaptureMouseClicksOutsideBabylon(): void {
     if (deviceBeingOriented && !currentlyCapturingMouseClicks) {
         currentlyCapturingMouseClicks = true;
         captureMouseClicksDiv.show();
+        // console.log("show");
     } else if (!deviceBeingOriented && currentlyCapturingMouseClicks) {
         currentlyCapturingMouseClicks = false;
         captureMouseClicksDiv.hide();
+        // console.log("hide");
+    } else {
+        // console.log("confused");
+        // console.log(deviceBeingOriented);
+        // console.log(currentlyCapturingMouseClicks);
     }
 }

@@ -361,6 +361,11 @@ BABYLON.FreeCamera = function(a,b,c) {};
 
 /**
  * @constructor
+*/
+BABYLON.DeviceOrientationCamera = function(a,b,c,d) {};
+
+/**
+ * @constructor
  */
 BABYLON.Scene = function(a) {};
 
@@ -390,6 +395,7 @@ BABYLON.Scene.prototype.activeCamera.inputs.attached.deviceOrientation;
 BABYLON.Scene.prototype.activeCamera.inputs.attached.deviceOrientation._alpha;
 BABYLON.Scene.prototype.activeCamera.inputs.attached.deviceOrientation._beta;
 BABYLON.Scene.prototype.activeCamera.inputs.attached.deviceOrientation._gamma;
+BABYLON.Scene.prototype.activeCamera.resetToCurrentRotation = function() {};
 BABYLON.Scene.prototype.lights = function() {};
 BABYLON.Scene.prototype.lights.name = function() {};
 BABYLON.Scene.prototype.lights.dispose = function() {};
@@ -415,6 +421,7 @@ BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLo
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLoadedObservable.add = function(a) {};
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.rotationQuaternion;
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.rotationQuaternion.toEulerAngles = function() {};
+BABYLON.Scene.prototype.createDefaultVRExperience.teleportCamera = function(a) {};
 BABYLON.Scene.prototype.getEngine = function() {};
 BABYLON.Scene.prototype.getEngine.getCaps = function() {};
 BABYLON.Scene.prototype.getEngine.getCaps.multiview;
@@ -586,3 +593,5 @@ function speechSynthesis() {};
 speechSynthesis.getVoices = function() {};
 speechSynthesis.onvoiceschanged = function() {};
 speechSynthesis.speak = function(a) {};
+
+var MSStream;

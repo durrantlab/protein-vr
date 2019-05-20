@@ -34,7 +34,7 @@ html, body {
     z-index: 3 !important;
 }
 
-#babylonVRiconbtn, #fullscreen-button {
+#babylonVRiconbtn, .ui-button {
     z-index: 4;
 }
 

@@ -1,10 +1,15 @@
 import * as Extras from "./Extras";
+import * as LoadingScreens from "./LoadingScreens";
 import * as Vars from "./Vars";
+import * as General from "./VR/General";  // Why in this dir?
 import * as VRLoad from "./VR/Load";
+import * as NonVRCamera from "./VR/NonVRCamera";  // Why in this dir?
 import * as Optimizations from "./VR/Optimizations";
 import * as Pickables from "./VR/Pickables";
 
 declare var BABYLON;
+
+export let cameraFromBabylonFile;
 
 /**
  * Load the scene, setup the VR, etc.
@@ -13,15 +18,13 @@ declare var BABYLON;
 export function load(): void {
     Vars.setup();
 
-    // Remove the initial loading screen.
-    document.getElementById("loading-container").outerHTML = "";
+    // Remove the initial loading javascript screen (not the babylonjs loading
+    // screen... That's to come).
+    LoadingScreens.removeLoadingJavascriptScreen();
 
     // Because of this error, you need to setup VR before loading the babylon
     // scene:
     // https://forum.babylonjs.com/t/createdefaultvrexperience-android-chrome-vr-mode-change-material-unusual-error/2738/4
-
-    // Essentially a placeholder camera...
-    let camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), Vars.scene);
 
     // You'll need a navigation mesh.
     let navMeshToUse = BABYLON.Mesh.CreateSphere("navTargetMesh", 4, 0.1, Vars.scene);
@@ -36,19 +39,55 @@ export function load(): void {
     });
 
     babylonScene(() => {
+        // You need to make the camera from the babylon file active. First,
+        // get the babylon camera.
+        cameraFromBabylonFile = Vars.scene.cameras.filter(
+            (c) => c.name.indexOf("VR") === -1,
+        )[0];
+
+        // If true, sets up device orientation camera. Otherwise, just use one
+        // in babylonjs file.
+        if (true) {
+            // Create a device orientation camera that matches the one loaded from the
+            // babylon file.
+            let DevOrCamera = new BABYLON.DeviceOrientationCamera(
+                "DevOr_camera",
+                cameraFromBabylonFile.position.clone(),
+                Vars.scene,
+                true,
+            );
+            DevOrCamera.rotation = cameraFromBabylonFile.rotation;
+            // DevOrCamera.resetToCurrentRotation();
+
+            // For debugging.
+            window["cameraFromBabylonFile"] = cameraFromBabylonFile;
+            window["DevOrCamera"] = DevOrCamera;
+
+            // Update the active camera to be the device orientation one.
+            Vars.scene.activeCamera = DevOrCamera; // cameraFromBabylonFile
+
+            // Make sure device orientation camera pointing in direction of original camera.
+            Vars.scene.activeCamera.rotationQuaternion = BABYLON.Quaternion.FromEulerVector(
+                cameraFromBabylonFile.rotation,
+            );
+
+        } else {
+            Vars.scene.activeCamera = cameraFromBabylonFile;
+        }
+
         Vars.determineCameraHeightFromActiveCamera();
+
+        // Setup the default (nonVR) camera.
+        NonVRCamera.setup();
+
+        // Setup the general things that apply regardless of the mode used.
+        // Here because it requires a ground mesh.
+        General.setup();
 
         // Load extra objects
         Extras.setup();
 
-        // Register a render loop to repeatedly render the scene
-        Vars.engine.runRenderLoop(() => {
-            // try {
-                Vars.scene.render();
-            // }  catch {
-                // console.log("ERROR!");
-            // }
-        });
+        // loadingAssetsDone(), below, will run once all assets loaded.
     });
 
     // Watch for browser/canvas resize events
@@ -63,11 +102,11 @@ export function load(): void {
  * @returns void
  */
 function babylonScene(callBackFunc): void {
-    Vars.engine.displayLoadingUI();
-    Vars.engine.loadingUIText = "Loading the main scene...";
+    LoadingScreens.babylonJSLoadingMsg("Loading the main scene...");
 
     // TODO: Use LoadAssetContainerAsync instead?
     BABYLON.SceneLoader.LoadAssetContainer("scene/", "scene.babylon", Vars.scene, (container) => {
+        LoadingScreens.startFakeLoading(90);
         Vars.scene.executeWhenReady(() => {
             container.addAllToScene();
 
@@ -78,9 +117,6 @@ function babylonScene(callBackFunc): void {
 
             // Attach camera to canvas inputs
             // Vars.scene.activeCamera.attachControl(Vars.canvas);
-
-            // Make sure camera can see objects that are very close.
-            Vars.scene.activeCamera.minZ = 0;
 
             // Delete all the lights but the first one that has the substring
             // shadowlight or shadow_light.
@@ -156,7 +192,33 @@ function babylonScene(callBackFunc): void {
         if (progress["lengthComputable"]) {
             // Only to 90 to not give the impression that it's done loading.
             let percent = Math.round(90 * progress["loaded"] / progress["total"]);
-            Vars.engine.loadingUIText = "Loading the main scene... " + percent.toString() + "%";
+            LoadingScreens.babylonJSLoadingMsg("Loading the main scene... " + percent.toString() + "%");
         }
+    });
+}
+
+export function loadingAssetsDone(): void {
+    // Give it a bit to let one render cycle go through. Hackish,
+    // admittedly.
+    setTimeout(Optimizations.updateEnvironmentShadows, 1000);
+
+    // Stop showing the fake loading screen.
+    LoadingScreens.stopFakeLoading();
+
+    // Make sure the camera can see far enough.
+    Vars.scene.activeCamera.maxZ = 250;
+
+    // Make sure camera can see objects that are very close.
+    Vars.scene.activeCamera.minZ = 0;
+
+    // Start the render loop. Register a render loop to repeatedly render the
+    // scene
+    Vars.engine.runRenderLoop(() => {
+        // try {
+            Vars.scene.render();
+        // }  catch {
+            // console.log("ERROR!");
+        // }
+        // console.log("render");
     });
 }

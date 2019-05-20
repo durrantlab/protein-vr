@@ -116,10 +116,12 @@ export function freezeMeshProps(mesh: any, freezeMaterial: boolean = true, world
  * @returns void
  */
 export function updateEnvironmentShadows(): void {
-    // Update the shadows. They are frozen otherwise.
-    Vars.scene.lights[0].autoUpdateExtends = true;
-    Extras.shadowGenerator.getShadowMap().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
-    Vars.scene.lights[0].autoUpdateExtends = false;
+    if (Extras.shadowGenerator) {
+        // Update the shadows. They are frozen otherwise.
+        Vars.scene.lights[0].autoUpdateExtends = true;
+        Extras.shadowGenerator.getShadowMap().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
+        Vars.scene.lights[0].autoUpdateExtends = false;
+    }
 }
 
 /**

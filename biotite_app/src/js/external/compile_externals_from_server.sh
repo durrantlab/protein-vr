@@ -22,5 +22,10 @@ java -jar ../../utilities/closure-compiler-v20180506.jar --compilation_level=SIM
 mv externals2.js externals.js
 
 # Now for a dirty trick. When we go full screen, I don't want to maximize canvas, but rather it's container.
-cat externals.js | sed "s|RequestFullscreen(this._renderingCanvas)|RequestFullscreen(document.getElementById('container'))|g" > t
-mv t externals.js
+export TRICK_FILENAME="jsfile.2.babylon.js"
+cat $TRICK_FILENAME | sed "s|RequestFullscreen(this._renderingCanvas)|RequestFullscreen(document.getElementById('container'))|g" > t
+mv t $TRICK_FILENAME
+
+export TRICK_FILENAME="externals.js"
+cat $TRICK_FILENAME | sed "s|RequestFullscreen(this._renderingCanvas)|RequestFullscreen(document.getElementById('container'))|g" > t
+mv t $TRICK_FILENAME

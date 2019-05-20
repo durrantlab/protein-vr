@@ -25,7 +25,17 @@ Download option. That way you can run it even without internet connection.
 
 Other selection types (hydrophobic).
 
-Setup scenes for presentations.
+Why does VR camera not match camera from babylon in initial orientation?
+
+Make sure you called camera.initControllers() !
+
+make sure the gamepad extensions is enabled in your browser! Check https://mozvr.com/ for installation instructions.
+
+FireFox Android not working, ?Need to check... Tried turning texture sies way
+down. No go. Need to try smaller babylon file. I kind of think that;'s it.
+
+Done or Ignore
+--------------
 
 fix protein VR on Google cardboard
 * Note that this doesn't happen in the playground.
@@ -37,17 +47,21 @@ fix protein VR on Google cardboard
   with the scene? You've tried very hard to eliminate functions. I think now
   you should try to rebuild from the ground up, to id the error.
 
-Why does VR camera not match camera from babylon in initial orientation?
-
 Help menu too? Button on front?
     Dedicate to Karen Curto.
-    Troubleshooting
-        Chrome: Go to chrome://flags, turn on WebVR. Even if it works, it could work better...
+
+Mobile safari: Must enable accelerometer: https://stackoverflow.com/questions/11784390/using-accelerometer-in-safari-ios "Motion and Orientation Access" Possible fix: https://github.com/w3c/deviceorientation/issues/57#issuecomment-481039307
+
+Does not appear that full screen works on iphone safari or chrome (which is basically safari): https://caniuse.com/#feat=fullscreen
+
+Note that Chrome on iOS works.
+
+Troubleshooting
+    Chrome: Go to chrome://flags, turn on WebVR. Even if it works, it could work better...
 
 Slight ticjk up after 90%
 
-Done or Ignore
---------------
+Setup scenes for presentations.
 
 Need skyboxes.
 

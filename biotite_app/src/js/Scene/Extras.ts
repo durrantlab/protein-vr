@@ -1,5 +1,7 @@
 import * as GUI from "./GUI";
 import * as jQuery from "./jQuery";
+import * as Load from "./Load";
+import * as LoadingScreens from "./LoadingScreens";
 import * as Vars from "./Vars";
 import * as Optimizations from "./VR/Optimizations";
 import * as Pickables from "./VR/Pickables";
@@ -49,43 +51,43 @@ export function setup(): void {
         }
 
         assetsManager.onProgress = (remainingCount, totalCount, lastFinishedTask) => {
-            Vars.engine.displayLoadingUI();  // Keep it up while progressing...
             let msg = "Loading molecular meshes... " + remainingCount + " of " + totalCount + " remaining.";
-            Vars.engine.loadingUIText = msg;
+            LoadingScreens.babylonJSLoadingMsg(msg);
         };
 
         assetsManager.onFinish = (tasks) => {
-            setupShadowCatchers();
-
-            // Make sure the camera can see far enough.
-            Vars.scene.activeCamera.maxZ = 250;
+            setupShadowCatchers();  // Related to extras, so keep it here.
 
             // Do you need to make the ground glass instead of invisible? See
             // scene_info.json, which can have transparentGround: true.
             if ((data["transparentGround"] !== undefined) && (data["transparentGround"] === true)) {
-                Vars.vrVars.groundMesh.visibility = 1;
-                let transparentGround = new BABYLON.StandardMaterial("transparentGround", Vars.scene);
+                if (Vars.vrVars.groundMesh) {
+                    Vars.vrVars.groundMesh.visibility = 1;
 
-                transparentGround.diffuseColor = new BABYLON.Color3(1, 1, 1);
-                transparentGround.specularColor = new BABYLON.Color3(0, 0, 0);
-                transparentGround.emissiveColor = new BABYLON.Color3(0, 0, 0);
-                transparentGround.alpha = Vars.TRANSPARENT_FLOOR_ALPHA;
-                // transparentGround.ambientColor = new BABYLON.Color3(0.23, 0.98, 0.53);
+                    let transparentGround = new BABYLON.StandardMaterial("transparentGround", Vars.scene);
 
-                Vars.vrVars.groundMesh.material = transparentGround;
+                    transparentGround.diffuseColor = new BABYLON.Color3(1, 1, 1);
+                    transparentGround.specularColor = new BABYLON.Color3(0, 0, 0);
+                    transparentGround.emissiveColor = new BABYLON.Color3(0, 0, 0);
+                    transparentGround.alpha = Vars.TRANSPARENT_FLOOR_ALPHA;
+                    // transparentGround.ambientColor = new BABYLON.Color3(0.23, 0.98, 0.53);
 
-                // let glass = new BABYLON.PBRMaterial("glass", Vars.scene);
-                // glass.reflectionTexture = hdrTexture;
-                // glass.refractionTexture = hdrTexture;
-                // glass.linkRefractionWithTransparency = true;
-                // glass.indexOfRefraction = 0.52;
-                // glass.alpha = 0; // Fully refractive material
-                // Vars.vrVars.groundMesh.material = glass;
+                    Vars.vrVars.groundMesh.material = transparentGround;
+
+                    // let glass = new BABYLON.PBRMaterial("glass", Vars.scene);
+                    // glass.reflectionTexture = hdrTexture;
+                    // glass.refractionTexture = hdrTexture;
+                    // glass.linkRefractionWithTransparency = true;
+                    // glass.indexOfRefraction = 0.52;
+                    // glass.alpha = 0; // Fully refractive material
+                    // Vars.vrVars.groundMesh.material = glass;
+                } else {
+                    console.log("Warning: Vars.vrVars.groundMesh not defined.");
+                }
             }
 
-            // Give it a bit to let one render cycle go through. Hackish,
-            // admittedly.
-            setTimeout(Optimizations.updateEnvironmentShadows, 1000);
+            // Finish up all scene preparations.
+            Load.loadingAssetsDone();
         };
 
         // console.log(Vars.scene.getWaitingItemsCount());
@@ -133,23 +135,28 @@ function setupShadowGenerator(): void {
     let shadowInf = getBlurDarknessFromLightName();
 
     // Set up the shadow generator.
-    shadowGenerator = new BABYLON.ShadowGenerator(4096, light);
-    shadowGenerator.useBlurExponentialShadowMap = true;
-    shadowGenerator.setDarkness(shadowInf.darkness);
+    // Below gives error on iphone sometimes...
+    if (!Vars.IOS) {
+        shadowGenerator = new BABYLON.ShadowGenerator(4096, light);
+        shadowGenerator.useBlurExponentialShadowMap = true;
+        shadowGenerator.setDarkness(shadowInf.darkness);
 
-    // If using kernal, do below.
-    shadowGenerator.useKernelBlur = true;  // Very good shadows, but more expensive.
-    shadowGenerator.blurKernel = shadowInf.blur;  // Degree of bluriness.
+        // If using kernal, do below.
+        shadowGenerator.useKernelBlur = true;  // Very good shadows, but more expensive.
+        shadowGenerator.blurKernel = shadowInf.blur;  // Degree of bluriness.
 
-    // If not using kernal, do below
-    // shadowGenerator.blurScale = 7;  // Good for surfaces and ribbon.
-    // shadowGenerator.blurBoxOffset = 5;
+        // If not using kernal, do below
+        // shadowGenerator.blurScale = 7;  // Good for surfaces and ribbon.
+        // shadowGenerator.blurBoxOffset = 5;
 
-    // Will make debugging easier.
-    window.shadowGenerator = shadowGenerator;
+        // Will make debugging easier.
+        window.shadowGenerator = shadowGenerator;
 
-    // Old parameters not used:
-    // shadowGenerator.usePoissonSampling = true;  // Good but slow.
+        // Old parameters not used:
+        // shadowGenerator.usePoissonSampling = true;  // Good but slow.
+    } else {
+        console.log("iOS, so not generating shadows... causes an error... See https://forum.babylonjs.com/t/issues-between-shadowgenerator-and-ios-osx/795");
+    }
 }
 
 /**
@@ -243,7 +250,9 @@ function setupMesh(mesh: any, objID: string, shadowQuality: string, uniqIntID: n
     }
 
     // Make it so it casts a shadow.
-    shadowGenerator.getShadowMap().renderList.push(mesh);
+    if (shadowGenerator) {
+        shadowGenerator.getShadowMap().renderList.push(mesh);
+    }
 
     // Make it pickable
     Pickables.addPickableMolecule(mesh);

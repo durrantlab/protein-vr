@@ -1,6 +1,4 @@
 import * as Vars from "../Vars";
-import * as General from "./General";
-import * as NonVRCamera from "./NonVRCamera";
 import * as Optimizations from "./Optimizations";
 import * as VRCamera from "./VRCamera";
 
@@ -11,12 +9,6 @@ declare var BABYLON;
  * @param {Object<string,*>} initParams The parameters.
  */
 export function setup(initParams: Vars.IVRSetup) {
-    // Setup the default (nonVR) camera.
-    NonVRCamera.setup();
-
-    // Setup the general things that apply regardless of the mode used.
-    General.setup();
-
     // Set up the parameters (filling in missing values, for example). Also
     // saves the modified params to the params module variable.
     Vars.setupVR(initParams);
