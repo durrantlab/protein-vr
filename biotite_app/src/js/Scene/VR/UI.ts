@@ -1,7 +1,9 @@
 // Sets up tweaks to the UI.
 
-import { jQuery } from "../jQuery";
+// import { jQuery } from "../jQuery";
 import * as Vars from "../Vars";
+
+declare var jQuery;
 
 /**
  * Sets up the 2D button that can be used to launch VR.

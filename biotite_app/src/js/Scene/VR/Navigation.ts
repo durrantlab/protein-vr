@@ -1,7 +1,7 @@
 // This module handles all things navigation related.
 
 // import * as NavTargetMesh from "./NavTargetMesh";
-import { jQuery } from "../jQuery";
+// import { jQuery } from "../jQuery";
 import * as Vars from "../Vars";
 import * as CommonCamera from "./CommonCamera";
 import * as Navigation from "./Navigation";
@@ -12,6 +12,7 @@ import * as Points from "./Points";
 import * as VRCamera from "./VRCamera";
 
 declare var BABYLON;
+declare var jQuery;
 
 export const enum NavMode {
     // Note: const enum needed for closure-compiler compatibility.
@@ -37,7 +38,7 @@ export function setup(): void {
     Vars.vrVars.groundMesh.checkCollisions = true;
 
     // The ground should generally be hidden. There's a chance it could be
-    // turned into glass too. See Extras.ts.
+    // turned into glass too. See Mols.
     Vars.vrVars.groundMesh.visibility = 0;
 
     Optimizations.optimizeMeshPicking(Vars.vrVars.groundMesh);

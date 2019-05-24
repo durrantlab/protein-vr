@@ -1,4 +1,4 @@
-import * as Extras from "../Extras";
+import * as Shadows from "../Mols/Shadows";
 import * as Vars from "../Vars";
 import * as VoiceCommands from "./VoiceCommands";
 
@@ -116,10 +116,10 @@ export function freezeMeshProps(mesh: any, freezeMaterial: boolean = true, world
  * @returns void
  */
 export function updateEnvironmentShadows(): void {
-    if (Extras.shadowGenerator) {
+    if (Shadows.shadowGenerator) {
         // Update the shadows. They are frozen otherwise.
         Vars.scene.lights[0].autoUpdateExtends = true;
-        Extras.shadowGenerator.getShadowMap().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
+        Shadows.shadowGenerator.getShadowMap().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
         Vars.scene.lights[0].autoUpdateExtends = false;
     }
 }

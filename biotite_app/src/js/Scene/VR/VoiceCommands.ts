@@ -1,4 +1,4 @@
-import * as jQuery from "../jQuery";
+// import * as jQuery from "../jQuery";
 import * as Vars from "../Vars";
 import * as Navigation from "./Navigation";
 import * as Optimizations from "./Optimizations";
@@ -6,6 +6,7 @@ import * as Optimizations from "./Optimizations";
 declare var annyang;
 declare var Fuse;
 declare var BABYLON;
+declare var jQuery;
 
 export let moleculeNameInfos;
 
@@ -354,7 +355,7 @@ class Speech {
     private voices = null;
 
     constructor() {
-        jQuery.jQuery(document).ready(() => {
+        jQuery(document).ready(() => {
             if ("speechSynthesis" in window) {
                 // First call to getVoices may be null...later an event indicates when it is loaded
                 this.voices = window.speechSynthesis.getVoices();

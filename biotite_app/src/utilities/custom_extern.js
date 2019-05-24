@@ -49,6 +49,7 @@ $3Dmol.removeLabel = function(a) {};
 $3Dmol.getID = function() {};
 $3Dmol.addSphere = function(a) {};
 $3Dmol.removeShape = function(a) {};
+$3Dmol.exportVRML = function() {};
 
 var SmilesDrawer = function(a) {};
 
@@ -88,6 +89,11 @@ jQuery.prototype.makeCssInline = function() {};  /** custom added */
 jQuery.modal = function(a) {};
 // jQuery.prototype.scrollspy = function() {};
 // jQuery.prototype.scrollspy.options = function() {};
+jQuery.prototype.getScript = function(a, b) {};
+jQuery.append = function(a) {};
+jQuery.keypress = function(a) {};
+jQuery.getJSON = function(a, b) {};
+jQuery.ajax = function(a,b) {};
 
 function _(astr) {};
 function __(astr) {};
@@ -305,6 +311,18 @@ BABYLON.Mesh.dispose = function() {};
 BABYLON.Mesh.getLODLevels = function() {};
 BABYLON.Mesh.removeLODLevel = function(a) {};
 BABYLON.Mesh.flipFaces = function(a) {};
+BABYLON.Mesh.BACKSIDE;
+BABYLON.Mesh.setPivotMatrix = function(a) {};
+BABYLON.Mesh.getBoundingInfo = function() {};
+BABYLON.Mesh.getBoundingInfo.boundingBox;
+BABYLON.Mesh.getBoundingInfo.boundingBox.maximumWorld;
+BABYLON.Mesh.getBoundingInfo.boundingBox.minimumWorld;
+BABYLON.Mesh.getBoundingInfo.boundingBox.centerWorld;
+BABYLON.Mesh.refreshBoundingInfo = function() {};
+
+BABYLON.Matrix;
+BABYLON.Matrix.Translation = function(a) {};
+
 
 /**
  * @constructor
@@ -396,6 +414,7 @@ BABYLON.Scene.prototype.activeCamera.inputs.attached.deviceOrientation._alpha;
 BABYLON.Scene.prototype.activeCamera.inputs.attached.deviceOrientation._beta;
 BABYLON.Scene.prototype.activeCamera.inputs.attached.deviceOrientation._gamma;
 BABYLON.Scene.prototype.activeCamera.resetToCurrentRotation = function() {};
+BABYLON.Scene.prototype.activeCamera.setTarget = function(a) {};
 BABYLON.Scene.prototype.lights = function() {};
 BABYLON.Scene.prototype.lights.name = function() {};
 BABYLON.Scene.prototype.lights.dispose = function() {};
@@ -558,6 +577,7 @@ BABYLON.Ray = function(a,b,c) {};
 BABYLON.VertexData = function() {};
 
 BABYLON.VertexData.prototype.applyToMesh = function(a) {};
+BABYLON.VertexData.prototypee.ComputeNormals = function(a,b,c) {};
 
 BABYLON.Quaternion;
 BABYLON.Quaternion.FromEulerAngles = function(a, b, c) {};

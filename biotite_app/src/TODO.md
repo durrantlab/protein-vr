@@ -50,6 +50,10 @@ fix protein VR on Google cardboard
 Help menu too? Button on front?
     Dedicate to Karen Curto.
 
+When loading through 3dmol, throw messages to let user know re. progress.
+
+Search for "// Work here".
+
 Mobile safari: Must enable accelerometer: https://stackoverflow.com/questions/11784390/using-accelerometer-in-safari-ios "Motion and Orientation Access" Possible fix: https://github.com/w3c/deviceorientation/issues/57#issuecomment-481039307
 
 Does not appear that full screen works on iphone safari or chrome (which is basically safari): https://caniuse.com/#feat=fullscreen

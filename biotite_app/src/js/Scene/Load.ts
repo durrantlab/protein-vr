@@ -1,5 +1,5 @@
-import * as Extras from "./Extras";
 import * as LoadingScreens from "./LoadingScreens";
+import * as MolsLoad from "./Mols/Load";
 import * as Vars from "./Vars";
 import * as General from "./VR/General";  // Why in this dir?
 import * as VRLoad from "./VR/Load";
@@ -85,7 +85,7 @@ export function load(): void {
         General.setup();
 
         // Load extra objects
-        Extras.setup();
+        MolsLoad.setup();
 
         // loadingAssetsDone(), below, will run once all assets loaded.
     });
@@ -145,12 +145,12 @@ function babylonScene(callBackFunc): void {
                 }
             }
 
-            // Remove some meshes used only for scene construction. In the
-            // perfect world, these wouldn't even be included in the babylon
-            // file.
+            // Hide objects used for scene creation.
             for (let meshIdx in Vars.scene.meshes) {
                 if (Vars.scene.meshes[meshIdx].name === "protein_box") {
-                    Vars.scene.meshes[meshIdx].dispose();
+                    // Vars.scene.meshes[meshIdx].dispose();
+                    Vars.scene.getMeshByName("protein_box").isVisible = false;
+                    // scene.getMeshByName("protein_box").visibility
                 }
             }
 
