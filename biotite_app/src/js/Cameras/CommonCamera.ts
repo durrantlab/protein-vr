@@ -1,8 +1,8 @@
 // These functions include camera functions common to all kinds of cameras.
 
+import * as Navigation from "../Navigation/Navigation";
+import * as Points from "../Navigation/Points";
 import * as Vars from "../Vars";
-import * as Navigation from "../VR/Navigation";
-import * as Points from "../VR/Points";
 import * as VRCamera from "./VRCamera";
 
 declare var BABYLON;

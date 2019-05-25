@@ -2,9 +2,9 @@
 // pickable.
 
 import * as CommonCamera from "../Cameras/CommonCamera";
+import * as Optimizations from "../Scene/Optimizations";
 import * as Vars from "../Vars";
 import * as Navigation from "./Navigation";
-import * as Optimizations from "./Optimizations";
 
 declare var BABYLON;
 

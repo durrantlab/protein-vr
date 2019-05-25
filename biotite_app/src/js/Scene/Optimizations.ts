@@ -1,6 +1,6 @@
 import * as Shadows from "../Mols/Shadows";
+import * as VoiceCommands from "../Navigation/VoiceCommands";
 import * as Vars from "../Vars";
-import * as VoiceCommands from "./VoiceCommands";
 
 declare var BABYLON;
 

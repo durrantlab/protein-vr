@@ -4,10 +4,10 @@
 // import { jQuery } from "../jQuery";
 import * as CommonCamera from "../Cameras/CommonCamera";
 import * as NonVRCamera from "../Cameras/NonVRCamera";
-import * as VRCamera from "../Cameras/VRCamera";
+// import * as VRCamera from "../Cameras/VRCamera";
+import * as Optimizations from "../Scene/Optimizations";
 import * as Vars from "../Vars";
 import * as Navigation from "./Navigation";
-import * as Optimizations from "./Optimizations";
 import * as Pickables from "./Pickables";
 import * as Points from "./Points";
 

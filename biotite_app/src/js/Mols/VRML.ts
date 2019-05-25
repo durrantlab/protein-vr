@@ -1,8 +1,8 @@
 // An module to manage VRML data obtained from 3Dmol.js. Assumes the 3Dmol.js
 // javascript file is already loaded.
 
+import * as Optimizations from "../Scene/Optimizations";
 import * as Vars from "../Vars";
-import * as Optimizations from "../VR/Optimizations";
 import * as CommonLoader from "./CommonLoader";
 
 declare var BABYLON;

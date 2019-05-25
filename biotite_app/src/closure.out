@@ -52,77 +52,77 @@ lodash.min.js:470: WARNING - unreachable code
         else {
              ^
 
-lodash.min.js:853: WARNING - cannot instantiate non-constructor
+lodash.min.js:619: WARNING - unreachable code
+        else {
+             ^
+
+lodash.min.js:714: WARNING - Function BABYLON.Ray: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+            ray = new BABYLON.Ray(camPos, exports.curStarePt.subtract(camPos));
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+lodash.min.js:1103: WARNING - cannot instantiate non-constructor
         result.optimizations.push(new ReportOptimizationChange(priority));
                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-lodash.min.js:856: WARNING - cannot instantiate non-constructor
+lodash.min.js:1106: WARNING - cannot instantiate non-constructor
         result.optimizations.push(new RemoveSurfaces(priority)); // Remove surfaces
                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-lodash.min.js:857: WARNING - cannot instantiate non-constructor
+lodash.min.js:1107: WARNING - cannot instantiate non-constructor
         result.optimizations.push(new ReportOptimizationChange(priority));
                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-lodash.min.js:861: WARNING - cannot instantiate non-constructor
+lodash.min.js:1111: WARNING - cannot instantiate non-constructor
         result.optimizations.push(new ReportOptimizationChange(priority));
                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-lodash.min.js:866: WARNING - cannot instantiate non-constructor
+lodash.min.js:1116: WARNING - cannot instantiate non-constructor
         result.optimizations.push(new ReportOptimizationChange(priority));
                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-lodash.min.js:870: WARNING - cannot instantiate non-constructor
+lodash.min.js:1120: WARNING - cannot instantiate non-constructor
         result.optimizations.push(new SimplifyMeshes(priority, 500)); // Simplify meshes.
                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-lodash.min.js:871: WARNING - cannot instantiate non-constructor
+lodash.min.js:1121: WARNING - cannot instantiate non-constructor
         result.optimizations.push(new ReportOptimizationChange(priority));
                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-lodash.min.js:988: WARNING - restricted index type
+lodash.min.js:1238: WARNING - restricted index type
 found   : string
 required: number
                     var mesh = meshesToConsider[meshIdx][1];
                                                 ^^^^^^^
 
-lodash.min.js:989: WARNING - restricted index type
+lodash.min.js:1239: WARNING - restricted index type
 found   : string
 required: number
                     var decimationLvel = meshesToConsider[meshIdx][2];
                                                           ^^^^^^^
 
-lodash.min.js:1528: WARNING - Function BABYLON.Ray: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
-            ray = new BABYLON.Ray(camPos, exports.curStarePt.subtract(camPos));
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-lodash.min.js:2469: WARNING - Bad type annotation. expected closing } See https://github.com/google/closure-compiler/wiki/Bad-Type-Annotation for more information.
+lodash.min.js:2719: WARNING - Bad type annotation. expected closing } See https://github.com/google/closure-compiler/wiki/Bad-Type-Annotation for more information.
      * @param  {Function()} callBack  A callback function.
                         ^
 
-lodash.min.js:2469: WARNING - Bad type annotation. expecting a variable name in a @param tag. See https://github.com/google/closure-compiler/wiki/Bad-Type-Annotation for more information.
+lodash.min.js:2719: WARNING - Bad type annotation. expecting a variable name in a @param tag. See https://github.com/google/closure-compiler/wiki/Bad-Type-Annotation for more information.
      * @param  {Function()} callBack  A callback function.
                         ^
 
-lodash.min.js:2496: WARNING - Object type "Object<*,*>" contains non-stringifiable key and it may lead to an error. Please use ES6 Map instead or implement your own Map structure.
+lodash.min.js:2746: WARNING - Object type "Object<*,*>" contains non-stringifiable key and it may lead to an error. Please use ES6 Map instead or implement your own Map structure.
     function setStyle(atomSel, style, updateData) {
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-lodash.min.js:2579: WARNING - Property FRONTSIDE never defined on BABYLON.Mesh
+lodash.min.js:2829: WARNING - Property FRONTSIDE never defined on BABYLON.Mesh
         mat.sideOrientation = BABYLON.Mesh.FRONTSIDE;
                                            ^^^^^^^^^
 
-lodash.min.js:2610: WARNING - Property subtract never defined on BABYLON.Vector3
+lodash.min.js:2860: WARNING - Property subtract never defined on BABYLON.Vector3
         exports.babylonMesh.position = exports.babylonMesh.position.subtract(delta);
                                                                     ^^^^^^^^
 
-lodash.min.js:3187: WARNING - unreachable code
-            else {
-                 ^
-
 lodash.min.js:3342: WARNING - Function require: called with 2 argument(s). Function requires at least 5 argument(s) and no more than 5 argument(s).
-require(["Game"], function (Game) {
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+require(["Scene/LoadAndSetup"], function (SceneLoad) {
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 lodash.min.js:3346: WARNING - Function define: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
 define("Start", function(){});
@@ -184,4 +184,4 @@ utilities/custom_extern.js:580: WARNING - Property prototypee never defined on B
 BABYLON.VertexData.prototypee.ComputeNormals = function(a,b,c) {};
                    ^^^^^^^^^^
 
-0 error(s), 43 warning(s), 67.5% typed
+0 error(s), 43 warning(s), 67.4% typed

@@ -1,4 +1,4 @@
-import * as Vars from "./Vars";
+import * as Vars from "../Vars";
 
 let intervalID;
 

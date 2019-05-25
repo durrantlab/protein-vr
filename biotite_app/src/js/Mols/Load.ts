@@ -1,4 +1,4 @@
-import * as GUI from "../GUI";
+import * as GUI from "../UI/GUI";
 // import * as jQuery from "../jQuery";
 import * as Vars from "../Vars";
 import * as CommonLoader from "./CommonLoader";

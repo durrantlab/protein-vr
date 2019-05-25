@@ -1,7 +1,7 @@
 // A place to put variables that need to be accessed from multiple places.
 // This module is a place to store "global" variables.
 
-import * as Navigation from "./VR/Navigation";
+import * as Navigation from "./Navigation/Navigation";
 
 declare var BABYLON;
 

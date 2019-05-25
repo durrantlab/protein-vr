@@ -17,6 +17,6 @@ require.config({
 });
 
 // This require function starts the app
-require(["Game"], (Game) => {
-    Game.start("renderCanvas");
+require(["Scene/LoadAndSetup"], (SceneLoad) => {
+    SceneLoad.load();  // ("renderCanvas");
 });

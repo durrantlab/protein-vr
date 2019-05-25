@@ -1,9 +1,9 @@
 // Functions common to all loaded molecules, regardless of source.
 
-import * as Load from "../Load";
+import * as Pickables from "../Navigation/Pickables";
+import * as LoadAndSetup from "../Scene/LoadAndSetup";
+import * as Optimizations from "../Scene/Optimizations";
 import * as Vars from "../Vars";
-import * as Optimizations from "../VR/Optimizations";
-import * as Pickables from "../VR/Pickables";
 import * as Shadows from "./Shadows";
 
 declare var BABYLON;
@@ -52,7 +52,7 @@ export function afterLoading(sceneInfoData: any): void {
     }
 
     // Finish up all scene preparations.
-    Load.loadingAssetsDone();
+    LoadAndSetup.loadingAssetsDone();
 }
 
 /**

@@ -1,9 +1,9 @@
-import * as CommonCamera from "./Cameras/CommonCamera";
-import * as Vars from "./Vars";
-import * as Optimizations from "./VR/Optimizations";
-import * as Pickables from "./VR/Pickables";
-import * as VRPoints from "./VR/Points";
-import * as VRVoiceCommands from "./VR/VoiceCommands";
+import * as CommonCamera from "../Cameras/CommonCamera";
+import * as Pickables from "../Navigation/Pickables";
+import * as VRPoints from "../Navigation/Points";
+import * as VRVoiceCommands from "../Navigation/VoiceCommands";
+import * as Optimizations from "../Scene/Optimizations";
+import * as Vars from "../Vars";
 
 declare var BABYLON;
 
