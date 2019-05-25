@@ -1,9 +1,9 @@
+import * as NonVRCamera from "./Cameras/NonVRCamera";  // Why in this dir?
 import * as LoadingScreens from "./LoadingScreens";
 import * as MolsLoad from "./Mols/Load";
 import * as Vars from "./Vars";
 import * as General from "./VR/General";  // Why in this dir?
 import * as VRLoad from "./VR/Load";
-import * as NonVRCamera from "./VR/NonVRCamera";  // Why in this dir?
 import * as Optimizations from "./VR/Optimizations";
 import * as Pickables from "./VR/Pickables";
 

@@ -1,7 +1,7 @@
 // This sets up the non vr camera. Not everyone has a vr headset.
 
 import * as Vars from "../Vars";
-import * as Navigation from "./Navigation";
+import * as Navigation from "../VR/Navigation";
 
 declare var BABYLON;
 

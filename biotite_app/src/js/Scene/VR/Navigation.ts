@@ -2,14 +2,14 @@
 
 // import * as NavTargetMesh from "./NavTargetMesh";
 // import { jQuery } from "../jQuery";
+import * as CommonCamera from "../Cameras/CommonCamera";
+import * as NonVRCamera from "../Cameras/NonVRCamera";
+import * as VRCamera from "../Cameras/VRCamera";
 import * as Vars from "../Vars";
-import * as CommonCamera from "./CommonCamera";
 import * as Navigation from "./Navigation";
-import * as NonVRCamera from "./NonVRCamera";
 import * as Optimizations from "./Optimizations";
 import * as Pickables from "./Pickables";
 import * as Points from "./Points";
-import * as VRCamera from "./VRCamera";
 
 declare var BABYLON;
 declare var jQuery;

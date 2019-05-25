@@ -1,5 +1,5 @@
+import * as CommonCamera from "./Cameras/CommonCamera";
 import * as Vars from "./Vars";
-import * as CommonCamera from "./VR/CommonCamera";
 import * as Optimizations from "./VR/Optimizations";
 import * as Pickables from "./VR/Pickables";
 import * as VRPoints from "./VR/Points";

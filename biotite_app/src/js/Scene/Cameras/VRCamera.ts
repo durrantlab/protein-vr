@@ -1,9 +1,9 @@
 // This module sets up the VR camera.
 
 import * as Vars from "../Vars";
-import * as Navigation from "./Navigation";
-import * as Optimizations from "./Optimizations";
-import * as Pickables from "./Pickables";
+import * as Navigation from "../VR/Navigation";
+import * as Optimizations from "../VR/Optimizations";
+import * as Pickables from "../VR/Pickables";
 import * as VRControllers from "./VRControllers";
 
 declare let BABYLON;

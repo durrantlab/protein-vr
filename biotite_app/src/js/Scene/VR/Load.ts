@@ -1,6 +1,6 @@
+import * as VRCamera from "../Cameras/VRCamera";
 import * as Vars from "../Vars";
 import * as Optimizations from "./Optimizations";
-import * as VRCamera from "./VRCamera";
 
 declare var BABYLON;
 

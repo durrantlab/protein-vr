@@ -1,8 +1,8 @@
 // This module includes functions to manage which meshes in the scene are
 // pickable.
 
+import * as CommonCamera from "../Cameras/CommonCamera";
 import * as Vars from "../Vars";
-import * as CommonCamera from "./CommonCamera";
 import * as Navigation from "./Navigation";
 import * as Optimizations from "./Optimizations";
 

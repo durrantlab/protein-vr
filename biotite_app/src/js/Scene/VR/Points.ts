@@ -1,11 +1,11 @@
 // This module has functions for storing various important points in the
 // scene. Note that the camera location is in CommonCamera, not here.
 
+import * as CommonCamera from "../Cameras/CommonCamera";
+import * as VRCamera from "../Cameras/VRCamera";
 import * as Vars from "../Vars";
-import * as CommonCamera from "./CommonCamera";
 import * as Navigation from "./Navigation";
 import * as Pickables from "./Pickables";
-import * as VRCamera from "./VRCamera";
 
 declare var BABYLON;
 
