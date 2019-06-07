@@ -34,6 +34,10 @@ make sure the gamepad extensions is enabled in your browser! Check https://mozvr
 FireFox Android not working, ?Need to check... Tried turning texture sies way
 down. No go. Need to try smaller babylon file. I kind of think that;'s it.
 
+Need to redo voice commands with new nav system.
+
+Need to make sure menu system still works with old system (Biotite).
+
 Done or Ignore
 --------------
 

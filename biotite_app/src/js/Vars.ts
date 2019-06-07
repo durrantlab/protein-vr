@@ -39,7 +39,9 @@ export const VR_CONTROLLER_PAD_ROTATION_DELAY_TIME = 750;  // time to wait betwe
 export const VR_CONTROLLER_PAD_RATIO_OF_MIDDLE_FOR_CAMERA_RESET = 0.1;
 export const MAX_TELEPORT_DIST = 15;
 export const TRANSPARENT_FLOOR_ALPHA = 0.05;  // 0.02;
-export const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;  // IOS doesn't support a lot of features!
+
+// IOS doesn't support a lot of features!
+export const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window["MSStream"];
 
 // Variables that can change.
 export let vrVars: IVRSetup;

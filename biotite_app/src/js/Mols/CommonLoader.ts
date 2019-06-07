@@ -117,7 +117,7 @@ export function setupMesh(mesh: any, objID: string, shadowQuality: string, uniqI
 
         let backgroundLum;
         if (lightingInf.darkness > 0.95) {
-            backgroundLum = 0.01;
+            backgroundLum = 0.05;
         } else if (lightingInf.darkness < 0.4) {
             backgroundLum = 0.0025;
         } else {
@@ -128,6 +128,8 @@ export function setupMesh(mesh: any, objID: string, shadowQuality: string, uniqI
             // let b = -0.0029545454545454545;  // 0.01 - 0.013636363636363637 * 0.95;
             backgroundLum = 0.013636363636363637 * lightingInf.darkness - 0.0029545454545454545;
         }
+
+        // backgroundLum = 1;
 
         mesh.material.emissiveColor = new BABYLON.Color3(backgroundLum, backgroundLum, backgroundLum);
         // let ssao = new BABYLON.SSAORenderingPipeline("ssaopipeline", Vars.scene, 0.75);

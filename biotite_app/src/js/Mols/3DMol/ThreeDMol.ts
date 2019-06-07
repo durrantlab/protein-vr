@@ -1,7 +1,8 @@
-// Functions from loading molecules directly from a 3Dmol.js instance.
+// Functions from loading molecules directly from a 3Dmol.js instance. See
+// VRML.ts for additional functions related to the mesh itself.
 
-import * as Vars from "../Vars";
-import * as CommonLoader from "./CommonLoader";
+import * as Vars from "../../Vars";
+import * as CommonLoader from "../CommonLoader";
 import * as VRML from "./VRML";
 
 declare var jQuery;
@@ -36,9 +37,9 @@ function after3DMolJsLoaded(sceneInfoData: any): void {
 
     let pdbUri = "https://files.rcsb.org/view/1XDN.pdb";
     VRML.loadPDBURL(pdbUri, () => {
-        VRML.setStyle();
+        VRML.viewer.setStyle({}, {"cartoon": {"color": "spectrum"}});
 
-        VRML.positionMeshInsideAnother(Vars.scene.getMeshByName("protein_box"));
+        VRML.render();
 
         // VRML.babylonMesh.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
         // Vars.scene.render();  // Needed to get bounding box to recalculate.
@@ -52,12 +53,14 @@ function after3DMolJsLoaded(sceneInfoData: any): void {
         // console.log(VRML.babylonMesh.getBoundingInfo().boundingBox.maximumWorld);
         // console.log(VRML.babylonMesh.getBoundingInfo().boundingBox.minimumWorld);
 
-        VRML.babylonMesh.showBoundingBox = true;
+        // if (VRML.babylonMesh !== undefined) {
+        //     VRML.babylonMesh.showBoundingBox = true;
+        // }
 
-
-        setTimeout(() => {        console.log(VRML.babylonMesh.getBoundingInfo().boundingBox.maximumWorld);
-            console.log(VRML.babylonMesh.getBoundingInfo().boundingBox.minimumWorld);
-    }, 2000);
+        // setTimeout(() => {
+        //     console.log(VRML.babylonMesh.getBoundingInfo().boundingBox.maximumWorld);
+        //     console.log(VRML.babylonMesh.getBoundingInfo().boundingBox.minimumWorld);
+        // }, 2000);
 
         // .refreshBoundingInfo();
 

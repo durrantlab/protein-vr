@@ -4,7 +4,7 @@ import * as MolsLoad from "../Mols/Load";
 import * as Navigation from "../Navigation/Navigation";
 import * as Pickables from "../Navigation/Pickables";
 import * as LoadingScreens from "../UI/LoadingScreens";
-import * as UI from "../UI/UI";
+import * as UI2D from "../UI/UI2D";
 import * as Vars from "../Vars";
 import * as Optimizations from "./Optimizations";
 
@@ -39,7 +39,7 @@ export function load(): void {
         Pickables.setup();
 
         // Sets up nav selection buttons in DOM.
-        UI.setup();
+        UI2D.setup();
 
         // Load extra objects
         MolsLoad.setup();
@@ -114,7 +114,7 @@ function babylonScene(callBackFunc): void {
         if (progress["lengthComputable"]) {
             // Only to 90 to not give the impression that it's done loading.
             let percent = Math.round(90 * progress["loaded"] / progress["total"]);
-            LoadingScreens.babylonJSLoadingMsg("Loading the main scene... " + percent.toString() + "%");
+            LoadingScreens.babylonJSLoadingMsg("ALoading the main scene... " + percent.toString() + "%");
         }
     });
 }

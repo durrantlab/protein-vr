@@ -7,14 +7,7 @@ tsc --target ES5 --alwaysStrict --module amd js/Scene/LoadAndSetup.ts
 r.js -o build.js
 
 # Closure compile
-#export formatting="--formatting=PRETTY_PRINT"
-export formatting=""
-
-# --externs='utilities/jquery-1.9.js' --externs='utilities/twitter-bootstrap-2.1.1-externs.js'
-java -jar utilities/closure-compiler-v20180506.jar --compilation_level=ADVANCED_OPTIMIZATIONS \
-    --externs='utilities/custom_extern.js' --js_output_file='lodash.min2.js' 'lodash.min.js' \
-    ${formatting} 2> closure.out
-mv lodash.min2.js lodash.min.js
+./utilities/closure.sh lodash.min.js
 
 # Combine it with the externals.
 # cat js/external/externals.js lodash.min.js > tmptmp
@@ -34,6 +27,15 @@ ls -1d ../build/js/* | grep -v "external" | awk '{print "rm -rf " $1}' | bash
 mv ../build/js/external/* ../build/js/
 rm -rf ../build/js/external/
 rm -rf ../build/js/require/  # Don't need this.
+
+# Also compile web workers separately
+find js -name "*WebWorker.ts" | awk '{print "tsc --target ES5 --alwaysStrict " $1}' | parallel --no-notice
+
+# Copy over web workers, fixing export problem.
+find js -name "*WebWorker.js" | awk '{print "cat " $1 " | grep -v exports > ../build/$(basename " $1 ")"}' | bash
+
+# Closure compile those
+ls ../build/*WebWorker.js | awk '{print "./utilities/closure.sh " $1}' | parallel --no-notice
 
 # Remove compiled js files
 echo "Removing compiled js files..."

@@ -1,9 +1,10 @@
-import * as GUI from "../UI/GUI";
+import * as Optimizations from "../Scene/Optimizations";
+import * as Menu3D from "../UI/Menu3D";
 // import * as jQuery from "../jQuery";
 import * as Vars from "../Vars";
+import * as ThreeDMol from "./3DMol/ThreeDMol";
 import * as CommonLoader from "./CommonLoader";
 import * as GLTF from "./GLTF";
-import * as ThreeDMol from "./ThreeDMol";
 
 declare var BABYLON;
 declare var jQuery;
@@ -33,7 +34,10 @@ export function setup() {
         // }
 
         if (Vars.vrVars.menuActive) {
-            GUI.setup(data);
+            Menu3D.setup(data);
         }
+
+        // Update the shadows.
+        Optimizations.updateEnvironmentShadows();
     });
 }

@@ -29,6 +29,7 @@ export function babylonJSLoadingMsg(msg: string): void {
 
 export function startFakeLoading(initialVal: number): void {
     let fakeVal = initialVal;
+    clearInterval(intervalID);
     intervalID = setInterval(() => {
         fakeVal = fakeVal + 0.02 * (99 - fakeVal);
         Vars.engine.displayLoadingUI();  // Keep it up while progressing...

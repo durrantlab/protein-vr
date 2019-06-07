@@ -87,8 +87,8 @@ export function optimizeMeshPicking(mesh: any): void {
     }
 
     // Now use octree for picking and collisions.
-    mesh.createOrUpdateSubmeshesOctree(64, 2);
-    mesh.useOctreeForCollisions = true;
+    // mesh.createOrUpdateSubmeshesOctree(64, 2);  // Messes up culling on protein all sticks.
+    // mesh.useOctreeForCollisions = true;
 }
 
 /**

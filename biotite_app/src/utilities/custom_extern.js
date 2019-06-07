@@ -205,6 +205,7 @@ BABYLON.Material.emissiveColor;
 BABYLON.Material.activeLight;
 BABYLON.Material.alpha;
 BABYLON.Material.freeze = function() {};
+BABYLON.Material.albedoColor;
 
 BABYLON.SSAORenderingPipeline = function(a,b,c) {};
 
@@ -229,6 +230,8 @@ BABYLON.GUI = function() {};
 BABYLON.GUI.GUI3DManager = function(a) {};
 
 BABYLON.GUI.GUI3DManager.prototype.addControl = function(a) {};
+BABYLON.GUI.GUI3DManager.prototype.rootContainer;
+BABYLON.GUI.GUI3DManager.prototype.rootContainer.isVisible;
 
 /**
  * @constructor
@@ -236,8 +239,11 @@ BABYLON.GUI.GUI3DManager.prototype.addControl = function(a) {};
 BABYLON.GUI.CylinderPanel = function() {};
 
 BABYLON.GUI.CylinderPanel.prototype.linkToTransformNode = function(a) {};
+BABYLON.GUI.CylinderPanel.prototype.addControl = function(a) {};
 BABYLON.GUI.CylinderPanel.prototype.radius;
 BABYLON.GUI.CylinderPanel.prototype.margin;
+BABYLON.GUI.CylinderPanel.prototype.blockLayout;
+BABYLON.GUI.CylinderPanel.prototype.columns;
 
 /**
  * @constructor
@@ -245,6 +251,11 @@ BABYLON.GUI.CylinderPanel.prototype.margin;
 BABYLON.GUI.SpherePanel = function() {};
 
 BABYLON.GUI.SpherePanel.prototype.linkToTransformNode = function(a) {};
+BABYLON.GUI.SpherePanel.prototype.addControl = function(a) {};
+BABYLON.GUI.SpherePanel.prototype.radius;
+BABYLON.GUI.SpherePanel.prototype.margin;
+BABYLON.GUI.SpherePanel.prototype.blockLayout;
+BABYLON.GUI.SpherePanel.prototype.columns;
 
 /**
  * @constructor
@@ -271,6 +282,8 @@ BABYLON.GUI.HolographicButton = function(a) {};
 BABYLON.GUI.HolographicButton.prototype.onPointerClickObservable = function() {};
 BABYLON.GUI.HolographicButton.prototype.onPointerClickObservable.add = function(a) {};
 BABYLON.GUI.HolographicButton.prototype.node = function() {};
+BABYLON.GUI.HolographicButton.prototype.mesh;
+BABYLON.GUI.HolographicButton.prototype.mesh.actionManager;
 BABYLON.GUI.HolographicButton.prototype.node.absolutePosition = function() {};
 
 
@@ -311,7 +324,11 @@ BABYLON.Mesh.dispose = function() {};
 BABYLON.Mesh.getLODLevels = function() {};
 BABYLON.Mesh.removeLODLevel = function(a) {};
 BABYLON.Mesh.flipFaces = function(a) {};
+BABYLON.Mesh.MergeMeshes = function(a,b,c,d,e) {};
 BABYLON.Mesh.BACKSIDE;
+BABYLON.Mesh.FRONTSIDE;
+BABYLON.Mesh.DOUBLESIDE;
+BABYLON.Mesh.showBoundingBox;
 BABYLON.Mesh.setPivotMatrix = function(a) {};
 BABYLON.Mesh.getBoundingInfo = function() {};
 BABYLON.Mesh.getBoundingInfo.boundingBox;
@@ -369,6 +386,7 @@ BABYLON.Engine.prototype.resize = function() {};
 BABYLON.Engine.prototype.enableOfflineSupport;
 BABYLON.Engine.prototype.switchFullscreen = function(a) {};
 BABYLON.Engine.prototype.displayLoadingUI = function() {};
+BABYLON.Engine.prototype.hideLoadingUI = function() {};
 BABYLON.Engine.prototype.loadingUIText;
 BABYLON.Engine.prototype.getFps = function() {};
 
@@ -559,7 +577,10 @@ BABYLON.Animation.prototype.setKeys = function(a) {};
 BABYLON.ActionManager = function(a) {};
 
 BABYLON.ActionManager.OnPickTrigger = function() {};
+BABYLON.ActionManager.NothingTrigger = function() {};
 BABYLON.ActionManager.prototype.registerAction = function(a) {};
+
+BABYLON.InterpolateValueAction = function(a,b,c,d,e) {};
 
 /**
  * @constructor
@@ -577,7 +598,7 @@ BABYLON.Ray = function(a,b,c) {};
 BABYLON.VertexData = function() {};
 
 BABYLON.VertexData.prototype.applyToMesh = function(a) {};
-BABYLON.VertexData.prototypee.ComputeNormals = function(a,b,c) {};
+BABYLON.VertexData.prototype.ComputeNormals = function(a,b,c) {};
 
 BABYLON.Quaternion;
 BABYLON.Quaternion.FromEulerAngles = function(a, b, c) {};
