@@ -23,5 +23,6 @@ influenza.good
 webapp-compiled
 scoria
 *.cache
-#build
+build
 **/web/*
+

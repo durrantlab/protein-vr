@@ -23,8 +23,6 @@ export let viewer;
 let vrmlStr;
 let vrmlParserWebWorker;
 
-export let babylonMesh;
-
 /**
  * Setup the ability to work with 3Dmol.js.
  * @returns void
@@ -67,12 +65,14 @@ export function loadPDBURL(url: string, callBack): void {
 
 /**
  * Sets the 3dmol.js style. Also generates a vrml string and values.
- * @param  {boolean=}     updateData  Whether to update the underlying data
- *                                    with this visualization. True by
- *                                    default.
+ * @param  {boolean=}      updateData  Whether to update the underlying data
+ *                                     with this visualization. True by
+ *                                     default.
+ * @param  {Function(*)=}  callBack    The callback function, with the new
+ *                                     mesh as a parameter.
  * @returns void
  */
-export function render(updateData: boolean = true): void {
+export function render(updateData: boolean = true, callBack: any = () => { return; }): void {
     // Make sure there are no waiting menus up and running. Happens some
     // times.
     Vars.engine.hideLoadingUI();
@@ -88,9 +88,14 @@ export function render(updateData: boolean = true): void {
             // comment out below. Changed my mind the kinds of manipulations above
             // should be performed on the mesh. Babylon is going to have better
             // functions for this than I can come up with.
-            importIntoBabylonScene();
+            let newMesh = importIntoBabylonScene();
 
-            positionMeshInsideAnother(Vars.scene.getMeshByName("protein_box"));
+            positionMeshInsideAnother(newMesh, Vars.scene.getMeshByName("protein_box"));
+
+            callBack(newMesh);  // Cloned so it won't change with new rep in future.
+
+            // Clean up.
+            modelData = [];
         });
     }
 }
@@ -172,9 +177,9 @@ function loadValsFromVRML(callBack: any): void {
 /**
  * Creates a babylonjs object from the values and adds it to the babylonjs
  * scene.
- * @returns void
+ * @returns {*} The new mesh from the 3dmoljs instance.
  */
-export function importIntoBabylonScene(): void {
+export function importIntoBabylonScene(): any {
     let meshes = [];
     for (let modelIdx in modelData) {
         if (modelData.hasOwnProperty(modelIdx)) {
@@ -192,9 +197,9 @@ export function importIntoBabylonScene(): void {
             vertexData["colors"] = modelDatum["colorsFlat"];
 
             // Delete the old mesh if it exists.
-            if (Vars.scene.getMeshByName("MeshFrom3DMol") !== null) {
-                Vars.scene.getMeshByName("MeshFrom3DMol").dispose();
-            }
+            // if (Vars.scene.getMeshByName("MeshFrom3DMol") !== null) {
+            //     Vars.scene.getMeshByName("MeshFrom3DMol").dispose();
+            // }
 
             // Make the new mesh
             let babylonMeshTmp = new BABYLON.Mesh("mesh_3dmol_tmp" + modelIdx, Vars.scene);
@@ -213,22 +218,25 @@ export function importIntoBabylonScene(): void {
         }
     }
 
+    let babylonMesh;
     if (meshes.length > 0) {
         // Merge all these meshes.
         // https://doc.babylonjs.com/how_to/how_to_merge_meshes
         babylonMesh = BABYLON.Mesh.MergeMeshes(meshes, true, true);  // dispose of source and allow 32 bit integers.
         // babylonMesh = meshes[0];
-        babylonMesh.name = "MeshFrom3DMol";
-        babylonMesh.id = "MeshFrom3DMol";
+        babylonMesh.name = "MeshFrom3DMol" + Math.random().toString();
+        babylonMesh.id = babylonMesh.name;
 
         // Work here
         CommonLoader.setupMesh(
-            babylonMesh, "MeshFrom3DMol", "Skip", 123456789,
+            babylonMesh, babylonMesh.name, "Skip", 123456789,
         );
     }
+
+    return babylonMesh;
 }
 
-export function positionMeshInsideAnother(otherBabylonMesh: any): void {
+export function positionMeshInsideAnother(babylonMesh: any, otherBabylonMesh: any): void {
     if (babylonMesh === undefined) {
         // No mesh exists.
         return;

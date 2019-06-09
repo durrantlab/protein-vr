@@ -1,10 +1,18 @@
 // Functions to create a protein visualization using 3DMol.js
 
+import * as Optimizations from "../../Scene/Optimizations";
 import * as Vars from "../../Vars";
 import * as VRML from "./VRML";
 
 // A place to keep track of all the styles. List of [key, vals]
-let styles: any[] = [];
+// let styles: any[] = [];
+
+// Where the meshes generated from 3DMol.js get stored.
+interface IStyleMesh {
+    mesh: any;
+    categoryKey: string;  // Everything but color. Obj key will include color (for lookup).
+}
+let styleMeshes: {[s: string]: IStyleMesh} = {};
 
 let selKeyWordTo3DMolSel = {
     // See VMD output TCL files for good ideas.
@@ -62,41 +70,72 @@ let colorSchemeKeyWordTo3DMol = {
 
 export function toggleRep(filters: string[], repName: string, colorScheme: string): void {
     // Get the key of this rep request.
-    let key = getKey(filters, repName, colorScheme);
+    let keys = getKeys(filters, repName, colorScheme);
 
-    if (styles.map((i) => i[0]).indexOf(key) !== -1) {
-        // If it already exists in styles, remove it.
-        styles = styles.filter((i) => i[0] !== key);
-    } else {
-        // Otherwise add it.
-        styles.push([key, {filters, repName, colorScheme}]);
+    // If it's "Hide", then just hide the mesh
+    if (colorScheme === "Hide") {
+        for (let fullKey in styleMeshes) {
+            if (styleMeshes.hasOwnProperty(fullKey)) {
+                let styleMesh = styleMeshes[fullKey];
+                if (styleMesh.categoryKey === keys.categoryKey) {
+                    styleMesh.mesh.isVisible = false;
+                    console.log("Hiding existing mesh...");
+                }
+            }
+        }
+        return;
     }
 
-    // Remove all representations from existing 3Dmoljs.
+    // Maybe the mesh has been generated previously. If so, just show that.
+    if (styleMeshes[keys.fullKey] !== undefined) {
+        styleMeshes[keys.fullKey].mesh.isVisible = true;
+        console.log("showing existing mesh...");
+        return;
+    }
+
+    // You'll need to use 3DMoljs to generate the mesh, since it's never been
+    // generated before. First remove all representations from existing
+    // 3Dmoljs.
     VRML.viewer.setStyle({});
 
-    // console.log("Styles", styles);
+    // Make the new representation.
+    let rep = {};
+    rep[repName.toLowerCase()] = colorSchemeKeyWordTo3DMol[colorScheme];
+    let sels = {"and": filters.map((i) => selKeyWordTo3DMolSel[i])};
+    VRML.viewer.addStyle(sels, rep);
 
-    // Now go through each of the styles and add it to the viewer.
-    for (let i in styles) {
-        if (styles.hasOwnProperty(i)) {
-            let iInt = parseInt(i, 10);
-            let style = styles[iInt];
-            let filts = style[1].filters;
-            let color = style[1].colorScheme;
-            let rep = {};
-            rep[style[1].repName.toLowerCase()] = colorSchemeKeyWordTo3DMol[color];
-            let sels = {"and": filts.map((i) => selKeyWordTo3DMolSel[i])};
-            // console.log(JSON.stringify(sels), JSON.stringify(rep));
-            VRML.viewer.addStyle(sels, rep);
+    VRML.render(true, (newMesh) => {
+        // Remove any other meshes that have the same category key (so could
+        // be different color... that would be removed.)
+        for (let i in styleMeshes) {
+            if (styleMeshes.hasOwnProperty(i)) {
+                let styleMesh = styleMeshes[i];
+                if (styleMesh.categoryKey === keys.categoryKey) {
+                    Optimizations.removeMeshEntirely(styleMesh.mesh);
+                    delete styleMeshes[i];
+                    console.log("deleting old mesh...");
+                }
+            }
         }
-    }
-    VRML.render();
+
+        // Add this new one.
+        styleMeshes[keys.fullKey] = {
+            categoryKey: keys.categoryKey,
+            mesh: newMesh,
+        };
+
+        console.log("added new mesh");
+
+        console.log(styleMeshes);
+    });
 }
 
-function getKey(filters: string[], repName: string, colorScheme: string) {
+function getKeys(filters: string[], repName: string, colorScheme: string) {
     filters.sort();
-    return filters.join("-") + "-" + repName + "-" + colorScheme;
+    return {
+        categoryKey: filters.join("-") + "-" + repName,
+        fullKey: filters.join("-") + "-" + repName + "-" + colorScheme,
+    };
 }
 
 /**

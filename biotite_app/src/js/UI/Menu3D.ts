@@ -60,7 +60,7 @@ function buildMenu(): any {
         "Protein": ["Cartoon"].concat(commonReps),
         "Water": commonReps,
     };
-    let colorSchemes = ["Element", "Red", "Blue", "Green", "Orange", "Yellow", "Purple", "Spectrum"];
+    let colorSchemes = ["Element", "Red", "Blue", "Green", "Orange", "Yellow", "Purple", "Spectrum", "Hide"];
 
     let menu = {};
     for (let i1 in components) {

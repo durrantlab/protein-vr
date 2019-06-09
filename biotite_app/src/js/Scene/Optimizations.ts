@@ -173,7 +173,7 @@ function sceneOptimizerParameters(): any {
  * @param  {*} mesh The mesh to remove.
  * @returns void
  */
-function removeMeshEntirely(mesh: any): void {
+export function removeMeshEntirely(mesh: any): void {
     if (mesh !== null) {
         mesh.dispose();
     }
