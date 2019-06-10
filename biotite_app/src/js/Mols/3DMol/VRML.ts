@@ -11,13 +11,15 @@ declare var jQuery;
 declare var $3Dmol;
 
 export interface IVRMLModel {
-    coorsFlat: number[];
-    normsFlat: number[];
-    colorsFlat: number[];
-    trisIdxs: number[];
+    coors: any;  // Float32Array
+    norms: any;  // Float32Array
+    colors: any;  // Float32Array
+    trisIdxs: any;  // Uint32Array
 }
 
 let modelData: IVRMLModel[] = [];
+let meshScaling: undefined;
+let meshTranslation: undefined;
 
 export let viewer;
 let vrmlStr;
@@ -133,15 +135,16 @@ function loadValsFromVRML(callBack: any): void {
 
             if (modelData.length === modelIdx) {
                 modelData.push({
-                    "coorsFlat": [],
-                    "normsFlat": [],
-                    "colorsFlat": [],
-                    "trisIdxs": [],
+                    "coors": new Float32Array(0),
+                    "norms": new Float32Array(0),
+                    "colors": new Float32Array(0),
+                    "trisIdxs": new Uint32Array(0),
                 });
             }
 
-            modelData[modelIdx][dataType].push.apply(
-                modelData[modelIdx][dataType], vals,
+            modelData[modelIdx][dataType] = typedArrayConcat(
+                dataType === "trisIdxs" ? Uint32Array : Float32Array,
+                [modelData[modelIdx][dataType], vals],
             );
 
             switch (status) {
@@ -154,7 +157,7 @@ function loadValsFromVRML(callBack: any): void {
                     break;
                 case "done":
                     // No more data. Run the callback.
-                    console.log(modelData);
+                    // console.log(modelData);
                     callBack();
                     break;
                 default:
@@ -175,6 +178,27 @@ function loadValsFromVRML(callBack: any): void {
 }
 
 /**
+ * Concatonates a list of typed arrays.
+ * @param  {} resultConstructor  The type of array. E.g., Uint8Array.
+ * @param  {} listOfArrays       A list of typed arrays to concatonate.
+ * @returns any The typed array.
+ */
+function typedArrayConcat(resultConstructor, listOfArrays): any {
+    // See http://2ality.com/2015/10/concatenating-typed-arrays.html
+    let totalLength = 0;
+    for (let arr of listOfArrays) {
+        totalLength += arr.length;
+    }
+    let result = new resultConstructor(totalLength);
+    let offset = 0;
+    for (let arr of listOfArrays) {
+        result.set(arr, offset);
+        offset += arr.length;
+    }
+    return result;
+}
+
+/**
  * Creates a babylonjs object from the values and adds it to the babylonjs
  * scene.
  * @returns {*} The new mesh from the 3dmoljs instance.
@@ -187,14 +211,16 @@ export function importIntoBabylonScene(): any {
 
             // Calculate normals instead? It's not necessary. Doesn't chang over
             // 3dmoljs calculated normals.
-            // BABYLON.VertexData.ComputeNormals(coorsFlat, trisIdxs, normsFlat);
+            BABYLON.VertexData.ComputeNormals(
+                modelDatum["coors"], modelDatum["trisIdxs"], modelDatum["norms"],
+            );
 
             // Compile all that into vertex data.
             let vertexData = new BABYLON.VertexData();
-            vertexData["positions"] = modelDatum["coorsFlat"];  // In quotes because from webworker (external)
+            vertexData["positions"] = modelDatum["coors"];  // In quotes because from webworker (external)
             vertexData["indices"] = modelDatum["trisIdxs"];
-            vertexData["normals"] = modelDatum["normsFlat"];
-            vertexData["colors"] = modelDatum["colorsFlat"];
+            vertexData["normals"] = modelDatum["norms"];
+            vertexData["colors"] = modelDatum["colors"];
 
             // Delete the old mesh if it exists.
             // if (Vars.scene.getMeshByName("MeshFrom3DMol") !== null) {
@@ -236,6 +262,12 @@ export function importIntoBabylonScene(): any {
     return babylonMesh;
 }
 
+/**
+ * Positions a given molecular mesh within a specified box..
+ * @param  {any} babylonMesh       The molecular mesh.
+ * @param  {any} otherBabylonMesh  The box.
+ * @returns void
+ */
 export function positionMeshInsideAnother(babylonMesh: any, otherBabylonMesh: any): void {
     if (babylonMesh === undefined) {
         // No mesh exists.
@@ -250,44 +282,45 @@ export function positionMeshInsideAnother(babylonMesh: any, otherBabylonMesh: an
     // Render to update the meshes
     Vars.scene.render();  // Needed to get bounding box to recalculate.
 
-    // Get the bounding box of the other mesh and it's dimensions.
-    let targetBox = otherBabylonMesh.getBoundingInfo().boundingBox;
-    let targetBoxDimens = Object.keys(targetBox.maximumWorld).map(
-        (k) => targetBox.maximumWorld[k] - targetBox.minimumWorld[k],
-    );
+    // If the required transformations have already been calculated, apply the
+    // same ones.
+    // console.log(meshScaling);
+    // debugger;
+    if (meshScaling === undefined) {
+        // Get the bounding box of the other mesh and it's dimensions.
+        let targetBox = otherBabylonMesh.getBoundingInfo().boundingBox;
+        let targetBoxDimens = Object.keys(targetBox.maximumWorld).map(
+            (k) => targetBox.maximumWorld[k] - targetBox.minimumWorld[k],
+        );
 
-    // Get the bounding box of this mesh.
-    let thisBox = babylonMesh.getBoundingInfo().boundingBox;
-    let thisBoxDimens = Object.keys(thisBox.maximumWorld).map(
-        (k) => thisBox.maximumWorld[k] - thisBox.minimumWorld[k],
-    );
+        // Get the bounding box of this mesh.
+        let thisBox = babylonMesh.getBoundingInfo().boundingBox;
+        let thisBoxDimens = Object.keys(thisBox.maximumWorld).map(
+            (k) => thisBox.maximumWorld[k] - thisBox.minimumWorld[k],
+        );
 
-    // Get the scales
-    let scales = targetBoxDimens.map((targetBoxDimen, i) =>
-        targetBoxDimen / thisBoxDimens[i],
-    );
+        // Get the scales
+        let scales = targetBoxDimens.map((targetBoxDimen, i) =>
+            targetBoxDimen / thisBoxDimens[i],
+        );
 
-    // Get the minimum scale
-    let minScale = Math.min.apply(null, scales);
+        // Get the minimum scale
+        let minScale = Math.min.apply(null, scales);
+        meshScaling = new BABYLON.Vector3(minScale, minScale, minScale);
 
-    // Scale the mesh by that amount.
-    babylonMesh.scaling = new BABYLON.Vector3(minScale, minScale, minScale);
-    Vars.scene.render();  // Needed to get bounding box to recalculate.
+        // Scale the mesh by that amount.
+        babylonMesh.scaling = meshScaling;
+        Vars.scene.render();  // Needed to get bounding box to recalculate.
 
-    // Move the mesh into the target.
-    let delta = thisBox.centerWorld.subtract(targetBox.centerWorld);
-    babylonMesh.position = babylonMesh.position.subtract(delta);
+        // Move the mesh into the target.
+        meshTranslation = thisBox.centerWorld.subtract(targetBox.centerWorld);
+        babylonMesh.position = babylonMesh.position.subtract(meshTranslation);
+    } else {
+        // Scaling and position already determined. So just use those.
+        babylonMesh.scaling = meshScaling;
+        babylonMesh.position = babylonMesh.position.subtract(meshTranslation);
+    }
 
     // You need to recalculate the shadows.
     Optimizations.updateEnvironmentShadows();
 }
-
-/**
- * Scale a model before importing it into babylon.
- * @param  {number} scaleFactor The scaling factor.
- * @returns void
- */
-// export function scaleBeforeBabylonImport(scaleFactor: number): void {
-//     coorsFlat = coorsFlat.map((v) => v * scaleFactor);
-// }
-// export function rotateBeforeBabylonImport(delta: number[]): void {}

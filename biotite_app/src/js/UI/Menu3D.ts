@@ -138,7 +138,7 @@ function setupMainMenu(data): void {
                     let func = btnInf.func;
                     let color = btnInf.color;
 
-                    let levelInt = parseInt(level, 10);
+                    let levelInt = +level;
 
                     allButtons.push(
                         new ButtonWrapper({
@@ -306,7 +306,7 @@ function setupNonVisualizationButtons(menuData: any): any {
                 return ("" + first.txt).localeCompare(second.txt);
             });
 
-            let levelInt = parseInt(level, 10);
+            let levelInt = +level;
             if (levelInt > 1) {  // Because even main submenu can't go back (will be cancel).
                 menuData[level].push({
                     color: yellowColor,
@@ -385,7 +385,7 @@ function setupMainMenuToggleButton(): void {
             // mainMenuGUI3DManager.isVisible = ! mainMenuGUI3DManager.isVisible; *****
             // for (let i in allButtons) {
             //     if (allButtons.hasOwnProperty(i)) {
-            //         let iInt = parseInt(i, 10);
+            //         let iInt = +i;
             //         allButtons[iInt].isVisible(buttonWrapper.value);
             //     }
             // }
@@ -445,7 +445,7 @@ function showOnlyButtonsOfLevel(level: number): void {
 
     // for (let aLevel in gui3DMenuManagers) {
     //     if (gui3DMenuManagers.hasOwnProperty(aLevel)) {
-    //         let aLevelInt = parseInt(aLevel, 10);
+    //         let aLevelInt = +aLevel;
     //         let manager = gui3DMenuManagers[aLevelInt];
 
     //         if (aLevelInt === 0) {

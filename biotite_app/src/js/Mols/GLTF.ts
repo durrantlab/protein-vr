@@ -23,7 +23,7 @@ export function setup(sceneInfoData: any): void {
                 // Get the meshes.
                 for (let uniqStrID in task.loadedMeshes) {
                     if (task.loadedMeshes.hasOwnProperty(uniqStrID)) {
-                        let uniqIntID = parseInt(uniqStrID, 10);
+                        let uniqIntID = +uniqStrID;
                         let mesh = task.loadedMeshes[uniqIntID];
 
                         CommonLoader.setupMesh(

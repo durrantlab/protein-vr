@@ -4,6 +4,8 @@ import * as Optimizations from "../../Scene/Optimizations";
 import * as Vars from "../../Vars";
 import * as VRML from "./VRML";
 
+declare var $3Dmol;
+
 // A place to keep track of all the styles. List of [key, vals]
 // let styles: any[] = [];
 
@@ -99,11 +101,34 @@ export function toggleRep(filters: string[], repName: string, colorScheme: strin
     VRML.viewer.setStyle({});
 
     // Make the new representation.
-    let rep = {};
-    rep[repName.toLowerCase()] = colorSchemeKeyWordTo3DMol[colorScheme];
+    let colorSccheme = colorSchemeKeyWordTo3DMol[colorScheme];
     let sels = {"and": filters.map((i) => selKeyWordTo3DMolSel[i])};
-    VRML.viewer.addStyle(sels, rep);
 
+    if (repName.toLowerCase() === "surface") {
+        VRML.viewer.addSurface(
+            $3Dmol.SurfaceType.MS,
+            colorSccheme,
+            sels,
+            undefined,
+            undefined,
+            () => {
+                toggleRepContinued(keys);
+            },
+        );
+    } else {
+        let rep = {};
+        rep[repName.toLowerCase()] = colorSccheme;
+        VRML.viewer.addStyle(sels, rep);
+        toggleRepContinued(keys);
+    }
+}
+
+/**
+ * Continues the toggleRep function.
+ * @param  {Object<string,*>} keys
+ * @returns void
+ */
+function toggleRepContinued(keys: any): void {
     VRML.render(true, (newMesh) => {
         // Remove any other meshes that have the same category key (so could
         // be different color... that would be removed.)

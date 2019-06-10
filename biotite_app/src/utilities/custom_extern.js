@@ -390,6 +390,8 @@ BABYLON.Engine.prototype.hideLoadingUI = function() {};
 BABYLON.Engine.prototype.loadingUIText;
 BABYLON.Engine.prototype.getFps = function() {};
 
+var require = function(a) {};
+
 /**
  * @constructor
 */
