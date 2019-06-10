@@ -112,23 +112,25 @@ export function toggleRep(filters: string[], repName: string, colorScheme: strin
             undefined,
             undefined,
             () => {
-                toggleRepContinued(keys);
+                toggleRepContinued(keys, repName);
             },
         );
     } else {
         let rep = {};
         rep[repName.toLowerCase()] = colorSccheme;
         VRML.viewer.addStyle(sels, rep);
-        toggleRepContinued(keys);
+        toggleRepContinued(keys, repName);
     }
 }
 
 /**
  * Continues the toggleRep function.
  * @param  {Object<string,*>} keys
+ * @param  {string}           repName  The erepresentative name. Like
+ *                                     "Surface".
  * @returns void
  */
-function toggleRepContinued(keys: any): void {
+function toggleRepContinued(keys: any, repName: string): void {
     VRML.render(true, (newMesh) => {
         // Remove any other meshes that have the same category key (so could
         // be different color... that would be removed.)
@@ -141,6 +143,12 @@ function toggleRepContinued(keys: any): void {
                     console.log("deleting old mesh...");
                 }
             }
+        }
+
+        // If the new mesh is a surface, make it so each triangle is two
+        // sided.
+        if (repName === "Surface") {
+            newMesh.material.backFaceCulling = false;
         }
 
         // Add this new one.

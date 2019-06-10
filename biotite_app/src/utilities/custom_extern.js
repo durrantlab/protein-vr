@@ -206,6 +206,7 @@ BABYLON.Material.activeLight;
 BABYLON.Material.alpha;
 BABYLON.Material.freeze = function() {};
 BABYLON.Material.albedoColor;
+BABYLON.Material.backFaceCulling;
 
 BABYLON.SSAORenderingPipeline = function(a,b,c) {};
 
