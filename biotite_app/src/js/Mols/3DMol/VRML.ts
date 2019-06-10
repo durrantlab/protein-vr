@@ -12,7 +12,7 @@ declare var $3Dmol;
 
 export interface IVRMLModel {
     coors: any;  // Float32Array
-    norms: any;  // Float32Array
+    // norms: any;  // Float32Array
     colors: any;  // Float32Array
     trisIdxs: any;  // Uint32Array
 }
@@ -136,7 +136,7 @@ function loadValsFromVRML(callBack: any): void {
             if (modelData.length === modelIdx) {
                 modelData.push({
                     "coors": new Float32Array(0),
-                    "norms": new Float32Array(0),
+                    // "norms": new Float32Array(0),
                     "colors": new Float32Array(0),
                     "trisIdxs": new Uint32Array(0),
                 });
@@ -211,15 +211,16 @@ export function importIntoBabylonScene(): any {
 
             // Calculate normals instead? It's not necessary. Doesn't chang over
             // 3dmoljs calculated normals.
+            let norms = [];
             BABYLON.VertexData.ComputeNormals(
-                modelDatum["coors"], modelDatum["trisIdxs"], modelDatum["norms"],
+                modelDatum["coors"], modelDatum["trisIdxs"], norms, // modelDatum["norms"],
             );
 
             // Compile all that into vertex data.
             let vertexData = new BABYLON.VertexData();
             vertexData["positions"] = modelDatum["coors"];  // In quotes because from webworker (external)
             vertexData["indices"] = modelDatum["trisIdxs"];
-            vertexData["normals"] = modelDatum["norms"];
+            vertexData["normals"] = norms;  // modelDatum["norms"];
             vertexData["colors"] = modelDatum["colors"];
 
             // Delete the old mesh if it exists.

@@ -60,7 +60,7 @@ export function loadValsFromVRML(vrmlStr: string): VRML.IVRMLModel[] {
             modelData.push({
                 "colors": strToColors(betweenbookends("color [", "]", vrmlChunk)),
                 "coors": strToCoors(betweenbookends("point [", "]", vrmlChunk)),
-                "norms": strToCoors(betweenbookends("vector [", "]", vrmlChunk)),
+                // "norms": strToCoors(betweenbookends("vector [", "]", vrmlChunk)),
                 "trisIdxs": strToTris(betweenbookends("coordIndex [", "]", vrmlChunk)),
             });
         }
@@ -80,7 +80,7 @@ export function loadValsFromVRML(vrmlStr: string): VRML.IVRMLModel[] {
         // Now you need to chunk all the data. This is because you can only
         // transfer so much data back to the main thread at a time.
         dataToSendBack = [];
-        let dataTypes = ["colors", "coors", "norms", "trisIdxs"];
+        let dataTypes = ["colors", "coors", "trisIdxs"];  // "norms",
         for (let modelIdx in modelData) {
             if (modelData.hasOwnProperty(modelIdx)) {
                 for (let idx2 in dataTypes) {
@@ -150,22 +150,21 @@ function strToCoors(str: string): any {
  * @param  {string} str The normals in string format.
  * @returns * The list (actually a Float32Array... not sure how to type this.)
  */
-function strToNorms(str: string): any {
-    // Convert coordinates in string form to arrays.
-    let normsStrs = str.match(numRegex);
-    let normLen = normsStrs.length;
-    let norms = new Float32Array(normLen);
+// function strToNorms(str: string): any {
+//     // Convert coordinates in string form to arrays.
+//     let normsStrs = str.match(numRegex);
+//     let normLen = normsStrs.length;
+//     let norms = new Float32Array(normLen);
 
-    for (let i = 0; i < normLen; i = i + 3) {
-        norms[i] = +normsStrs[i];
-        norms[i + 1] = +normsStrs[i + 1];
-        norms[i + 2] = +normsStrs[i + 2];
-    }
+//     for (let i = 0; i < normLen; i = i + 3) {
+//         norms[i] = +normsStrs[i];
+//         norms[i + 1] = +normsStrs[i + 1];
+//         norms[i + 2] = +normsStrs[i + 2];
+//     }
 
-    // Now convert it to a typed array, which is much faster.
-    return norms;
-};
-
+//     // Now convert it to a typed array, which is much faster.
+//     return norms;
+// };
 
 /**
  * Converts colors in string format to list of numbers. Similar to
@@ -241,8 +240,7 @@ function betweenbookends(bookend1: string, bookend2: string, str: string): strin
  * @param  {Array<Object<string, Array<number>>>}  modelData  Information
  *                                                            about
  *                                                            coordinates,
- *                                                            norms, colors,
- *                                                            etc.
+ *                                                            colors, etc.
  * @returns Array<Object<string, Array<number>>>   Like model Data, but with
  *                                                 the coordinates translated.
  */
@@ -265,8 +263,7 @@ function translateBeforeBabylonImport(delta: number[], modelData: VRML.IVRMLMode
  * @param  {Array<Object<string, Array<number>>>}  modelData  Information
  *                                                            about
  *                                                            coordinates,
- *                                                            norms, colors,
- *                                                            etc.
+ *                                                            colors, etc.
  * @returns * The x, y, z of the geometric center. Float32Array.
  */
 function getGeometricCenter(modelData: VRML.IVRMLModel[]): any {
