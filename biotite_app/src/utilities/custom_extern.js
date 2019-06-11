@@ -91,6 +91,7 @@ jQuery.modal = function(a) {};
 // jQuery.prototype.scrollspy.options = function() {};
 jQuery.prototype.getScript = function(a, b) {};
 jQuery.append = function(a) {};
+jQuery.remove = function() {};
 jQuery.keypress = function(a) {};
 jQuery.getJSON = function(a, b) {};
 jQuery.ajax = function(a,b) {};

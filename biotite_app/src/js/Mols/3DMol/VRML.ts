@@ -20,16 +20,15 @@ export interface IVRMLModel {
 let modelData: IVRMLModel[] = [];
 let meshScaling = undefined;
 let meshTranslation = undefined;
-let iFrame3DMol = undefined;
-
-let callBackAfterIFrameLoaded;
-let callBackAfterDataLoaded;
-let callBackAfterExportVRML;
-let callBackAfterSurfaceAdded;
 
 export let viewer;
+let element;
+let config;
+
 let vrmlStr;
 let vrmlParserWebWorker;
+let pdbTxt = "";
+let hasActiveSurface = false;
 
 /**
  * Setup the ability to work with 3Dmol.js.
@@ -37,70 +36,51 @@ let vrmlParserWebWorker;
  * @returns void
  */
 export function setup(callBack): void {
-    // Keep track of the iframe. It will run when the iframe send a message
-    // saying it has loaded.
-    callBackAfterIFrameLoaded = callBack;
-
-    // This window must listen for the iframe...
-    if (window.addEventListener) {  // For standards-compliant web browsers
-        window.addEventListener("message", getMsgFrom3DMoljs, false);
-    } else {
-        window["attachEvent"]("onmessage", getMsgFrom3DMoljs);
-    }
-
     // Add a container for 3dmoljs.
-    // let extraStyle = "display:none;";
-    let extraStyle = "width:150px; height:150px; z-index:150; position:fixed; top:0; left:0;";
-    jQuery("body").append(`<iframe
-        id="mol-container"
-        class="mol-container"
-        src="3dmol.html"
-        style="${extraStyle}"></iframe>`);
-
-    iFrame3DMol = document.getElementById("mol-container")["contentWindow"];
+    addDiv();
 
     // Make the viewer object.
-    // let element = jQuery("#mol-container");
-    // let config = { backgroundColor: "white" };
-    // viewer = $3Dmol.createViewer( element, config );
+    element = jQuery("#mol-container");
+    config = { backgroundColor: "white" };
+    viewer = $3Dmol.createViewer( element, config );
     // jQuery("#mol-container canvas")["attr"]("style", extraStyle);
-    // window["viewer"] = viewer;
+    window["viewer"] = viewer;  // For debugging.
+
+    callBack();
 }
 
-function getMsgFrom3DMoljs(evt) {
-    console.log("MAIN: Msg from iframe:");
-    console.log(evt["data"]);
-
-    switch (evt["data"]) {
-        case "3DMolLoaded":
-            callBackAfterIFrameLoaded();
-            callBackAfterIFrameLoaded = undefined;
-            break;
-        case "addPDBTxtDone":
-            callBackAfterDataLoaded();
-            callBackAfterDataLoaded = undefined;
-            break;
-        case "exportVRMLDone":
-            vrmlStr = iFrame3DMol["vrmlStr"];
-            callBackAfterExportVRML();
-            callBackAfterExportVRML = undefined;
-            break;
-        case "addSurfaceDone":
-            callBackAfterSurfaceAdded();
-            callBackAfterSurfaceAdded = undefined;
-            break;
-        default:
+/**
+ * Add (or readd) div 3DMoljs div.
+ * @returns void
+ */
+function addDiv(): void {
+    let molContainer = jQuery("#mol-container");
+    if (molContainer) {
+        molContainer.remove();
     }
-}
 
-function sendMsgTo3DMoljs(msg) {
-    console.log("MAIN: Msg to iframe:");
-    console.log(msg);
-    iFrame3DMol.postMessage(msg, window.origin);
+    let extraStyle = "display:none;";
+    // let extraStyle = "width:150px; height:150px; z-index:150; position:fixed; top:0; left:0;";
+    jQuery("body").append(`<div
+        id="mol-container"
+        class="mol-container"
+        style="${extraStyle}"></div>`);
 }
 
 export function resetAll() {
-    iFrame3DMol["resetAll"]();
+    if (hasActiveSurface) {
+        hasActiveSurface = false;
+
+        // I can't get rid of the surfaces without causing
+        // problems. I'm just going to go nuclear and reload the
+        // whole thing.
+        viewer = null;
+        setup(() => {
+            viewer.addModel( pdbTxt, "pdb" );
+        });
+    }
+
+    viewer.setStyle({}, {});
 }
 
 /**
@@ -110,18 +90,17 @@ export function resetAll() {
  * @returns void
  */
 export function loadPDBURL(url: string, callBack): void {
-    callBackAfterDataLoaded = callBack;
     jQuery.ajax( url, {
         "success": (data) => {
             // Setup the visualization
-            // viewer.addModel( data, "pdb" );
-            sendMsgTo3DMoljs(["addPDBTxt", data]);
+            pdbTxt = data;  // In case you need to restart.
+            viewer.addModel( data, "pdb" );
+            // viewer.zoomTo();
 
             // render();  // Use default style.
             // viewer.render();
 
-            // Below now runs when you get the message back from the iframe.
-            // callBack();
+            callBack();
         },
         "error": (hdr, status, err) => {
             console.error( "Failed to load PDB " + url + ": " + err );
@@ -130,16 +109,22 @@ export function loadPDBURL(url: string, callBack): void {
 }
 
 export function setStyle(sels, rep) {
-    sendMsgTo3DMoljs(["setStyle", {"sels": sels, "rep": rep}]);
+    viewer.setStyle(sels, rep);
+    viewer.render();
 }
 
 export function addSurface(colorScheme, sels, callBack) {
-    callBackAfterSurfaceAdded = callBack;
-    sendMsgTo3DMoljs(["addSurface", {"colorScheme": colorScheme, "sels": sels}]);
-}
-
-export function removeAllSurfaces() {
-    sendMsgTo3DMoljs(["removeAllSurfaces", undefined]);
+    hasActiveSurface = true;
+    viewer.addSurface(
+        $3Dmol.SurfaceType.MS,
+        colorScheme,
+        sels,
+        undefined,
+        undefined,
+        () => {
+            callBack();
+        },
+    );
 }
 
 /**
@@ -188,9 +173,8 @@ export function render(updateData: boolean = true, callBack: any = () => { retur
  */
 function loadVRMLFrom3DMol(callBack): void {
     // Make the VRML string from that model.
-    // vrmlStr = viewer.exportVRML();
-    sendMsgTo3DMoljs(["exportVRML", undefined]);
-    callBackAfterExportVRML = callBack;
+    vrmlStr = viewer.exportVRML();
+    callBack();
 }
 
 /**
