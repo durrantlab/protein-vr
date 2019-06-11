@@ -14,17 +14,19 @@ declare var BABYLON;
  * @returns void
  */
 export function setup(sceneInfoData: any): void {
-    // Load 3DMoljs
-    try {
-        jQuery.getScript(
-            "https://3Dmol.csb.pitt.edu/build/3Dmol-min.js",
-            ( data, textStatus, jqxhr ) => {
-                after3DMolJsLoaded(sceneInfoData);
-            },
-        );
-    } catch (err) {
-        after3DMolJsLoaded(sceneInfoData);
-    }
+    // Load the 3DMoljs iframe.
+    // try {
+    //     jQuery.getScript(
+    //         // "https://3Dmol.csb.pitt.edu/build/3Dmol-min.js",
+    //         "https://3Dmol.csb.pitt.edu/build/3Dmol.js",
+    //         ( data, textStatus, jqxhr ) => {
+    //             after3DMolJsLoaded(sceneInfoData);
+    //         },
+    //     );
+    // } catch (err) {
+    //     after3DMolJsLoaded(sceneInfoData);
+    // }
+    after3DMolJsLoaded(sceneInfoData);
 }
 
 /**
@@ -33,47 +35,14 @@ export function setup(sceneInfoData: any): void {
  * @returns void
  */
 function after3DMolJsLoaded(sceneInfoData: any): void {
-    VRML.setup();
-
-    let pdbUri = "https://files.rcsb.org/view/1XDN.pdb";
-    VRML.loadPDBURL(pdbUri, () => {
-        VRML.viewer.setStyle({}, {"cartoon": {"color": "spectrum"}});
-
-        VRML.render();
-
-        // VRML.babylonMesh.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-        // Vars.scene.render();  // Needed to get bounding box to recalculate.
-        // VRML.babylonMesh.refreshBoundingInfo();  // Not needed.
-        // console.log(VRML.babylonMesh.getBoundingInfo().boundingBox.maximumWorld);
-        // console.log(VRML.babylonMesh.getBoundingInfo().boundingBox.minimumWorld);
-
-        // VRML.babylonMesh.scaling = new BABYLON.Vector3(0.01, 0.01, 0.01);
-        // Vars.scene.render();  // Needed to get bounding box to recalculate.
-        // VRML.babylonMesh.refreshBoundingInfo();  // Not needed.
-        // console.log(VRML.babylonMesh.getBoundingInfo().boundingBox.maximumWorld);
-        // console.log(VRML.babylonMesh.getBoundingInfo().boundingBox.minimumWorld);
-
-        // if (VRML.babylonMesh !== undefined) {
-        //     VRML.babylonMesh.showBoundingBox = true;
-        // }
-
-        // setTimeout(() => {
-        //     console.log(VRML.babylonMesh.getBoundingInfo().boundingBox.maximumWorld);
-        //     console.log(VRML.babylonMesh.getBoundingInfo().boundingBox.minimumWorld);
-        // }, 2000);
-
-        // .refreshBoundingInfo();
-
-        // VRML.scaleBeforeBabylonImport(0.1);
-        // VRML.translateBeforeBabylonImport([5, 0, 0]);
-        // VRML.getGeometricCenter();
-
-        // VRML.importIntoBabylonScene();
-
-        // Target the camera to one of the vertexes of the mesh
-        // Vars.scene.activeCamera.setTarget(new BABYLON.Vector3(lastVertex[0], lastVertex[1], lastVertex[2]));
-
-        // Done loading...
-        CommonLoader.afterLoading(sceneInfoData);
+    VRML.setup(() => {
+        let pdbUri = "https://files.rcsb.org/view/1XDN.pdb";
+        VRML.loadPDBURL(pdbUri, () => {
+            VRML.setStyle({}, {"cartoon": {"color": "spectrum"}});
+            VRML.render(true, () => {
+                // Done loading...
+                CommonLoader.afterLoading(sceneInfoData);
+            });
+        });
     });
 }

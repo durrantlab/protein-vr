@@ -9,6 +9,8 @@ declare var $3Dmol;
 // A place to keep track of all the styles. List of [key, vals]
 // let styles: any[] = [];
 
+let currentSurface = undefined;
+
 // Where the meshes generated from 3DMol.js get stored.
 interface IStyleMesh {
     mesh: any;
@@ -98,27 +100,35 @@ export function toggleRep(filters: string[], repName: string, colorScheme: strin
     // You'll need to use 3DMoljs to generate the mesh, since it's never been
     // generated before. First remove all representations from existing
     // 3Dmoljs.
-    VRML.viewer.setStyle({});
+    // let viewer = VRML.viewer;
+    // VRML.removeAllSurfaces();
+    // VRML.setStyle({}, undefined);
+    // console.log("Abovee causes an error...");
+    VRML.resetAll();
+    // VRML.viewer.render();
 
     // Make the new representation.
     let colorSccheme = colorSchemeKeyWordTo3DMol[colorScheme];
     let sels = {"and": filters.map((i) => selKeyWordTo3DMolSel[i])};
 
     if (repName.toLowerCase() === "surface") {
-        VRML.viewer.addSurface(
-            $3Dmol.SurfaceType.MS,
-            colorSccheme,
-            sels,
-            undefined,
-            undefined,
-            () => {
-                toggleRepContinued(keys, repName);
-            },
-        );
+        VRML.addSurface(colorSccheme, sels, () => {
+            toggleRepContinued(keys, repName);
+        });
+        // currentSurface = VRML.viewer.addSurface(
+        //     $3Dmol.SurfaceType.MS,
+        //     colorSccheme,
+        //     sels,
+        //     undefined,
+        //     undefined,
+        //     () => {
+        //         toggleRepContinued(keys, repName);
+        //     },
+        // );
     } else {
         let rep = {};
         rep[repName.toLowerCase()] = colorSccheme;
-        VRML.viewer.addStyle(sels, rep);
+        VRML.setStyle(sels, rep);
         toggleRepContinued(keys, repName);
     }
 }
@@ -145,10 +155,16 @@ function toggleRepContinued(keys: any, repName: string): void {
             }
         }
 
-        // If the new mesh is a surface, make it so each triangle is two
-        // sided.
+        // If the new mesh is a surface, make it so each triangle is two sided
+        // and delete the surface from 3Dmoljs instance (cleanup).
         if (repName === "Surface") {
             newMesh.material.backFaceCulling = false;
+
+            // if (currentSurface !== undefined) {
+                // debugger;
+                // VRML.viewer.removeSurface(currentSurface["surfid"]);
+                // currentSurface = undefined;
+            // }
         }
 
         // Add this new one.
@@ -158,8 +174,6 @@ function toggleRepContinued(keys: any, repName: string): void {
         };
 
         console.log("added new mesh");
-
-        console.log(styleMeshes);
     });
 }
 

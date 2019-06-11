@@ -1,6 +1,7 @@
 // An module to manage VRML data obtained from 3Dmol.js. Assumes the 3Dmol.js
 // javascript file is already loaded.
 
+import { setMoleculeNameInfos } from "../../Navigation/VoiceCommands";
 import * as Optimizations from "../../Scene/Optimizations";
 import * as Vars from "../../Vars";
 import * as CommonLoader from "../CommonLoader";
@@ -17,8 +18,14 @@ export interface IVRMLModel {
 }
 
 let modelData: IVRMLModel[] = [];
-let meshScaling: undefined;
-let meshTranslation: undefined;
+let meshScaling = undefined;
+let meshTranslation = undefined;
+let iFrame3DMol = undefined;
+
+let callBackAfterIFrameLoaded;
+let callBackAfterDataLoaded;
+let callBackAfterExportVRML;
+let callBackAfterSurfaceAdded;
 
 export let viewer;
 let vrmlStr;
@@ -26,20 +33,74 @@ let vrmlParserWebWorker;
 
 /**
  * Setup the ability to work with 3Dmol.js.
+ * @param  {Function()} callBack  Runs once the iframe is loaded is loaded.
  * @returns void
  */
-export function setup(): void {
+export function setup(callBack): void {
+    // Keep track of the iframe. It will run when the iframe send a message
+    // saying it has loaded.
+    callBackAfterIFrameLoaded = callBack;
+
+    // This window must listen for the iframe...
+    if (window.addEventListener) {  // For standards-compliant web browsers
+        window.addEventListener("message", getMsgFrom3DMoljs, false);
+    } else {
+        window["attachEvent"]("onmessage", getMsgFrom3DMoljs);
+    }
+
     // Add a container for 3dmoljs.
-    jQuery("body").append(`<div
+    // let extraStyle = "display:none;";
+    let extraStyle = "width:150px; height:150px; z-index:150; position:fixed; top:0; left:0;";
+    jQuery("body").append(`<iframe
         id="mol-container"
         class="mol-container"
-        style="display:none;"></div>`);
+        src="3dmol.html"
+        style="${extraStyle}"></iframe>`);
+
+    iFrame3DMol = document.getElementById("mol-container")["contentWindow"];
 
     // Make the viewer object.
-    let element = jQuery("#mol-container");
-    let config = { backgroundColor: "white" };
-    viewer = $3Dmol.createViewer( element, config );
-    window["viewer"] = viewer;
+    // let element = jQuery("#mol-container");
+    // let config = { backgroundColor: "white" };
+    // viewer = $3Dmol.createViewer( element, config );
+    // jQuery("#mol-container canvas")["attr"]("style", extraStyle);
+    // window["viewer"] = viewer;
+}
+
+function getMsgFrom3DMoljs(evt) {
+    console.log("MAIN: Msg from iframe:");
+    console.log(evt["data"]);
+
+    switch (evt["data"]) {
+        case "3DMolLoaded":
+            callBackAfterIFrameLoaded();
+            callBackAfterIFrameLoaded = undefined;
+            break;
+        case "addPDBTxtDone":
+            callBackAfterDataLoaded();
+            callBackAfterDataLoaded = undefined;
+            break;
+        case "exportVRMLDone":
+            vrmlStr = iFrame3DMol["vrmlStr"];
+            callBackAfterExportVRML();
+            callBackAfterExportVRML = undefined;
+            break;
+        case "addSurfaceDone":
+            callBackAfterSurfaceAdded();
+            callBackAfterSurfaceAdded = undefined;
+            break;
+        default:
+    }
+}
+
+function sendMsgTo3DMoljs(msg) {
+    console.log("MAIN: Msg to iframe:");
+    console.log(msg);
+    iFrame3DMol.postMessage(msg, window.origin);
+}
+
+export function resetAll() {
+    iFrame3DMol["resetAll"]();
 }
 
 /**
@@ -49,19 +110,36 @@ export function setup(): void {
  * @returns void
  */
 export function loadPDBURL(url: string, callBack): void {
+    callBackAfterDataLoaded = callBack;
     jQuery.ajax( url, {
         "success": (data) => {
             // Setup the visualization
-            viewer.addModel( data, "pdb" );
+            // viewer.addModel( data, "pdb" );
+            sendMsgTo3DMoljs(["addPDBTxt", data]);
+
             // render();  // Use default style.
             // viewer.render();
 
-            callBack();
+            // Below now runs when you get the message back from the iframe.
+            // callBack();
         },
         "error": (hdr, status, err) => {
             console.error( "Failed to load PDB " + url + ": " + err );
         },
     });
+}
+
+export function setStyle(sels, rep) {
+    sendMsgTo3DMoljs(["setStyle", {"sels": sels, "rep": rep}]);
+}
+
+export function addSurface(colorScheme, sels, callBack) {
+    callBackAfterSurfaceAdded = callBack;
+    sendMsgTo3DMoljs(["addSurface", {"colorScheme": colorScheme, "sels": sels}]);
+}
+
+export function removeAllSurfaces() {
+    sendMsgTo3DMoljs(["removeAllSurfaces", undefined]);
 }
 
 /**
@@ -79,35 +157,40 @@ export function render(updateData: boolean = true, callBack: any = () => { retur
     Vars.engine.hideLoadingUI();
 
     // Render the style
-    viewer.render();
+    // viewer.render();
 
     if (updateData) {
         // Load the data.
-        loadVRMLFrom3DMol();
-        loadValsFromVRML(() => {
-            // Could modify coordinates before importing into babylon scene, so
-            // comment out below. Changed my mind the kinds of manipulations above
-            // should be performed on the mesh. Babylon is going to have better
-            // functions for this than I can come up with.
-            let newMesh = importIntoBabylonScene();
+        loadVRMLFrom3DMol(() => {
+            loadValsFromVRML(() => {
+                // Could modify coordinates before importing into babylon
+                // scene, so comment out below. Changed my mind the kinds of
+                // manipulations above should be performed on the mesh.
+                // Babylon is going to have better functions for this than I
+                // can come up with.
+                let newMesh = importIntoBabylonScene();
 
-            positionMeshInsideAnother(newMesh, Vars.scene.getMeshByName("protein_box"));
+                positionMeshInsideAnother(newMesh, Vars.scene.getMeshByName("protein_box"));
 
-            callBack(newMesh);  // Cloned so it won't change with new rep in future.
+                callBack(newMesh);  // Cloned so it won't change with new rep in future.
 
-            // Clean up.
-            modelData = [];
+                // Clean up.
+                modelData = [];
+            });
         });
     }
 }
 
 /**
  * Loads the VRML string from the 3Dmol instance.
+ * @param  {Function(*)=}  callBack    The callback function.
  * @returns void
  */
-function loadVRMLFrom3DMol(): void {
+function loadVRMLFrom3DMol(callBack): void {
     // Make the VRML string from that model.
-    vrmlStr = viewer.exportVRML();
+    // vrmlStr = viewer.exportVRML();
+    sendMsgTo3DMoljs(["exportVRML", undefined]);
+    callBackAfterExportVRML = callBack;
 }
 
 /**
