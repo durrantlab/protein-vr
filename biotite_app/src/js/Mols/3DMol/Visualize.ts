@@ -16,7 +16,7 @@ interface IStyleMesh {
     mesh: any;
     categoryKey: string;  // Everything but color. Obj key will include color (for lookup).
 }
-let styleMeshes: {[s: string]: IStyleMesh} = {};
+export let styleMeshes: {[s: string]: IStyleMesh} = {};
 
 let selKeyWordTo3DMolSel = {
     // See VMD output TCL files for good ideas.
@@ -58,14 +58,18 @@ selKeyWordTo3DMolSel["Ligand"] = {"not": {"or": [
 ]}};
 
 let colorSchemeKeyWordTo3DMol = {
-    "Element": {"colorscheme": "default"},
-    "Red": {"color": "red"},
+    "Amino Acid": {"colorscheme": "amino"},
     "Blue": {"color": "blue"},
+    "Chain": {"colorscheme": "chain"},
+    "Element": {"colorscheme": "default"},
     "Green": {"color": "green"},
+    "Nucleic": {"colorscheme": "nucleic"},
     "Orange": {"color": "orange"},
-    "Yellow": {"color": "yellow"},
     "Purple": {"color": "purple"},
+    "Red": {"color": "red"},
     "Spectrum": {"color": "spectrum"},
+    "White": {"color": "white"},
+    "Yellow": {"color": "yellow"},
 };
 
 // Ligand?
@@ -87,6 +91,9 @@ export function toggleRep(filters: string[], repName: string, colorScheme: strin
                 }
             }
         }
+
+        // Still need to position the meshes (hiding some reps could make others bigger).
+        VRML.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"));
         return;
     }
 
@@ -115,16 +122,6 @@ export function toggleRep(filters: string[], repName: string, colorScheme: strin
         VRML.addSurface(colorSccheme, sels, () => {
             toggleRepContinued(keys, repName);
         });
-        // currentSurface = VRML.viewer.addSurface(
-        //     $3Dmol.SurfaceType.MS,
-        //     colorSccheme,
-        //     sels,
-        //     undefined,
-        //     undefined,
-        //     () => {
-        //         toggleRepContinued(keys, repName);
-        //     },
-        // );
     } else {
         let rep = {};
         rep[repName.toLowerCase()] = colorSccheme;
@@ -136,12 +133,12 @@ export function toggleRep(filters: string[], repName: string, colorScheme: strin
 /**
  * Continues the toggleRep function.
  * @param  {Object<string,*>} keys
- * @param  {string}           repName  The erepresentative name. Like
+ * @param  {string}           repName  The representative name. Like
  *                                     "Surface".
  * @returns void
  */
 function toggleRepContinued(keys: any, repName: string): void {
-    VRML.render(true, (newMesh) => {
+    VRML.render(true, repName, (newMesh) => {
         // Remove any other meshes that have the same category key (so could
         // be different color... that would be removed.)
         for (let i in styleMeshes) {

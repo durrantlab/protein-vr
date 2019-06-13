@@ -19,8 +19,6 @@ Use new voice system from bugmebot. It's better. But doesn't work on phones... ?
 
 Option to make VR scenes discoverable.
 
-Can't simplify gltf. Colors now work, but number of vertexes doesn't chang.e
-
 Download option. That way you can run it even without internet connection.
 
 Other selection types (hydrophobic).
@@ -40,6 +38,7 @@ Need to make sure menu system still works with old system (Biotite).
 
 Done or Ignore
 --------------
+Can't simplify gltf. Colors now work, but number of vertexes doesn't chang.e
 
 fix protein VR on Google cardboard
 * Note that this doesn't happen in the playground.

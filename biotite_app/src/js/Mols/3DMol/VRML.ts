@@ -5,6 +5,7 @@ import { setMoleculeNameInfos } from "../../Navigation/VoiceCommands";
 import * as Optimizations from "../../Scene/Optimizations";
 import * as Vars from "../../Vars";
 import * as CommonLoader from "../CommonLoader";
+import * as Visualize from "./Visualize";
 import * as VRMLParserWebWorker from "./VRMLParserWebWorker";  // So you can access when no webworker support.
 
 declare var BABYLON;
@@ -18,8 +19,7 @@ export interface IVRMLModel {
 }
 
 let modelData: IVRMLModel[] = [];
-let meshScaling = undefined;
-let meshTranslation = undefined;
+let molRotation = new BABYLON.Vector3(0, 0, 0);
 
 export let viewer;
 let element;
@@ -108,12 +108,25 @@ export function loadPDBURL(url: string, callBack): void {
     });
 }
 
-export function setStyle(sels, rep) {
+/**
+ * Set the style on the 3DMoljs viewer.
+ * @param  {Object<*,*>} sels  A selection object.
+ * @param  {Object<*,*>} rep   A representation object.
+ * @returns void
+ */
+export function setStyle(sels: any, rep: any): void {
     viewer.setStyle(sels, rep);
     viewer.render();
 }
 
-export function addSurface(colorScheme, sels, callBack) {
+/**
+ * Add a surface to the 3DMoljs viewer.
+ * @param  {Object<*,*>} colorScheme  A colorscheme object.
+ * @param  {Object<*,*>} sels         A selection object.
+ * @param  {Function()} callBack     A callback function.
+ * @returns void
+ */
+export function addSurface(colorScheme: any, sels: any, callBack: any): void {
     hasActiveSurface = true;
     viewer.addSurface(
         $3Dmol.SurfaceType.MS,
@@ -132,11 +145,13 @@ export function addSurface(colorScheme, sels, callBack) {
  * @param  {boolean=}      updateData  Whether to update the underlying data
  *                                     with this visualization. True by
  *                                     default.
+ * @param  {string}        repName     The representative name. Like
+ *                                     "Surface".
  * @param  {Function(*)=}  callBack    The callback function, with the new
  *                                     mesh as a parameter.
  * @returns void
  */
-export function render(updateData: boolean = true, callBack: any = () => { return; }): void {
+export function render(updateData: boolean = true, repName: string, callBack: any = () => { return; }): void {
     // Make sure there are no waiting menus up and running. Happens some
     // times.
     Vars.engine.hideLoadingUI();
@@ -147,7 +162,7 @@ export function render(updateData: boolean = true, callBack: any = () => { retur
     if (updateData) {
         // Load the data.
         loadVRMLFrom3DMol(() => {
-            loadValsFromVRML(() => {
+            loadValsFromVRML(repName, () => {
                 // Could modify coordinates before importing into babylon
                 // scene, so comment out below. Changed my mind the kinds of
                 // manipulations above should be performed on the mesh.
@@ -155,7 +170,7 @@ export function render(updateData: boolean = true, callBack: any = () => { retur
                 // can come up with.
                 let newMesh = importIntoBabylonScene();
 
-                positionMeshInsideAnother(newMesh, Vars.scene.getMeshByName("protein_box"));
+                positionAll3DMolMeshInsideAnother(newMesh, Vars.scene.getMeshByName("protein_box"));
 
                 callBack(newMesh);  // Cloned so it won't change with new rep in future.
 
@@ -179,9 +194,10 @@ function loadVRMLFrom3DMol(callBack): void {
 
 /**
  * Load in values like coordinates and colors from the VRML string.
+ * @param  {string}  repName  The representative name. Like "Surface".
  * @returns void
  */
-function loadValsFromVRML(callBack: any): void {
+function loadValsFromVRML(repName: string, callBack: any): void {
     // Clear previous model data.
     modelData = [];
 
@@ -234,6 +250,7 @@ function loadValsFromVRML(callBack: any): void {
         vrmlParserWebWorker.postMessage({
             "cmd": "start",
             "data": vrmlStr,
+            "removeExtraPts": (repName === "Stick"),
         });
     } else {
         // Sorry! No Web Worker support..
@@ -329,62 +346,114 @@ export function importIntoBabylonScene(): any {
 }
 
 /**
- * Positions a given molecular mesh within a specified box..
+ * Rotate the molecular meshes.
+ * @param  {string} axis    The axis. "x", "y", or "z".
+ * @param  {number} amount  The amount. In radians, I think.
+ * @returns void
+ */
+export function setMolRotation(axis: string, amount: number): void {
+    molRotation[axis] += amount;
+}
+
+/**
+ * Positions a given molecular mesh within a specified box.
  * @param  {any} babylonMesh       The molecular mesh.
  * @param  {any} otherBabylonMesh  The box.
  * @returns void
  */
-export function positionMeshInsideAnother(babylonMesh: any, otherBabylonMesh: any): void {
-    if (babylonMesh === undefined) {
-        // No mesh exists.
-        return;
+export function positionAll3DMolMeshInsideAnother(babylonMesh: any, otherBabylonMesh: any): void {
+    // Reset the scaling, position, and rotation of all the visible molecular
+    // meshes.
+    let allVisMolMeshes = [];
+    for (let molMeshId in Visualize.styleMeshes) {
+        if (Visualize.styleMeshes.hasOwnProperty(molMeshId)) {
+            let allVisMolMesh = Visualize.styleMeshes[molMeshId].mesh;
+
+            if (allVisMolMesh.isVisible === true) {
+                // Make sure allVisMolMesh is not scaled or positioned. But
+                // note that rotations are preserved.
+                allVisMolMesh.scaling = new BABYLON.Vector3(1, 1, 1);
+                allVisMolMesh.position = new BABYLON.Vector3(0, 0, 0);
+                allVisMolMesh.rotation = molRotation;
+                allVisMolMesh.visibility = 0;  // Hide while rotating.
+                allVisMolMeshes.push(allVisMolMesh);
+            }
+        }
     }
 
-    // Make sure babylonMesh is not scaled or positioned. But note that
-    // rotations are preserved.
-    babylonMesh.scaling = new BABYLON.Vector3(1, 1, 1);
-    babylonMesh.position = new BABYLON.Vector3(0, 0, 0);
+    // Add the current one (just added).
+    if (babylonMesh !== undefined) {
+        babylonMesh.scaling = new BABYLON.Vector3(1, 1, 1);
+        babylonMesh.position = new BABYLON.Vector3(0, 0, 0);
+        babylonMesh.rotation = molRotation;
+        allVisMolMeshes.push(babylonMesh);
+    }
+
+    if (allVisMolMeshes.length === 0) {
+        // No meshes to show.
+        return;
+    }
 
     // Render to update the meshes
     Vars.scene.render();  // Needed to get bounding box to recalculate.
 
-    // If the required transformations have already been calculated, apply the
-    // same ones.
-    // console.log(meshScaling);
-    // debugger;
-    if (meshScaling === undefined) {
-        // Get the bounding box of the other mesh and it's dimensions.
-        let targetBox = otherBabylonMesh.getBoundingInfo().boundingBox;
-        let targetBoxDimens = Object.keys(targetBox.maximumWorld).map(
-            (k) => targetBox.maximumWorld[k] - targetBox.minimumWorld[k],
-        );
+    // Get the bounding box of the other mesh and it's dimensions
+    // (protein_box).
+    let targetBox = otherBabylonMesh.getBoundingInfo().boundingBox;
+    let targetBoxDimens = Object.keys(targetBox.maximumWorld).map(
+        (k) => targetBox.maximumWorld[k] - targetBox.minimumWorld[k],
+    );
 
-        // Get the bounding box of this mesh.
-        let thisBox = babylonMesh.getBoundingInfo().boundingBox;
-        let thisBoxDimens = Object.keys(thisBox.maximumWorld).map(
-            (k) => thisBox.maximumWorld[k] - thisBox.minimumWorld[k],
-        );
+    // Get the molecular model with the biggest volume.
+    let maxVol = 0.0;
+    let thisBox;
+    let thisBoxDimens;
+    for (let allVisMolMeshIdx in allVisMolMeshes) {
+        if (allVisMolMeshes.hasOwnProperty(allVisMolMeshIdx)) {
+            let allVisMolMesh = allVisMolMeshes[allVisMolMeshIdx];
 
-        // Get the scales
-        let scales = targetBoxDimens.map((targetBoxDimen, i) =>
-            targetBoxDimen / thisBoxDimens[i],
-        );
+            // Get the bounding box of this mesh.
+            let thisBoxTmp = allVisMolMesh.getBoundingInfo().boundingBox;
+            let thisBoxDimensTmp = Object.keys(thisBoxTmp.maximumWorld).map(
+                (k) => thisBoxTmp.maximumWorld[k] - thisBoxTmp.minimumWorld[k],
+            );
+            let volume = thisBoxDimensTmp[0] * thisBoxDimensTmp[1] * thisBoxDimensTmp[2];
 
-        // Get the minimum scale
-        let minScale = Math.min.apply(null, scales);
-        meshScaling = new BABYLON.Vector3(minScale, minScale, minScale);
+            if (volume > maxVol) {
+                maxVol = volume;
+                thisBox = thisBoxTmp;
+                thisBoxDimens = thisBoxDimensTmp;
+            }
+        }
+    }
 
-        // Scale the mesh by that amount.
-        babylonMesh.scaling = meshScaling;
-        Vars.scene.render();  // Needed to get bounding box to recalculate.
+    // Get the scales
+    let scales = targetBoxDimens.map((targetBoxDimen, i) =>
+        targetBoxDimen / thisBoxDimens[i],
+    );
 
-        // Move the mesh into the target.
-        meshTranslation = thisBox.centerWorld.subtract(targetBox.centerWorld);
-        babylonMesh.position = babylonMesh.position.subtract(meshTranslation);
-    } else {
-        // Scaling and position already determined. So just use those.
-        babylonMesh.scaling = meshScaling;
-        babylonMesh.position = babylonMesh.position.subtract(meshTranslation);
+    // Get the minimum scale
+    let minScale = Math.min.apply(null, scales);
+    let meshScaling = new BABYLON.Vector3(minScale, minScale, minScale);
+
+    // Scale the meshes.
+    for (let allVisMolMeshIdx in allVisMolMeshes) {
+        if (allVisMolMeshes.hasOwnProperty(allVisMolMeshIdx)) {
+            let allVisMolMesh = allVisMolMeshes[allVisMolMeshIdx];
+            allVisMolMesh.scaling = meshScaling;
+        }
+    }
+
+    Vars.scene.render();  // Needed to get bounding box to recalculate.
+
+    // Translate the meshes.
+    let meshTranslation = thisBox.centerWorld.subtract(targetBox.centerWorld);
+    for (let allVisMolMeshIdx in allVisMolMeshes) {
+        if (allVisMolMeshes.hasOwnProperty(allVisMolMeshIdx)) {
+            let allVisMolMesh = allVisMolMeshes[allVisMolMeshIdx];
+            allVisMolMesh.position = allVisMolMesh.position.subtract(meshTranslation);
+            allVisMolMesh.visibility = 1;  // Hide while rotating.
+        }
     }
 
     // You need to recalculate the shadows.

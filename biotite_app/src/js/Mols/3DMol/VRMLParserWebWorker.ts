@@ -21,10 +21,11 @@ if (inWebWorker) {
     self.onmessage = (e) => {
         let cmd = e.data["cmd"];
         let data = e.data["data"];
+        let removeExtraPts = e.data["removeExtraPts"];
 
         if (cmd === "start") {
             // This will populate dataToSendBack
-            loadValsFromVRML(data);
+            loadValsFromVRML(data, removeExtraPts);
             cmd = "sendDataChunk";
         }
 
@@ -41,10 +42,16 @@ if (inWebWorker) {
 
 /**
  * Load in values like coordinates and colors from the VRML string.
- * @param  {string} vrmlStr  The string containing the VRML data.
+ * @param  {string}        vrmlStr         The string containing the VRML data.
+ * @param  {boolean=false} removeExtraPts  Whether to remove extra points at
+ *                                         the origin. Sticks representation
+ *                                         from 3DMoljs unfortunately
+ *                                         generates these. They make it hard
+ *                                         to center sticks-only
+ *                                         representations.
  * @returns Array<Object<string, Array<number>>>   The model data.
  */
-export function loadValsFromVRML(vrmlStr: string): VRML.IVRMLModel[] {
+export function loadValsFromVRML(vrmlStr: string, removeExtraPts: boolean = false): VRML.IVRMLModel[] {
     let modelData: VRML.IVRMLModel[] = [];
 
     // A given VRML file could have multiple IndexedFaceSets. Divide and
@@ -55,11 +62,19 @@ export function loadValsFromVRML(vrmlStr: string): VRML.IVRMLModel[] {
         if (vrmlChunks.hasOwnProperty(idx)) {
             let vrmlChunk = vrmlChunks[idx];
 
+            // Extract the coordinates from the vrml text
+            let coors = strToCoors(betweenbookends("point [", "]", vrmlChunk));
+
+            // Remove stray points (added to the origin) if necessary.
+            if (removeExtraPts) {
+                coors = removeStrayPoints(coors);
+            }
+
             // Make sure string keys for closure compiler, since web worker is
             // external.
             modelData.push({
                 "colors": strToColors(betweenbookends("color [", "]", vrmlChunk)),
-                "coors": strToCoors(betweenbookends("point [", "]", vrmlChunk)),
+                "coors": coors,
                 "trisIdxs": strToTris(betweenbookends("coordIndex [", "]", vrmlChunk)),
             });
         }
@@ -98,6 +113,34 @@ export function loadValsFromVRML(vrmlStr: string): VRML.IVRMLModel[] {
         }
         return [];
     }
+}
+
+/**
+ * Fixes 0,0,0 points from the coordinates. 3DMoljs unfortunately adds these
+ * to stick representations.
+ * @param  {*} pts The coordinates. Float32Array.
+ * @returns * Float32Array
+ */
+export function removeStrayPoints(pts: any): any {
+    console.log("Removing extra points.");
+
+    let firstX = pts[0];
+    let firstY = pts[1];
+    let firstZ = pts[2];
+
+    let coorsLen = pts.length;
+
+    for (let coorIdx = 0; coorIdx < coorsLen; coorIdx = coorIdx + 3) {
+        let idx2 = coorIdx + 1;
+        let idx3 = coorIdx + 2;
+        if ((pts[coorIdx] === 0) && (pts[idx2] === 0) && (pts[idx3] === 0)) {
+            pts[coorIdx] = firstX;
+            pts[idx2] = firstY;
+            pts[idx3] = firstZ;
+        }
+    }
+
+    return pts;
 }
 
 /**

@@ -3,6 +3,7 @@
 
 import * as Vars from "../../Vars";
 import * as CommonLoader from "../CommonLoader";
+import * as Visualize from "./Visualize";
 import * as VRML from "./VRML";
 
 declare var jQuery;
@@ -37,11 +38,11 @@ function after3DMolJsLoaded(sceneInfoData: any): void {
     VRML.setup(() => {
         let pdbUri = "https://files.rcsb.org/view/1XDN.pdb";
         VRML.loadPDBURL(pdbUri, () => {
-            VRML.setStyle({}, {"cartoon": {"color": "spectrum"}});
-            VRML.render(true, () => {
-                // Done loading...
-                CommonLoader.afterLoading(sceneInfoData);
-            });
+            // Show protein ribbon by default.
+            Visualize.toggleRep(["Protein", "All"], "Cartoon", "Spectrum");
+
+            // Continue...
+            CommonLoader.afterLoading(sceneInfoData);
         });
     });
 }
