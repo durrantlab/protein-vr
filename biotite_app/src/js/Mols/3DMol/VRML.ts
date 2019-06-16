@@ -85,8 +85,9 @@ export function resetAll() {
 
 /**
  * Load a file into the 3dmol object.
- * @param  {string}     url       The url.
- * @param  {Function()} callBack  A callback function.
+ * @param  {string}     url        The url.
+ * @param  {Function(*)} callBack  A callback function. The 3DMoljs molecule
+ *                                 object is the parameter.
  * @returns void
  */
 export function loadPDBURL(url: string, callBack): void {
@@ -94,13 +95,13 @@ export function loadPDBURL(url: string, callBack): void {
         "success": (data) => {
             // Setup the visualization
             pdbTxt = data;  // In case you need to restart.
-            viewer.addModel( data, "pdb" );
+            let mdl = viewer.addModel( data, "pdb" );
             // viewer.zoomTo();
 
             // render();  // Use default style.
             // viewer.render();
 
-            callBack();
+            callBack(mdl);
         },
         "error": (hdr, status, err) => {
             console.error( "Failed to load PDB " + url + ": " + err );

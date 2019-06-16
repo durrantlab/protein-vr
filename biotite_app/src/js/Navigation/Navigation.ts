@@ -126,8 +126,6 @@ export function actOnStareTrigger(): void {
         lastTrigger = curTime;
     }
 
-    console.log("hi");
-
     // Click, space, or something. You need to decide how to act.
     switch (Pickables.getCategoryOfCurMesh()) {
         case Pickables.PickableCategory.Ground:

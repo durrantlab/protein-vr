@@ -17,7 +17,6 @@ export function setupShadowGenerator(): void {
     let shadowInf = getBlurDarknessFromLightName();
     shadowInf.T = 0;
     shadowInf.blur = 2;
-    console.log(shadowInf);
 
     // Set up the shadow generator.
     // Below gives error on iphone sometimes...
