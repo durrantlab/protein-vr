@@ -149,10 +149,10 @@ export function actOnStareTrigger(): void {
 
 /**
  * Teleport to a given location.
- * @param  {*}          [newLoc=undefined] The new location. Uses stare point
- *                                         if no location given.
- * @param  {function()} [callBack=]        The callback function once teleport
- *                                         is done.
+ * @param  {*}         [newLoc=undefined] The new location. Uses stare point
+ *                                        if no location given.
+ * @param  {Function}  [callBack=]        The callback function once teleport
+ *                                        is done.
  * @returns void
  */
 function teleport(newLoc = undefined, callBack = undefined): void {

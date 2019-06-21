@@ -87,6 +87,8 @@ jQuery.prototype.draggable = function(a) {};
 jQuery.prototype.makeCssInline = function() {};  /** custom added */
 // jQuery.prototype.modal = function(a) {};
 jQuery.modal = function(a) {};
+jQuery.html = function(a) {};
+jQuery.attr = function(a,b) {};
 // jQuery.prototype.scrollspy = function() {};
 // jQuery.prototype.scrollspy.options = function() {};
 jQuery.prototype.getScript = function(a, b) {};
@@ -326,7 +328,7 @@ BABYLON.Mesh.dispose = function() {};
 BABYLON.Mesh.getLODLevels = function() {};
 BABYLON.Mesh.removeLODLevel = function(a) {};
 BABYLON.Mesh.flipFaces = function(a) {};
-BABYLON.Mesh.MergeMeshes = function(a,b,c,d,e) {};
+BABYLON.Mesh.MergeMeshes = function(a,b,c) {};
 BABYLON.Mesh.BACKSIDE;
 BABYLON.Mesh.FRONTSIDE;
 BABYLON.Mesh.DOUBLESIDE;
@@ -338,6 +340,7 @@ BABYLON.Mesh.getBoundingInfo.boundingBox.maximumWorld;
 BABYLON.Mesh.getBoundingInfo.boundingBox.minimumWorld;
 BABYLON.Mesh.getBoundingInfo.boundingBox.centerWorld;
 BABYLON.Mesh.refreshBoundingInfo = function() {};
+BABYLON.Mesh.animations;
 
 BABYLON.Matrix;
 BABYLON.Matrix.Translation = function(a) {};
@@ -359,10 +362,11 @@ BABYLON.PointLight = function(a,b,c) {};
 BABYLON.Vector3 = function(a,b,c) {};
 
 BABYLON.Vector3.Distance = function(a,b) {};
-BABYLON.Vector3.subtract = function(a) {}
-BABYLON.Vector3.clone = function() {}
-BABYLON.Vector3.add = function(a) {}
-BABYLON.Vector3.copyFrom = function(a) {}
+BABYLON.Vector3.subtract = function(a) {};
+BABYLON.Vector3.clone = function() {};
+BABYLON.Vector3.prototype.clone = function() {};
+BABYLON.Vector3.add = function(a) {};
+BABYLON.Vector3.copyFrom = function(a) {};
 BABYLON.Vector3.normalize = function() {};
 BABYLON.Vector3.equals = function(a) {};
 BABYLON.Vector3.scale = function(a) {};
@@ -466,6 +470,7 @@ BABYLON.Scene.prototype.createDefaultVRExperience.teleportCamera = function(a) {
 BABYLON.Scene.prototype.getEngine = function() {};
 BABYLON.Scene.prototype.getEngine.getCaps = function() {};
 BABYLON.Scene.prototype.getEngine.getCaps.multiview;
+BABYLON.Scene.prototype.WebVRController;
 BABYLON.Scene.prototype.WebVRController.onTriggerStateChangedObservable = function() {};
 BABYLON.Scene.prototype.WebVRController.onTriggerStateChangedObservable.add = function(a) {};
 BABYLON.Scene.prototype.WebVRController.onPadStateChangedObservable = function() {};
@@ -574,6 +579,9 @@ BABYLON.VertexBuffer.PositionKind = function() {};
 BABYLON.RenderTargetTexture = function() {};
 BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE = function() {};
 BABYLON.Animation.prototype.setKeys = function(a) {};
+BABYLON.Animation.ANIMATIONTYPE_FLOAT;
+BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE;
+
 
 /**
  * @constructor
@@ -593,6 +601,9 @@ BABYLON.ExecuteCodeAction = function(a,b) {};
 
 /**
  * @constructor
+ * @param {*} a
+ * @param {*} b
+ * @param {number=} c
  */
 BABYLON.Ray = function(a,b,c) {};
 
@@ -603,6 +614,7 @@ BABYLON.VertexData = function() {};
 
 BABYLON.VertexData.prototype.applyToMesh = function(a) {};
 BABYLON.VertexData.prototype.ComputeNormals = function(a,b,c) {};
+BABYLON.VertexData.ComputeNormals = function(a,b,c) {};
 
 BABYLON.Quaternion;
 BABYLON.Quaternion.FromEulerAngles = function(a, b, c) {};

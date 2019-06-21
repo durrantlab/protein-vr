@@ -290,32 +290,28 @@ function SimplifyMeshes(priority: number, minNumVertsThatIsProblem: number, deci
         meshesToConsider.sort((a, b) => b[0] - a[0]);
 
         // Simplify those meshes.
-        for (let meshIdx in meshesToConsider) {
-            if (meshesToConsider.hasOwnProperty(meshIdx)) {
-                let mesh = meshesToConsider[meshIdx][1];
-                let decimationLvel = meshesToConsider[meshIdx][2];
+        for (let meshToConsider of meshesToConsider) {
+            let mesh = meshToConsider[1];
+            let decimationLvel = meshToConsider[2];
 
-                // Remove the existing LODs if they exist.
-                while (mesh.getLODLevels().length > 0) {
-                    let firstLODMesh = mesh.getLODLevels()[0]["mesh"];
-                    mesh.removeLODLevel(firstLODMesh);
-                    removeMeshEntirely(firstLODMesh);
-                }
-                // console.log("GGG1", mesh.name, mesh.getLODLevels().length);
-
-                // https://doc.babylonjs.com/api/classes/babylon.mesh#simplify
-                mesh.simplify([{"quality": decimationLvel, "distance": 0.001}],
-                    false, BABYLON.SimplificationType.QUADRATIC, () => {
-                        // console.log("GGG2", mesh.name, mesh.getLODLevels().length);
-                        // let simpMesh = mesh.getLODLevels()[0]["mesh"];
-                        // removeMeshEntirely(mesh);
-                        // console.log(simpMesh);
-                        // window["mesh"] = mesh;
-                        // console.log(mesh.name, decimationLvel);
-                    },
-                );
-
+            // Remove the existing LODs if they exist.
+            while (mesh.getLODLevels().length > 0) {
+                let firstLODMesh = mesh.getLODLevels()[0]["mesh"];
+                mesh.removeLODLevel(firstLODMesh);
+                removeMeshEntirely(firstLODMesh);
             }
+
+            // https://doc.babylonjs.com/api/classes/babylon.mesh#simplify
+            mesh.simplify([{"quality": decimationLvel, "distance": 0.001}],
+                false, BABYLON.SimplificationType.QUADRATIC, () => {
+                    // console.log("GGG2", mesh.name, mesh.getLODLevels().length);
+                    // let simpMesh = mesh.getLODLevels()[0]["mesh"];
+                    // removeMeshEntirely(mesh);
+                    // console.log(simpMesh);
+                    // window["mesh"] = mesh;
+                    // console.log(mesh.name, decimationLvel);
+                },
+            );
         }
 
         return true;

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Bootstrap 4, from LayoutIt!</title>
+
+    <meta name="description" content="Protein-VR: Documentation">
+    <meta name="author" content="Jacob Durrant">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+  </head>
+  <body>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">
+                        PDB ID or URL
+                    </label>
+                    <input type="text" class="form-control" id="urlOrPDB" />
+                    <p class="help-block">
+                        Enter a PDB ID (e.g., <a target="_blank" href="https://www.rcsb.org/structure/1xdn">1XDN</a>)
+                        or the URL of a PDB or SDF file (e.g., <a target="_blank" href="https://files.rcsb.org/view/1XDN.pdb">https://files.rcsb.org/.../1XDN.pdb</a>,
+                        <a target="_blank" href="https://www.drugbank.ca/structures/small_molecule_drugs/DB00316.sdf">https://www.drugbank.ca/.../DB00316.sdf</a>).
+                    </p>
+                </div>
+                <button id="submit" class="btn btn-primary">
+                    Load Molecule
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/jquery.min.js"></script>
+    <script src="scripts/bootstrap.min.js"></script>
+    <script src="scripts/scripts.js"></script>
+    <script>
+        jQuery(document).ready(() => {
+            jQuery("#submit").click(() => {
+                let curUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                let newUrl = curUrl.slice(0, curUrl.length - 14) + "?src=" + jQuery("#urlOrPDB").val();
+                top.location.href = newUrl;
+            });
+        });
+    </script>
+  </body>
+</html>

@@ -2,6 +2,8 @@
 // VRML.ts for additional functions related to the mesh itself.
 
 import * as Menu3D from "../../UI/Menu3D/Menu3D";
+import * as OpenPopup from "../../UI/OpenPopup";
+import * as UrlVars from "../../UrlVars";
 import * as Vars from "../../Vars";
 import * as CommonLoader from "../CommonLoader";
 import * as Visualize from "./Visualize";
@@ -11,6 +13,16 @@ declare var jQuery;
 declare var BABYLON;
 
 export let atomicInfo = {};
+
+export let modelUrl = "nanokid.sdf";
+
+/**
+ * Setter for modelUrl.
+ * @param  {string} url The new value.
+ * @returns void
+ */
+export function setModelUrl(url: string): void { modelUrl = url; }
+
 
 /**
  * Load in the extra molecule meshes.
@@ -39,9 +51,15 @@ export function setup(sceneInfoData: any): void {
  */
 function after3DMolJsLoaded(sceneInfoData: any): void {
     VRML.setup(() => {
-        let pdbUri = "https://files.rcsb.org/view/1XDN.pdb";
-        VRML.loadPDBURL(pdbUri, (mdl3DMol) => {
+        UrlVars.readUrlParams();
+
+        // let pdbUri = "https://files.rcsb.org/view/1XDN.pdb";
+        VRML.loadPDBURL(modelUrl, (mdl3DMol) => {
+            // Update URL with location
+            UrlVars.setURL();
+
             // Get additional selection information about the loaded molecule.
+            // Like residue name.
             getAdditionalSels(mdl3DMol);
 
             // Now that the pdb is loaded, you need to repopulate the menu. In
@@ -50,15 +68,33 @@ function after3DMolJsLoaded(sceneInfoData: any): void {
             // 3Dmoljs, so let's just recreate for now.
             Menu3D.setup();  // Will use scene_info.json from what was previously saved.
 
+            // Now that the PDB is loaded, you can start loading styles.
+            UrlVars.startLoadingStyles();
+
             // Show protein ribbon by default.
-            Visualize.toggleRep(["Protein", "All"], "Cartoon", "Spectrum");
+            // Visualize.toggleRep(["Protein", "All"], "Cartoon", "Spectrum");
 
             // Continue...
             CommonLoader.afterLoading(sceneInfoData);
+
+            // If it's nanokid, open a popup to let them specify a url or
+            // pdbid.
+            if (modelUrl === "nanokid.sdf") {
+                setTimeout(() => {
+                    // Give them some time to admire nanokid... :)
+                    OpenPopup.openUrlModal("Load Molecule", "help/load.html");
+                }, 3000);
+            }
         });
     });
 }
 
+/**
+ * Generates additional possible selections from the properties of the atoms
+ * themselves (like residue names).
+ * @param  {*} mdl3DMol  A 3dmoljs molecule object.
+ * @returns void
+ */
 function getAdditionalSels(mdl3DMol): void {
     // Get all the atoms.
     let atoms = mdl3DMol.selectedAtoms({});

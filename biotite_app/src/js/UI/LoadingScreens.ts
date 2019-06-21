@@ -27,6 +27,12 @@ export function babylonJSLoadingMsg(msg: string): void {
     Vars.engine.loadingUIText = msg;
 }
 
+/**
+ * Starts the fake loading screen, to give the impression that things are
+ * loading.
+ * @param  {number} initialVal  The initial fake value (%).
+ * @returns void
+ */
 export function startFakeLoading(initialVal: number): void {
     let fakeVal = initialVal;
     clearInterval(intervalID);
@@ -37,6 +43,10 @@ export function startFakeLoading(initialVal: number): void {
     }, 100);
 }
 
+/**
+ * Stop the fake-loading splash screen.
+ * @returns void
+ */
 export function stopFakeLoading(): void {
     clearInterval(intervalID);
 }

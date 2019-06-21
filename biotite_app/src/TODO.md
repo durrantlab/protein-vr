@@ -36,8 +36,28 @@ Need to redo voice commands with new nav system.
 
 Need to make sure menu system still works with old system (Biotite).
 
+
+Option to keep mesh on floor. (option becauser bilayer, then middle is good.)
+    Works but needs flag to turn on and off.
+
+Way to remove specific reps added previoiusly.
+
+Selection to get all stuff around ligand.
+
+
 Done or Ignore
 --------------
+
+Way to simplify the menu? It's a beast.
+
+pdb
+
+Remove all reps button.
+
+Default
+
+URL
+
 Can't simplify gltf. Colors now work, but number of vertexes doesn't chang.e
 
 fix protein VR on Google cardboard

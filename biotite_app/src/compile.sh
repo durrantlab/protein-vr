@@ -21,6 +21,7 @@ mkdir ../build
 # Copy over files to build
 echo "Copying to build directory..."
 rsync --exclude '*.ts' --exclude '*.sh' --exclude '*.out' --exclude 'utilities' --exclude 'build.js' -rv * ../build/
+cp js/nanokid.sdf ../build/
 
 # Simplify js structure
 ls -1d ../build/js/* | grep -v "external" | awk '{print "rm -rf " $1}' | bash

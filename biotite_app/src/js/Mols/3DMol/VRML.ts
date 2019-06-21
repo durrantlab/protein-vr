@@ -2,10 +2,10 @@
 // javascript file is already loaded.
 
 import { setMoleculeNameInfos } from "../../Navigation/VoiceCommands";
-import * as Optimizations from "../../Scene/Optimizations";
+import * as UrlVars from "../../UrlVars";
 import * as Vars from "../../Vars";
 import * as CommonLoader from "../CommonLoader";
-import * as Visualize from "./Visualize";
+import * as PositionInScene from "./PositionInScene";
 import * as VRMLParserWebWorker from "./VRMLParserWebWorker";  // So you can access when no webworker support.
 
 declare var BABYLON;
@@ -19,7 +19,7 @@ export interface IVRMLModel {
 }
 
 let modelData: IVRMLModel[] = [];
-let molRotation = new BABYLON.Vector3(0, 0, 0);
+export let molRotation = new BABYLON.Vector3(0, 0, 0);
 
 export let viewer;
 let element;
@@ -27,12 +27,13 @@ let config;
 
 let vrmlStr;
 let vrmlParserWebWorker;
-let pdbTxt = "";
+let molTxt = "";
+let molTxtType = "pdb";
 let hasActiveSurface = false;
 
 /**
  * Setup the ability to work with 3Dmol.js.
- * @param  {Function()} callBack  Runs once the iframe is loaded is loaded.
+ * @param  {Function} callBack  Runs once the iframe is loaded is loaded.
  * @returns void
  */
 export function setup(callBack): void {
@@ -76,7 +77,7 @@ export function resetAll() {
         // whole thing.
         viewer = null;
         setup(() => {
-            viewer.addModel( pdbTxt, "pdb" );
+            viewer.addModel( molTxt, "pdb" );
         });
     }
 
@@ -85,17 +86,23 @@ export function resetAll() {
 
 /**
  * Load a file into the 3dmol object.
- * @param  {string}     url        The url.
- * @param  {Function(*)} callBack  A callback function. The 3DMoljs molecule
- *                                 object is the parameter.
+ * @param  {string}     url     The url.
+ * @param  {Function} callBack  A callback function. The 3DMoljs molecule
+ *                              object is the parameter.
  * @returns void
  */
 export function loadPDBURL(url: string, callBack): void {
     jQuery.ajax( url, {
         "success": (data) => {
             // Setup the visualization
-            pdbTxt = data;  // In case you need to restart.
-            let mdl = viewer.addModel( data, "pdb" );
+            molTxt = data;  // In case you need to restart.
+            molTxtType = "pdb";
+
+            if (url.slice(url.length - 3).toLowerCase() === "sdf") {
+                molTxtType = "sdf";
+            }
+
+            let mdl = viewer.addModel( data, molTxtType );
             // viewer.zoomTo();
 
             // render();  // Use default style.
@@ -104,15 +111,15 @@ export function loadPDBURL(url: string, callBack): void {
             callBack(mdl);
         },
         "error": (hdr, status, err) => {
-            console.error( "Failed to load PDB " + url + ": " + err );
+            console.error( "Failed to load molecule " + url + ": " + err );
         },
     });
 }
 
 /**
  * Set the style on the 3DMoljs viewer.
- * @param  {Object<*,*>} sels  A selection object.
- * @param  {Object<*,*>} rep   A representation object.
+ * @param  {Object<string,*>} sels  A selection object.
+ * @param  {Object<string,*>} rep   A representation object.
  * @returns void
  */
 export function setStyle(sels: any, rep: any): void {
@@ -122,9 +129,9 @@ export function setStyle(sels: any, rep: any): void {
 
 /**
  * Add a surface to the 3DMoljs viewer.
- * @param  {Object<*,*>} colorScheme  A colorscheme object.
- * @param  {Object<*,*>} sels         A selection object.
- * @param  {Function()} callBack     A callback function.
+ * @param  {Object<string,*>} colorScheme  A colorscheme object.
+ * @param  {Object<string,*>} sels         A selection object.
+ * @param  {Function}         callBack     A callback function.
  * @returns void
  */
 export function addSurface(colorScheme: any, sels: any, callBack: any): void {
@@ -143,16 +150,14 @@ export function addSurface(colorScheme: any, sels: any, callBack: any): void {
 
 /**
  * Sets the 3dmol.js style. Also generates a vrml string and values.
- * @param  {boolean=}      updateData  Whether to update the underlying data
- *                                     with this visualization. True by
- *                                     default.
- * @param  {string}        repName     The representative name. Like
- *                                     "Surface".
- * @param  {Function(*)=}  callBack    The callback function, with the new
- *                                     mesh as a parameter.
+ * @param  {boolean}    updateData  Whether to update the underlying data with
+ *                                  this visualization. True by default.
+ * @param  {string}     repName     The representative name. Like "Surface".
+ * @param  {Function=}  callBack    The callback function, with the new mesh
+ *                                  as a parameter.
  * @returns void
  */
-export function render(updateData: boolean = true, repName: string, callBack: any = () => { return; }): void {
+export function render(updateData, repName: string, callBack: any = () => { return; }): void {
     // Make sure there are no waiting menus up and running. Happens some
     // times.
     Vars.engine.hideLoadingUI();
@@ -171,9 +176,12 @@ export function render(updateData: boolean = true, repName: string, callBack: an
                 // can come up with.
                 let newMesh = importIntoBabylonScene();
 
-                positionAll3DMolMeshInsideAnother(newMesh, Vars.scene.getMeshByName("protein_box"));
-
-                callBack(newMesh);  // Cloned so it won't change with new rep in future.
+                if (newMesh !== undefined) {
+                    // It's undefined if, for example, trying to do cartoon on
+                    // ligand.
+                    PositionInScene.positionAll3DMolMeshInsideAnother(newMesh, Vars.scene.getMeshByName("protein_box"));
+                    callBack(newMesh);  // Cloned so it won't change with new rep in future.
+                }
 
                 // Clean up.
                 modelData = [];
@@ -184,7 +192,7 @@ export function render(updateData: boolean = true, repName: string, callBack: an
 
 /**
  * Loads the VRML string from the 3Dmol instance.
- * @param  {Function(*)=}  callBack    The callback function.
+ * @param  {Function=}  callBack    The callback function.
  * @returns void
  */
 function loadVRMLFrom3DMol(callBack): void {
@@ -212,22 +220,25 @@ function loadValsFromVRML(repName: string, callBack: any): void {
             let resp = event.data;
             let chunk = resp["chunk"];
             let status = resp["status"];
-            let modelIdx = chunk[0];
-            let dataType = chunk[1];
-            let vals = chunk[2];
 
-            if (modelData.length === modelIdx) {
-                modelData.push({
-                    "coors": new Float32Array(0),
-                    "colors": new Float32Array(0),
-                    "trisIdxs": new Uint32Array(0),
-                });
+            if (chunk !== undefined) {
+                let modelIdx = chunk[0];
+                let dataType = chunk[1];
+                let vals = chunk[2];
+
+                if (modelData.length === modelIdx) {
+                    modelData.push({
+                        "coors": new Float32Array(0),
+                        "colors": new Float32Array(0),
+                        "trisIdxs": new Uint32Array(0),
+                    });
+                }
+
+                modelData[modelIdx][dataType] = typedArrayConcat(
+                    dataType === "trisIdxs" ? Uint32Array : Float32Array,
+                    [modelData[modelIdx][dataType], vals],
+                );
             }
-
-            modelData[modelIdx][dataType] = typedArrayConcat(
-                dataType === "trisIdxs" ? Uint32Array : Float32Array,
-                [modelData[modelIdx][dataType], vals],
-            );
 
             switch (status) {
                 case "more":
@@ -262,9 +273,9 @@ function loadValsFromVRML(repName: string, callBack: any): void {
 
 /**
  * Concatonates a list of typed arrays.
- * @param  {} resultConstructor  The type of array. E.g., Uint8Array.
- * @param  {} listOfArrays       A list of typed arrays to concatonate.
- * @returns any The typed array.
+ * @param  {*} resultConstructor  The type of array. E.g., Uint8Array.
+ * @param  {*} listOfArrays       A list of typed arrays to concatonate.
+ * @returns * The typed array.
  */
 function typedArrayConcat(resultConstructor, listOfArrays): any {
     // See http://2ality.com/2015/10/concatenating-typed-arrays.html
@@ -352,111 +363,20 @@ export function importIntoBabylonScene(): any {
  * @param  {number} amount  The amount. In radians, I think.
  * @returns void
  */
-export function setMolRotation(axis: string, amount: number): void {
+export function updateMolRotation(axis: string, amount: number): void {
     molRotation[axis] += amount;
+
+    // Update URL too.
+    UrlVars.setURL();
 }
 
 /**
- * Positions a given molecular mesh within a specified box.
- * @param  {any} babylonMesh       The molecular mesh.
- * @param  {any} otherBabylonMesh  The box.
+ * Setts the molRotation object externally.
+ * @param  {number} x
+ * @param  {number} y
+ * @param  {number} z
  * @returns void
  */
-export function positionAll3DMolMeshInsideAnother(babylonMesh: any, otherBabylonMesh: any): void {
-    // Reset the scaling, position, and rotation of all the visible molecular
-    // meshes.
-    let allVisMolMeshes = [];
-    for (let molMeshId in Visualize.styleMeshes) {
-        if (Visualize.styleMeshes.hasOwnProperty(molMeshId)) {
-            let allVisMolMesh = Visualize.styleMeshes[molMeshId].mesh;
-
-            if (allVisMolMesh.isVisible === true) {
-                // Make sure allVisMolMesh is not scaled or positioned. But
-                // note that rotations are preserved.
-                allVisMolMesh.scaling = new BABYLON.Vector3(1, 1, 1);
-                allVisMolMesh.position = new BABYLON.Vector3(0, 0, 0);
-                allVisMolMesh.rotation = molRotation;
-                allVisMolMesh.visibility = 0;  // Hide while rotating.
-                allVisMolMeshes.push(allVisMolMesh);
-            }
-        }
-    }
-
-    // Add the current one (just added).
-    if (babylonMesh !== undefined) {
-        babylonMesh.scaling = new BABYLON.Vector3(1, 1, 1);
-        babylonMesh.position = new BABYLON.Vector3(0, 0, 0);
-        babylonMesh.rotation = molRotation;
-        allVisMolMeshes.push(babylonMesh);
-    }
-
-    if (allVisMolMeshes.length === 0) {
-        // No meshes to show.
-        return;
-    }
-
-    // Render to update the meshes
-    Vars.scene.render();  // Needed to get bounding box to recalculate.
-
-    // Get the bounding box of the other mesh and it's dimensions
-    // (protein_box).
-    let targetBox = otherBabylonMesh.getBoundingInfo().boundingBox;
-    let targetBoxDimens = Object.keys(targetBox.maximumWorld).map(
-        (k) => targetBox.maximumWorld[k] - targetBox.minimumWorld[k],
-    );
-
-    // Get the molecular model with the biggest volume.
-    let maxVol = 0.0;
-    let thisBox;
-    let thisBoxDimens;
-    for (let allVisMolMeshIdx in allVisMolMeshes) {
-        if (allVisMolMeshes.hasOwnProperty(allVisMolMeshIdx)) {
-            let allVisMolMesh = allVisMolMeshes[allVisMolMeshIdx];
-
-            // Get the bounding box of this mesh.
-            let thisBoxTmp = allVisMolMesh.getBoundingInfo().boundingBox;
-            let thisBoxDimensTmp = Object.keys(thisBoxTmp.maximumWorld).map(
-                (k) => thisBoxTmp.maximumWorld[k] - thisBoxTmp.minimumWorld[k],
-            );
-            let volume = thisBoxDimensTmp[0] * thisBoxDimensTmp[1] * thisBoxDimensTmp[2];
-
-            if (volume > maxVol) {
-                maxVol = volume;
-                thisBox = thisBoxTmp;
-                thisBoxDimens = thisBoxDimensTmp;
-            }
-        }
-    }
-
-    // Get the scales
-    let scales = targetBoxDimens.map((targetBoxDimen, i) =>
-        targetBoxDimen / thisBoxDimens[i],
-    );
-
-    // Get the minimum scale
-    let minScale = Math.min.apply(null, scales);
-    let meshScaling = new BABYLON.Vector3(minScale, minScale, minScale);
-
-    // Scale the meshes.
-    for (let allVisMolMeshIdx in allVisMolMeshes) {
-        if (allVisMolMeshes.hasOwnProperty(allVisMolMeshIdx)) {
-            let allVisMolMesh = allVisMolMeshes[allVisMolMeshIdx];
-            allVisMolMesh.scaling = meshScaling;
-        }
-    }
-
-    Vars.scene.render();  // Needed to get bounding box to recalculate.
-
-    // Translate the meshes.
-    let meshTranslation = thisBox.centerWorld.subtract(targetBox.centerWorld);
-    for (let allVisMolMeshIdx in allVisMolMeshes) {
-        if (allVisMolMeshes.hasOwnProperty(allVisMolMeshIdx)) {
-            let allVisMolMesh = allVisMolMeshes[allVisMolMeshIdx];
-            allVisMolMesh.position = allVisMolMesh.position.subtract(meshTranslation);
-            allVisMolMesh.visibility = 1;  // Hide while rotating.
-        }
-    }
-
-    // You need to recalculate the shadows.
-    Optimizations.updateEnvironmentShadows();
+export function setMolRotation(x: number, y: number, z: number): void {
+    molRotation = new BABYLON.Vector3(x, y, z);
 }

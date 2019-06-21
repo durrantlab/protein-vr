@@ -1,7 +1,10 @@
 // Functions to create a protein visualization using 3DMol.js
 
 import * as Optimizations from "../../Scene/Optimizations";
+import * as Menu3D from "../../UI/Menu3D/Menu3D";
+import * as UrlVars from "../../UrlVars";
 import * as Vars from "../../Vars";
+import * as PositionInScene from "./PositionInScene";
 import * as VRML from "./VRML";
 
 declare var $3Dmol;
@@ -76,9 +79,25 @@ let colorSchemeKeyWordTo3DMol = {
 
 // All residus? Chains? Elements? Others here... https://3dmol.csb.pitt.edu/doc/types.html#AtomSpec
 
-export function toggleRep(filters: string[], repName: string, colorScheme: string): void {
+/**
+ * The toggleRep function. Starts the mesh-creation proecss.
+ * @param  {Array<*>}            filters        Can include strings (lookup
+ *                                              sel in selKeyWordTo3DMolSel).
+ *                                              Or a 3DMoljs selection object.
+ * @param  {string}              repName        The representative name. Like
+ *                                              "Surface".
+ * @param  {string}              colorScheme    The name of the color scheme.
+ * @param  {Function|undefined}  finalCallback  Callback to run once the mesh
+ *                                              is entirely done.
+ * @returns void
+ */
+export function toggleRep(filters: any[], repName: string, colorScheme: string, finalCallback= undefined): void {
     // Get the key of this rep request.
     let keys = getKeys(filters, repName, colorScheme);
+
+    if (finalCallback === undefined) {
+        finalCallback = () => { return; };
+    }
 
     // If it's "Hide", then just hide the mesh
     if (colorScheme === "Hide") {
@@ -93,7 +112,14 @@ export function toggleRep(filters: string[], repName: string, colorScheme: strin
         }
 
         // Still need to position the meshes (hiding some reps could make others bigger).
-        VRML.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"));
+        PositionInScene.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"));
+
+        // Update the URL
+        UrlVars.setURL();
+
+        // Recalculate the menu
+        Menu3D.setup();
+
         return;
     }
 
@@ -101,6 +127,16 @@ export function toggleRep(filters: string[], repName: string, colorScheme: strin
     if (styleMeshes[keys.fullKey] !== undefined) {
         styleMeshes[keys.fullKey].mesh.isVisible = true;
         console.log("showing existing mesh...");
+
+        // Still need to position the meshes (hiding some reps could make others bigger).
+        PositionInScene.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"));
+
+        // Update the URL
+        UrlVars.setURL();
+
+        // Recalculate the menu
+        Menu3D.setup();
+
         return;
     }
 
@@ -116,28 +152,33 @@ export function toggleRep(filters: string[], repName: string, colorScheme: strin
 
     // Make the new representation.
     let colorSccheme = colorSchemeKeyWordTo3DMol[colorScheme];
-    let sels = {"and": filters.map((i) => selKeyWordTo3DMolSel[i])};
+    let sels = {"and": filters.map((i) => {
+        // "i" can be a keyword or a selection json itself.
+        return (selKeyWordTo3DMolSel[i] !== undefined) ? selKeyWordTo3DMolSel[i] : i;
+    })};
 
     if (repName.toLowerCase() === "surface") {
         VRML.addSurface(colorSccheme, sels, () => {
-            toggleRepContinued(keys, repName);
+            toggleRepContinued(keys, repName, finalCallback);
         });
     } else {
         let rep = {};
         rep[repName.toLowerCase()] = colorSccheme;
         VRML.setStyle(sels, rep);
-        toggleRepContinued(keys, repName);
+        toggleRepContinued(keys, repName, finalCallback);
     }
 }
 
 /**
  * Continues the toggleRep function.
- * @param  {Object<string,*>} keys
- * @param  {string}           repName  The representative name. Like
- *                                     "Surface".
+ * @param  {Object<string,*>}    keys
+ * @param  {string}              repName        The representative name. Like
+ *                                              "Surface".
+ * @param  {Function|undefined}  finalCallback  Callback to run once the mesh
+ *                                              is entirely done.
  * @returns void
  */
-function toggleRepContinued(keys: any, repName: string): void {
+function toggleRepContinued(keys: any, repName: string, finalCallback): void {
     VRML.render(true, repName, (newMesh) => {
         // Remove any other meshes that have the same category key (so could
         // be different color... that would be removed.)
@@ -170,31 +211,52 @@ function toggleRepContinued(keys: any, repName: string): void {
             mesh: newMesh,
         };
 
+        // Update the URL
+        UrlVars.setURL();
+
+        // Recalculate the menu
+        Menu3D.setup();
+
+        finalCallback();
+
         console.log("added new mesh");
     });
 }
 
+/**
+ * Get keys to uniquelty describe a given representations.
+ * @param  {Array<string|Object>} filters      Selections. Can be keywords or
+ *                                             3dmoljs selection objects.
+ * @param  {string}               repName      The name of the representation,
+ *                                             e.g., "Cartoon".
+ * @param  {string}               colorScheme  The color style keyword.
+ */
 function getKeys(filters: string[], repName: string, colorScheme: string) {
     filters.sort();
+    let filtersStr = filters.map((f) => {
+        if (typeof f === "string") {
+            return f;
+        } else {
+            return JSON.stringify(f);
+        }
+    });  // In case some JSON selections.
+
     return {
-        categoryKey: filters.join("-") + "-" + repName,
-        fullKey: filters.join("-") + "-" + repName + "-" + colorScheme,
+        categoryKey: filtersStr.join("--") + "--" + repName,
+        fullKey: filtersStr.join("--") + "--" + repName + "--" + colorScheme,
     };
 }
 
 /**
  * Also adds upper and lower versions of elements in a list.
- * @param  {string[]} lst  The original list.
+ * @param  {Array<string>} lst  The original list.
  * @returns string  The list with uppercase and lowercase items also added.
  */
 function lAndU(lst: string[]): string[] {
     let newLst = lst.map((s) => s);
-    for (let i in lst) {
-        if (lst.hasOwnProperty(i)) {
-            let s = lst[i];
-            newLst.push(s.toUpperCase());
-            newLst.push(s.toLowerCase());
-        }
+    for (let s of lst) {
+        newLst.push(s.toUpperCase());
+        newLst.push(s.toLowerCase());
     }
 
     // See https://gomakethings.com/removing-duplicates-from-an-array-with-vanilla-javascript/

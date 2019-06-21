@@ -31,9 +31,11 @@ function setupNonVRCameraObj(): void {
     nonVRCamera.keysRight = [68, 39];
 
     // Turn on gravity. Note: Turning this on causes problems, and it doesn't
-    // seem to be necessary.
+    // seem to be necessary. Well, it does help with arrow/wsad navigation
+    // (can't fly off).
     // Vars.scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
-    // nonVRCamera.applyGravity = true;
+    Vars.scene.gravity = new BABYLON.Vector3(0, -0.1, 0);
+    nonVRCamera.applyGravity = true;
 
     // Enable collision detection. Note that the second paramerter is a
     // radius.

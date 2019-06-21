@@ -32,6 +32,13 @@ if (inWebWorker) {
         if (cmd === "sendDataChunk") {
             let chunkToSend = dataToSendBack.shift();
             let status = (dataToSendBack.length === 0) ? "done" : "more";
+
+            if (chunkToSend === undefined) {
+                // This happens if there's no mesh (i.e., ribbon on pure
+                // ligand).
+                status = "done";
+            }
+
             postMessage({
                 "chunk": chunkToSend,
                 "status": status,
@@ -42,13 +49,12 @@ if (inWebWorker) {
 
 /**
  * Load in values like coordinates and colors from the VRML string.
- * @param  {string}        vrmlStr         The string containing the VRML data.
- * @param  {boolean=false} removeExtraPts  Whether to remove extra points at
- *                                         the origin. Sticks representation
- *                                         from 3DMoljs unfortunately
- *                                         generates these. They make it hard
- *                                         to center sticks-only
- *                                         representations.
+ * @param  {string}    vrmlStr         The string containing the VRML data.
+ * @param  {boolean=}  removeExtraPts  Whether to remove extra points at the
+ *                                     origin. Sticks representation from
+ *                                     3DMoljs unfortunately generates these.
+ *                                     They make it hard to center sticks-only
+ *                                     representations.
  * @returns Array<Object<string, Array<number>>>   The model data.
  */
 export function loadValsFromVRML(vrmlStr: string, removeExtraPts: boolean = false): VRML.IVRMLModel[] {
@@ -58,26 +64,22 @@ export function loadValsFromVRML(vrmlStr: string, removeExtraPts: boolean = fals
     // handle separately.
     let vrmlChunks = vrmlStr.split("geometry IndexedFaceSet {").splice(1);
 
-    for (let idx in vrmlChunks) {
-        if (vrmlChunks.hasOwnProperty(idx)) {
-            let vrmlChunk = vrmlChunks[idx];
+    for (let vrmlChunk of vrmlChunks) {
+        // Extract the coordinates from the vrml text
+        let coors = strToCoors(betweenbookends("point [", "]", vrmlChunk));
 
-            // Extract the coordinates from the vrml text
-            let coors = strToCoors(betweenbookends("point [", "]", vrmlChunk));
-
-            // Remove stray points (added to the origin) if necessary.
-            if (removeExtraPts) {
-                coors = removeStrayPoints(coors);
-            }
-
-            // Make sure string keys for closure compiler, since web worker is
-            // external.
-            modelData.push({
-                "colors": strToColors(betweenbookends("color [", "]", vrmlChunk)),
-                "coors": coors,
-                "trisIdxs": strToTris(betweenbookends("coordIndex [", "]", vrmlChunk)),
-            });
+        // Remove stray points (added to the origin) if necessary.
+        if (removeExtraPts) {
+            coors = removeStrayPoints(coors);
         }
+
+        // Make sure string keys for closure compiler, since web worker is
+        // external.
+        modelData.push({
+            "colors": strToColors(betweenbookends("color [", "]", vrmlChunk)),
+            "coors": coors,
+            "trisIdxs": strToTris(betweenbookends("coordIndex [", "]", vrmlChunk)),
+        });
     }
 
     // Now that you've collected all the data, go back and translate all the
@@ -97,16 +99,10 @@ export function loadValsFromVRML(vrmlStr: string, removeExtraPts: boolean = fals
         let dataTypes = ["colors", "coors", "trisIdxs"];
         for (let modelIdx in modelData) {
             if (modelData.hasOwnProperty(modelIdx)) {
-                for (let idx2 in dataTypes) {
-                    if (dataTypes.hasOwnProperty(idx2)) {
-                        let dataType = dataTypes[idx2];
-                        let chunks = chunk(modelData[modelIdx][dataType]);
-                        for (let chunkIdx in chunks) {
-                            if (chunks.hasOwnProperty(chunkIdx)) {
-                                let chunk = chunks[chunkIdx];
-                                dataToSendBack.push([+modelIdx, dataType, chunk]);
-                            }
-                        }
+                for (let dataType of dataTypes) {
+                    let chunks = chunk(modelData[+modelIdx][dataType]);
+                    for (let chunk of chunks) {
+                        dataToSendBack.push([+modelIdx, dataType, chunk]);
                     }
                 }
             }

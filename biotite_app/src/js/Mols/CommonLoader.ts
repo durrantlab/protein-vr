@@ -8,7 +8,11 @@ import * as Shadows from "./Shadows";
 
 declare var BABYLON;
 
-export function beforeLoading() {
+/**
+ * Run this before loading.
+ * @returns void
+ */
+export function beforeLoading(): void {
     // Set up the shadow generator.
     Shadows.setupShadowGenerator();
 

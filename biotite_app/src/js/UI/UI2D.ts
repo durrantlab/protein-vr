@@ -1,6 +1,7 @@
 // Sets up tweaks to the UI.
 
 // import { jQuery } from "../jQuery";
+import * as OpenPopup from "../UI/OpenPopup";
 import * as Vars from "../Vars";
 
 declare var jQuery;
@@ -81,7 +82,9 @@ function addRunModeButtons(): void {
 
     const helpButton = jQuery("#help-button");
     helpButton.click(() => {
-        window.open("help/index.html", "_blank");
+        // window.open("help/index.html", "_blank");
+        OpenPopup.openUrlModal("Help", "help/index.html");
+
     });
 
     // Also make VR button visible.

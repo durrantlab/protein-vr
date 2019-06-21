@@ -82,7 +82,7 @@ function vrSetupBeforeBabylonFileLoaded(): void {
 
 /**
  * Load the scene from the .babylon file.
- * @param  {function()} callBackFunc The callback function to run when loaded.
+ * @param  {Function} callBackFunc The callback function to run when loaded.
  * @returns void
  */
 function babylonScene(callBackFunc): void {

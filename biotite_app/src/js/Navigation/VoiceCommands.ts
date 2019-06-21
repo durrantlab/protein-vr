@@ -17,7 +17,12 @@ let uniqRepresentations = [];
 let isAnnyangAlreadyLoaded = false;
 let alreadyGaveInstructions = false;
 
-export function setup(data) {
+/**
+ * Setup the voice commands.
+ * @param  {*} data
+ * @returns void
+ */
+export function setup(data): void {
     if (!isAnnyangAlreadyLoaded) {
         // Not loaded yet, so first load javascript
         jQuery.getScript("js/annyang.min.js", () => {
