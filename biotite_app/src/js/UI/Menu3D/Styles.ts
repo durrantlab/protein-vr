@@ -116,13 +116,29 @@ export function buildStylesSubMenu(): any {
         }
     }
 
+    return menu;
+}
+
+/**
+ * Populates the portion of the styles menu that lets the user remove old
+ * styles.
+ * @param  {any} menuInf
+ * @returns void
+ */
+export function updatePastStylesInMenu(menuInf: any): void {
     // Also add in existing styles so they can be removed.
+    menuInf["Styles"]["Remove Existing"] = {};
+    Menu3D.setupSubMenuNavButtons(
+        menuInf["Styles"]["Remove Existing"],
+        ["Styles", "Remove Existing"],
+    );
+
     for (let repName in Visualize.styleMeshes) {
         if (Visualize.styleMeshes.hasOwnProperty(repName)) {
             if (Visualize.styleMeshes[repName].mesh.isVisible === true) {
                 let lbl = repName.replace(/--/g, " ");
                 lbl = lbl.replace(/{/g, "").replace(/}/g, "").replace(/"/g, "");
-                menu["Remove Existing"][lbl] = () => {
+                menuInf["Styles"]["Remove Existing"][lbl] = () => {
                     Menu3D.openMainMenuFloorButton.toggled();
                     setTimeout(() => {
                         let repInfo = UrlVars.extractRepInfoFromKey(repName);
@@ -132,8 +148,6 @@ export function buildStylesSubMenu(): any {
             }
         }
     }
-
-    return menu;
 }
 
 /**

@@ -44,6 +44,7 @@ Way to remove specific reps added previoiusly.
 
 Selection to get all stuff around ligand.
 
+When you update selections like resid, no need to regnerate whole menu. Just that section. Really, menu should never be setup twice. Put in a check to make sure that never happens.
 
 Done or Ignore
 --------------

@@ -9,10 +9,7 @@ import * as Styles from "./Styles";
 declare var BABYLON;
 
 // An easy way to define a menu. It's a nested object. See setup();
-let menuInf;
-
-// The program will convert that nested array to a flat list.
-let menuInfFlat;
+export let menuInf;
 
 export let clickSound: any = undefined;
 export let openMainMenuFloorButton: any;
@@ -22,7 +19,7 @@ export let openMainMenuFloorButton: any;
 let allButtons;
 let GUI3DMenuManager;
 let commonMenuAnchor;
-let latestLevelViewed;
+let latestBreadcrumbsViewed;
 let sceneInfoData;
 
 /**
@@ -37,13 +34,13 @@ let sceneInfoData;
 export function setup(data?): void {
     // Initialize some variables
     allButtons = [];
-    latestLevelViewed = 0;
+    latestBreadcrumbsViewed = [];
     menuInf = {
         "Styles": Styles.buildStylesSubMenu(),
         "Rotate": Rotations.buildRotationsSubMenu(),
         "Last": () => {
-            console.log("Going to", latestLevelViewed);
-            showOnlyButtonsOfLevel(latestLevelViewed);
+            console.log("Going to", latestBreadcrumbsViewed);
+            showOnlyButtonsOfLevel(latestBreadcrumbsViewed);
         },
     };
 
@@ -79,8 +76,6 @@ export function setup(data?): void {
     }
 }
 
-// window["setup"] = setup;
-
 /**
  * Setup the main menu.
  * @returns void
@@ -90,12 +85,12 @@ function setupMainMenu(): void {
     // VRVoiceCommands.setMoleculeNameInfos(data);
 
     // Flatten the menu data.
-    menuInfFlat = groupMenuInfByLevel();
+    // menuInfFlat = groupMenuInfByLevel();
 
     // Here would also be a good place to add additional buttons such as voice
-    // dictation. See setupSubMenuNavButtons for how this was done
+    // dictation. See setupAllSubMenuNavButtons for how this was done
     // previously.
-    menuInfFlat = setupSubMenuNavButtons(menuInfFlat);
+    setupAllSubMenuNavButtons(menuInf);
 
     commonMenuAnchor = new BABYLON.TransformNode(""); // this can be a mesh, too
 
@@ -135,9 +130,7 @@ function setupMainMenu(): void {
     //         // window.but = but;
     //     }
     // }
-    // setupSubMenuNavButtons(cylinderPanelMainMenu, data);
-
-    // window["cylinderPanelMainMenu"] = cylinderPanelMainMenu;
+    // setupAllSubMenuNavButtons(cylinderPanelMainMenu, data);
 }
 
 /**
@@ -195,157 +188,56 @@ function createPanelSixteenButtons(): void {
     panel.blockLayout = false;
 }
 
-/**
- * Takes the data in menuInf and groups it into appropriate levels. Eventually
- * these levels will becomme diferent submenus.
- * @returns Object<number: Array<string, *>> The grouped data.
- */
-function groupMenuInfByLevel(): any {
-    // You need to restructure the menuInf variable.
-    let menuData = {};  // Where to put the data.
-
-    let levelsUsed = [];
+function applyFuncToAllMenuLevels(funcToApply: any): void {
 
     /**
-     * Get the next available level slot.
-     * @param  {number} bestLevelGuess  The best guess at the next available
-     *                                  slot.
-     * @returns number  The actual slot.
-     */
-    let getNextAvailableLevel = (bestLevelGuess: number): number => {
-        // You may need to adjust the level to make sure it hasn't already
-        // been used.
-        while (levelsUsed.indexOf(bestLevelGuess) !== -1) {
-            bestLevelGuess++;
-        }
-
-        return bestLevelGuess;
-    };
-
-    /**
-     * @param  {Object}           inf      The menuInfo data.
-     * @param  {number}           level    The currently menu level.
-     * @param  {number|undefined} upLevel  The level of the submenu one above
-     *                                     this one.
+     * @param  {Object}           subMenu      The submenu data.
+     * @param  {Array<string>}    breadcrumbs  They list of keys to get to
+     *                                         this point in the menu.
      * @returns void
      */
-    let recurse = (inf: any, level: number, upLevel: number): void => {
-        levelsUsed.push(level);
+    let recurse = (subMenu: any, breadcrumbs: string[]): void => {
+        funcToApply(subMenu, breadcrumbs);
 
-        let keys = Object.keys(inf);
-        for (let idx in keys) {
-            if (keys.hasOwnProperty(idx)) {
-                let key = keys[idx];
-                let val = inf[key];
-
-                // Make sure list initialized.s
-                menuData[level] = (menuData[level] === undefined) ? [] : menuData[level];
-
-                switch (typeof(val)) {
-                    case "function":
-                        menuData[level].push({
-                            func: val,
-                            txt: key,
-                            upLevel,
-                        });
-                        break;
-                    case "object":
-                        let nextLevel = getNextAvailableLevel(level + 1);
-                        menuData[level].push({
-                            color: "green",
-                            func: () => { showOnlyButtonsOfLevel(nextLevel); },
-                            txt: key + " ⇨",  // " >"
-                            upLevel,
-                        });
-                        recurse(val, nextLevel, level);
-                        break;
-                    default:
-                        alert("error!");
-                }
+        let keys = Object.keys(subMenu);
+        for (let key of keys) {
+            let subMenuItems = subMenu[key];
+            switch (typeof(subMenuItems)) {
+                case "object":
+                    recurse(subMenuItems, breadcrumbs.concat([key]));
+                    break;
+                default:
+                    continue;
             }
         }
     };
 
-    recurse(menuInf, 1, undefined);
-
-    return menuData;
+    recurse(menuInf, []);
 }
 
 /**
  * Set up submenu navigation buttons like back and close.
- * @param  {Object} menuData
- * @returns *
- */
-function setupSubMenuNavButtons(menuData: any): any {
-    // Each of the submenus should have a back button and a close menu button.
-    for (let level in menuData) {
-        if (menuData.hasOwnProperty(level)) {
-            // Sort the existing items by the text. To alphabetize before
-            // adding "control" buttons below.
-            menuData[level].sort((first, second) => {
-                // See https://stackoverflow.com/questions/51165/how-to-sort-strings-in-javascript
-                return ("" + first.txt).localeCompare(second.txt);
-            });
-
-            let levelInt = +level;
-            if (levelInt > 1) {  // Because even main submenu can't go back (will be cancel).
-                menuData[level].push({
-                    color: "yellow",
-                    func: () => {
-                        showOnlyButtonsOfLevel(menuData[level][0].upLevel);
-                    },
-                    txt: "Back ⇦",  // " >"
-                    upLevel: menuData[level][0].upLevel,
-                });
-            }
-
-            if (levelInt > 0) {
-                menuData[level].push({
-                    color: "red",
-                    func: () => {
-                        // showOnlyButtonsOfLevel(0);
-                        openMainMenuFloorButton.toggled();
-                    },
-                    txt: "Close Menu ×",  // " >"
-                    upLevel: menuData[level][0].upLevel,
-                });
-            }
-        }
-    }
-    // console.log(menuData);
-
-    return menuData;
-}
-
-/**
- * Sets up some additional buttons (like audio, tactile feedback, etc).
- * @param  {*}                panel  The panel to add the buttons to.
- * @param  {Object<string,*>} data   The data from scene_info.json.
  * @returns void
  */
-// function setupSubMenuNavButtons(panel: any, data: any): void {
-    // Turn on speech synthesis.
-    // allButtons.push(
-    //     new ButtonWrapper({
-    //         clickFunc: (buttonWrapper) => {
-    //             // TODO:
-    //             if (buttonWrapper.value) {
-    //                 VRVoiceCommands.setup(data);
-    //             } else {
-    //                 VRVoiceCommands.stopVoiceCommands();
-    //             }
-    //         },
-    //         default: false,
-    //         falseTxt: "Audio Commands\n(On)",
-    //         initFunc: (buttonWrapper) => {
-    //             buttonWrapper.isVisible(false);  // No audio to begin.
-    //         },
-    //         name: "menu-audio-commands-button",
-    //         panel,
-    //         trueTxt: "Audio Commands\n(Off)",
-    //     }),
-    // );
-// }
+function setupAllSubMenuNavButtons(): void {
+    // Each of the submenus should have a back button and a close menu button.
+    applyFuncToAllMenuLevels((subMenu, breadcrumbs) => {
+        setupSubMenuNavButtons(subMenu, breadcrumbs);
+    });
+}
+
+export function setupSubMenuNavButtons(subMenu, breadcrumbs) {
+    if (breadcrumbs.length > 0) {
+        // No back button on top-level menu.
+        subMenu["Back ⇦"] = () => {
+            let newBreadcrumbs = breadcrumbs.slice(0, breadcrumbs.length - 1);
+            showOnlyButtonsOfLevel(newBreadcrumbs);
+        };
+    }
+    subMenu["Close Menu ×"] = () => {
+        openMainMenuFloorButton.toggled();
+    };
+}
 
 /**
  * Setup the toggle button on the floor that turns the main menu on and off.
@@ -363,9 +255,9 @@ function setupMainMenuToggleButton(): void {
     openMainMenuFloorButton = new Button.ButtonWrapper({
         clickFunc: (buttonWrapper) => {
             if (!buttonWrapper.value) {
-                showOnlyButtonsOfLevel(0);
+                showOnlyButtonsOfLevel(undefined);
             } else {
-                showOnlyButtonsOfLevel(1);
+                showOnlyButtonsOfLevel([]);
             }
 
             commonMenuAnchor.position.copyFrom(CommonCamera.getCameraPosition());
@@ -404,12 +296,13 @@ function setupMainMenuToggleButton(): void {
 
 /**
  * Shows the buttons associated with a specific submenu level.
- * @param  {number} level
+ * @param  {Array<string>|undefined} breadcrumbs The breadcrumbs to get to the desired menu level.
  * @returns void
  */
-function showOnlyButtonsOfLevel(level: number): void {
-    if (level > 1) {  // Not the main menu.
-        latestLevelViewed = level;
+function showOnlyButtonsOfLevel(breadcrumbs: string[]): void {
+    if ((breadcrumbs !== undefined) && (breadcrumbs.length > 0)) {
+        // Not the top-level menu or floor button, so enable "Last" button.
+        latestBreadcrumbsViewed = breadcrumbs;
     }
 
     // Hide all the buttons.
@@ -417,58 +310,82 @@ function showOnlyButtonsOfLevel(level: number): void {
         btn.isVisible(false);
     }
 
-    if (level === 0) {
+    if (breadcrumbs === undefined) {
         // It's the button on the floor. Just needed to hide all buttons, so
         // now you're good.
         return;
     }
 
+    // Find the submenu
+    let subMenu = menuInf;
+    for (let breadcrumb of breadcrumbs) {
+        subMenu = subMenu[breadcrumb];
+    }
+
+    // Get the names of the submenu items.
+    let subMenuItemNames = Object.keys(subMenu);
+
+    // Set some names aside as "special".
+    let redBtns = ["Close Menu ×"];
+    let yellowBtns = ["Back ⇦"];
+    let specialBtns = redBtns.concat(yellowBtns);
+
+    // Sort those names
+    subMenuItemNames.sort((first, second) => {
+        // See https://stackoverflow.com/questions/51165/how-to-sort-strings-in-javascript
+        let firstIsSpecial = specialBtns.indexOf(first) !== -1;
+        let secondIsSpecial = specialBtns.indexOf(second) !== -1;
+        if (firstIsSpecial && !secondIsSpecial) {
+            return 1;
+        } else if (!firstIsSpecial && secondIsSpecial) {
+            return -1;
+        } else {
+            return ("" + first).localeCompare(second);
+        }
+    });
+
     // Figure out what layout to use.
     let btnIdxOrder = [];
-    if (menuInfFlat[level].length <= 4) {
+    if (subMenuItemNames.length <= 4) {
         btnIdxOrder = [7, 6, 5, 4];
-    } else if (menuInfFlat[level].length <= 8) {
+    } else if (subMenuItemNames.length <= 8) {
         btnIdxOrder = [7, 6, 5, 4, 11, 10, 9, 8];
-    } else if (menuInfFlat[level].length <= 12) {
+    } else if (subMenuItemNames.length <= 12) {
         btnIdxOrder = [3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8];
     } else {
         btnIdxOrder = [3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12];
     }
 
-    // Show enough buttons for the number of menu items to show, and update
-    // them.
-    for (let i = 0; i < menuInfFlat[level].length; i++) {
+    // Update and show the buttons.
+    for (let i = 0; i < subMenuItemNames.length; i++) {
+        let subMenuItemName = subMenuItemNames[i];
+        let subMenuItem = subMenu[subMenuItemName];
         let btnidx = btnIdxOrder[i];
-        let menuInfFlatThisOne = menuInfFlat[level][i];
         let btn = allButtons[btnidx];
-        btn.updateTxt(menuInfFlatThisOne.txt);
-        btn.updateColor(menuInfFlatThisOne.color);
-        btn.clickFunc = menuInfFlatThisOne.func;
+        btn.updateTxt(subMenuItemName);
+
+        switch (typeof(subMenuItem)) {
+            case "object":
+                btn.clickFunc = () => {
+                    showOnlyButtonsOfLevel(breadcrumbs.concat(subMenuItemName));
+                };
+                btn.updateColor("green");
+                break;
+            case "function":
+                btn.clickFunc = subMenuItem;
+                btn.updateColor("default");
+                break;
+            default:
+                break;
+        }
+
+        if (redBtns.indexOf(subMenuItemName) !== -1) {
+            btn.updateColor("red");
+        } else if (yellowBtns.indexOf(subMenuItemName) !== -1) {
+            btn.updateColor("yellow");
+        }
         // menuInfFlatThisOne.upLevel doesn't seem to be necessary.
+
         btn.isVisible(true);
     }
 };
-
-// function updateMainMenuButtons() {
-//     for (let objID in visibilityInfo) {
-//         if (visibilityInfo.hasOwnProperty(objID)) {
-//             let button = visibilityInfo[objID][0];
-//             let visibilityState = visibilityInfo[objID][1];
-
-//             let txtStr = objID.replace(/.sdf/g, "").replace(/.pdb/g, "");
-//             txtStr = txtStr.replace(/.wrl/g, "");
-//             txtStr = txtStr.replace(/_/g, "\n");
-//             txtStr += "\n(" + (visibilityState ? "Hide" : "Show") + ")";
-
-//             let text = new BABYLON.GUI.TextBlock();
-//             text.text = txtStr;
-//             text.color = "white";
-//             // text.fontSize = 24;
-//             text.resizeToFit = true;
-//             button.content.dispose();
-//             button.content = text;
-
-//             button.isVisible = mainMenuVisible;
-//         }
-//     }
-// }

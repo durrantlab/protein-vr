@@ -2,6 +2,7 @@
 
 import * as Optimizations from "../../Scene/Optimizations";
 import * as Menu3D from "../../UI/Menu3D/Menu3D";
+import * as Styles from "../../UI/Menu3D/Styles";
 import * as UrlVars from "../../UrlVars";
 import * as Vars from "../../Vars";
 import * as PositionInScene from "./PositionInScene";
@@ -114,11 +115,7 @@ export function toggleRep(filters: any[], repName: string, colorScheme: string, 
         // Still need to position the meshes (hiding some reps could make others bigger).
         PositionInScene.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"));
 
-        // Update the URL
-        UrlVars.setURL();
-
-        // Recalculate the menu
-        Menu3D.setup();
+        visChanged();
 
         return;
     }
@@ -131,11 +128,7 @@ export function toggleRep(filters: any[], repName: string, colorScheme: string, 
         // Still need to position the meshes (hiding some reps could make others bigger).
         PositionInScene.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"));
 
-        // Update the URL
-        UrlVars.setURL();
-
-        // Recalculate the menu
-        Menu3D.setup();
+        visChanged();
 
         return;
     }
@@ -211,11 +204,7 @@ function toggleRepContinued(keys: any, repName: string, finalCallback): void {
             mesh: newMesh,
         };
 
-        // Update the URL
-        UrlVars.setURL();
-
-        // Recalculate the menu
-        Menu3D.setup();
+        visChanged();
 
         finalCallback();
 
@@ -267,4 +256,14 @@ function lAndU(lst: string[]): string[] {
     return newLst;
 }
 
-// export function
+/**
+ * This runs whenever a visualization changes, no matter how it changes.
+ * @returns void
+ */
+function visChanged(): void {
+        // Update the URL
+        UrlVars.setURL();
+
+        // Recalculate the past-styles section of the menu.
+        Styles.updatePastStylesInMenu(Menu3D.menuInf);
+}

@@ -7,7 +7,7 @@ tsc --target ES5 --alwaysStrict --module amd js/Scene/LoadAndSetup.ts
 r.js -o build.js
 
 # Closure compile
-# ./utilities/closure.sh lodash.min.js
+./utilities/closure.sh lodash.min.js
 
 # Combine it with the externals.
 # cat js/external/externals.js lodash.min.js > tmptmp
