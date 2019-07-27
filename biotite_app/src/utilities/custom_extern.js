@@ -341,6 +341,7 @@ BABYLON.Mesh.getBoundingInfo.boundingBox.minimumWorld;
 BABYLON.Mesh.getBoundingInfo.boundingBox.centerWorld;
 BABYLON.Mesh.refreshBoundingInfo = function() {};
 BABYLON.Mesh.animations;
+BABYLON.Mesh.getWorldMatrix = function() {};
 
 BABYLON.Matrix;
 BABYLON.Matrix.Translation = function(a) {};
@@ -376,6 +377,8 @@ BABYLON.Vector3.z = 0;
 BABYLON.Vector3.GetAngleBetweenVectors = function(a,b,c) {};
 BABYLON.Vector3.normalizeFromLength = function(a) {};
 BABYLON.Vector3.Zero = function() {};
+BABYLON.Vector3.equalsToFloats = function(a,b,c) {};
+BABYLON.Vector3.TransformCoordinates = function(a,b) {};
 
 /**
  * @constructor
@@ -494,6 +497,8 @@ BABYLON.Scene.prototype.createDefaultVRExperience.onEnteringVRObservable = funct
 BABYLON.Scene.prototype.createDefaultVRExperience.onEnteringVRObservable.add = function(a) {};
 BABYLON.Scene.prototype.createDefaultVRExperience.onExitingVRObservable = function() {};
 BABYLON.Scene.prototype.createDefaultVRExperience.onExitingVRObservable.add = function(a) {};
+BABYLON.Scene.prototype.createDefaultVRExperience.onAfterEnteringVRObservable = function() {};
+BABYLON.Scene.prototype.createDefaultVRExperience.onAfterEnteringVRObservable.add = function(a) {};
 BABYLON.Scene.prototype.createDefaultVRExperience.raySelectionPredicate;
 BABYLON.Scene.prototype.createDefaultVRExperience.updateGazeTrackerScale;
 BABYLON.Scene.prototype.createDefaultVRExperience.displayGaze

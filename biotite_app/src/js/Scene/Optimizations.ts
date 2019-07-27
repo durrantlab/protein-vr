@@ -21,27 +21,29 @@ export function setup(): void {
     Vars.scene.autoClearDepthAndStencil = false;
 
     // Modify some meshes
-    for (const idx in Vars.scene.meshes) {
-        if (Vars.scene.meshes.hasOwnProperty(idx)) {
-            const mesh = Vars.scene.meshes[idx];
+    /** @type {number} */
+    let len = Vars.scene.meshes.length;
+    let zeroVec = new BABYLON.Color3(0, 0, 0);
+    for (let idx = 0; idx < len; idx++) {
+        /** @const {*} */
+        const mesh = Vars.scene.meshes[idx];
 
-            // Meshes that contain the word "baked" should be shadeless
-            if ((mesh.name.indexOf("baked") !== -1) && (mesh.material !== undefined)) {
-                // Make material shadeless
-                mesh.material.diffuseColor = new BABYLON.Color3(0, 0, 0);
-                mesh.material.specularColor = new BABYLON.Color3(0, 0, 0);
-                mesh.material.emissiveTexture = mesh.material.diffuseTexture;
-                mesh.material.diffuseTexture = null;
+        // Meshes that contain the word "baked" should be shadeless
+        if ((mesh.name.indexOf("baked") !== -1) && (mesh.material !== undefined)) {
+            // Make material shadeless
+            mesh.material.diffuseColor = zeroVec;
+            mesh.material.specularColor = zeroVec;
+            mesh.material.emissiveTexture = mesh.material.diffuseTexture;
+            mesh.material.diffuseTexture = null;
 
-                // Material won't be changing. But apparently this is no
-                // longer a needed optimization:
-                // http://www.html5gamedevs.com/topic/37540-when-is-it-safe-to-freeze-materials/
-                // mesh.material.freeze();
+            // Material won't be changing. But apparently this is no
+            // longer a needed optimization:
+            // http://www.html5gamedevs.com/topic/37540-when-is-it-safe-to-freeze-materials/
+            // mesh.material.freeze();
 
-                // Assume no change in location (because that would require
-                // recalculating shadows)
-                mesh.freezeWorldMatrix();
-            }
+            // Assume no change in location (because that would require
+            // recalculating shadows)
+            mesh.freezeWorldMatrix();
         }
     }
 }
@@ -49,12 +51,13 @@ export function setup(): void {
 /**
  * Gets the number of vertices in a mesh.
  * @param  {*} mesh The mesh.
- * @returns number|null  The number of vertices.
+ * @returns {number|null}  The number of vertices.
  */
 function getNumVertices(mesh: any): number|null {
     // First, get the number of vertexes.
-    let numVertexes;
+    let numVertexes = 0;
     if (mesh !== undefined) {
+        /** @type {Array<*>} */
         let vertexData = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
         if (vertexData === null) { return null; }  // Something like __root__
         numVertexes = vertexData.length / 3;
@@ -71,6 +74,7 @@ function getNumVertices(mesh: any): number|null {
  */
 export function optimizeMeshPicking(mesh: any): void {
     // First, get the number of vertexes.
+    /** @type {number} */
     let numVertexes = getNumVertices(mesh);
     if (numVertexes === null) { return; }  // Something like __root__
 
@@ -180,77 +184,85 @@ export function removeMeshEntirely(mesh: any): void {
     mesh = null;
 }
 
-/**
- * Remove the surface mesh (it takes a lot of resources).
- * @param  {number} priority The priority of this optimization.
- * @returns void
- */
-function ReportOptimizationChange(priority: number): void {
-    if (typeof priority === "undefined") {
-        priority = 0;
+class ReportOptimizationChange {
+    /**
+     * Remove the surface mesh (it takes a lot of resources).
+     * @param  {number} priority The priority of this optimization.
+     * @returns void
+     */
+    constructor(priority: number) {
+        if (priority === undefined) {
+            priority = 0;
+        }
+
+        this["priority"] = priority;
+        this["apply"] = (scene) => {
+            console.log("Optimization priority:", this["priority"]);
+            console.log("FPS:", Vars.engine.getFps());
+            console.log("");
+            return true;
+        };
+
+        this["getDescription"] = () => {
+            return "Reports the current priority. For debugging.";
+        };
     }
-
-    this["priority"] = priority;
-    this["apply"] = (scene) => {
-        console.log("Optimization priority:", this["priority"]);
-        console.log("FPS:", Vars.engine.getFps());
-        console.log("");
-        return true;
-    };
-
-    this["getDescription"] = () => {
-        return "Reports the current priority. For debugging.";
-    };
 }
 
-/**
- * Remove the surface mesh (it takes a lot of resources).
- * @param  {number} priority The priority of this optimization.
- * @returns void
- */
-function RemoveSurfaces(priority: number): void {
-    if (typeof priority === "undefined") {
-        priority = 0;
+// tslint:disable-next-line:max-classes-per-file
+class RemoveSurfaces {
+    /**
+     * Remove the surface mesh (it takes a lot of resources).
+     * @param  {number} priority The priority of this optimization.
+     * @returns void
+     */
+    constructor(priority: number) {
+        if (typeof priority === "undefined") {
+            priority = 0;
+        }
+
+        this["priority"] = priority;
+        this["apply"] = (scene) => {
+            // Delete the surface mesh. Note that it will still be visible in the
+            // main menu, but oh well.
+            let surfaces = Vars.scene.getMeshByName("surfaces.wrl");
+            removeMeshEntirely(surfaces);
+
+            // Failed attempty below, but perhaps worth revisiting in the future.
+            // VoiceCommands.showOrHideModel("", "surface", false);
+            // VoiceCommands.interpretHideShowCommands(["surface"], true);
+            return true;
+        };
+
+        this["getDescription"] = () => {
+            return "Removes surface representations.";
+        };
     }
-
-    this["priority"] = priority;
-    this["apply"] = (scene) => {
-        // Delete the surface mesh. Note that it will still be visible in the
-        // main menu, but oh well.
-        let surfaces = Vars.scene.getMeshByName("surfaces.wrl");
-        removeMeshEntirely(surfaces);
-
-        // Failed attempty below, but perhaps worth revisiting in the future.
-        // VoiceCommands.showOrHideModel("", "surface", false);
-        // VoiceCommands.interpretHideShowCommands(["surface"], true);
-        return true;
-    };
-
-    this["getDescription"] = () => {
-        return "Removes surface representations.";
-    };
 }
 
+// tslint:disable-next-line:max-classes-per-file
+class SimplifyMeshes {
+    /**
+     * A scene optimization to decimate the big meshes.
+     * @param  {number} priority                  The priority of this
+     *                                            optimization.
+     * @param  {number} minNumVertsThatIsProblem  The target number of vertices.
+     * @param  {number} [decimationLevel=]        The decimation level. If not
+     *                                            specified, calculated from
+     *                                            minNumVertsThatIsProblem.
+     */
+    constructor(priority: number, minNumVertsThatIsProblem: number, decimationLevel: number = undefined) {
+        if (typeof priority === "undefined") {
+            priority = 0;
+        }
 
-/**
- * A scene optimization to decimate the big meshes.
- * @param  {number} priority                  The priority of this
- *                                            optimization.
- * @param  {number} minNumVertsThatIsProblem  The target number of vertices.
- * @param  {number} [decimationLevel=]        The decimation level. If not
- *                                            specified, calculated from
- *                                            minNumVertsThatIsProblem.
- */
-function SimplifyMeshes(priority: number, minNumVertsThatIsProblem: number, decimationLevel: number = undefined) {
-    if (typeof priority === "undefined") {
-        priority = 0;
-    }
-
-    this["priority"] = priority;
-    this["apply"] = (scene) => {
-        let meshesToConsider = [];
-        for (let meshIdx in Vars.scene.meshes) {
-            if (Vars.scene.meshes.hasOwnProperty(meshIdx)) {
+        this["priority"] = priority;
+        this["apply"] = (scene) => {
+            /** @type {Array<Array<number,*,number>>} */
+            let meshesToConsider = [];
+            /** @type {number} */
+            let len = Vars.scene.meshes.length;
+            for (let meshIdx = 0; meshIdx < len; meshIdx++) {
                 let mesh = Vars.scene.meshes[meshIdx];
 
                 // If it's decimated, skip it. It will be deleted and
@@ -263,6 +275,7 @@ function SimplifyMeshes(priority: number, minNumVertsThatIsProblem: number, deci
                 // mesh.material.wireframe = true;
 
                 // Get the number of vertexes.
+                /** @type {number} */
                 let numVertexes = getNumVertices(mesh);
                 if (numVertexes === null) { continue; }  // Something like __root__
                 if (numVertexes < minNumVertsThatIsProblem) { continue; }
@@ -283,41 +296,46 @@ function SimplifyMeshes(priority: number, minNumVertsThatIsProblem: number, deci
                 //     // "syncIterations": ?  // Just keep default. Not sure what this is.
                 // }, () => { return; });
             }
-        }
 
-        // Order the meshes from the one with most vertices to the one with
-        // least (prioritize bad ones).
-        meshesToConsider.sort((a, b) => b[0] - a[0]);
+            // Order the meshes from the one with most vertices to the one with
+            // least (prioritize bad ones).
+            meshesToConsider.sort((a, b) => b[0] - a[0]);
 
-        // Simplify those meshes.
-        for (let meshToConsider of meshesToConsider) {
-            let mesh = meshToConsider[1];
-            let decimationLvel = meshToConsider[2];
+            // Simplify those meshes.
+            let meshesToConsiderLen = meshesToConsider.length;
+            for (let i = 0; i < meshesToConsiderLen; i++) {
+                /** @type {Array<number,*,number>} */
+                let meshToConsider = meshesToConsider[i];
+                let mesh = meshToConsider[1];
 
-            // Remove the existing LODs if they exist.
-            while (mesh.getLODLevels().length > 0) {
-                let firstLODMesh = mesh.getLODLevels()[0]["mesh"];
-                mesh.removeLODLevel(firstLODMesh);
-                removeMeshEntirely(firstLODMesh);
+                /** @type {number} */
+                let decimationLvel = meshToConsider[2];
+
+                // Remove the existing LODs if they exist.
+                while (mesh.getLODLevels().length > 0) {
+                    let firstLODMesh = mesh.getLODLevels()[0]["mesh"];
+                    mesh.removeLODLevel(firstLODMesh);
+                    removeMeshEntirely(firstLODMesh);
+                }
+
+                // https://doc.babylonjs.com/api/classes/babylon.mesh#simplify
+                mesh.simplify([{"quality": decimationLvel, "distance": 0.001}],
+                    false, BABYLON.SimplificationType.QUADRATIC, () => {
+                        // console.log("GGG2", mesh.name, mesh.getLODLevels().length);
+                        // let simpMesh = mesh.getLODLevels()[0]["mesh"];
+                        // removeMeshEntirely(mesh);
+                        // console.log(simpMesh);
+                        // window["mesh"] = mesh;
+                        // console.log(mesh.name, decimationLvel);
+                    },
+                );
             }
 
-            // https://doc.babylonjs.com/api/classes/babylon.mesh#simplify
-            mesh.simplify([{"quality": decimationLvel, "distance": 0.001}],
-                false, BABYLON.SimplificationType.QUADRATIC, () => {
-                    // console.log("GGG2", mesh.name, mesh.getLODLevels().length);
-                    // let simpMesh = mesh.getLODLevels()[0]["mesh"];
-                    // removeMeshEntirely(mesh);
-                    // console.log(simpMesh);
-                    // window["mesh"] = mesh;
-                    // console.log(mesh.name, decimationLvel);
-                },
-            );
-        }
+            return true;
+        };
 
-        return true;
-    };
-
-    this["getDescription"] = () => {
-        return "Simplifies the geometry of complex objects in the scene.";
-    };
+        this["getDescription"] = () => {
+            return "Simplifies the geometry of complex objects in the scene.";
+        };
+    }
 }

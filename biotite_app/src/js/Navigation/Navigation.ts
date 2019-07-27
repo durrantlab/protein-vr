@@ -64,7 +64,11 @@ export function setup(): void {
     keepCameraOverFloor();
 }
 
+/** @type {*} */
 let lastCameraPt;
+
+/** @type {string} */
+let lastCameraName = "";
 
 /**
  * Check and make sure the camera is over the ground. If not, move it back so
@@ -78,7 +82,7 @@ function keepCameraOverFloor(): void {
         // let cameraPt = Vars.scene.activeCamera.position.clone();
         let cameraPt = CommonCamera.getCameraPosition();  // cloned pt.
         let groundPointBelowCamera = Points.groundPointPickingInfo(cameraPt);
-        if (groundPointBelowCamera.pickedMesh === null) {
+        if ((groundPointBelowCamera.pickedMesh === null) && (lastCameraName === Vars.scene.activeCamera.id)) {
             // You're not above the ground! This shouldn't happen, but it can
             // occasionally. Return the camera to its previous position. One
             // example is if you're using the controllers on a HTC vive to
@@ -89,6 +93,7 @@ function keepCameraOverFloor(): void {
             CommonCamera.setCameraPosition(lastCameraPt);
         } else {
             lastCameraPt = cameraPt;
+            lastCameraName = Vars.scene.activeCamera.id;
         }
         // console.log(groundPointBelowCamera);
     });
@@ -166,6 +171,7 @@ function teleport(newLoc = undefined, callBack = undefined): void {
     Vars.vrHelper.gazeTrackerMesh.isVisible = false;
 
     // Animate the transition to the new location.
+    /** @const {*} */
     const animationCameraTeleportation = new BABYLON.Animation(
         "animationCameraTeleportation", "position", 90,
         BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
@@ -191,13 +197,16 @@ function teleport(newLoc = undefined, callBack = undefined): void {
     startLoc = startLoc.subtract(eyeToCamVec);
 
     // Animate to new location.
+    /** @const {Array<Object<string, *>>} */
     const animationCameraTeleportationKeys = [
         { "frame": 0, "value": startLoc },
         { "frame": Vars.TRANSPORT_DURATION, "value": newLoc },
     ];
     animationCameraTeleportation.setKeys(animationCameraTeleportationKeys);
 
+    /** @const {*} */
     const activeCamera = Vars.scene.activeCamera;
+
     activeCamera.animations = [];
     activeCamera.animations.push(animationCameraTeleportation);
 
@@ -224,6 +233,8 @@ function grow(): void {
     // Get the vector form the stare point to the camera.
     let cameraPos = CommonCamera.getCameraPosition();
     let vecStarePtCamera = Points.curStarePt.subtract(cameraPos);
+
+    /** @type {number} */
     let vecStarePtDist = vecStarePtCamera.length();
 
     let newPt;

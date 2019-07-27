@@ -6,6 +6,7 @@ import * as Pickables from "../Navigation/Pickables";
 import * as LoadingScreens from "../UI/LoadingScreens";
 import * as UI2D from "../UI/UI2D";
 import * as Vars from "../Vars";
+import * as Lecturer from "../WebRTC/Lecturer";
 import * as Optimizations from "./Optimizations";
 
 declare var BABYLON;
@@ -62,7 +63,7 @@ function vrSetupBeforeBabylonFileLoaded(): void {
 
     // Setup the VR here. Set up the parameters (filling in missing values,
     // for example). Also saves the modified params to the params module
-    // variable.
+    // variable. Note that this calls createDefaultVRExperience.
     Vars.setupVR({
         groundMeshName: "ground",
         navTargetMesh: navMeshToUse,
@@ -97,7 +98,11 @@ function babylonScene(callBackFunc): void {
             // There should be only one camera at this point, because the VR
             // stuff is in the callback. Make that that one camera is the
             // active one.
-            Vars.scene.activeCamera =  Vars.scene.cameras[0];
+            // Vars.scene.activeCamera =  Vars.scene.cameras[0];
+
+            // Make sure the active camera is the one loaded from the babylon
+            // file. Should be the only one without the string VR in it.
+            Vars.scene.activeCamera = Vars.scene.cameras.filter((c) => c.name.indexOf("VR") === -1)[0];
 
             // Attach camera to canvas inputs
             // Vars.scene.activeCamera.attachControl(Vars.canvas);
@@ -158,7 +163,9 @@ function keepOnlyLightWithShadowlightSubstr(): void {
  */
 function hideObjectsUsedForSceneCreation(): void {
     // Hide objects used for scene creation.
-    for (let meshIdx in Vars.scene.meshes) {
+    /** @type {number} */
+    let len = Vars.scene.meshes.length;
+    for (let meshIdx = 0; meshIdx < len; meshIdx++) {
         if (Vars.scene.meshes[meshIdx].name === "protein_box") {
             // Vars.scene.meshes[meshIdx].dispose();
             Vars.scene.getMeshByName("protein_box").isVisible = false;
@@ -174,7 +181,9 @@ function hideObjectsUsedForSceneCreation(): void {
 function optimizeMeshesAndMakeClickable(): void {
     // Optimize and make meshes clickable. Also, make sure all meshes
     // are emmissive.
-    for (let meshIdx in Vars.scene.meshes) {
+    /** @type {number} */
+    let len = Vars.scene.meshes.length;
+    for (let meshIdx = 0; meshIdx < len; meshIdx++) {
         if (Vars.scene.meshes[meshIdx].material) {
             let mesh = Vars.scene.meshes[meshIdx];
 
@@ -230,3 +239,5 @@ export function loadingAssetsDone(): void {
         // console.log("render");
     });
 }
+
+Lecturer.tmp();

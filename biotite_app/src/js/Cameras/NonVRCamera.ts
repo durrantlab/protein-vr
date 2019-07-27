@@ -5,7 +5,9 @@ import * as Vars from "../Vars";
 
 declare var BABYLON;
 
+/** @type {*} */
 let nonVRCamera;
+
 let lastCameraPosAboveGroundMesh = new BABYLON.Vector3(0, 0, 0);
 
 /**

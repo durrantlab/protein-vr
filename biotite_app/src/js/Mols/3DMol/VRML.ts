@@ -18,14 +18,20 @@ export interface IVRMLModel {
     trisIdxs: any;  // Uint32Array
 }
 
+/** @type {Array<Object<string,*>>} */
 let modelData: IVRMLModel[] = [];
+
 export let molRotation = new BABYLON.Vector3(0, 0, 0);
 
 export let viewer;
 let element;
+
+/** @type {Object<string,string>} */
 let config;
 
+/** @type {string} */
 let vrmlStr;
+
 let vrmlParserWebWorker;
 let molTxt = "";
 let molTxtType = "pdb";
@@ -77,7 +83,7 @@ export function resetAll() {
         // whole thing.
         viewer = null;
         setup(() => {
-            viewer.addModel( molTxt, "pdb" );
+            viewer.addModel(molTxt, "pdb");
         });
     }
 
@@ -93,8 +99,15 @@ export function resetAll() {
  */
 export function loadPDBURL(url: string, callBack): void {
     jQuery.ajax( url, {
-        "success": (data) => {
+
+        /**
+         * When the url data is retrieved.
+         * @param  {string} data  The remote data.
+         * @returns void
+         */
+        "success": (data: string): void => {
             // Setup the visualization
+            /** @type {string} */
             molTxt = data;  // In case you need to restart.
             molTxtType = "pdb";
 
@@ -110,6 +123,13 @@ export function loadPDBURL(url: string, callBack): void {
 
             callBack(mdl);
         },
+
+        /**
+         * If there's an error...
+         * @param  {*}       hdr
+         * @param  {*}       status
+         * @param  {string}  err
+         */
         "error": (hdr, status, err) => {
             console.error( "Failed to load molecule " + url + ": " + err );
         },
@@ -123,6 +143,15 @@ export function loadPDBURL(url: string, callBack): void {
  * @returns void
  */
 export function setStyle(sels: any, rep: any): void {
+    // If the selection looks like {"and":[{}, {...}]}, simplify it.
+    if ((sels["and"] !== undefined) &&                // "and" is a key
+        (Object.keys(sels).length === 1) &&           // it is the only key
+        (JSON.stringify(sels["and"][0]) === "{}") &&  // it points to a list with {} as first item.
+        (sels["and"].length === 2)) {                 // that list has only to elements
+
+        sels = sels["and"][1];
+    }
+
     viewer.setStyle(sels, rep);
     viewer.render();
 }
@@ -197,13 +226,15 @@ export function render(updateData, repName: string, callBack: any = () => { retu
  */
 function loadVRMLFrom3DMol(callBack): void {
     // Make the VRML string from that model.
+    /** @type {string} */
     vrmlStr = viewer.exportVRML();
     callBack();
 }
 
 /**
  * Load in values like coordinates and colors from the VRML string.
- * @param  {string}  repName  The representative name. Like "Surface".
+ * @param  {string}    repName   The representative name. Like "Surface".
+ * @param  {Function}  callBack  A callback function.
  * @returns void
  */
 function loadValsFromVRML(repName: string, callBack: any): void {
@@ -217,13 +248,21 @@ function loadValsFromVRML(repName: string, callBack: any): void {
 
         vrmlParserWebWorker.onmessage = (event) => {
             // Msg back from web worker
+            /** @type {Object<string,*>} */
             let resp = event.data;
+
             let chunk = resp["chunk"];
+
+            /** @type {string} */
             let status = resp["status"];
 
             if (chunk !== undefined) {
+                /** @type {number} */
                 let modelIdx = chunk[0];
+
+                /** @type {string} */
                 let dataType = chunk[1];
+
                 let vals = chunk[2];
 
                 if (modelData.length === modelIdx) {
@@ -273,19 +312,28 @@ function loadValsFromVRML(repName: string, callBack: any): void {
 
 /**
  * Concatonates a list of typed arrays.
- * @param  {*} resultConstructor  The type of array. E.g., Uint8Array.
- * @param  {*} listOfArrays       A list of typed arrays to concatonate.
- * @returns * The typed array.
+ * @param  {*}        resultConstructor  The type of array. E.g., Uint8Array.
+ * @param  {Array<*>} listOfArrays       A list of typed arrays to
+ *                                       concatonate.
+ * @returns {*} The typed array.
  */
 function typedArrayConcat(resultConstructor, listOfArrays): any {
     // See http://2ality.com/2015/10/concatenating-typed-arrays.html
     let totalLength = 0;
-    for (let arr of listOfArrays) {
+
+    /** @type {number} */
+    let listOfArraysLen = listOfArrays.length;
+    for (let i = 0; i < listOfArraysLen; i++) {
+        /** @type {Array<*>} */
+        let arr = listOfArrays[i];
         totalLength += arr.length;
     }
+
     let result = new resultConstructor(totalLength);
     let offset = 0;
-    for (let arr of listOfArrays) {
+    for (let i = 0; i < listOfArraysLen; i++) {
+        /** @type {Array<*>} */
+        let arr = listOfArrays[i];
         result.set(arr, offset);
         offset += arr.length;
     }
@@ -298,45 +346,50 @@ function typedArrayConcat(resultConstructor, listOfArrays): any {
  * @returns {*} The new mesh from the 3dmoljs instance.
  */
 export function importIntoBabylonScene(): any {
+    // The material to add to all meshes.
+    let mat = new BABYLON.StandardMaterial("Material", Vars.scene);
+    mat.diffuseColor = new BABYLON.Color3(1, 1, 1);
+    mat.emissiveColor = new BABYLON.Color3(0, 0, 0);
+    mat.specularColor = new BABYLON.Color3(0, 0, 0);
+    // mat.sideOrientation = BABYLON.Mesh.FRONTSIDE;
+    // mat.sideOrientation = BABYLON.Mesh.BACKSIDE;
+
     let meshes = [];
-    for (let modelIdx in modelData) {
-        if (modelData.hasOwnProperty(modelIdx)) {
-            let modelDatum = modelData[modelIdx];
 
-            // Calculate normals instead? It's not necessary. Doesn't chang over
-            // 3dmoljs calculated normals.
-            let norms = [];
-            BABYLON.VertexData.ComputeNormals(
-                modelDatum["coors"], modelDatum["trisIdxs"], norms,
-            );
+    /** @type {number} */
+    let len = modelData.length;
 
-            // Compile all that into vertex data.
-            let vertexData = new BABYLON.VertexData();
-            vertexData["positions"] = modelDatum["coors"];  // In quotes because from webworker (external)
-            vertexData["indices"] = modelDatum["trisIdxs"];
-            vertexData["normals"] = norms;
-            vertexData["colors"] = modelDatum["colors"];
+    for (let modelIdx = 0; modelIdx < len; modelIdx++) {
+        let modelDatum = modelData[modelIdx];
 
-            // Delete the old mesh if it exists.
-            // if (Vars.scene.getMeshByName("MeshFrom3DMol") !== null) {
-            //     Vars.scene.getMeshByName("MeshFrom3DMol").dispose();
-            // }
+        // Calculate normals instead? It's not necessary. Doesn't chang over
+        // 3dmoljs calculated normals.
+        let norms = [];
+        BABYLON.VertexData.ComputeNormals(
+            modelDatum["coors"], modelDatum["trisIdxs"], norms,
+        );
 
-            // Make the new mesh
-            let babylonMeshTmp = new BABYLON.Mesh("mesh_3dmol_tmp" + modelIdx, Vars.scene);
-            vertexData.applyToMesh(babylonMeshTmp);
+        // Compile all that into vertex data.
+        let vertexData = new BABYLON.VertexData();
+        vertexData["positions"] = modelDatum["coors"];  // In quotes because from webworker (external)
+        vertexData["indices"] = modelDatum["trisIdxs"];
+        vertexData["normals"] = norms;
+        vertexData["colors"] = modelDatum["colors"];
 
-            // Add a material.
-            let mat = new BABYLON.StandardMaterial("Material", Vars.scene);
-            mat.diffuseColor = new BABYLON.Color3(1, 1, 1);
-            mat.emissiveColor = new BABYLON.Color3(0, 0, 0);
-            mat.specularColor = new BABYLON.Color3(0, 0, 0);
-            // mat.sideOrientation = BABYLON.Mesh.FRONTSIDE;
-            // mat.sideOrientation = BABYLON.Mesh.BACKSIDE;
-            babylonMeshTmp.material = mat;
+        // Delete the old mesh if it exists.
+        // if (Vars.scene.getMeshByName("MeshFrom3DMol") !== null) {
+        //     Vars.scene.getMeshByName("MeshFrom3DMol").dispose();
+        // }
 
-            meshes.push(babylonMeshTmp);
-        }
+        // Make the new mesh
+        let babylonMeshTmp = new BABYLON.Mesh("mesh_3dmol_tmp" + modelIdx, Vars.scene);
+        vertexData.applyToMesh(babylonMeshTmp);
+
+        // Add a material.
+        babylonMeshTmp.material = mat;
+        // babylonMeshTmp.showBoundingBox = true;
+
+        meshes.push(babylonMeshTmp);
     }
 
     let babylonMesh;
@@ -371,7 +424,7 @@ export function updateMolRotation(axis: string, amount: number): void {
 }
 
 /**
- * Setts the molRotation object externally.
+ * Sets the molRotation object externally. Does not actually rotate anything.
  * @param  {number} x
  * @param  {number} y
  * @param  {number} z

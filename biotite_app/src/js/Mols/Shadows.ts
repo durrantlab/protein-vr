@@ -14,6 +14,7 @@ export function setupShadowGenerator(): void {
     // Get the light that will cast the shadows.
     let light = Vars.scene.lights[0];
 
+    /** @type {Object<string,number>} */
     let shadowInf = getBlurDarknessFromLightName();
     shadowInf.T = 0;
     shadowInf.blur = 2;
@@ -34,7 +35,7 @@ export function setupShadowGenerator(): void {
         // shadowGenerator.blurBoxOffset = 5;
 
         // Will make debugging easier.
-        window.shadowGenerator = shadowGenerator;
+        // window.shadowGenerator = shadowGenerator;
 
         // Old parameters not used:
         // shadowGenerator.usePoissonSampling = true;  // Good but slow.
@@ -57,12 +58,13 @@ export function getBlurDarknessFromLightName(): any {
     // Now overwrite those values if reason to do so in the name of the light.
     let blurMatches = light.name.match(/blur_([0-9\.]+)/g);
     if (blurMatches !== null) {
-        blur = parseFloat(blurMatches[0].substr(5));
+        blur = +blurMatches[0].substr(5);
     }
 
+    /** @type Array<string> */
     let darknessMatches = light.name.match(/dark_([0-9\.]+)/g);
     if (darknessMatches !== null) {
-        darkness = parseFloat(darknessMatches[0].substr(5));
+        darkness = +darknessMatches[0].substr(5);
     }
 
     return {blur, darkness};
@@ -74,20 +76,20 @@ export function getBlurDarknessFromLightName(): any {
  */
 export function setupShadowCatchers(): void {
     // Go through and find the shdow catchers
-    for (let idx in Vars.scene.meshes) {
-        if (Vars.scene.meshes.hasOwnProperty(idx)) {
-            let mesh = Vars.scene.meshes[idx];
-            if ((mesh.name.toLowerCase().indexOf("shadowcatcher") !== -1) || (
-                mesh.name.toLowerCase().indexOf("shadow_catcher") !== -1)) {
+    /** @type {number} */
+    let len = Vars.scene.meshes.length;
+    for (let idx = 0; idx < len; idx++) {
+        let mesh = Vars.scene.meshes[idx];
+        if ((mesh.name.toLowerCase().indexOf("shadowcatcher") !== -1) || (
+            mesh.name.toLowerCase().indexOf("shadow_catcher") !== -1)) {
 
-                // Make the material
-                mesh.material = new BABYLON.ShadowOnlyMaterial("shadow_catch" + idx.toString(), Vars.scene);
-                mesh.material.activeLight = Vars.scene.lights[0];
-                // mesh.material.alpha = 0.1;
+            // Make the material
+            mesh.material = new BABYLON.ShadowOnlyMaterial("shadow_catch" + idx.toString(), Vars.scene);
+            mesh.material.activeLight = Vars.scene.lights[0];
+            // mesh.material.alpha = 0.1;
 
-                // It can receive shadows.
-                mesh.receiveShadows = true;
-            }
+            // It can receive shadows.
+            mesh.receiveShadows = true;
         }
     }
 }

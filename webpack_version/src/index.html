@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <meta name="description" content="ProteinVR Scene">
+    <meta name="author" content="DurrantLab">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ProteinVR</title>
+
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+    <![endif]-->
+</head>
+
+<body id="bdy">
+    <div id="loadingContainer">
+        <div id="loading"></div>
+        <p>Loading ProteinVR...</p>
+    </div>
+
+    <div id="container">
+        <canvas id="renderCanvas" touch-action="none"></canvas>
+        <div id="capture-clicks" touch-action="none"></div>
+    </div>
+
+    <script src="js/jsfile.1.pep.min.js"></script>
+    <script src="js/jsfile.2.babylon.js"></script>
+    <script src="js/jsfile.3.babylonjs.loaders.min.js"></script>
+    <script src="js/jsfile.4.babylonjs.materials.min.js"></script>
+    <script src="js/jsfile.5.babylon.gui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.18/peer.min.js" async></script>
+</body>
+
+</html>

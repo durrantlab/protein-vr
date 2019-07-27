@@ -4,8 +4,12 @@ import * as VRML from "./VRML";
 declare var WorkerGlobalScope;
 declare var postMessage;
 
+/** @const {number} */
 const DATA_CHUNK_SIZE = 10000000;
-let dataToSendBack = undefined;
+
+/** @type {Array<*>} */
+let dataToSendBack = [];
+
 let numRegex = new RegExp("(^|-| )[0-9\.]{1,8}", "g");
 let geoCenter = undefined;
 
@@ -19,8 +23,12 @@ if (typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScop
 // Get the data from the main thread, if webworker.
 if (inWebWorker) {
     self.onmessage = (e) => {
+        /** @type {string} */
         let cmd = e.data["cmd"];
+
         let data = e.data["data"];
+
+        /** @type {boolean} */
         let removeExtraPts = e.data["removeExtraPts"];
 
         if (cmd === "start") {
@@ -58,13 +66,15 @@ if (inWebWorker) {
  * @returns Array<Object<string, Array<number>>>   The model data.
  */
 export function loadValsFromVRML(vrmlStr: string, removeExtraPts: boolean = false): VRML.IVRMLModel[] {
+    /** @type {Array<Objecet<string,*>>} */
     let modelData: VRML.IVRMLModel[] = [];
 
     // A given VRML file could have multiple IndexedFaceSets. Divide and
     // handle separately.
     let vrmlChunks = vrmlStr.split("geometry IndexedFaceSet {").splice(1);
-
-    for (let vrmlChunk of vrmlChunks) {
+    let vrmlChunksLen = vrmlChunks.length;
+    for (let i = 0; i < vrmlChunksLen; i++) {
+        let vrmlChunk = vrmlChunks[i];
         // Extract the coordinates from the vrml text
         let coors = strToCoors(betweenbookends("point [", "]", vrmlChunk));
 
@@ -97,13 +107,19 @@ export function loadValsFromVRML(vrmlStr: string, removeExtraPts: boolean = fals
         // transfer so much data back to the main thread at a time.
         dataToSendBack = [];
         let dataTypes = ["colors", "coors", "trisIdxs"];
-        for (let modelIdx in modelData) {
-            if (modelData.hasOwnProperty(modelIdx)) {
-                for (let dataType of dataTypes) {
-                    let chunks = chunk(modelData[+modelIdx][dataType]);
-                    for (let chunk of chunks) {
-                        dataToSendBack.push([+modelIdx, dataType, chunk]);
-                    }
+        let dataTypesLen = dataTypes.length;
+
+        /** @type {number} */
+        let len = modelData.length;
+        for (let modelIdx = 0; modelIdx < len; modelIdx++) {
+            for (let i = 0; i < dataTypesLen; i++) {
+                /** @type {string} */
+                let dataType = dataTypes[i];
+                let chunks = chunk(modelData[modelIdx][dataType]);
+                let chunksLen = chunks.length;
+                for (let i2 = 0; i2 < chunksLen; i2++) {
+                    let chunk = chunks[i2];
+                    dataToSendBack.push([modelIdx, dataType, chunk]);
                 }
             }
         }
@@ -120,10 +136,16 @@ export function loadValsFromVRML(vrmlStr: string, removeExtraPts: boolean = fals
 export function removeStrayPoints(pts: any): any {
     console.log("Removing extra points.");
 
+    /** @type {number} */
     let firstX = pts[0];
+
+    /** @type {number} */
     let firstY = pts[1];
+
+    /** @type {number} */
     let firstZ = pts[2];
 
+    /** @type {number} */
     let coorsLen = pts.length;
 
     for (let coorIdx = 0; coorIdx < coorsLen; coorIdx = coorIdx + 3) {
@@ -263,6 +285,7 @@ function betweenbookends(bookend1: string, bookend2: string, str: string): strin
 function translateBeforeBabylonImport(delta: number[], modelData: VRML.IVRMLModel[]): VRML.IVRMLModel[] {
     let numModels = modelData.length;
     for (let modelIdx = 0; modelIdx < numModels; modelIdx++) {
+        /** @type {number} */
         let coorsLen = modelData[modelIdx]["coors"].length;
         for (let coorIdx = 0; coorIdx < coorsLen; coorIdx = coorIdx + 3) {
             modelData[modelIdx]["coors"][coorIdx] = modelData[modelIdx]["coors"][coorIdx] - delta[0];
@@ -288,6 +311,7 @@ function getGeometricCenter(modelData: VRML.IVRMLModel[]): any {
         return new Float32Array([0.0, 0.0, 0.0]);
     }
 
+    /** @type {number} */
     let coorCountAllModels = modelData.map((m) => m["coors"].length).reduce((a: number, b: number) => a + b);
     if (coorCountAllModels === 0) {
         // No coordinates... it's an empty mesh.
@@ -302,6 +326,7 @@ function getGeometricCenter(modelData: VRML.IVRMLModel[]): any {
     for (let modelIdx = 0; modelIdx < numModels; modelIdx++) {
         let modelDatum = modelData[modelIdx];
         let coors = modelDatum["coors"];
+        /** @type {number} */
         let coorsLen = coors.length;
         for (let coorIdx = 0; coorIdx < coorsLen; coorIdx = coorIdx + 3) {
             xTotal = xTotal + coors[coorIdx];

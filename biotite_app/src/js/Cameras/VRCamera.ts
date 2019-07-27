@@ -25,7 +25,7 @@ export function setup(): void {
  */
 function setupEnterAndExitVRCallbacks(): void {
     Vars.vrHelper.onEnteringVRObservable.add((a, b) => {
-        // Not sure what a and b are. Both are objects.
+        // When you enter VR. Not sure what a and b are. Both are objects.
 
         // Update navMode
         Vars.vrVars.navMode = Navigation.NavMode.VRNoControllers;
@@ -45,6 +45,11 @@ function setupEnterAndExitVRCallbacks(): void {
 
         window["vrHelper"] = Vars.vrHelper;
     });
+
+    // Vars.vrHelper.onAfterEnteringVRObservable.add(() => {
+    //     // Make sure camera starts off at same location as babylon camera
+    //     debugger;
+    // });
 
     Vars.vrHelper.onExitingVRObservable.add(() => {
         // Update navMode
@@ -78,10 +83,18 @@ function setupEnterAndExitVRCallbacks(): void {
  * @returns {*} The custom mesh (almost an empty).
  */
 function makeEmptyMesh(): any {
+    /** @const {*} */
     const customMesh = new BABYLON.Mesh("vrNavTargetMesh", Vars.scene);
+
+    /** @const {Array<number>} */
     const positions = [0, 0, 0];
+
+    /** @const {Array<number>} */
     const indices = [0];
+
+    /** @const {*} */
     const vertexData = new BABYLON.VertexData();
+
     vertexData.positions = positions;
     vertexData.indices = indices;
     vertexData.applyToMesh(customMesh);
@@ -95,7 +108,12 @@ function makeEmptyMesh(): any {
  * @returns void
  */
 export function setupGazeTracker(): void {
-    Vars.vrHelper.raySelectionPredicate = (mesh) => {
+
+    /**
+     * @param {*}
+     * @returns boolean
+     */
+    Vars.vrHelper.raySelectionPredicate = (mesh: any): boolean => {
         // if (!mesh.isVisible) {
         //     return false;
         // }

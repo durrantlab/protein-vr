@@ -25,4 +25,4 @@ scoria
 *.cache
 build
 **/web/*
-
+node_modules

@@ -44,7 +44,7 @@
         jQuery(document).ready(() => {
             jQuery("#submit").click(() => {
                 let curUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                let newUrl = curUrl.slice(0, curUrl.length - 14) + "?src=" + jQuery("#urlOrPDB").val();
+                let newUrl = curUrl.slice(0, curUrl.length - 15) + "?src=" + jQuery("#urlOrPDB").val();
                 top.location.href = newUrl;
             });
         });

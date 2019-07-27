@@ -34,20 +34,43 @@ down. No go. Need to try smaller babylon file. I kind of think that;'s it.
 
 Need to redo voice commands with new nav system.
 
-Need to make sure menu system still works with old system (Biotite).
-
-
 Option to keep mesh on floor. (option becauser bilayer, then middle is good.)
     Works but needs flag to turn on and off.
 
-Way to remove specific reps added previoiusly.
+Wifi solution?: https://stackoverflow.com/questions/23915411/building-an-intranet-using-a-wireless-router-and-mamp
 
-Selection to get all stuff around ligand.
+follow-the-=leader needs to be smoother
 
-When you update selections like resid, no need to regnerate whole menu. Just that section. Really, menu should never be setup twice. Put in a check to make sure that never happens.
+also sync representative changes
+
+Also need to get peerjs working with VR cameras of all sorts.
+
+
+
+
 
 Done or Ignore
 --------------
+
+https://peerjs.com
+
+Also, spaces if some rep names get too long.
+
+Back rotate button (undo?)
+
+Protein shouldn't fly in on style change.
+
+Any selection that has only one option ("All") should just be collapsed.
+
+Selection to get all stuff around ligand.
+
+Need to make sure menu system still works with old system (Biotite).
+
+Way to remove specific reps added previoiusly.
+
+When you update selections like resid, no need to regnerate whole menu. Just
+that section. Really, menu should never be setup twice. Put in a check to make
+sure that never happens.
 
 Way to simplify the menu? It's a beast.
 

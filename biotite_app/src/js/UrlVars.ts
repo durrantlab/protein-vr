@@ -1,8 +1,10 @@
 import * as ThreeDMol from "./Mols/3DMol/ThreeDMol";
 import * as Visualize from "./Mols/3DMol/Visualize";
 import * as VRML from "./Mols/3DMol/VRML";
+import * as Student from "./WebRTC/Student";
 
 let stylesQueue = [];
+let webrtc;
 
 /**
  * Get all the url parameters from a url string.
@@ -28,7 +30,9 @@ function getAllUrlParams(url: string): any {
         // split our query string into its component parts
         let arr = queryString.split("&");
 
-        for (let a of arr) {
+        let arrLen = arr.length;
+        for (let i = 0; i < arrLen; i++) {
+            let a = arr[i];
             // separate the keys and the values
             let keyValPair = a.split("=");
 
@@ -60,16 +64,19 @@ export function setURL(): void {
     let params = [];
 
     // Get the rotations.
+    /** @type {number} */
     let x = VRML.molRotation.x;
     if (x !== 0) {
         params.push("x=" + round(x));
     }
 
+    /** @type {number} */
     let y = VRML.molRotation.y;
     if (y !== 0) {
         params.push("y=" + round(y));
     }
 
+    /** @type {number} */
     let z = VRML.molRotation.z;
     if (z !== 0) {
         params.push("z=" + round(z));
@@ -78,15 +85,20 @@ export function setURL(): void {
     // Set the url.
     params.push("src=" + ThreeDMol.modelUrl);
 
+    if (webrtc !== undefined) {
+        params.push("webrtc=" + webrtc);
+    }
+
     // Also get all the representations
     let i = 0;
     let styles = [];
-    for (let key in Visualize.styleMeshes) {
-        if (Visualize.styleMeshes.hasOwnProperty(key)) {
-            if (Visualize.styleMeshes[key].mesh.isVisible) {
-                styles.push("style" + i.toString() + "=" + key);
-                i++;
-            }
+    let keys = Object.keys(Visualize.styleMeshes);
+    let len = keys.length;
+    for (let i2 = 0; i2 < len; i2++) {
+        let key = keys[i2];
+        if (Visualize.styleMeshes[key].mesh.isVisible) {
+            styles.push("style" + i.toString() + "=" + key);
+            i++;
         }
     }
     // styles.reverse();  // order doens't matter anyway.
@@ -112,13 +124,29 @@ export function setURL(): void {
 export function readUrlParams(): void {
     let params = getAllUrlParams(window.location.href);
 
+    // Before anything, check if this is a webrtc session.
+    webrtc = params["webrtc"];
+    if (webrtc !== undefined) {
+        Student.startFollowing(webrtc);
+    }
+
     // Update the mesh rotations
-    params["x"] = (params["x"] === undefined) ? 0 : +params["x"];
-    params["y"] = (params["y"] === undefined) ? 0 : +params["y"];
-    params["z"] = (params["z"] === undefined) ? 0 : +params["z"];
-    VRML.setMolRotation(params["x"], params["y"], params["z"]);
+    /** @type {number} */
+    let x = params["x"];
+
+    /** @type {number} */
+    let y = params["y"];
+
+    /** @type {number} */
+    let z = params["z"];
+
+    x = (x === undefined) ? 0 : +x;
+    y = (y === undefined) ? 0 : +y;
+    z = (z === undefined) ? 0 : +z;
+    VRML.setMolRotation(x, y, z);
 
     // Set the url if it's present.
+    /** @type {string} */
     let src = params["src"];
     if (src !== undefined) {
         if ((src.length === 4) && (src.indexOf(".") === -1)) {
@@ -129,12 +157,14 @@ export function readUrlParams(): void {
     }
 
     // Setup the styles as well.
-    for (let key in params) {
-        if (params.hasOwnProperty(key)) {
-            if (key.slice(0, 5) === "style") {
-                let repInfo = extractRepInfoFromKey(params[key]);
-                stylesQueue.push(repInfo);
-            }
+    /** @type {Array<string>} */
+    let keys = Object.keys(params);
+    let len = keys.length;
+    for (let i = 0; i < len; i++) {
+        let key = keys[i];
+        if (key.slice(0, 5) === "style") {
+            let repInfo = extractRepInfoFromKey(params[key]);
+            stylesQueue.push(repInfo);
         }
     }
 

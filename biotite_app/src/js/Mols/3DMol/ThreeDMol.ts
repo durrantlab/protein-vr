@@ -2,6 +2,7 @@
 // VRML.ts for additional functions related to the mesh itself.
 
 import * as Menu3D from "../../UI/Menu3D/Menu3D";
+import * as Styles from "../../UI/Menu3D/Styles";
 import * as OpenPopup from "../../UI/OpenPopup";
 import * as UrlVars from "../../UrlVars";
 import * as Vars from "../../Vars";
@@ -62,11 +63,8 @@ function after3DMolJsLoaded(sceneInfoData: any): void {
             // Like residue name.
             getAdditionalSels(mdl3DMol);
 
-            // Now that the pdb is loaded, you need to repopulate the menu. In
-            // the future, you might setup the menu for the first time from
-            // here instead, but I can still imagine using ProteinVR without
-            // 3Dmoljs, so let's just recreate for now.
-            Menu3D.setup();  // Will use scene_info.json from what was previously saved.
+            // Now that the pdb is loaded, you need to update the menu.
+            Styles.updateModelSpecificSelectionsInMenu(Menu3D.menuInf);
 
             // Now that the PDB is loaded, you can start loading styles.
             UrlVars.startLoadingStyles();
@@ -82,7 +80,7 @@ function after3DMolJsLoaded(sceneInfoData: any): void {
             if (modelUrl === "nanokid.sdf") {
                 setTimeout(() => {
                     // Give them some time to admire nanokid... :)
-                    OpenPopup.openUrlModal("Load Molecule", "help/load.html");
+                    OpenPopup.openUrlModal("Load Molecule", "pages/load.html");
                 }, 3000);
             }
         });
@@ -97,6 +95,7 @@ function after3DMolJsLoaded(sceneInfoData: any): void {
  */
 function getAdditionalSels(mdl3DMol): void {
     // Get all the atoms.
+    /** @type {Array<Object<string,*>>} */
     let atoms = mdl3DMol.selectedAtoms({});
 
     atomicInfo = {
@@ -108,8 +107,10 @@ function getAdditionalSels(mdl3DMol): void {
         "Secondary Structure": [],
     };
 
+    /** @type {number} */
     let atomsLen = atoms.length;
     for (let i = 0; i < atomsLen; i++) {
+        /** @type {Object<string,*>} */
         let atom = atoms[i];
         atomicInfo["Atom Name"].push(atom["atom"]);
         atomicInfo["Chain"].push(atom["chain"]);
@@ -120,19 +121,28 @@ function getAdditionalSels(mdl3DMol): void {
     }
 
     // We want just unique values.
-    for (let lbl in atomicInfo) {
-        if (atomicInfo.hasOwnProperty(lbl)) {
-            atomicInfo[lbl] = uniq(atomicInfo[lbl]);
-        }
+    let lbls = Object.keys(atomicInfo);
+    let len = lbls.length;
+    for (let i = 0; i < len; i++) {
+        let lbl = lbls[i];
+        atomicInfo[lbl] = uniq(atomicInfo[lbl]);
     }
 }
 
+/**
+ * Get the unique values in an array.
+ * @param  {Array<*>} arr  The array
+ * @returns Array<*>  The array, with unique values.
+ */
 function uniq(arr: any[]): any[] {
     // see
     // https://stackoverflow.com/questions/11688692/how-to-create-a-list-of-unique-items-in-javascript
     let u = {};
     let a = [];
-    for (let i = 0, l = arr.length; i < l; ++i) {
+
+    /** @type {number} */
+    let len = arr.length;
+    for (let i = 0, l = len; i < l; ++i) {
         if (!u.hasOwnProperty(arr[i])) {
             a.push(arr[i]);
             u[arr[i]] = 1;

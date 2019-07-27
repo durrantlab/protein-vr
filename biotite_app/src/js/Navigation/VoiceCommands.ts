@@ -48,6 +48,9 @@ function _setup(data) {
         let cmd = ["hide", "show", "high"][i];
         let isVisible = cmd === "show";
 
+        // Presence of below probes this never runs...
+        debugger;
+
         for (let modelNameIdx in uniqModelNames) {
             if (uniqModelNames.hasOwnProperty(modelNameIdx)) {
                 let modelName = uniqModelNames[modelNameIdx];

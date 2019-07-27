@@ -13,7 +13,13 @@ export let pointWayOffScreen = new BABYLON.Vector3(-1000, 1000, 1000);
 export let groundPointBelowCamera = new BABYLON.Vector3(0, 0, 0);
 export let groundPointBelowStarePt = new BABYLON.Vector3(0, 0, 0);
 export let curStarePt = new BABYLON.Vector3(0, 0, 0);
-export function setCurStarePt(pt) {
+
+/**
+ * Sets the curStarePt variable externally.
+ * @param {*} pt
+ * @returns void
+ */
+export function setCurStarePt(pt: any): void {
     curStarePt.copyFrom(pt);
 }
 
@@ -54,6 +60,7 @@ export function setup(): void {
 export function setStarePointInfo(): void {
     // This function runs with ever turn of the render loop. Set's information
     // about what you're looking/pointing at. Info saved to curStarePt
+    /** @type {*} */
     let ray;
 
     if (Vars.vrVars.navMode === Navigation.NavMode.NoVR) {
@@ -66,6 +73,7 @@ export function setStarePointInfo(): void {
                (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
 
         // Find the valid gazetracker mesh.
+        /** @type {*} */
         let gazeTrackerMesh;
         if (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers) {
             gazeTrackerMesh = Vars.vrHelper.rightControllerGazeTrackerMesh;
@@ -85,6 +93,7 @@ export function setStarePointInfo(): void {
         }
 
         // Construct a ray from the camera to the stare obj
+        /** @type {*} */
         let camPos = CommonCamera.getCameraPosition();
         // ray = new BABYLON.Ray(camPos, curStarePt.subtract(camPos), 1000);
         ray = new BABYLON.Ray(camPos, curStarePt.subtract(camPos));
@@ -104,6 +113,7 @@ function cancelStareIfFarAway(): void {
         setCurStarePt(pointWayOffScreen);
         Pickables.setCurPickedMesh(undefined);
     } else {
+        /** @type {number} */
         let dist = BABYLON.Vector3.Distance(
             CommonCamera.getCameraPosition(), curStarePt,
         );
@@ -122,11 +132,15 @@ function cancelStareIfFarAway(): void {
  */
 function setPickPointAndObjInScene(ray, updatePos = true): void {
     // Determines where the specified ray intersects a pickable object.
+    /** @const {*} */
     const pickingInfo = Vars.scene.pickWithRay(ray, (mesh) => {
         return Pickables.checkIfMeshPickable(mesh);
     });
 
-    if ((pickingInfo.hit) && (pickingInfo.distance < Vars.MAX_TELEPORT_DIST)) {
+    /** @type {number} */
+    let pickingInfoDist = pickingInfo.distance;
+
+    if ((pickingInfo.hit) && (pickingInfoDist < Vars.MAX_TELEPORT_DIST)) {
         // It does hit the floor or some other pickable object. Return the
         // point.
         if (updatePos) { setCurStarePt(pickingInfo.pickedPoint); }
@@ -144,11 +158,15 @@ function setPickPointAndObjInScene(ray, updatePos = true): void {
  * @returns Object<string,*> The picking info, projected onto the ground.
  */
 export function groundPointPickingInfo(pt: any): any {
+    /** @const {*} */
     const ray = new BABYLON.Ray(
         pt, new BABYLON.Vector3(0, -1, 0), 50,
     );
+
+    /** @const {*} */
     const pickingInfo = Vars.scene.pickWithRay(ray, (mesh) => {
         return (mesh.id === Vars.vrVars.groundMesh.id);
     });
+
     return pickingInfo;
 }

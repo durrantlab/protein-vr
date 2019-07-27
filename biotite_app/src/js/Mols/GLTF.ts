@@ -13,6 +13,7 @@ declare var BABYLON;
  * @returns void
  */
 export function setup(sceneInfoData: any): void {
+    debugger;  // Putting this here to prove this never runs. Legacy code.
     let assetsManager = new BABYLON.AssetsManager(Vars.scene);
 
     for (let idx in sceneInfoData["objIDs"]) {

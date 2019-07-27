@@ -1,15 +1,23 @@
 declare var jQuery;
 
 let botstrapLoaded = false;
+
+/** @type {Function} */
 let modalFunc;
 
-export function openUrlModal(title: string, url: string) {
+/**
+ * Opens a modal.
+ * @param  {string} title  The tittle.
+ * @param  {string} url    The URL.
+ * @returns void
+ */
+export function openUrlModal(title: string, url: string): void {
     // Load the css if needed.
     if (!botstrapLoaded) {
         botstrapLoaded = true;
 
         // Add the css
-        document.head.insertAdjacentHTML( "beforeend", "<link rel=stylesheet href=help/css/bootstrap.min.css>" );
+        document.head.insertAdjacentHTML( "beforeend", "<link rel=stylesheet href=pages/css/bootstrap.min.css>" );
 
         // Add the DOM for a modal
         document.body.insertAdjacentHTML("beforeend", `
@@ -40,8 +48,8 @@ export function openUrlModal(title: string, url: string) {
         `);
 
         // Add the javascript
-        // jQuery.getScript( "help/scripts/popper.min.js", ( data, textStatus, jqxhr ) => {
-        jQuery.getScript( "help/scripts/bootstrap.min.js", ( data, textStatus, jqxhr ) => {
+        // jQuery.getScript( "pages/scripts/popper.min.js", ( data, textStatus, jqxhr ) => {
+        jQuery.getScript( "pages/scripts/bootstrap.min.js", ( data, textStatus, jqxhr ) => {
             modalFunc = jQuery.prototype.modal;  // Save for later use.
             openUrlModalContinue(title, url);
         });
@@ -51,7 +59,13 @@ export function openUrlModal(title: string, url: string) {
     }
 }
 
-function openUrlModalContinue(title: string, url: string) {
+/**
+ * A follow-up function for opening the url modal.
+ * @param  {string} title  The title.
+ * @param  {string} url    The url.
+ * @returns void
+ */
+function openUrlModalContinue(title: string, url: string): void {
     jQuery.prototype.modal = modalFunc;
     let myModal = jQuery("#myModal");
     myModal.find("h4.modal-title").html(title);

@@ -119,10 +119,13 @@ export function setupMesh(mesh: any, objID: string, shadowQuality: string, uniqI
         // In House scene, background luminosity of 0.0025 is good. There shadow darkness was 0.35.
         // Let's play around with a scheme for guessing at the right background luminosity.
 
-        let backgroundLum;
-        if (lightingInf.darkness > 0.95) {
+        let backgroundLum = 0;
+
+        /** @type {number} */
+        let lightingInfDarkness = lightingInf.darkness;
+        if (lightingInfDarkness > 0.95) {
             backgroundLum = 0.05;
-        } else if (lightingInf.darkness < 0.4) {
+        } else if (lightingInfDarkness < 0.4) {
             backgroundLum = 0.0025;
         } else {
             // Scaled
@@ -130,7 +133,7 @@ export function setupMesh(mesh: any, objID: string, shadowQuality: string, uniqI
             // (0.4, 0.0025)
             // let m = 0.013636363636363637;  // (0.01 - 0.0025) / (0.95 - 0.4);
             // let b = -0.0029545454545454545;  // 0.01 - 0.013636363636363637 * 0.95;
-            backgroundLum = 0.013636363636363637 * lightingInf.darkness - 0.0029545454545454545;
+            backgroundLum = 0.013636363636363637 * lightingInfDarkness - 0.0029545454545454545;
         }
 
         // backgroundLum = 1;

@@ -7,8 +7,11 @@ import * as VRCamera from "./VRCamera";
 
 declare var BABYLON;
 
-let forwardVec = new BABYLON.Vector3(1, 0, 0);
-let upVec = new BABYLON.Vector3(1, 0, 0);
+/** @const {*} */
+const forwardVec = new BABYLON.Vector3(1, 0, 0);
+
+/** @const {*} */
+const upVec = new BABYLON.Vector3(1, 0, 0);
 
 // let activeCamPos = new BABYLON.Vector3(0, 0, 0);
 
@@ -18,7 +21,10 @@ let upVec = new BABYLON.Vector3(1, 0, 0);
  */
 export function getCameraPosition(): any {
     // If it's a VR camera, you need to make an adjustment.
-    let activeCam = Vars.scene.activeCamera;
+
+    /** @const {*} */
+    const activeCam = Vars.scene.activeCamera;
+
     let activeCamPos = activeCam.position.clone();
 
     if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
@@ -61,6 +67,36 @@ export function setCameraPosition(pt): void {
     }
 }
 
+export function getCameraRotation(): any {
+    if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
+    (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
+        return Vars.scene.activeCamera.deviceRotationQuaternion.clone();
+    } else {
+        return Vars.scene.activeCamera.rotationQuaternion.clone();
+    }
+}
+
+export function getCameraRotationQuaternion(): any {
+    if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
+    (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
+        // window["camera"] = Vars.scene.activeCamera;
+        // return Vars.scene.activeCamera.leftCamera.rotationQuaternion;
+        return Vars.scene.activeCamera.deviceRotationQuaternion;
+    } else {
+        return Vars.scene.activeCamera.rotationQuaternion;
+    }
+}
+
+export function setCameraRotationQuaternion(rotQua): any {
+    if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
+    (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
+        console.log("PROBLEM!");
+    } else {
+        // console.log(Vars.scene.activeCamera.rotationQuaternion, rotQua.clone());
+        Vars.scene.activeCamera.rotationQuaternion = rotQua.clone();
+    }
+}
+
 /**
  * Gets the camera rotation
  * @returns * The rotation.
@@ -71,6 +107,8 @@ export function getCameraRotationY(): any {
 
         // Complicated in the case of a VR camera.
         let groundPtVec = Points.groundPointBelowStarePt.subtract(Points.groundPointBelowCamera);
+
+        /** @type {number} */
         let angle = BABYLON.Vector3.GetAngleBetweenVectors(groundPtVec, forwardVec, upVec);
 
         if (groundPtVec.z < 0) {

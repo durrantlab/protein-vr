@@ -59,7 +59,9 @@ function setupTrigger(webVRController: any): void {
             return;
         }
 
+        /** @const {number} */
         const curTime = new Date().getTime();
+
         // console.log(curTime, lastTriggerTime, curTime - lastTriggerTime, Vars.VR_CONTROLLER_TRIGGER_DELAY_TIME);
         if (curTime - lastTriggerTime > Vars.VR_CONTROLLER_TRIGGER_DELAY_TIME) {
             // Enough time has passed...
@@ -108,10 +110,12 @@ function setupPad(webVRController: any): void {
     webVRController.onPadValuesChangedObservable.add((state) => {
         // If it's not a press right in the middle, then save the y value for
         // moving foward/backward.
+        /** @type {number} */
         padMoveSpeedFactor = state["y"];
 
         // Also save the x for turning. But here you can make people really
         // sick, so only trigger if on outer 4ths of pad (no accidents).
+        /** @type {number} */
         padRotateSpeedFactor = state["x"];
 
         // First check if it's right in the middle. That's reset camera zone,

@@ -23,7 +23,8 @@ interface IStyleMesh {
 export let styleMeshes: {[s: string]: IStyleMesh} = {};
 
 let selKeyWordTo3DMolSel = {
-    // See VMD output TCL files for good ideas.
+    // See VMD output TCL files for good ideas. You may nee to look at
+    // Styles.ts too.
     "All":         {},
     "Protein":     {"resn": lAndU(["ALA", "ARG", "ASP", "ASN", "ASX", "CYS",
                                    "GLN", "GLU", "GLX", "GLY", "HIS", "HSP",
@@ -61,6 +62,17 @@ selKeyWordTo3DMolSel["Ligand"] = {"not": {"or": [
     selKeyWordTo3DMolSel["Water"],
 ]}};
 
+// Add in all within ligand
+selKeyWordTo3DMolSel["Ligand Context"] = {
+    "byres": true,
+    "within": {
+        "distance": 4.0,
+        "sel": selKeyWordTo3DMolSel["Ligand"],
+    },
+};
+
+console.log(JSON.stringify(selKeyWordTo3DMolSel["Ligand Context"]));
+
 let colorSchemeKeyWordTo3DMol = {
     "Amino Acid": {"colorscheme": "amino"},
     "Blue": {"color": "blue"},
@@ -94,6 +106,7 @@ let colorSchemeKeyWordTo3DMol = {
  */
 export function toggleRep(filters: any[], repName: string, colorScheme: string, finalCallback= undefined): void {
     // Get the key of this rep request.
+    /** @type {Object<string,*>} */
     let keys = getKeys(filters, repName, colorScheme);
 
     if (finalCallback === undefined) {
@@ -102,13 +115,14 @@ export function toggleRep(filters: any[], repName: string, colorScheme: string, 
 
     // If it's "Hide", then just hide the mesh
     if (colorScheme === "Hide") {
-        for (let fullKey in styleMeshes) {
-            if (styleMeshes.hasOwnProperty(fullKey)) {
-                let styleMesh = styleMeshes[fullKey];
-                if (styleMesh.categoryKey === keys.categoryKey) {
-                    styleMesh.mesh.isVisible = false;
-                    console.log("Hiding existing mesh...");
-                }
+        let fullKeys = Object.keys(styleMeshes);
+        let len = fullKeys.length;
+        for (let i = 0; i < len; i++) {
+            let fullKey = fullKeys[i];
+            let styleMesh = styleMeshes[fullKey];
+            if (styleMesh.categoryKey === keys.categoryKey) {
+                styleMesh.mesh.isVisible = false;
+                console.log("Hiding existing mesh...");
             }
         }
 
@@ -144,6 +158,7 @@ export function toggleRep(filters: any[], repName: string, colorScheme: string, 
     // VRML.viewer.render();
 
     // Make the new representation.
+    /** @type {string} */
     let colorSccheme = colorSchemeKeyWordTo3DMol[colorScheme];
     let sels = {"and": filters.map((i) => {
         // "i" can be a keyword or a selection json itself.
@@ -175,14 +190,15 @@ function toggleRepContinued(keys: any, repName: string, finalCallback): void {
     VRML.render(true, repName, (newMesh) => {
         // Remove any other meshes that have the same category key (so could
         // be different color... that would be removed.)
-        for (let i in styleMeshes) {
-            if (styleMeshes.hasOwnProperty(i)) {
-                let styleMesh = styleMeshes[i];
-                if (styleMesh.categoryKey === keys.categoryKey) {
-                    Optimizations.removeMeshEntirely(styleMesh.mesh);
-                    delete styleMeshes[i];
-                    console.log("deleting old mesh...");
-                }
+        let ks = Object.keys(styleMeshes);
+        let len = ks.length;
+        for (let i = 0; i < len; i++) {
+            let key = ks[i];
+            let styleMesh = styleMeshes[key];
+            if (styleMesh.categoryKey === keys.categoryKey) {
+                Optimizations.removeMeshEntirely(styleMesh.mesh);
+                delete styleMeshes[key];
+                console.log("deleting old mesh...");
             }
         }
 
@@ -219,8 +235,9 @@ function toggleRepContinued(keys: any, repName: string, finalCallback): void {
  * @param  {string}               repName      The name of the representation,
  *                                             e.g., "Cartoon".
  * @param  {string}               colorScheme  The color style keyword.
+ * @returns {Object<string,*>}
  */
-function getKeys(filters: string[], repName: string, colorScheme: string) {
+function getKeys(filters: string[], repName: string, colorScheme: string): any {
     filters.sort();
     let filtersStr = filters.map((f) => {
         if (typeof f === "string") {
@@ -239,11 +256,13 @@ function getKeys(filters: string[], repName: string, colorScheme: string) {
 /**
  * Also adds upper and lower versions of elements in a list.
  * @param  {Array<string>} lst  The original list.
- * @returns string  The list with uppercase and lowercase items also added.
+ * @returns {Array<string>}  The list with uppercase and lowercase items also added.
  */
 function lAndU(lst: string[]): string[] {
     let newLst = lst.map((s) => s);
-    for (let s of lst) {
+    let len = lst.length;
+    for (let i = 0; i < len; i++) {
+        let s = lst[i];
         newLst.push(s.toUpperCase());
         newLst.push(s.toLowerCase());
     }

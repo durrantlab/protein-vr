@@ -9,6 +9,7 @@ import * as Styles from "./Styles";
 declare var BABYLON;
 
 // An easy way to define a menu. It's a nested object. See setup();
+/** @type {Object<string,*>} */
 export let menuInf;
 
 export let clickSound: any = undefined;
@@ -16,11 +17,17 @@ export let openMainMenuFloorButton: any;
 
 // These variables need to be initialized in setup(), to enable reloading if
 // necessary.
+/** @type {Array<*>} */
 let allButtons;
+
+let latestBreadcrumbsViewed;
+
+/** @type {Object<string>} */
+let sceneInfoData;
+
 let GUI3DMenuManager;
 let commonMenuAnchor;
-let latestBreadcrumbsViewed;
-let sceneInfoData;
+
 
 /**
  * Load the 3D GUI. Also reloads the GUI (destroys old version). Reloading is
@@ -74,6 +81,9 @@ export function setup(data?): void {
             { loop: false, autoplay: false, spatialSound: true, volume: 0.1 },
         );
     }
+
+    // Simplify the menu (collapsing excessive parts).
+    reduceSingleItemSubMenus();
 }
 
 /**
@@ -90,7 +100,7 @@ function setupMainMenu(): void {
     // Here would also be a good place to add additional buttons such as voice
     // dictation. See setupAllSubMenuNavButtons for how this was done
     // previously.
-    setupAllSubMenuNavButtons(menuInf);
+    setupAllSubMenuNavButtons();
 
     commonMenuAnchor = new BABYLON.TransformNode(""); // this can be a mesh, too
 
@@ -200,7 +210,9 @@ function applyFuncToAllMenuLevels(funcToApply: any): void {
         funcToApply(subMenu, breadcrumbs);
 
         let keys = Object.keys(subMenu);
-        for (let key of keys) {
+        let keysLen = keys.length;
+        for (let i = 0; i < keysLen; i++) {
+            let key = keys[i];
             let subMenuItems = subMenu[key];
             switch (typeof(subMenuItems)) {
                 case "object":
@@ -306,7 +318,9 @@ function showOnlyButtonsOfLevel(breadcrumbs: string[]): void {
     }
 
     // Hide all the buttons.
-    for (let btn of allButtons) {
+    let allButtonsLen = allButtons.length;
+    for (let i = 0; i < allButtonsLen; i++) {
+        let btn = allButtons[i];
         btn.isVisible(false);
     }
 
@@ -318,7 +332,9 @@ function showOnlyButtonsOfLevel(breadcrumbs: string[]): void {
 
     // Find the submenu
     let subMenu = menuInf;
-    for (let breadcrumb of breadcrumbs) {
+    let breadcrumbsLen = breadcrumbs.length;
+    for (let i = 0; i < breadcrumbsLen; i++) {
+        let breadcrumb = breadcrumbs[i];
         subMenu = subMenu[breadcrumb];
     }
 
@@ -357,7 +373,8 @@ function showOnlyButtonsOfLevel(breadcrumbs: string[]): void {
     }
 
     // Update and show the buttons.
-    for (let i = 0; i < subMenuItemNames.length; i++) {
+    let len = subMenuItemNames.length;
+    for (let i = 0; i < len; i++) {
         let subMenuItemName = subMenuItemNames[i];
         let subMenuItem = subMenu[subMenuItemName];
         let btnidx = btnIdxOrder[i];
@@ -389,3 +406,80 @@ function showOnlyButtonsOfLevel(breadcrumbs: string[]): void {
         btn.isVisible(true);
     }
 };
+
+/**
+ * If a given submenu has only one item, condense the menu.
+ * @returns void
+ */
+function reduceSingleItemSubMenus(): void {
+    /**
+     * @param  {Object}           subMenu      The submenu data.
+     * @param  {Array<string>}    breadcrumbs  They list of keys to get to
+     *                                         this point in the menu.
+     * @returns void
+     */
+    let recurse = (subMenu: any, breadcrumbs: string[]): void => {
+        let keys = Object.keys(subMenu);
+
+        // There should be three items in a one-item submenu, including back
+        // and close.
+        if (keys.length === 3) {
+            let keysToKeep = keys.filter((k) => {
+                if (k === "Close Menu ×") {
+                    return false;
+                } else if (k === "Back ⇦") {
+                    return false;
+                }
+
+                return true;
+            });
+            if (keysToKeep.length === 1) {
+                // Only one item remains. That's the one to collpase.
+                let keyToKeep = keysToKeep[0];
+
+                // Get the name of the new key (one up with keyToKeep added to
+                // end).
+                let lastKey = breadcrumbs[breadcrumbs.length - 1];
+                let newKey = lastKey + ": " + keyToKeep;
+
+                // Redefine the breadcrumbs
+                breadcrumbs = breadcrumbs.slice(0, breadcrumbs.length - 1).concat([newKey]);
+
+                // Go through the menu keys to get to the submenu above this
+                // one.
+                subMenu = menuInf;
+                let breadcrumbsButLast = breadcrumbs.slice(0, breadcrumbs.length - 1);
+                let breadcrumbsButLastLen = breadcrumbsButLast.length;
+                for (let i = 0; i < breadcrumbsButLastLen; i++) {
+                    let breadcrumb = breadcrumbsButLast[i];
+                    subMenu = subMenu[breadcrumb];
+                }
+
+                // Rename if submenu.
+                subMenu[newKey] = subMenu[lastKey][keyToKeep];
+                delete subMenu[lastKey];
+
+                // Go into new submenu
+                subMenu = subMenu[newKey];
+
+                // Update keys
+                keys = Object.keys(subMenu);
+            }
+        }
+
+        let keysLen = keys.length;
+        for (let i = 0; i < keysLen; i++) {
+            let key = keys[i];
+            let subMenuItems = subMenu[key];
+            switch (typeof(subMenuItems)) {
+                case "object":
+                    recurse(subMenuItems, breadcrumbs.concat([key]));
+                    break;
+                default:
+                    continue;
+            }
+        }
+    };
+
+    recurse(menuInf, []);
+}

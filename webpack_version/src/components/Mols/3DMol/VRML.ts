@@ -1,0 +1,449 @@
+// An module to manage VRML data obtained from 3Dmol.js. Assumes the 3Dmol.js
+// javascript file is already loaded.
+
+// import { setMoleculeNameInfos } from "../../Navigation/VoiceCommands";
+import * as UrlVars from "../../UrlVars";
+import * as Vars from "../../Vars";
+import * as CommonLoader from "../CommonLoader";
+import * as PositionInScene from "./PositionInScene";
+// import vrmlParserWebWorker from "./VRMLParser.worker.js";
+// import VRMLParser from "worker-loader!./VRMLParser.worker.ts";
+
+import VRMLParser = require("worker-loader?name=dist/[name].js!./VRMLParser.worker");
+// import * as VRMLParser from "worker-loader?name=dist/[name].js!./VRMLParser.worker";
+
+// import * as VRMLParserWebWorker from "./VRMLParser.worker";  // So you can access when no webworker support.
+
+declare var BABYLON: any;
+declare var jQuery: any;
+declare var $3Dmol: any;
+
+export interface IVRMLModel {
+    coors: any;  // Float32Array
+    colors: any;  // Float32Array
+    trisIdxs: any;  // Uint32Array
+}
+
+/** @type {Array<Object<string,*>>} */
+let modelData: IVRMLModel[] = [];
+
+export let molRotation: any = new BABYLON.Vector3(0, 0, 0);
+
+export let viewer: any;
+let element: any;
+
+/** @type {Object<string,string>} */
+let config: any;
+
+/** @type {string} */
+let vrmlStr: string;
+
+let vrmlParserWebWorker = new VRMLParser();
+
+let molTxt = "";
+let molTxtType = "pdb";
+let hasActiveSurface = false;
+
+/**
+ * Setup the ability to work with 3Dmol.js.
+ * @param  {Function} callBack  Runs once the iframe is loaded is loaded.
+ * @returns void
+ */
+export function setup(callBack: any): void {
+    // Add a container for 3dmoljs.
+    addDiv();
+
+    // Make the viewer object.
+    element = jQuery("#mol-container");
+    config = { backgroundColor: "white" };
+    viewer = $3Dmol.createViewer( element, config );
+    // jQuery("#mol-container canvas")["attr"]("style", extraStyle);
+    window["viewer"] = viewer;  // For debugging.
+
+    callBack();
+}
+
+/**
+ * Add (or readd) div 3DMoljs div.
+ * @returns void
+ */
+function addDiv(): void {
+    let molContainer = jQuery("#mol-container");
+    if (molContainer) {
+        molContainer.remove();
+    }
+
+    let extraStyle = "display:none;";
+    // let extraStyle = "width:150px; height:150px; z-index:150; position:fixed; top:0; left:0;";
+    jQuery("body").append(`<div
+        id="mol-container"
+        class="mol-container"
+        style="${extraStyle}"></div>`);
+}
+
+export function resetAll() {
+    if (hasActiveSurface) {
+        hasActiveSurface = false;
+
+        // I can't get rid of the surfaces without causing
+        // problems. I'm just going to go nuclear and reload the
+        // whole thing.
+        viewer = null;
+        setup(() => {
+            viewer.addModel(molTxt, "pdb");
+        });
+    }
+
+    viewer.setStyle({}, {});
+}
+
+/**
+ * Load a file into the 3dmol object.
+ * @param  {string}     url     The url.
+ * @param  {Function} callBack  A callback function. The 3DMoljs molecule
+ *                              object is the parameter.
+ * @returns void
+ */
+export function loadPDBURL(url: string, callBack: any): void {
+    jQuery.ajax( url, {
+
+        /**
+         * When the url data is retrieved.
+         * @param  {string} data  The remote data.
+         * @returns void
+         */
+        "success": (data: string): void => {
+            // Setup the visualization
+            /** @type {string} */
+            molTxt = data;  // In case you need to restart.
+            molTxtType = "pdb";
+
+            if (url.slice(url.length - 3).toLowerCase() === "sdf") {
+                molTxtType = "sdf";
+            }
+
+            let mdl = viewer.addModel( data, molTxtType );
+            // viewer.zoomTo();
+
+            // render();  // Use default style.
+            // viewer.render();
+
+            callBack(mdl);
+        },
+
+        /**
+         * If there's an error...
+         * @param  {*}       hdr
+         * @param  {*}       status
+         * @param  {string}  err
+         */
+        "error": (hdr: any, status: any, err: any) => {
+            console.error( "Failed to load molecule " + url + ": " + err );
+        },
+    });
+}
+
+/**
+ * Set the style on the 3DMoljs viewer.
+ * @param  {Object<string,*>} sels  A selection object.
+ * @param  {Object<string,*>} rep   A representation object.
+ * @returns void
+ */
+export function setStyle(sels: any, rep: any): void {
+    // If the selection looks like {"and":[{}, {...}]}, simplify it.
+    if ((sels["and"] !== undefined) &&                // "and" is a key
+        (Object.keys(sels).length === 1) &&           // it is the only key
+        (JSON.stringify(sels["and"][0]) === "{}") &&  // it points to a list with {} as first item.
+        (sels["and"].length === 2)) {                 // that list has only to elements
+
+        sels = sels["and"][1];
+    }
+
+    viewer.setStyle(sels, rep);
+    viewer.render();
+}
+
+/**
+ * Add a surface to the 3DMoljs viewer.
+ * @param  {Object<string,*>} colorScheme  A colorscheme object.
+ * @param  {Object<string,*>} sels         A selection object.
+ * @param  {Function}         callBack     A callback function.
+ * @returns void
+ */
+export function addSurface(colorScheme: any, sels: any, callBack: any): void {
+    hasActiveSurface = true;
+    viewer.addSurface(
+        $3Dmol.SurfaceType.MS,
+        colorScheme,
+        sels,
+        undefined,
+        undefined,
+        () => {
+            callBack();
+        },
+    );
+}
+
+/**
+ * Sets the 3dmol.js style. Also generates a vrml string and values.
+ * @param  {boolean}    updateData  Whether to update the underlying data with
+ *                                  this visualization. True by default.
+ * @param  {string}     repName     The representative name. Like "Surface".
+ * @param  {Function=}  callBack    The callback function, with the new mesh
+ *                                  as a parameter.
+ * @returns void
+ */
+export function render(updateData: boolean, repName: string, callBack: any = () => { return; }): void {
+    // Make sure there are no waiting menus up and running. Happens some
+    // times.
+    Vars.engine.hideLoadingUI();
+
+    // Render the style
+    // viewer.render();
+
+    if (updateData) {
+        // Load the data.
+        loadVRMLFrom3DMol(() => {
+            loadValsFromVRML(repName, () => {
+                // Could modify coordinates before importing into babylon
+                // scene, so comment out below. Changed my mind the kinds of
+                // manipulations above should be performed on the mesh.
+                // Babylon is going to have better functions for this than I
+                // can come up with.
+                let newMesh = importIntoBabylonScene();
+
+                if (newMesh !== undefined) {
+                    // It's undefined if, for example, trying to do cartoon on
+                    // ligand.
+                    PositionInScene.positionAll3DMolMeshInsideAnother(newMesh, Vars.scene.getMeshByName("protein_box"));
+                    callBack(newMesh);  // Cloned so it won't change with new rep in future.
+                }
+
+                // Clean up.
+                modelData = [];
+            });
+        });
+    }
+}
+
+/**
+ * Loads the VRML string from the 3Dmol instance.
+ * @param  {Function=}  callBack    The callback function.
+ * @returns void
+ */
+function loadVRMLFrom3DMol(callBack: any): void {
+    // Make the VRML string from that model.
+    /** @type {string} */
+    vrmlStr = viewer.exportVRML();
+    callBack();
+}
+
+/**
+ * Load in values like coordinates and colors from the VRML string.
+ * @param  {string}    repName   The representative name. Like "Surface".
+ * @param  {Function}  callBack  A callback function.
+ * @returns void
+ */
+function loadValsFromVRML(repName: string, callBack: any): void {
+    // Clear previous model data.
+    modelData = [];
+
+    if (typeof(Worker) !== "undefined") {
+        // So web workers are supported...
+        // if (typeof(vrmlParserWebWorker) === "undefined") {
+        //     vrmlParserWebWorker = new Worker("VRMLParserWebWorker.js");
+        // }
+
+        vrmlParserWebWorker.onmessage = (event: any) => {
+            // Msg back from web worker
+            /** @type {Object<string,*>} */
+            let resp = event.data;
+
+            let chunk = resp["chunk"];
+
+            /** @type {string} */
+            let status = resp["status"];
+
+            if (chunk !== undefined) {
+                /** @type {number} */
+                let modelIdx: number = chunk[0];
+
+                /** @type {string} */
+                let dataType = chunk[1];
+
+                let vals = chunk[2];
+
+                if (modelData.length === modelIdx) {
+                    modelData.push({
+                        "coors": new Float32Array(0),
+                        "colors": new Float32Array(0),
+                        "trisIdxs": new Uint32Array(0),
+                    });
+                }
+
+                modelData[modelIdx][dataType] = typedArrayConcat(
+                    dataType === "trisIdxs" ? Uint32Array : Float32Array,
+                    [modelData[modelIdx][dataType], vals],
+                );
+            }
+
+            switch (status) {
+                case "more":
+                    // There's more data. Request it now.
+                    vrmlParserWebWorker.postMessage({
+                        "cmd": "sendDataChunk",
+                        "data": undefined,
+                    });
+                    break;
+                case "done":
+                    // No more data. Run the callback.
+                    // console.log(modelData);
+                    callBack();
+                    break;
+                default:
+                    console.log("Error here!");
+            }
+        };
+
+        debugger;
+        Note that the message below never seems to be posted. You could
+        always try this other web-based technique with multiple entry
+        points: https://github.com/Qwaz/webworker-with-typescript/tree/master/multiple-entry
+
+        // Send message to web worker.
+        vrmlParserWebWorker.postMessage({
+            "cmd": "start",
+            "data": vrmlStr,
+            "removeExtraPts": (repName === "Stick"),
+        });
+    } else {
+        // TODO: Throw proper error here.
+        // Sorry! No Web Worker support..
+        // modelData = VRMLParserWebWorker.loadValsFromVRML(vrmlStr);
+        // callBack();
+    }
+}
+
+/**
+ * Concatonates a list of typed arrays.
+ * @param  {*}        resultConstructor  The type of array. E.g., Uint8Array.
+ * @param  {Array<*>} listOfArrays       A list of typed arrays to
+ *                                       concatonate.
+ * @returns {*} The typed array.
+ */
+function typedArrayConcat(resultConstructor: any, listOfArrays: any[]): any {
+    // See http://2ality.com/2015/10/concatenating-typed-arrays.html
+    let totalLength = 0;
+
+    /** @type {number} */
+    let listOfArraysLen = listOfArrays.length;
+    for (let i = 0; i < listOfArraysLen; i++) {
+        /** @type {Array<*>} */
+        let arr = listOfArrays[i];
+        totalLength += arr.length;
+    }
+
+    let result = new resultConstructor(totalLength);
+    let offset = 0;
+    for (let i = 0; i < listOfArraysLen; i++) {
+        /** @type {Array<*>} */
+        let arr = listOfArrays[i];
+        result.set(arr, offset);
+        offset += arr.length;
+    }
+    return result;
+}
+
+/**
+ * Creates a babylonjs object from the values and adds it to the babylonjs
+ * scene.
+ * @returns {*} The new mesh from the 3dmoljs instance.
+ */
+export function importIntoBabylonScene(): any {
+    // The material to add to all meshes.
+    let mat = new BABYLON.StandardMaterial("Material", Vars.scene);
+    mat.diffuseColor = new BABYLON.Color3(1, 1, 1);
+    mat.emissiveColor = new BABYLON.Color3(0, 0, 0);
+    mat.specularColor = new BABYLON.Color3(0, 0, 0);
+    // mat.sideOrientation = BABYLON.Mesh.FRONTSIDE;
+    // mat.sideOrientation = BABYLON.Mesh.BACKSIDE;
+
+    let meshes = [];
+
+    /** @type {number} */
+    let len = modelData.length;
+
+    for (let modelIdx = 0; modelIdx < len; modelIdx++) {
+        let modelDatum = modelData[modelIdx];
+
+        // Calculate normals instead? It's not necessary. Doesn't chang over
+        // 3dmoljs calculated normals.
+        let norms: any[] = [];
+        BABYLON.VertexData.ComputeNormals(
+            modelDatum["coors"], modelDatum["trisIdxs"], norms,
+        );
+
+        // Compile all that into vertex data.
+        let vertexData = new BABYLON.VertexData();
+        vertexData["positions"] = modelDatum["coors"];  // In quotes because from webworker (external)
+        vertexData["indices"] = modelDatum["trisIdxs"];
+        vertexData["normals"] = norms;
+        vertexData["colors"] = modelDatum["colors"];
+
+        // Delete the old mesh if it exists.
+        // if (Vars.scene.getMeshByName("MeshFrom3DMol") !== null) {
+        //     Vars.scene.getMeshByName("MeshFrom3DMol").dispose();
+        // }
+
+        // Make the new mesh
+        let babylonMeshTmp = new BABYLON.Mesh("mesh_3dmol_tmp" + modelIdx, Vars.scene);
+        vertexData.applyToMesh(babylonMeshTmp);
+
+        // Add a material.
+        babylonMeshTmp.material = mat;
+        // babylonMeshTmp.showBoundingBox = true;
+
+        meshes.push(babylonMeshTmp);
+    }
+
+    let babylonMesh;
+    if (meshes.length > 0) {
+        // Merge all these meshes.
+        // https://doc.babylonjs.com/how_to/how_to_merge_meshes
+        babylonMesh = BABYLON.Mesh.MergeMeshes(meshes, true, true);  // dispose of source and allow 32 bit integers.
+        // babylonMesh = meshes[0];
+        babylonMesh.name = "MeshFrom3DMol" + Math.random().toString();
+        babylonMesh.id = babylonMesh.name;
+
+        // Work here
+        CommonLoader.setupMesh(
+            babylonMesh, babylonMesh.name, "Skip", 123456789,
+        );
+    }
+
+    return babylonMesh;
+}
+
+/**
+ * Rotate the molecular meshes.
+ * @param  {string} axis    The axis. "x", "y", or "z".
+ * @param  {number} amount  The amount. In radians, I think.
+ * @returns void
+ */
+export function updateMolRotation(axis: string, amount: number): void {
+    molRotation[axis] += amount;
+
+    // Update URL too.
+    UrlVars.setURL();
+}
+
+/**
+ * Sets the molRotation object externally. Does not actually rotate anything.
+ * @param  {number} x
+ * @param  {number} y
+ * @param  {number} z
+ * @returns void
+ */
+export function setMolRotation(x: number, y: number, z: number): void {
+    molRotation = new BABYLON.Vector3(x, y, z);
+}

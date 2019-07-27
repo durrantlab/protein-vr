@@ -20,18 +20,30 @@ interface IButtonWrapper {
 }
 
 export class ButtonWrapper {
+    /** @type {Function} */
     public clickFunc;
+
     public button: any;
+
+    /** @type {number} */
     public level: number;
+
+    /** @type {boolean} */
     private value: boolean;
+
     private textBlock: any;
+
+    /** @type {string} */
     private trueTxt: string;
+
+    /** @type {string} */
     private falseTxt: string;
+
     private containingMesh: any;
     private defaultMat: any;
     private greenMat: any;
     private yellowMat: any;
-    private redMat; any;
+    private redMat: any;
 
     /**
      * The constructor.
@@ -97,6 +109,10 @@ export class ButtonWrapper {
         }
     }
 
+    /**
+     * Updates the button color.
+     * @param color string
+     */
     public updateColor(color: string): void {
         switch (color) {
             case "default":
@@ -149,6 +165,7 @@ export class ButtonWrapper {
         Menu3D.clickSound.play();
 
         // Switch value.
+        /** @type {boolean} */
         this.value = !this.value;
 
         // Fire the user-defined trigger.
@@ -173,11 +190,26 @@ export class ButtonWrapper {
             this.falseTxt = txt;
         }
 
+        this.textBlock.text = this.wrap(this.textBlock.text, 25);
+
         this.button.content.dispose();
         this.button.content = this.textBlock;
     }
 
+    /**
+     * Wrap the text to keep it from getting too long.
+     * @param {stirng} s  The string to wrap.
+     * @param {number} w  The width.
+     * @returns {string} The wrapped text.
+     */
+    private wrap(s: string, w: number): string {
+        return s.replace(
+            new RegExp(`(?![^\\n]{1,${w}}$)([^\\n]{1,${w}})\\s`, "g"), "$1\n",
+        );
+    }
+
     private makeColorMats(): void {
+        /** @const {number} */
         const colorDelta = 0.1;
 
         this.defaultMat = this.button.mesh.material;

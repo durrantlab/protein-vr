@@ -3,6 +3,7 @@
 // import { jQuery } from "../jQuery";
 import * as OpenPopup from "../UI/OpenPopup";
 import * as Vars from "../Vars";
+import * as Lecturer from "../WebRTC/Lecturer";
 
 declare var jQuery;
 
@@ -49,6 +50,30 @@ function addRunModeButtons(): void {
         </button>
 
         <button
+          title="Share (Follow-the-Leader)"
+          id="follow-the-leader"
+          class="ui-button"
+          style="color:white;
+                 width:80px;
+                 right:20px;
+                 position:absolute;
+                 height:50px;
+                 bottom:140px;
+                 background-color:rgba(51,51,51,0.7);
+                 border:none;
+                 outline:none;
+                 cursor:pointer;">
+                 <svg version="1.2" baseProfile="tiny" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+	 x="0px" y="0px" width="48px" height="48px" viewBox="0 0 48 48" xml:space="preserve">
+<path fill="none" stroke="#FFFFFF" stroke-width="1.5" d="M35.4,4.6c-3.2,0-5.8,2.4-5.8,5.8l0,0c0,0.5,0.2,1.1,0.5,1.4l-13.4,7.8
+	c-1-1.4-2.6-1.8-4.1-1.8c-3.2,0-5.8,2.4-5.8,5.8l0,0c0,2.9,2.6,5.8,5.8,5.8l0,0c1.3,0,2.2-0.5,3.2-1.4l13.6,8.3
+	c-0.3,0.4-0.3,0.9-0.3,1.4c0,3.4,2.7,5.8,5.9,5.8l0,0c3.2,0,5.6-2.4,5.6-5.8l0,0c0-2.9-2.4-5.9-5.6-5.9l0,0c-1.7,0-3.2,1.1-4.4,2
+	l-13.1-7.3c0.5-0.9,0.7-2,0.7-2.9c0-0.5,0-1.4-0.2-2l13.3-7.3c1,0.9,2.5,1.5,4.1,1.5c3.2,0,5.9-2.5,5.9-5.4l0,0
+	C41.3,6.9,38.5,4.6,35.4,4.6L35.4,4.6L35.4,4.6z"/>
+</svg>
+        </button>
+
+        <button
           title="Click for help"
           id="help-button"
           class="ui-button"
@@ -57,7 +82,7 @@ function addRunModeButtons(): void {
                  right:20px;
                  position:absolute;
                  height:50px;
-                 bottom:140px;
+                 bottom:200px;
                  background-color:rgba(51,51,51,0.7);
                  border:none;
                  outline:none;
@@ -74,17 +99,28 @@ function addRunModeButtons(): void {
         </button>
     `);
 
+    /** @const {*} */
     const fullScreenButton = jQuery("#fullscreen-button");
+
     fullScreenButton.click(() => {
         Vars.engine.switchFullscreen(true);
         jQuery("#renderCanvas").focus();  // So keypress will work.
     });
 
+    /** @const {*} */
     const helpButton = jQuery("#help-button");
-    helpButton.click(() => {
-        // window.open("help/index.html", "_blank");
-        OpenPopup.openUrlModal("Help", "help/index.html");
 
+    helpButton.click(() => {
+        // window.open("pages/index.html", "_blank");
+        OpenPopup.openUrlModal("Help", "pages/index.html");
+
+    });
+
+    /** @const {*} */
+    const shareButton = jQuery("#follow-the-leader");
+
+    shareButton.click(() => {
+        Lecturer.startBroadcast();
     });
 
     // Also make VR button visible.

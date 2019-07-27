@@ -1,7 +1,7 @@
 # Make js files
 echo "Compiling ts..."
-tsc --target ES5 --alwaysStrict --module amd js/Start.ts
-tsc --target ES5 --alwaysStrict --module amd js/Scene/LoadAndSetup.ts
+tsc --target ES2015 --alwaysStrict --module amd js/Start.ts
+tsc --target ES2015 --alwaysStrict --module amd js/Scene/LoadAndSetup.ts
 
 # Combine into a single js.
 r.js -o build.js

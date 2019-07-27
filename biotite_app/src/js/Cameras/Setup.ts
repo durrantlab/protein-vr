@@ -14,7 +14,7 @@ export function setup() {
     )[0];
 
     // If true, sets up device orientation camera. Otherwise, just use one in
-    // babylonjs file.
+    // babylonjs file. A toggle for debugging.
     if (true) {
         // Create a device orientation camera that matches the one loaded from
         // the babylon file.
@@ -24,7 +24,7 @@ export function setup() {
             Vars.scene,
             true,
         );
-        DevOrCamera.rotation = cameraFromBabylonFile.rotation;
+        DevOrCamera.rotation = cameraFromBabylonFile.rotation.clone();
         // DevOrCamera.resetToCurrentRotation();
 
         // For debugging.
@@ -39,7 +39,6 @@ export function setup() {
         Vars.scene.activeCamera.rotationQuaternion = BABYLON.Quaternion.FromEulerVector(
             cameraFromBabylonFile.rotation,
         );
-
     } else {
         Vars.scene.activeCamera = cameraFromBabylonFile;
     }

@@ -23,24 +23,52 @@ export let canvas;
 export let engine;
 export let scene;
 export let vrHelper;
+
+/** @type {number} */
 export let cameraHeight;
 
 // Also some constants
+/** @const {number} */
 export const TRANSPORT_DURATION = 11;
+
+/** @const {number} */
 export const MAX_DIST_TO_MOL_ON_TELEPORT = 1.5;
+
+/** @const {number} */
 export const MIN_DIST_TO_MOL_ON_TELEPORT = 1.0;
+
+/** @const {number} */
 export const MAX_VERTS_PER_SUBMESH = 2000;  // This is kind of an arbitrary number.
+
+/** @const {number} */
 export const BUTTON_SPHERE_RADIUS = 1.2;  // the radius of the spheres around buttons used to detect clicks.
+
+/** @const {number} */
 export const MENU_RADIUS = 2.5;  // 3 is comfortable, but doesn't work in crowded environments.
+
+/** @const {number} */
 export const MENU_MARGIN = 0.05;  // 0.15;  // 0.1;
+
+/** @const {number} */
 export const PAD_MOVE_SPEED = 0.01;
+
+/** @const {number} */
 export const VR_CONTROLLER_TRIGGER_DELAY_TIME = 500;  // time to wait between triggers.
+
+/** @const {number} */
 export const VR_CONTROLLER_PAD_ROTATION_DELAY_TIME = 750;  // time to wait between triggers.
+
+/** @const {number} */
 export const VR_CONTROLLER_PAD_RATIO_OF_MIDDLE_FOR_CAMERA_RESET = 0.1;
+
+/** @const {number} */
 export const MAX_TELEPORT_DIST = 15;
+
+/** @const {number} */
 export const TRANSPARENT_FLOOR_ALPHA = 0.05;  // 0.02;
 
 // IOS doesn't support a lot of features!
+/** @const {*} */
 export const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window["MSStream"];
 
 // Variables that can change.
@@ -77,12 +105,16 @@ export function determineCameraHeightFromActiveCamera(): void {
     // actually used anywhere...
     if (cameraHeight === undefined) {
         // Calculate the camera height from it's position.
+        /** @const {*} */
         const ray = new BABYLON.Ray(
             scene.activeCamera.position, new BABYLON.Vector3(0, -1, 0), 50,
         );
+
+        /** @const {*} */
         const pickingInfo = scene.pickWithRay(ray, (mesh) => {
             return (mesh.name === "ground");
         });
+
         cameraHeight = pickingInfo.distance;
     }
 }

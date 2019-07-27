@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Mirror Sharing</title>
+
+    <meta name="description" content="Protein-VR: Follow-the-Leader Sharing">
+    <meta name="author" content="Jacob Durrant">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+  </head>
+  <body>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- <h3>
+                        Follow-the-Leader Sharing
+                    </h3> -->
+                    <p>
+                        Others can use the URL below to view the ProteinVR scene through your eyes:
+                    </p>
+                    <form role="form">
+                        <div class="form-group">
+
+                            <!-- <label for="followTheLeaderURL">
+                                Follow-the-Leader URL
+                            </label> -->
+                            <input type="text" class="form-control" id="followTheLeaderURL" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    <script src="scripts/jquery.min.js"></script>
+    <script src="scripts/bootstrap.min.js"></script>
+    <script src="scripts/scripts.js"></script>
+    <script>
+        jQuery(document).ready(() => {
+            let url = window.location.href.replace("pages/follow-the-leader.html", "");
+
+            // Let's try to shorten it. This will only work it's being hosted
+            // on one of the durrantlab websites.
+            // alert("Your shortener isn't accounting for get parameters. Need to get that in here.");
+            // console.log("https://durrantlab.pitt.edu/shrt/short.php?url=" + url);
+            jQuery.ajax("https://durrantlab.pitt.edu/shrt/short.php?url=" + url)
+            .done(function(txt) {
+                jQuery("#followTheLeaderURL").val(txt);
+            })
+            .fail(function(txt) {
+                jQuery("#followTheLeaderURL").val(url);
+            });
+            // .always(function() {
+            //     alert( "complete" );
+            // });
+
+            // jQuery("#followTheLeaderURL").val(
+
+            // );
+        });
+    </script>
+  </body>
+</html>
