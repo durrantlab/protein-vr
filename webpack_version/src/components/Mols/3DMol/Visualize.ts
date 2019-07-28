@@ -8,7 +8,7 @@ import * as Vars from "../../Vars";
 import * as PositionInScene from "./PositionInScene";
 import * as VRML from "./VRML";
 
-declare var $3Dmol: any;
+// declare var $3Dmol: any;
 
 // A place to keep track of all the styles. List of [key, vals]
 // let styles: any[] = [];

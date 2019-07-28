@@ -6,17 +6,23 @@ import * as UrlVars from "../../UrlVars";
 import * as Vars from "../../Vars";
 import * as CommonLoader from "../CommonLoader";
 import * as PositionInScene from "./PositionInScene";
+// import * as $3Dmol from "../../../../node_modules/3dmol/3Dmol/3dmol";
+
+declare var $3Dmol;
+
 // import vrmlParserWebWorker from "./VRMLParser.worker.js";
 // import VRMLParser from "worker-loader!./VRMLParser.worker.ts";
 
-import VRMLParser = require("worker-loader?name=dist/[name].js!./VRMLParser.worker");
+// import VRMLParser = require("worker-loader?name=dist/[name].js!./VRMLParser.worker");
 // import * as VRMLParser from "worker-loader?name=dist/[name].js!./VRMLParser.worker";
 
 // import * as VRMLParserWebWorker from "./VRMLParser.worker";  // So you can access when no webworker support.
 
 declare var BABYLON: any;
 declare var jQuery: any;
-declare var $3Dmol: any;
+declare var __webpack_hash__;
+
+// declare var $3Dmol: any;
 
 export interface IVRMLModel {
     coors: any;  // Float32Array
@@ -38,7 +44,7 @@ let config: any;
 /** @type {string} */
 let vrmlStr: string;
 
-let vrmlParserWebWorker = new VRMLParser();
+let vrmlParserWebWorker = new Worker("vrmlWebWorker." + __webpack_hash__ + ".js")
 
 let molTxt = "";
 let molTxtType = "pdb";
@@ -290,6 +296,7 @@ function loadValsFromVRML(repName: string, callBack: any): void {
             switch (status) {
                 case "more":
                     // There's more data. Request it now.
+                    // debugger;
                     vrmlParserWebWorker.postMessage({
                         "cmd": "sendDataChunk",
                         "data": undefined,
@@ -305,12 +312,8 @@ function loadValsFromVRML(repName: string, callBack: any): void {
             }
         };
 
-        debugger;
-        Note that the message below never seems to be posted. You could
-        always try this other web-based technique with multiple entry
-        points: https://github.com/Qwaz/webworker-with-typescript/tree/master/multiple-entry
-
         // Send message to web worker.
+        // debugger;
         vrmlParserWebWorker.postMessage({
             "cmd": "start",
             "data": vrmlStr,

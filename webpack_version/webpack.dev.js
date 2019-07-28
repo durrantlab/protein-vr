@@ -7,12 +7,10 @@ module.exports = merge(common, {
     devtool: 'inline-source-map',
     devServer: {
         contentBase: './dist',
-        hot: true
+        hot: false,  // This breaks webworkers if true.
+        liveReload: true
     },
     plugins: [
         new webpackDashboard(),
-    ],
-    output: {
-        filename: '[name].[hash].js'
-    }
+    ]
 });

@@ -4,10 +4,11 @@ const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 var DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
 const webpack = require('webpack');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
+var HtmlWebpackExcludeAssetsPlugin = require('html-webpack-exclude-assets-plugin');
 
 module.exports = {
     entry: {
-        // vrmlWebWorker: './src/components/Mols/3DMol/VRMLParser.worker.ts',
+        vrmlWebWorker: './src/components/Mols/3DMol/VRMLParser.worker.ts',
         app: './src/index.ts'
     },
     plugins: [
@@ -16,20 +17,25 @@ module.exports = {
             // title: 'Test Title',
             template: path.join(__dirname, 'src/index.html'),
             // favicon: ???
-            minify: true
+            minify: true,
+            excludeAssets: [/vrmlWebWorker.*.js/]
         }),
+        new HtmlWebpackExcludeAssetsPlugin(),
         new DuplicatePackageCheckerPlugin(),
         new webpack.ProvidePlugin({
             // For plugins that are not webpack-compatible.
             $: 'jquery',
             jQuery: 'jquery',
-            "window.jQuery": "jquery"
+            "window.jQuery": "jquery",
+            $3Dmol: '3dmol',
+            "window.$3Dmol": '3dmol'
         }),
         new CopyWebpackPlugin([
             {from: 'src/babylon_scenes', to: 'babylon_scenes'},
             {from: 'src/js', to: 'js'},
             {from: 'src/components/UI/OpenPopup/pages', to: 'pages'}
-        ])
+        ]),
+        new webpack.ExtendedAPIPlugin()  // Gives hash as __webpack_hash__
     ],
     module: {
         rules: [
@@ -86,21 +92,25 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js']
     },
     output: {
-        chunkFilename: '[name].[contenthash].js',
+        filename: "[name].[hash].js",
+        // chunkFilename: '[name].[hash].js',
         path: path.resolve(__dirname, 'dist')
     },
     optimization: {
-        moduleIds: 'hashed',
-        splitChunks: {
-            chunks: 'all',
-            cacheGroups: {
-                vendor: {
-                    test: /[\\/]node_modules[\\/]/,
-                    name: 'vendors',
-                    chunks: 'all'
-                }
-            }
-        },
-        runtimeChunk: 'single'
+        // Below breaks webworker, because calls window from within it.
+        // Really, we need separrate compiles for webworker and main.
+
+        // moduleIds: 'hashed',
+        // splitChunks: {
+        //     chunks: 'all',
+        //     cacheGroups: {
+        //         vendor: {
+        //             test: /[\\/]node_modules[\\/]/,
+        //             name: 'vendors',
+        //             chunks: 'all'
+        //         }
+        //     }
+        // },
+        // runtimeChunk: 'single'
     }
 };

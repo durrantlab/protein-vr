@@ -9,7 +9,7 @@
         "allowJs": true
     },
     "include": [
-        "./src/webworker.d.ts", "./src/index.d.ts"
+        "./src/index.d.ts"
     ],
     "exclude": [
         "node_modules"
