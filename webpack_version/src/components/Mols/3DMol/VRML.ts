@@ -20,7 +20,7 @@ declare var $3Dmol;
 
 declare var BABYLON: any;
 declare var jQuery: any;
-declare var __webpack_hash__;
+// declare var __webpack_hash__;
 
 // declare var $3Dmol: any;
 
@@ -44,7 +44,8 @@ let config: any;
 /** @type {string} */
 let vrmlStr: string;
 
-let vrmlParserWebWorker = new Worker("vrmlWebWorker." + __webpack_hash__ + ".js")
+// let vrmlParserWebWorker = new Worker("vrmlWebWorker." + __webpack_hash__ + ".js")
+let vrmlParserWebWorker = new Worker("vrmlWebWorker.js")
 
 let molTxt = "";
 let molTxtType = "pdb";

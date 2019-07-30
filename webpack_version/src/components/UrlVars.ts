@@ -2,6 +2,9 @@ import * as ThreeDMol from "./Mols/3DMol/ThreeDMol";
 import * as Visualize from "./Mols/3DMol/Visualize";
 import * as VRML from "./Mols/3DMol/VRML";
 import * as Student from "./WebRTC/Student";
+import * as Vars from "./Vars";
+
+declare var jQuery: any;
 
 let stylesQueue: any[] = [];
 let webrtc: any;
@@ -101,7 +104,6 @@ export function setURL(): void {
             i++;
         }
     }
-    // styles.reverse();  // order doens't matter anyway.
     params = params.concat(styles);
 
     // Update URL
@@ -128,6 +130,17 @@ export function readUrlParams(): void {
     webrtc = params["webrtc"];
     if (webrtc !== undefined) {
         Student.startFollowing(webrtc);
+
+        // Prevent the student from being able to change the view or anything.
+        Vars.scene.activeCamera.inputs.clear();
+
+        // Also hide some of the buttons.
+        jQuery("#help-button").hide();
+        jQuery("#follow-the-leader").hide();
+        jQuery("#babylonVRiconbtn").hide();
+        let fullscreenButton = jQuery("#fullscreen-button");
+        let top = +fullscreenButton.css("bottom").replace(/px/g, "");
+        fullscreenButton.css("bottom", (top - 60).toString() + "px");
     }
 
     // Update the mesh rotations
@@ -173,8 +186,6 @@ export function readUrlParams(): void {
         stylesQueue.push([["Protein", "All"], "Cartoon", "Spectrum"]);
         stylesQueue.push([["Ligand", "All"], "Stick", "Element"]);
     }
-
-    // stylesQueue.reverse();  // order doens't matter anyway.
 }
 
 /**

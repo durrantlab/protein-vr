@@ -444,6 +444,8 @@ BABYLON.Scene.prototype.activeCamera.inputs.attached.deviceOrientation._beta;
 BABYLON.Scene.prototype.activeCamera.inputs.attached.deviceOrientation._gamma;
 BABYLON.Scene.prototype.activeCamera.resetToCurrentRotation = function() {};
 BABYLON.Scene.prototype.activeCamera.setTarget = function(a) {};
+BABYLON.Scene.prototype.activeCamera.inputs;
+BABYLON.Scene.prototype.activeCamera.inputs.clear = function() {};
 BABYLON.Scene.prototype.lights = function() {};
 BABYLON.Scene.prototype.lights.name = function() {};
 BABYLON.Scene.prototype.lights.dispose = function() {};
@@ -664,4 +666,3 @@ var MSStream;
 var Peer = function(a,b) {};
 
 // var webpackJsonp;
-

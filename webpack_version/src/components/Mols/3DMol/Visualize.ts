@@ -71,8 +71,6 @@ selKeyWordTo3DMolSel["Ligand Context"] = {
     },
 };
 
-console.log(JSON.stringify(selKeyWordTo3DMolSel["Ligand Context"]));
-
 let colorSchemeKeyWordTo3DMol = {
     "Amino Acid": {"colorscheme": "amino"},
     "Blue": {"color": "blue"},

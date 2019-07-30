@@ -1,13 +1,12 @@
 const webpack = require('webpack');
 const merge = require('webpack-merge');
-const common = require('./webpack.common.js');
+const webworker = require('./webpack.webworker.js');
+const notWebworker = require('./webpack.not-webworker.js');
+const path = require('path');
 const ClosurePlugin = require('closure-webpack-plugin');
-
 // const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-// const ClosurePlugin = require('closure-webpack-plugin');
-
-module.exports = merge(common, {
+let forProd = {
     mode: 'production',
     plugins: [
         // new MiniCssExtractPlugin({
@@ -22,23 +21,20 @@ module.exports = merge(common, {
     optimization: {
         // sideEffects: false,
         // concatenateModules: false,
-        // minimizer: [
-        //     new ClosurePlugin({
-        //         mode: 'AGGRESSIVE_BUNDLE', // 'STANDARD',
-        //         platform: "java"
-        //     }, {
-        //         // compiler flags here
-        //         //
-        //         // for debuging help, try these:
-        //         //
-        //         // formatting: 'PRETTY_PRINT'
-        //         // debug: true,
-        //         // renaming: false
-        //         // compilation_level: 'ADVANCED',
-        //         formatting: 'PRETTY_PRINT',
-        //         //
-        //     })
-        // ],
+        minimizer: [
+            new ClosurePlugin({
+                mode: 'STANDARD', // 'AGGRESSIVE_BUNDLE', // 'STANDARD',
+                platform: "java"
+            }, {
+                // debug: true,
+                // renaming: false
+                externs: [
+                    path.resolve(__dirname, '../closure/custom_extern.js')
+                ],
+                compilation_level: 'ADVANCED',
+                // formatting: 'PRETTY_PRINT',
+            })
+        ],
 
         // minimize: false,
         // minimizer: [
@@ -82,4 +78,9 @@ module.exports = merge(common, {
             },
         },
     }
-});
+}
+
+let webworkerFinal = merge(webworker, forProd);
+let nonWebworkerFinal = merge(notWebworker, forProd);
+
+module.exports = [webworkerFinal, nonWebworkerFinal];

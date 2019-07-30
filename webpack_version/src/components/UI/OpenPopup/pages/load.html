@@ -42,11 +42,18 @@
     <script src="scripts/scripts.js"></script>
     <script>
         jQuery(document).ready(() => {
-            jQuery("#submit").click(() => {
+            var submitButton = jQuery("#submit");
+            submitButton.click(() => {
                 let curUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                 let newUrl = curUrl.slice(0, curUrl.length - 15) + "?src=" + jQuery("#urlOrPDB").val();
                 top.location.href = newUrl;
             });
+            jQuery("body").keypress((e) => {
+                if (e.charCode === 13) {
+                    submitButton.trigger("click");
+                }
+            });
+            jQuery("#urlOrPDB").focus();
         });
     </script>
   </body>

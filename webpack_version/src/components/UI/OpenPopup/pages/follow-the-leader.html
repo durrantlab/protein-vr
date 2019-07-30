@@ -15,7 +15,6 @@
 
   </head>
   <body>
-
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
@@ -47,22 +46,18 @@
 
             // Let's try to shorten it. This will only work it's being hosted
             // on one of the durrantlab websites.
-            // alert("Your shortener isn't accounting for get parameters. Need to get that in here.");
-            // console.log("https://durrantlab.pitt.edu/shrt/short.php?url=" + url);
+            var followTheLeaderURLVal = jQuery("#followTheLeaderURL");
             jQuery.ajax("https://durrantlab.pitt.edu/shrt/short.php?url=" + url)
             .done(function(txt) {
-                jQuery("#followTheLeaderURL").val(txt);
+                followTheLeaderURLVal.val(txt);
+                followTheLeaderURLVal.focus();
+                followTheLeaderURLVal.select();
             })
             .fail(function(txt) {
-                jQuery("#followTheLeaderURL").val(url);
+                followTheLeaderURLVal.val(url);
+                followTheLeaderURLVal.focus();
+                followTheLeaderURLVal.select();
             });
-            // .always(function() {
-            //     alert( "complete" );
-            // });
-
-            // jQuery("#followTheLeaderURL").val(
-
-            // );
         });
     </script>
   </body>

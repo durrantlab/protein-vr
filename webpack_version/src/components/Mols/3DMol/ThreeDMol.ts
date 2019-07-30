@@ -9,13 +9,15 @@ import * as Vars from "../../Vars";
 import * as CommonLoader from "../CommonLoader";
 import * as Visualize from "./Visualize";
 import * as VRML from "./VRML";
-import * as NanoKidFile from "./nanokid.sdf"
+
+// Unfortunately, closure compiler breaks this. So hard code.
+// import * as NanoKidFile from "./nanokid.sdf"
 
 declare var jQuery: any;
 
 export let atomicInfo = {};
 
-export let modelUrl = NanoKidFile;
+export let modelUrl = "nanokid.sdf";  // NanoKidFile;
 
 /**
  * Setter for modelUrl.
@@ -23,7 +25,6 @@ export let modelUrl = NanoKidFile;
  * @returns void
  */
 export function setModelUrl(url: string): void { modelUrl = url; }
-
 
 /**
  * Load in the extra molecule meshes.
@@ -77,7 +78,7 @@ function after3DMolJsLoaded(sceneInfoData: any): void {
 
             // If it's nanokid, open a popup to let them specify a url or
             // pdbid.
-            if (modelUrl === NanoKidFile) {
+            if (modelUrl === "nanokid.sdf") {
                 setTimeout(() => {
                     // Give them some time to admire nanokid... :)
                     OpenPopup.openUrlModal("Load Molecule", "pages/load.html");
