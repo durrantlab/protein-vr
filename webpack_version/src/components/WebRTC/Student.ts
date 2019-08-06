@@ -57,6 +57,12 @@ let stud;
 let targetCameraPosition: any = null;
 let targetCameraRotationQuaternion: any = null;
 
+/**
+ * Start following the leader. Receives information from remote user re.
+ * camera position and rotation, and mirrors that on the present camera.
+ * @param  {string} id  The remote webrtc id.
+ * @returns void
+ */
 export function startFollowing(id: string): void {
     targetCameraPosition = new Float32Array(CommonCamera.getCameraPosition().asArray());
     targetCameraRotationQuaternion = new Float32Array(CommonCamera.getCameraRotationQuaternion().asArray());
@@ -69,13 +75,6 @@ export function startFollowing(id: string): void {
             case "locrot":
                 targetCameraPosition = new Float32Array([val[0], val[1], val[2]]);
                 targetCameraRotationQuaternion = new Float32Array([val[3], val[4], val[5], val[6]]);
-
-                // CommonCamera.setCameraPosition(
-                //     new BABYLON.Vector3(val[0], val[1], val[2]),
-                // );
-                // CommonCamera.setCameraRotationQuaternion(
-                    // new BABYLON.Quaternion(val[3], val[4], val[5], val[6]),
-                // );
                 break;
             default:
                 break;
@@ -88,8 +87,7 @@ export function startFollowing(id: string): void {
         let cameraLoc = new Float32Array(CommonCamera.getCameraPosition().asArray());
         let newPos = moveVecTowards(
             cameraLoc,
-            targetCameraPosition,
-            2.0
+            targetCameraPosition
         );
         let newPosAsVec = BABYLON.Vector3.FromArray(newPos);
         CommonCamera.setCameraPosition(newPosAsVec);
@@ -97,8 +95,7 @@ export function startFollowing(id: string): void {
         let cameraRotQuat = new Float32Array(CommonCamera.getCameraRotationQuaternion().asArray());
         let newRot = moveVecTowards(
             cameraRotQuat,
-            targetCameraRotationQuaternion,
-            0.261799  // 15 degrees
+            targetCameraRotationQuaternion
         )
         let newRotAsVec = BABYLON.Quaternion.FromArray(newRot);
         CommonCamera.setCameraRotationQuaternion(newRotAsVec);
@@ -113,7 +110,13 @@ export function startFollowing(id: string): void {
     });
 }
 
-function moveVecTowards(curVec: any, targetVec: any, closeVal: number) {
+/**
+ * Moves a vector towards the target vector. Gets applied to both the camera
+ * position and rotation.
+ * @param  {any} curVec     The current vector.
+ * @param  {any} targetVec  The target vector.
+ */
+function moveVecTowards(curVec: any, targetVec: any) {
     let numEntries = curVec.length;
 
     // Now get the distance between curVec and this newPos.
@@ -128,84 +131,6 @@ function moveVecTowards(curVec: any, targetVec: any, closeVal: number) {
 
     // Scale the delta and add it to the curVec. That's the newPos.
     for (let i = 0; i < numEntries; i++) { newPos[i] =  curVec[i] + animRatio * fac * deltaPos[i]; }
-
-    return newPos;
-}
-
-
-function moveVecTowardsOld2(curVec: any, targetVec: any, closeVal: number) {
-    let numEntries = curVec.length;
-
-    // A variable taht will contain the new position
-    let newPos = new Float32Array(numEntries);
-
-    // Now get the distance between curVec and this newPos.
-    let deltaPos = new Float32Array(numEntries);
-    for (let i = 0; i < numEntries; i++) { deltaPos[i] = targetVec[i] - curVec[i]; }
-
-    // Get the length of that vector (current to newPos/midpoint).
-    let lenVec = 0
-    for (let i = 0; i < numEntries; i++) { lenVec += deltaPos[i] * deltaPos[i]; }
-    lenVec = Math.sqrt(lenVec);
-
-    // Move faster when far away.
-    let animRatio = Vars.scene.getAnimationRatio();
-    let speed = animRatio * 0.98;  // Fast
-    if (lenVec < closeVal) {
-        // Slow when you get faster.
-        speed = 0.99;
-    }
-
-    // Start by guessing that the new point is half way between here and the
-    // target.
-    let speed2 = animRatio - speed;
-    for (let i = 0; i < numEntries; i++) { newPos[i] = speed * curVec[i] + speed2 * targetVec[i]; }
-
-
-    // if (lenVec === 0) {
-    //     // Already there. So skip.
-    //     return curVec;
-    // }
-
-    // if (lenVec > closeDist) {
-    //     // Too far away... it would be too big a jump. Move towards thew
-    //     // target just a bit.
-    //     let animRatio = Vars.scene.getAnimationRatio();
-    //     for (let i = 0; i < numEntries; i++) {
-    //         newPos[i] = curVec[i] + speed * animRatio * deltaPos[i] / lenVec;
-    //     }
-    // }
-
-    return newPos;
-}
-
-function moveVecTowardsOld(curVec: any, targetVec: any, speed: number, closeDist: number) {
-    let numEntries = curVec.length;
-    let deltaPos = new Float32Array(numEntries);
-    for (let i = 0; i < numEntries; i++) {
-        deltaPos[i] = targetVec[i] - curVec[i];
-    }
-
-    let lenVec = 0
-    for (let i = 0; i < numEntries; i++) {
-        lenVec += deltaPos[i] * deltaPos[i];
-    }
-    lenVec = Math.sqrt(lenVec);
-
-    if (lenVec === 0) {
-        return curVec;
-    }
-    if (lenVec < closeDist) {
-        // You're so close. Just set it to the final position.
-        return targetVec;
-    }
-
-    // Move towards thew target just a bit.
-    let newPos = new Float32Array(numEntries);
-    let animRatio = Vars.scene.getAnimationRatio();
-    for (let i = 0; i < numEntries; i++) {
-        newPos[i] = curVec[i] + speed * animRatio * deltaPos[i] / lenVec;
-    }
 
     return newPos;
 }

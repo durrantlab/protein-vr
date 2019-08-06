@@ -1,5 +1,4 @@
 import * as Shadows from "../Mols/Shadows";
-// import * as VoiceCommands from "../Navigation/VoiceCommands";
 import * as Vars from "../Vars";
 
 declare var BABYLON: any;
@@ -235,10 +234,6 @@ class RemoveSurfaces {
             // main menu, but oh well.
             let surfaces = Vars.scene.getMeshByName("surfaces.wrl");
             removeMeshEntirely(surfaces);
-
-            // Failed attempty below, but perhaps worth revisiting in the future.
-            // VoiceCommands.showOrHideModel("", "surface", false);
-            // VoiceCommands.interpretHideShowCommands(["surface"], true);
             return true;
         };
 

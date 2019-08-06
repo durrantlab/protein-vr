@@ -1,3 +1,5 @@
+// VOICE COMMANDS CURRENTLY DEPRECIATED. BUT PERHAPS IN A FUTURE RELEASE...
+
 // import * as jQuery from "../jQuery";
 import * as Optimizations from "../Scene/Optimizations";
 import * as Vars from "../Vars";

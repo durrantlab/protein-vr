@@ -1,28 +1,15 @@
 // An module to manage VRML data obtained from 3Dmol.js. Assumes the 3Dmol.js
 // javascript file is already loaded.
 
-// import { setMoleculeNameInfos } from "../../Navigation/VoiceCommands";
 import * as UrlVars from "../../UrlVars";
 import * as Vars from "../../Vars";
 import * as CommonLoader from "../CommonLoader";
 import * as PositionInScene from "./PositionInScene";
-// import * as $3Dmol from "../../../../node_modules/3dmol/3Dmol/3dmol";
 
 declare var $3Dmol;
 
-// import vrmlParserWebWorker from "./VRMLParser.worker.js";
-// import VRMLParser from "worker-loader!./VRMLParser.worker.ts";
-
-// import VRMLParser = require("worker-loader?name=dist/[name].js!./VRMLParser.worker");
-// import * as VRMLParser from "worker-loader?name=dist/[name].js!./VRMLParser.worker";
-
-// import * as VRMLParserWebWorker from "./VRMLParser.worker";  // So you can access when no webworker support.
-
 declare var BABYLON: any;
 declare var jQuery: any;
-// declare var __webpack_hash__;
-
-// declare var $3Dmol: any;
 
 export interface IVRMLModel {
     coors: any;  // Float32Array
@@ -88,7 +75,11 @@ function addDiv(): void {
         style="${extraStyle}"></div>`);
 }
 
-export function resetAll() {
+/**
+ * Resets the 3Dmol.js visualization.
+ * @returns void
+ */
+export function resetAll(): void {
     if (hasActiveSurface) {
         hasActiveSurface = false;
 
@@ -106,7 +97,7 @@ export function resetAll() {
 
 /**
  * Load a file into the 3dmol object.
- * @param  {string}     url     The url.
+ * @param  {string}   url       The url.
  * @param  {Function} callBack  A callback function. The 3DMoljs molecule
  *                              object is the parameter.
  * @returns void

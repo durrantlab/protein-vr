@@ -5,8 +5,11 @@ declare var BABYLON: any;
 
 export let cameraFromBabylonFile: any;
 
-// Runs after the babylon scene is loaded.
-export function setup() {
+/**
+ * This function runs after the babylon scene is loaded.
+ * @returns void
+ */
+export function setup(): void {
     // You need to make the camera from the babylon file active. First, get
     // the babylon camera.
     cameraFromBabylonFile = Vars.scene.cameras.filter(

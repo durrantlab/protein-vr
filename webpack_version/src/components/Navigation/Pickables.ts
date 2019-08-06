@@ -91,7 +91,7 @@ export function checkIfMeshPickable(mesh: any): boolean {
 
 /**
  * Get the category of the currently selected mesh.
- * @returns *
+ * @returns number The category.
  */
 export function getCategoryOfCurMesh(): PickableCategory {
     if (curPickedMesh === undefined) {

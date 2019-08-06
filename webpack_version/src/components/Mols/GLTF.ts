@@ -1,6 +1,5 @@
 // Functions from loading molecules in GLTF format into the scene.
 
-// import * as VRVoiceCommands from "../Navigation/VoiceCommands";
 import * as LoadingScreens from "../UI/LoadingScreens";
 import * as Vars from "../Vars";
 import * as CommonLoader from "./CommonLoader";

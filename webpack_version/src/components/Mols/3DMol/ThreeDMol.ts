@@ -32,18 +32,7 @@ export function setModelUrl(url: string): void { modelUrl = url; }
  * @returns void
  */
 export function setup(sceneInfoData: any): void {
-    // Load the 3DMoljs iframe.
-    // try {
-    //     jQuery.getScript(
-    //         // "https://3Dmol.csb.pitt.edu/build/3Dmol-min.js",
-    //         "https://3Dmol.csb.pitt.edu/build/3Dmol.js",
-    //         (data: any, textStatus: any, jqxhr: any) => {
-    //             after3DMolJsLoaded(sceneInfoData);
-    //         },
-    //     );
-    // } catch (err) {
-        after3DMolJsLoaded(sceneInfoData);
-    // }
+    after3DMolJsLoaded(sceneInfoData);
 }
 
 /**

@@ -157,8 +157,8 @@ export function positionAll3DMolMeshInsideAnother(babylonMesh: any, otherBabylon
 
 /**
  * How much to move the mesh to position it on the ground.
- * @param  {*} biggestMolMesh The biggest molecular mesh.
- * @param  {Object} targetBox      The box within which to position the mesh.
+ * @param  {*} biggestMolMesh  The biggest molecular mesh.
+ * @param  {Object} targetBox  The box within which to position the mesh.
  * @returns number  How much to move along the Y axis.
  */
 function moveMolMeshesToGround(biggestMolMesh: any, targetBox: any): number {

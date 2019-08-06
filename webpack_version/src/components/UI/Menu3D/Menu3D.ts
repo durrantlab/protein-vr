@@ -1,6 +1,5 @@
 import * as CommonCamera from "../../Cameras/CommonCamera";
 import * as VRPoints from "../../Navigation/Points";
-// import * as VRVoiceCommands from "../../Navigation/VoiceCommands";
 import * as Vars from "../../Vars";
 import * as Button from "./Button";
 import * as Rotations from "./Rotations";
@@ -92,12 +91,6 @@ export function setup(data?: any): void {
  * @returns void
  */
 function setupMainMenu(): void {
-    // Get the descriptions
-    // VRVoiceCommands.setMoleculeNameInfos(data);
-
-    // Flatten the menu data.
-    // menuInfFlat = groupMenuInfByLevel();
-
     // Here would also be a good place to add additional buttons such as voice
     // dictation. See setupAllSubMenuNavButtons for how this was done
     // previously.
@@ -105,43 +98,7 @@ function setupMainMenu(): void {
 
     commonMenuAnchor = new BABYLON.TransformNode(""); // this can be a mesh, too
 
-    // createPanelIfNeeded(1);
     createPanelSixteenButtons();
-
-    // for (let key in VRVoiceCommands.moleculeNameInfos) {
-    //     if (VRVoiceCommands.moleculeNameInfos.hasOwnProperty(key)) {
-    //         let inf = VRVoiceCommands.moleculeNameInfos[key];
-    //         let desc = inf.description;
-
-    //         allButtons.push(
-    //             new ButtonWrapper({
-    //                 clickFunc: (buttonWrapper) => {
-    //                     VRVoiceCommands.showOrHideModel(
-    //                         inf.modelName,
-    //                         inf.representation,
-    //                         !buttonWrapper.value,
-    //                     );
-
-    //                     // For reasons I don't understand, the radius on this
-    //                     // cylinder (set below) doesn't take. Put it here to
-    //                     // too make sure.
-    //                     // cylinderPanelMainMenu.radius = Vars.MENU_RADIUS;
-    //                     // cylinderPanelMainMenu.margin = Vars.MENU_MARGIN;
-    //                 },
-    //                 default: false,
-    //                 falseTxt: desc + "\n(Hide)",
-    //                 initFunc: (buttonWrapper) => {
-    //                     buttonWrapper.isVisible(false);  // Buttons start off hidden.
-    //                 },
-    //                 name: "menu-visible-button-" + inf.modelName.replace(/ /g, "").replace(/\n/g, ""),
-    //                 panel: cylinderPanelMainMenu,
-    //                 trueTxt: desc + "\n(Show)",
-    //             }),
-    //         );
-    //         // window.but = but;
-    //     }
-    // }
-    // setupAllSubMenuNavButtons(cylinderPanelMainMenu, data);
 }
 
 /**
@@ -199,6 +156,13 @@ function createPanelSixteenButtons(): void {
     panel.blockLayout = false;
 }
 
+/**
+ * Applies a user-provided function to all levels of the menu. For example,
+ * adds "Back" and "Close Menu" buttons to all sub menus.
+ * @param  {Function(Object, Array<string>)} funcToApply  The function to
+ * apply.
+ * @returns void
+ */
 function applyFuncToAllMenuLevels(funcToApply: any): void {
 
     /**
@@ -239,7 +203,15 @@ function setupAllSubMenuNavButtons(): void {
     });
 }
 
-export function setupSubMenuNavButtons(subMenu: any, breadcrumbs: string[]) {
+/**
+ * Sets up the submenu navigation buttons ("Back", "Close Menu"). This
+ * function acts on a single submenu, but elsewhere it is applied to all
+ * submenus.
+ * @param  {*}        subMenu      Information about the submenu.
+ * @param  {string[]} breadcrumbs  The breadcrumbs to get to this submenu.
+ * @returns void
+ */
+export function setupSubMenuNavButtons(subMenu: any, breadcrumbs: string[]): void {
     if (breadcrumbs.length > 0) {
         // No back button on top-level menu.
         subMenu["Back ⇦"] = () => {

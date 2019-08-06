@@ -66,6 +66,12 @@ export function load(): void {
     });
 }
 
+/**
+ * A few VR-relevant things need to be handled before you load the babylon
+ * scene. These are separated into this function so they can be called
+ * separately.
+ * @returns void
+ */
 function vrSetupBeforeBabylonFileLoaded(): void {
     // You'll need a navigation mesh.
     let navMeshToUse = BABYLON.Mesh.CreateSphere("navTargetMesh", 4, 0.1, Vars.scene);
@@ -225,6 +231,11 @@ function optimizeMeshesAndMakeClickable(): void {
     }
 }
 
+/**
+ * This runs when all the assets are fully loaded. Does things like start the
+ * render loop.
+ * @returns void
+ */
 export function loadingAssetsDone(): void {
     // Give it a bit to let one render cycle go through. Hackish,
     // admittedly.
@@ -242,13 +253,6 @@ export function loadingAssetsDone(): void {
     // Start the render loop. Register a render loop to repeatedly render the
     // scene
     Vars.engine.runRenderLoop(() => {
-        // try {
-            Vars.scene.render();
-        // }  catch {
-            // console.log("ERROR!");
-        // }
-        // console.log("render");
+        Vars.scene.render();
     });
 }
-
-Lecturer.tmp();

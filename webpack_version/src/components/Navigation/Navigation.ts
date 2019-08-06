@@ -22,10 +22,6 @@ export const enum NavMode {
     NoVR = 3,
 }
 
-// ***** TODO: WORK ON THIS:
-// export let interactingObjs = [];
-// export function addInteractingObj(mesh) { interactingObjs.push(mesh); }
-
 let currentlyTeleporting = false;
 
 /**

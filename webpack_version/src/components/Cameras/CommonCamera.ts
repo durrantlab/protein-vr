@@ -67,22 +67,14 @@ export function setCameraPosition(pt: any): void {
     }
 }
 
-// export function getCameraRotation(): any {
-//     if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
-//     (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
-//         return Vars.scene.activeCamera.deviceRotationQuaternion.clone();
-//     } else {
-//         return Vars.scene.activeCamera.rotationQuaternion.clone();
-//     }
-// }
-
+/**
+ * Gets the rotation quaternion of the current camera, whether Universal,
+ * DeviceOrientation, or VR.
+ * @returns * The quaternion.
+ */
 export function getCameraRotationQuaternion(): any {
-    // console.log(Vars.scene.activeCamera.rotationQuaternion);
-    // return Vars.scene.activeCamera.rotationQuaternion;
-
     if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
         (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
-        // window["camera"] = Vars.scene.activeCamera;
         // return Vars.scene.activeCamera.leftCamera.rotationQuaternion;
         return Vars.vrHelper.webVRCamera.deviceRotationQuaternion;
         // Vars.scene.activeCamera.deviceRotationQuaternion;
@@ -92,7 +84,14 @@ export function getCameraRotationQuaternion(): any {
     }
 }
 
-export function setCameraRotationQuaternion(rotQua: any): any {
+/**
+ * Sets the rotation quaternion of the camera. As currently implemented,
+ * assumes Universal camera (i.e., this function should only be called in
+ * Student mode).
+ * @param  {*} rotQua The rotation quaternion.
+ * @returns void
+ */
+export function setCameraRotationQuaternion(rotQua: any): void {
     if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
     (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
         console.log("PROBLEM!");
@@ -103,7 +102,7 @@ export function setCameraRotationQuaternion(rotQua: any): any {
 }
 
 /**
- * Gets the camera rotation
+ * Gets the camera rotation.
  * @returns * The rotation.
  */
 export function getCameraRotationY(): any {

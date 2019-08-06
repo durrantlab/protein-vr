@@ -21,13 +21,17 @@ export class Lecturer extends WebRTCBase.WebRTCBase {
         });
     }
 
+    /**
+     * Send data to a remote webrtc partner.
+     * @param  {*} data  The data to send.
+     * @returns void
+     */
     public sendData(data: any): void {
         /** @type {number} */
         let connsLen = this.conns.length;
         for (let i = 0; i < connsLen; i++) {
             let conn = this.conns[i];
             conn.send(data);
-            // console.log(data + " sent");
         }
     }
 
@@ -62,6 +66,11 @@ export class Lecturer extends WebRTCBase.WebRTCBase {
     }
 }
 
+/**
+ * Start broadcasting information like the current camera location and
+ * position.
+ * @returns void
+ */
 export function startBroadcast(): void {
     // Contact the peerjs server
     let lect = new Lecturer();
@@ -79,14 +88,6 @@ export function startBroadcast(): void {
         let rotQua = CommonCamera.getCameraRotationQuaternion();
 
         let rotFac = 1.0;
-        // if (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers) {
-            // Strangely, activeCamera.leftCamera.rotationQuaternion faces the
-            // opposite direction of activeCamera.rotationQuaternion, if VR
-            // camera.
-            // rotFac = -1.0;
-        // }
-        // console.log("Actually, up and down work. I think it's just rotation around up axis.");
-
         let val = [pos.x, pos.y, pos.z, rotFac * rotQua.x, rotFac * rotQua.y, rotFac * rotQua.z, rotFac * rotQua.w];
         lect.sendData({
             "type": "locrot",
@@ -96,7 +97,3 @@ export function startBroadcast(): void {
 }
 
 // window["startBroadcast"] = startBroadcast;
-
-export function tmp() {
-    console.log("moo. Why is this here?");
-}
