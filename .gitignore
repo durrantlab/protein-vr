@@ -26,3 +26,4 @@ scoria
 build
 **/web/*
 node_modules
+rsync.sh

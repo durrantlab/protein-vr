@@ -5,6 +5,7 @@ import * as Pickables from "../Navigation/Pickables";
 import * as Optimizations from "../Scene/Optimizations";
 import * as Vars from "../Vars";
 import * as VRControllers from "./VRControllers";
+import * as UrlVars from "../UrlVars";
 
 declare var BABYLON: any;
 declare var jQuery: any;
@@ -14,6 +15,11 @@ declare var jQuery: any;
  * @returns void
  */
 export function setup(): void {
+    if (UrlVars.checkWebrtcInUrl()) {
+        // Never do VR in webrtc mode.
+        return;
+    }
+
     // Setup different trigger VR functions (changes state, etc.)
     setupEnterAndExitVRCallbacks();
     VRControllers.setup();
@@ -44,7 +50,7 @@ function setupEnterAndExitVRCallbacks(): void {
         // shadows in VR otherwise.
         Optimizations.updateEnvironmentShadows();
 
-        // window["vrHelper"] = Vars.vrHelper;
+        window["vrHelper"] = Vars.vrHelper;
     });
 
     // Vars.vrHelper.onAfterEnteringVRObservable.add(() => {

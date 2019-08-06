@@ -27,7 +27,7 @@ export class Lecturer extends WebRTCBase.WebRTCBase {
         for (let i = 0; i < connsLen; i++) {
             let conn = this.conns[i];
             conn.send(data);
-            console.log(data + " sent");
+            // console.log(data + " sent");
         }
     }
 
@@ -77,7 +77,6 @@ export function startBroadcast(): void {
     setInterval(() => {
         let pos = CommonCamera.getCameraPosition();
         let rotQua = CommonCamera.getCameraRotationQuaternion();
-        console.log(pos, rotQua);
 
         let rotFac = 1.0;
         // if (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers) {

@@ -2,11 +2,11 @@
 // This module is a place to store "global" variables.
 
 import * as Navigation from "./Navigation/Navigation";
+import * as UrlVars from "./UrlVars";
 
 declare var BABYLON: any;
 
 export interface IVRSetup {
-    groundMeshName: string;  // The name of the floor mesh
     groundMesh?: any;  // The actual mesh
     navTargetMesh?: any;            // The mesh that appears where you're
                                     // gazing. Always on, even during
@@ -73,7 +73,7 @@ export const TRANSPARENT_FLOOR_ALPHA: number = 0.05;  // 0.02;
 export const IOS: boolean = false;  // TODO: /iPad|iPhone|iPod/.test(navigator.userAgent) && !window["MSStream"];
 
 // Variables that can change.
-export let vrVars: IVRSetup;
+export let vrVars: IVRSetup = {};
 
 /**
  * Setup the Vars.
@@ -94,7 +94,7 @@ export function setup(): void {
     scene = new BABYLON.Scene(engine);
 
     // For debugging
-    // window["scene"] = scene;
+    window["scene"] = scene;
 }
 
 /**
@@ -136,6 +136,11 @@ export function setCameraHeight(height: number): void {
  * @param  {Object<string,*>} initParams The initial parameters.
  */
 export function setupVR(initParams: IVRSetup): void {
+    // If running in Student mode, do not set up VR camera...
+    if (UrlVars.checkWebrtcInUrl()) {
+        return;
+    }
+
     // Create the vr helper. See http://doc.babylonjs.com/how_to/webvr_helper
     let params = {
         // "createDeviceOrientationCamera": false,  // This makes phone ignore motion sensor. No good.
@@ -151,8 +156,11 @@ export function setupVR(initParams: IVRSetup): void {
     vrHelper = scene.createDefaultVRExperience(params);
 
     // Hide the vrHelper icon initially.
-    document.getElementById("babylonVRiconbtn").style.opacity = "0.0";  // Non IE;
-    document.getElementById("babylonVRiconbtn").style.filter = "alpha(opacity=0)";  // IE;
+    let babylonVRiconbtn = document.getElementById("babylonVRiconbtn");
+    if (babylonVRiconbtn !== null) {
+        babylonVRiconbtn.style.opacity = "0.0";  // Non IE;
+        babylonVRiconbtn.style.filter = "alpha(opacity=0)";  // IE;
+    }
 
     // window["vrHelper"] = vrHelper;
     // console.log(window.vrHelper);

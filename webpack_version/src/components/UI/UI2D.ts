@@ -123,8 +123,11 @@ function addRunModeButtons(): void {
     });
 
     // Also make VR button visible.
-    document.getElementById("babylonVRiconbtn").style.opacity = "1.0";  // Non IE;
-    document.getElementById("babylonVRiconbtn").style.filter = "alpha(opacity=1.0)";  // IE;
+    let babylonVRiconbtn = document.getElementById("babylonVRiconbtn");
+    if (babylonVRiconbtn !== null) {
+        babylonVRiconbtn.style.opacity = "1.0";  // Non IE;
+        babylonVRiconbtn.style.filter = "alpha(opacity=1.0)";  // IE;
+    }
 }
 
 /**

@@ -47,6 +47,7 @@
             // Let's try to shorten it. This will only work it's being hosted
             // on one of the durrantlab websites.
             var followTheLeaderURLVal = jQuery("#followTheLeaderURL");
+            followTheLeaderURLVal.val(url);
             jQuery.ajax("https://durrantlab.pitt.edu/shrt/short.php?url=" + url)
             .done(function(txt) {
                 followTheLeaderURLVal.val(txt);

@@ -1,3 +1,4 @@
+
 /**
  * @constructor
  */
@@ -97,6 +98,8 @@ jQuery.remove = function() {};
 jQuery.keypress = function(a) {};
 jQuery.getJSON = function(a, b) {};
 jQuery.ajax = function(a,b) {};
+jQuery.hide = function() {};
+jQuery.css = function(a,b) {};
 
 function _(astr) {};
 function __(astr) {};
@@ -379,6 +382,8 @@ BABYLON.Vector3.normalizeFromLength = function(a) {};
 BABYLON.Vector3.Zero = function() {};
 BABYLON.Vector3.equalsToFloats = function(a,b,c) {};
 BABYLON.Vector3.TransformCoordinates = function(a,b) {};
+BABYLON.Vector3.asArray = function() {};
+BABYLON.Vector3.FromArray = function(a) {};
 
 /**
  * @constructor
@@ -467,6 +472,7 @@ BABYLON.Scene.prototype.createDefaultVRExperience.leftControllerGazeTrackerMesh;
 BABYLON.Scene.prototype.createDefaultVRExperience.gazeTrackerMesh;
 BABYLON.Scene.prototype.createDefaultVRExperience.gazeTrackerMesh.isVisible;
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera;
+BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.deviceRotationQuaternion;
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLoadedObservable = function() {};
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLoadedObservable.add = function(a) {};
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.rotationQuaternion;
@@ -626,6 +632,12 @@ BABYLON.VertexData.ComputeNormals = function(a,b,c) {};
 BABYLON.Quaternion;
 BABYLON.Quaternion.FromEulerAngles = function(a, b, c) {};
 BABYLON.Quaternion.FromEulerVector = function(a) {};
+BABYLON.Quaternion.asArray = function() {};
+BABYLON.Quaternion.FromArray = function(a) {};
+BABYLON.Quaternion.x;
+BABYLON.Quaternion.y;
+BABYLON.Quaternion.z;
+BABYLON.Quaternion.w;
 
 var annyang = function() {};
 annyang.addCommands = function(a) {};

@@ -7,7 +7,7 @@ import * as Vars from "./Vars";
 declare var jQuery: any;
 
 let stylesQueue: any[] = [];
-let webrtc: any;
+export let webrtc: any = undefined;
 
 /**
  * Get all the url parameters from a url string.
@@ -89,6 +89,7 @@ export function setURL(): void {
     params.push("src=" + ThreeDMol.modelUrl);
 
     if (webrtc !== undefined) {
+        console.log("setting webrtc...");
         params.push("webrtc=" + webrtc);
     }
 
@@ -134,13 +135,17 @@ export function readUrlParams(): void {
         // Prevent the student from being able to change the view or anything.
         Vars.scene.activeCamera.inputs.clear();
 
-        // Also hide some of the buttons.
+        // Also hide/move some of the buttons.
         jQuery("#help-button").hide();
         jQuery("#follow-the-leader").hide();
         jQuery("#babylonVRiconbtn").hide();
         let fullscreenButton = jQuery("#fullscreen-button");
         let top = +fullscreenButton.css("bottom").replace(/px/g, "");
         fullscreenButton.css("bottom", (top - 60).toString() + "px");
+
+        // Make sure clicking on the screen doesn't move either. Basically
+        // disable all teleportation.
+        jQuery("#capture-clicks").remove();
     }
 
     // Update the mesh rotations
@@ -224,4 +229,12 @@ export function startLoadingStyles(): void {
             startLoadingStyles();
         });
     }
+}
+
+/**
+ * Checks if "webrtc=" in url. This works even if UrlVars hasn't been set yet.
+ * @returns boolean
+ */
+export function checkWebrtcInUrl(): boolean {
+    return window.location.href.indexOf("webrtc=") !== -1;
 }

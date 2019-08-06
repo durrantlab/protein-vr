@@ -60,12 +60,16 @@ function after3DMolJsLoaded(sceneInfoData: any): void {
             // Update URL with location
             UrlVars.setURL();
 
-            // Get additional selection information about the loaded molecule.
-            // Like residue name.
-            getAdditionalSels(mdl3DMol);
+            if (!UrlVars.checkWebrtcInUrl()) {
+                // It's not follow-the-leader mode, set setup menu.
 
-            // Now that the pdb is loaded, you need to update the menu.
-            Styles.updateModelSpecificSelectionsInMenu(Menu3D.menuInf);
+                // Get additional selection information about the loaded molecule.
+                // Like residue name.
+                getAdditionalSels(mdl3DMol);
+
+                // Now that the pdb is loaded, you need to update the menu.
+                Styles.updateModelSpecificSelectionsInMenu(Menu3D.menuInf);
+            }
 
             // Now that the PDB is loaded, you can start loading styles.
             UrlVars.startLoadingStyles();

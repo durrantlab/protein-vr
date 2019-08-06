@@ -8,6 +8,7 @@ import * as UI2D from "../UI/UI2D";
 import * as Vars from "../Vars";
 import * as Lecturer from "../WebRTC/Lecturer";
 import * as Optimizations from "./Optimizations";
+import * as UrlVars from "../UrlVars";
 
 declare var BABYLON: any;
 
@@ -31,21 +32,32 @@ export function load(): void {
         // Setup the cameras.
         CamerasSetup.setup();
 
-        // Setup the general things that apply regardless of the mode used.
-        // Here because it requires a ground mesh. Set up the floor mesh
-        // (hidden).
-        Navigation.setup();
+        if (!UrlVars.checkWebrtcInUrl()) {
+            // The below are run if not in webrtc (follow-the-leader) mode.
 
-        // Setup function to manage pickable objects (e.g., floor).
-        Pickables.setup();
+            // Setup the general things that apply regardless of the mode used.
+            // Here because it requires a ground mesh. Set up the floor mesh
+            // (hidden).
+            Navigation.setup();
 
-        // Sets up nav selection buttons in DOM.
-        UI2D.setup();
+            // Setup function to manage pickable objects (e.g., floor).
+            Pickables.setup();
+        } else {
+            // Initially, no VR.
+            Vars.vrVars.navMode = Navigation.NavMode.NoVR;
+
+            // Also, make sure ground is not visible.
+            let groundMesh = Vars.scene.getMeshByID("ground");
+            groundMesh.visibility = 0;
+        }
 
         // Load extra objects
         MolsLoad.setup();
 
         // loadingAssetsDone(), below, will run once all assets loaded.
+
+        // Sets up nav selection buttons in DOM.
+        UI2D.setup();
     });
 
     // Watch for browser/canvas resize events
@@ -65,7 +77,6 @@ function vrSetupBeforeBabylonFileLoaded(): void {
     // for example). Also saves the modified params to the params module
     // variable. Note that this calls createDefaultVRExperience.
     Vars.setupVR({
-        groundMeshName: "ground",
         navTargetMesh: navMeshToUse,
     });
 

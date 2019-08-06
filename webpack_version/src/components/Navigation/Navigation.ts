@@ -10,6 +10,7 @@ import * as Vars from "../Vars";
 import * as Navigation from "./Navigation";
 import * as Pickables from "./Pickables";
 import * as Points from "./Points";
+import * as UrlVars from "../UrlVars";
 
 declare var BABYLON: any;
 declare var jQuery: any;
@@ -33,8 +34,8 @@ let currentlyTeleporting = false;
  */
 export function setup(): void {
     // Allways collide with a floor mesh.
-    Vars.vrVars.groundMesh = Vars.scene.getMeshByID(Vars.vrVars.groundMeshName);
-    if (Vars.vrVars.groundMesh === null) { alert("No mesh named " + Vars.vrVars.groundMeshName); }
+    Vars.vrVars.groundMesh = Vars.scene.getMeshByID("ground");
+    if (Vars.vrVars.groundMesh === null) { alert("No mesh named ground"); }
     Vars.vrVars.groundMesh.checkCollisions = true;
 
     // The ground should generally be hidden. There's a chance it could be
@@ -123,6 +124,11 @@ let lastTrigger: number = 0;
  * @returns void
  */
 export function actOnStareTrigger(): void {
+    if (UrlVars.webrtc !== undefined) {
+        // If in follow-the-leader mode, don't ever trigger.
+        return;
+    }
+
     // There is a refractory period to prevent rapid trigger fires.
     let curTime = new Date().getTime();
     if (curTime - lastTrigger < 250) {

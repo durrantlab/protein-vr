@@ -62,7 +62,7 @@ export function startFollowing(id: string): void {
     targetCameraRotationQuaternion = new Float32Array(CommonCamera.getCameraRotationQuaternion().asArray());
 
     let stud = new Student((data: any) => {
-        console.log("stud1 got data", data);
+        // console.log("stud1 got data", data);
         let type = data["type"];
         let val = data["val"];
         switch (type) {

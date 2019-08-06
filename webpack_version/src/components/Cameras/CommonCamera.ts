@@ -67,22 +67,27 @@ export function setCameraPosition(pt: any): void {
     }
 }
 
-export function getCameraRotation(): any {
-    if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
-    (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
-        return Vars.scene.activeCamera.deviceRotationQuaternion.clone();
-    } else {
-        return Vars.scene.activeCamera.rotationQuaternion.clone();
-    }
-}
+// export function getCameraRotation(): any {
+//     if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
+//     (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
+//         return Vars.scene.activeCamera.deviceRotationQuaternion.clone();
+//     } else {
+//         return Vars.scene.activeCamera.rotationQuaternion.clone();
+//     }
+// }
 
 export function getCameraRotationQuaternion(): any {
+    // console.log(Vars.scene.activeCamera.rotationQuaternion);
+    // return Vars.scene.activeCamera.rotationQuaternion;
+
     if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
-    (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
+        (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
         // window["camera"] = Vars.scene.activeCamera;
         // return Vars.scene.activeCamera.leftCamera.rotationQuaternion;
-        return Vars.scene.activeCamera.deviceRotationQuaternion;
+        return Vars.vrHelper.webVRCamera.deviceRotationQuaternion;
+        // Vars.scene.activeCamera.deviceRotationQuaternion;
     } else {
+        // Regular (Universal) camera.
         return Vars.scene.activeCamera.rotationQuaternion;
     }
 }

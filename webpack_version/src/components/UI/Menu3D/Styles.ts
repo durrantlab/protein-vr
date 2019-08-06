@@ -83,6 +83,12 @@ export function buildStylesSubMenu(): any {
  * @returns void
  */
 export function updatePastStylesInMenu(menuInf: any): void {
+    if (UrlVars.checkWebrtcInUrl()) {
+        // Follow-the-leader mode. So no need to update menu (it doesn't
+        // exist).
+        return;
+    }
+
     // Also add in existing styles so they can be removed.
     menuInf["Styles"]["Remove Existing"] = {};
     Menu3D.setupSubMenuNavButtons(
