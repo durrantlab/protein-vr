@@ -4,7 +4,6 @@
 const ctx: Worker = self as any;
 
 declare var WorkerGlobalScope: any;
-declare var postMessage: any;
 
 /** @const {number} */
 const DATA_CHUNK_SIZE = 10000000;

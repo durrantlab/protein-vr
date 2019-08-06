@@ -5,7 +5,6 @@ import * as Menu3D from "./Menu3D";
 declare var BABYLON: any;
 
 let btnScale = new BABYLON.Vector3(0.75, 0.75, 0.75);
-// let btnScale = new BABYLON.Vector3(1.0, 1.0, 1.0);
 
 interface IButtonWrapper {
     panel: any;
@@ -82,7 +81,8 @@ export class ButtonWrapper {
 
         this.button.scaling = btnScale.clone();
 
-        // Make the button clickable. No. It is the sphere that will trigger this...
+        // Make the button clickable. No. It is the sphere that will trigger
+        // this... So commented out.
         // this.button.onPointerClickObservable.add((e) => {
             // this.toggled();
         // });
@@ -146,10 +146,6 @@ export class ButtonWrapper {
         } else {
             // A setter. Note that this doesn't affect visibility on meshes
             // (they could be entirely transparent).
-        //     mesh.actionManager
-        // .registerAction(
-            // )
-
             this.button.isVisible = val;
             this.containingMesh.isVisible = val;
         }
@@ -208,6 +204,11 @@ export class ButtonWrapper {
         );
     }
 
+    /**
+     * Make variously colored materials for the different kinds of menu
+     * buttons.
+     * @returns void
+     */
     private makeColorMats(): void {
         /** @const {number} */
         const colorDelta = 0.1;

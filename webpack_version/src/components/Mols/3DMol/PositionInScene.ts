@@ -66,6 +66,7 @@ export function positionAll3DMolMeshInsideAnother(babylonMesh: any, otherBabylon
     let allVisMolMeshesLen = allVisMolMeshes.length;
     for (let i = 0; i < allVisMolMeshesLen; i++) {
         let allVisMolMesh = allVisMolMeshes[i];
+
         // Get the bounding box of this mesh.
         let thisBoxTmp = allVisMolMesh.getBoundingInfo().boundingBox;
         let thisBoxDimensTmp = Object.keys(thisBoxTmp.maximumWorld).map(

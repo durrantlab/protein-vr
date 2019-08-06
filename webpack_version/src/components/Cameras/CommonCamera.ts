@@ -3,7 +3,6 @@
 import * as Navigation from "../Navigation/Navigation";
 import * as Points from "../Navigation/Points";
 import * as Vars from "../Vars";
-import * as VRCamera from "./VRCamera";
 
 declare var BABYLON: any;
 
@@ -75,9 +74,7 @@ export function setCameraPosition(pt: any): void {
 export function getCameraRotationQuaternion(): any {
     if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
         (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
-        // return Vars.scene.activeCamera.leftCamera.rotationQuaternion;
         return Vars.vrHelper.webVRCamera.deviceRotationQuaternion;
-        // Vars.scene.activeCamera.deviceRotationQuaternion;
     } else {
         // Regular (Universal) camera.
         return Vars.scene.activeCamera.rotationQuaternion;
@@ -96,7 +93,6 @@ export function setCameraRotationQuaternion(rotQua: any): void {
     (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
         console.log("PROBLEM!");
     } else {
-        // console.log(Vars.scene.activeCamera.rotationQuaternion, rotQua.clone());
         Vars.scene.activeCamera.rotationQuaternion = rotQua.clone();
     }
 }

@@ -8,7 +8,6 @@ import * as VRControllers from "./VRControllers";
 import * as UrlVars from "../UrlVars";
 
 declare var BABYLON: any;
-declare var jQuery: any;
 
 /**
  * Sets up the VR camera.
@@ -53,11 +52,6 @@ function setupEnterAndExitVRCallbacks(): void {
         window["vrHelper"] = Vars.vrHelper;
     });
 
-    // Vars.vrHelper.onAfterEnteringVRObservable.add(() => {
-    //     // Make sure camera starts off at same location as babylon camera
-    //     debugger;
-    // });
-
     Vars.vrHelper.onExitingVRObservable.add(() => {
         // Update navMode
         Vars.vrVars.navMode = Navigation.NavMode.NoVR;
@@ -69,20 +63,6 @@ function setupEnterAndExitVRCallbacks(): void {
         // safe side.
         Optimizations.updateEnvironmentShadows();
     });
-
-
-    // Vars.vrHelper.onNewMeshPicked.add((pickingInfo) => {
-    //     // Callback receiving ray cast picking info
-    //     Pickables.setCurPickedMesh(pickingInfo.pickedMesh);
-    // });
-
-    // Vars.vrHelper.onSelectedMeshUnselected.add((mesh) => {
-        // Mesh has been unselected
-        // Pickables.setCurPickedMesh(undefined);
-        // Navigation.setCurStarePt(Navigation.pointWayOffScreen);
-        // console.log(mesh, Pickables.curPickedMesh, Navigation.curStarePt);
-        // console.log("GGGG");
-    // });
 }
 
 /**
@@ -134,5 +114,6 @@ export function setupGazeTracker(): void {
 
     Vars.vrHelper.enableInteractions();
 
+    // For debugging...
     // window.vrHelper = Vars.vrHelper;
 }

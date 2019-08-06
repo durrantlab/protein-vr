@@ -12,20 +12,30 @@ export function buildRotationsSubMenu(): any {
         "Undo Rotate": () => {
             let vec = PositionInScene.lastRotationBeforeAnimation;
             VRML.setMolRotation(vec.x, vec.y, vec.z);
-            PositionInScene.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"), true);
+            PositionInScene.positionAll3DMolMeshInsideAnother(
+                undefined, Vars.scene.getMeshByName("protein_box"), true
+            );
         },
         "X Axis": () => {
             VRML.updateMolRotation("x", amt);
-            PositionInScene.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"), true);
+            PositionInScene.positionAll3DMolMeshInsideAnother(
+                undefined, Vars.scene.getMeshByName("protein_box"), true
+            );
         },
         "Y Axis": () => {
             VRML.updateMolRotation("y", amt);
-            PositionInScene.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"), true);
+            PositionInScene.positionAll3DMolMeshInsideAnother(
+                undefined, Vars.scene.getMeshByName("protein_box"), true
+            );
         },
         "Z Axis": () => {
             VRML.updateMolRotation("z", amt);
-            PositionInScene.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"), true);
+            PositionInScene.positionAll3DMolMeshInsideAnother(
+                undefined, Vars.scene.getMeshByName("protein_box"), true
+            );
         },
+
+        // Below judged unnecessary with new "undo" button.
         // "-X Axis": () => {
         //     VRML.updateMolRotation("x", -amt);
         //     PositionInScene.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"));

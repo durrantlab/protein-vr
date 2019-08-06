@@ -1,6 +1,5 @@
 // Sets up tweaks to the UI.
 
-// import { jQuery } from "../jQuery";
 import * as OpenPopup from "./OpenPopup/OpenPopup";
 import * as Vars from "../Vars";
 import * as Lecturer from "../WebRTC/Lecturer";
@@ -141,4 +140,6 @@ function debugMode(): void {
         document.getElementById("scene-explorer-host").style.zIndex = "15";
     }, 500);
 }
+
+// For debugging...
 // window["debugMode"] = debugMode;

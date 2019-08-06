@@ -2,7 +2,6 @@
 // scene. Note that the camera location is in CommonCamera, not here.
 
 import * as CommonCamera from "../Cameras/CommonCamera";
-// import * as VRCamera from "../Cameras/VRCamera";
 import * as Vars from "../Vars";
 import * as Navigation from "./Navigation";
 import * as Pickables from "./Pickables";
@@ -95,7 +94,6 @@ export function setStarePointInfo(): void {
         // Construct a ray from the camera to the stare obj
         /** @type {*} */
         let camPos = CommonCamera.getCameraPosition();
-        // ray = new BABYLON.Ray(camPos, curStarePt.subtract(camPos), 1000);
         ray = new BABYLON.Ray(camPos, curStarePt.subtract(camPos));
     } else {
         console.log("Unexpected error.");

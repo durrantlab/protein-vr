@@ -1,8 +1,8 @@
+// Functions for follow-the-leader mode, that the leader (lecturer) uses.
+
 import * as CommonCamera from "../Cameras/CommonCamera";
 import * as OpenPopup from "../UI/OpenPopup/OpenPopup";
 import * as WebRTCBase from "./WebRTCBase";
-import * as Vars from "../Vars";
-import * as Navigation from "../Navigation/Navigation";
 
 export class Lecturer extends WebRTCBase.WebRTCBase {
     public idReady: any = null;
@@ -35,6 +35,14 @@ export class Lecturer extends WebRTCBase.WebRTCBase {
         }
     }
 
+    /**
+     * Sets up the webrtc callback functions.
+     * @param  {Function(string)} idReadyResolve  The function to call when
+     *                                            peer.js is open.
+     * @param  {Function()}       gotConnResolve  The function to call when
+     *                                            the connection is resolved.
+     * @returns void
+     */
     private setupWebRTCCallbacks(idReadyResolve: any, gotConnResolve: any): void {
         this.peer.on("open", (id: string) => {
             // Workaround for peer.reconnect deleting previous id
@@ -96,4 +104,5 @@ export function startBroadcast(): void {
     }, 100);
 }
 
+// For debugging...
 // window["startBroadcast"] = startBroadcast;

@@ -5,9 +5,7 @@ import * as Menu3D from "../../UI/Menu3D/Menu3D";
 import * as Styles from "../../UI/Menu3D/Styles";
 import * as OpenPopup from "../../UI/OpenPopup/OpenPopup";
 import * as UrlVars from "../../UrlVars";
-import * as Vars from "../../Vars";
 import * as CommonLoader from "../CommonLoader";
-import * as Visualize from "./Visualize";
 import * as VRML from "./VRML";
 
 // Unfortunately, closure compiler breaks this. So hard code.
@@ -62,9 +60,6 @@ function after3DMolJsLoaded(sceneInfoData: any): void {
 
             // Now that the PDB is loaded, you can start loading styles.
             UrlVars.startLoadingStyles();
-
-            // Show protein ribbon by default.
-            // Visualize.toggleRep(["Protein", "All"], "Cartoon", "Spectrum");
 
             // Continue...
             CommonLoader.afterLoading(sceneInfoData);

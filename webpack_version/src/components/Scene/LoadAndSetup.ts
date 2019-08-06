@@ -94,7 +94,6 @@ function vrSetupBeforeBabylonFileLoaded(): void {
 
     // For debugging...
     // trackDebugSphere();
-
     // window.Vars = Vars;
 }
 
@@ -184,9 +183,7 @@ function hideObjectsUsedForSceneCreation(): void {
     let len = Vars.scene.meshes.length;
     for (let meshIdx = 0; meshIdx < len; meshIdx++) {
         if (Vars.scene.meshes[meshIdx].name === "protein_box") {
-            // Vars.scene.meshes[meshIdx].dispose();
             Vars.scene.getMeshByName("protein_box").isVisible = false;
-            // scene.getMeshByName("protein_box").visibility
         }
     }
 }

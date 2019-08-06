@@ -1,3 +1,6 @@
+// Functions that are common to the main classes of Lecturer.ts and
+// Student.ts.
+
 declare var Peer: any;
 
 export class WebRTCBase {
@@ -10,6 +13,10 @@ export class WebRTCBase {
         this.setupWebRTCCloseFuncs();
     }
 
+    /**
+     * Creates a peer.js object for use in follow-the-leader mode.
+     * @returns void
+     */
     private createPeerObj(): void {
         // Create own peer object with connection to shared PeerJS server
         this.peer = new Peer(null, {
@@ -17,6 +24,11 @@ export class WebRTCBase {
         });
     }
 
+    /**
+     * Sets up the functions that are fired when peer.js disconnects or
+     * produces an error.
+     * @returns void
+     */
     private setupWebRTCCloseFuncs(): void {
         this.peer.on("disconnected", () => {
             console.log("Connection lost. Please reconnect");

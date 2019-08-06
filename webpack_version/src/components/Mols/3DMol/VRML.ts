@@ -31,7 +31,6 @@ let config: any;
 /** @type {string} */
 let vrmlStr: string;
 
-// let vrmlParserWebWorker = new Worker("vrmlWebWorker." + __webpack_hash__ + ".js")
 let vrmlParserWebWorker = new Worker("vrmlWebWorker.js")
 
 let molTxt = "";
@@ -51,7 +50,6 @@ export function setup(callBack: any): void {
     element = jQuery("#mol-container");
     config = { backgroundColor: "white" };
     viewer = $3Dmol.createViewer( element, config );
-    // jQuery("#mol-container canvas")["attr"]("style", extraStyle);
     window["viewer"] = viewer;  // For debugging.
 
     callBack();
@@ -68,7 +66,6 @@ function addDiv(): void {
     }
 
     let extraStyle = "display:none;";
-    // let extraStyle = "width:150px; height:150px; z-index:150; position:fixed; top:0; left:0;";
     jQuery("body").append(`<div
         id="mol-container"
         class="mol-container"
@@ -120,11 +117,7 @@ export function loadPDBURL(url: string, callBack: any): void {
                 molTxtType = "sdf";
             }
 
-            let mdl = viewer.addModel( data, molTxtType );
-            // viewer.zoomTo();
-
-            // render();  // Use default style.
-            // viewer.render();
+            let mdl = viewer.addModel(data, molTxtType);
 
             callBack(mdl);
         },
@@ -196,9 +189,6 @@ export function render(updateData: boolean, repName: string, callBack: any = () 
     // times.
     Vars.engine.hideLoadingUI();
 
-    // Render the style
-    // viewer.render();
-
     if (updateData) {
         // Load the data.
         loadVRMLFrom3DMol(() => {
@@ -247,11 +237,6 @@ function loadValsFromVRML(repName: string, callBack: any): void {
     modelData = [];
 
     if (typeof(Worker) !== "undefined") {
-        // So web workers are supported...
-        // if (typeof(vrmlParserWebWorker) === "undefined") {
-        //     vrmlParserWebWorker = new Worker("VRMLParserWebWorker.js");
-        // }
-
         vrmlParserWebWorker.onmessage = (event: any) => {
             // Msg back from web worker
             /** @type {Object<string,*>} */
@@ -288,7 +273,6 @@ function loadValsFromVRML(repName: string, callBack: any): void {
             switch (status) {
                 case "more":
                     // There's more data. Request it now.
-                    // debugger;
                     vrmlParserWebWorker.postMessage({
                         "cmd": "sendDataChunk",
                         "data": undefined,
@@ -296,7 +280,6 @@ function loadValsFromVRML(repName: string, callBack: any): void {
                     break;
                 case "done":
                     // No more data. Run the callback.
-                    // console.log(modelData);
                     callBack();
                     break;
                 default:
@@ -360,8 +343,6 @@ export function importIntoBabylonScene(): any {
     mat.diffuseColor = new BABYLON.Color3(1, 1, 1);
     mat.emissiveColor = new BABYLON.Color3(0, 0, 0);
     mat.specularColor = new BABYLON.Color3(0, 0, 0);
-    // mat.sideOrientation = BABYLON.Mesh.FRONTSIDE;
-    // mat.sideOrientation = BABYLON.Mesh.BACKSIDE;
 
     let meshes = [];
 
@@ -384,11 +365,6 @@ export function importIntoBabylonScene(): any {
         vertexData["indices"] = modelDatum["trisIdxs"];
         vertexData["normals"] = norms;
         vertexData["colors"] = modelDatum["colors"];
-
-        // Delete the old mesh if it exists.
-        // if (Vars.scene.getMeshByName("MeshFrom3DMol") !== null) {
-        //     Vars.scene.getMeshByName("MeshFrom3DMol").dispose();
-        // }
 
         // Make the new mesh
         let babylonMeshTmp = new BABYLON.Mesh("mesh_3dmol_tmp" + modelIdx, Vars.scene);

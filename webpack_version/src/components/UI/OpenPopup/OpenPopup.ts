@@ -1,6 +1,6 @@
 declare var jQuery: any;
 
-let botstrapLoaded = false;
+let bootstrapLoaded = false;
 
 /** @type {Function} */
 let modalFunc: any;
@@ -13,8 +13,8 @@ let modalFunc: any;
  */
 export function openUrlModal(title: string, url: string): void {
     // Load the css if needed.
-    if (!botstrapLoaded) {
-        botstrapLoaded = true;
+    if (!bootstrapLoaded) {
+        bootstrapLoaded = true;
 
         // Add the css
         document.head.insertAdjacentHTML( "beforeend", "<link rel=stylesheet href=pages/css/bootstrap.min.css>" );
@@ -48,13 +48,7 @@ export function openUrlModal(title: string, url: string): void {
         `);
 
         // Add the javascript
-        // jQuery.getScript( "pages/scripts/popper.min.js", ( data, textStatus, jqxhr ) => {
-        // jQuery.getScript( "pages/scripts/bootstrap.min.js", (data: any, textStatus: any, jqxhr: any) => {
-            // debugger;
-            // modalFunc = jQuery.prototype.modal;  // Save for later use.
-            openUrlModalContinue(title, url);
-        // });
-        // });
+        openUrlModalContinue(title, url);
     } else {
         openUrlModalContinue(title, url);
     }
@@ -67,12 +61,11 @@ export function openUrlModal(title: string, url: string): void {
  * @returns void
  */
 function openUrlModalContinue(title: string, url: string): void {
-    // debugger;
-    // jQuery.prototype.modal = modalFunc;
     let myModal = jQuery("#myModal");
     myModal.find("h4.modal-title").html(title);
     myModal.find("iframe").attr("src", url);
     myModal.modal();
 }
 
+// For debugging...
 // window["openUrlModal"] = openUrlModal;

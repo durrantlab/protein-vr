@@ -83,7 +83,6 @@ export function checkIfMeshPickable(mesh: any): boolean {
     // entirely transparent (visibility is 0), but it will still intercept the
     // stare point. This is by design.
     if (!mesh.isVisible) { return false; }
-    // if (mesh.visibility === 0) { return false; }
 
     // Otherwise, pick only if in the list.
     return pickableMeshes.indexOf(mesh) !== -1;

@@ -1,3 +1,5 @@
+// Functions for follow-the-leader mode, that the follower (student) uses.
+
 import * as CommonCamera from "../Cameras/CommonCamera";
 import * as WebRTCBase from "./WebRTCBase";
 import * as Vars from "../Vars";
@@ -14,6 +16,11 @@ export class Student extends WebRTCBase.WebRTCBase {
         this.setupWebRTCCallbacks();
     }
 
+    /**
+     * Joins an existing webrtc connection.
+     * @param  {string} id  The peer.js id.
+     * @returns void
+     */
     public joinExistingSession(id: string): void {
         // Close old connection
         if (this.conn) {
@@ -32,13 +39,22 @@ export class Student extends WebRTCBase.WebRTCBase {
         });
     }
 
-    private setupWebRTCCallbacks() {
+    /**
+     * Setup the webrtc callbacks.
+     * @returns void
+     */
+    private setupWebRTCCallbacks(): void {
         this.peer.on("close", () => {
             this.conn = null;
             console.log("Connection destroyed. Please refresh");
         });
     }
 
+    /**
+     * Setup the callbacks for when data is received or the connection is
+     * closed.
+     * @returns void
+     */
     private setConnectionCallbacks(): void {
         // Handle incoming data (messages only since this is the signal
         // sender)
@@ -51,8 +67,6 @@ export class Student extends WebRTCBase.WebRTCBase {
         });
     }
 }
-
-let stud;
 
 let targetCameraPosition: any = null;
 let targetCameraRotationQuaternion: any = null;
@@ -99,14 +113,6 @@ export function startFollowing(id: string): void {
         )
         let newRotAsVec = BABYLON.Quaternion.FromArray(newRot);
         CommonCamera.setCameraRotationQuaternion(newRotAsVec);
-
-        // CommonCamera.setCameraPosition(
-        //     moveVecTowards(
-        //         CommonCamera.getCameraPosition(),
-        //         targetCameraPosition,
-        //         0.05, 0.1
-        //     )
-        // );
     });
 }
 

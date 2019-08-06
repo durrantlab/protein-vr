@@ -39,17 +39,8 @@ export function afterLoading(sceneInfoData: any): void {
             transparentGround.specularColor = new BABYLON.Color3(0, 0, 0);
             transparentGround.emissiveColor = new BABYLON.Color3(0, 0, 0);
             transparentGround.alpha = Vars.TRANSPARENT_FLOOR_ALPHA;
-            // transparentGround.ambientColor = new BABYLON.Color3(0.23, 0.98, 0.53);
 
             Vars.vrVars.groundMesh.material = transparentGround;
-
-            // let glass = new BABYLON.PBRMaterial("glass", Vars.scene);
-            // glass.reflectionTexture = hdrTexture;
-            // glass.refractionTexture = hdrTexture;
-            // glass.linkRefractionWithTransparency = true;
-            // glass.indexOfRefraction = 0.52;
-            // glass.alpha = 0; // Fully refractive material
-            // Vars.vrVars.groundMesh.material = glass;
         } else {
             console.log("Warning: Vars.vrVars.groundMesh not defined.");
         }
@@ -70,54 +61,20 @@ export function afterLoading(sceneInfoData: any): void {
  */
 export function setupMesh(mesh: any, objID: string, shadowQuality: string, uniqIntID: number): void {
     if ((mesh.material !== undefined) && (mesh.material !== null)) {
-        // if (shadowQuality !== "Skip") {
-        //     // So using shadows baked from blender.
-
-        //     // Save the side orientation before removing mesh.
-        //     let oldMatOrien = mesh.material.sideOrientation;
-
-        //     // Remove existing material
-        //     mesh.material.dispose();
-        //     mesh.material = null;
-
-        //     // Make sure not alpha blended.
-        //     mesh.hasVertexAlpha = false;
-        //     mesh.visibility = true;
-
-        //     // Create new material
-        //     let mat = new BABYLON.StandardMaterial("molMat" + uniqIntID.toString(), Vars.scene);
-        //     mat.diffuseColor = new BABYLON.Color3(1, 1, 1);
-        //     mat.specularColor = new BABYLON.Color3(0, 0, 0);
-        //     mat.opacityTexture = null;
-        //     mat.sideOrientation = oldMatOrien;
-
-        //     // mat.diffuseTexture.hasAlpha = false;
-        //     let texName = objID + ".png";
-        //     let tex = new BABYLON.Texture(  // lightmapTexture
-        //         texName, Vars.scene,
-        //     );
-        //     tex.vScale = -1;
-        //     mat.emissiveTexture = tex;
-
-        //     mat.disableLighting = true;
-        //     mat.sideOrientation = BABYLON.Material.ClockWiseSideOrientation;
-        //     mat.backFaceCulling = false;
-
-        //     // Add it to the mesh
-        //     mesh.material = mat;
-
-        //     // Freeze the material (improves optimization).
-        //     Optimizations.freezeMeshProps(mesh);
-        // } else {
-
-        // Not using baked shadows. Add a small emission color so the dark
+        // Add a small emission color so the dark
         // side of the protein isn't too dark.
         let lightingInf = Shadows.getBlurDarknessFromLightName();
 
         // Experience:
-        // In Couch scene, background luminosity of 0.01 is good. There shadow darkness was 0.9625
-        // In House scene, background luminosity of 0.0025 is good. There shadow darkness was 0.35.
-        // Let's play around with a scheme for guessing at the right background luminosity.
+
+        // In Couch scene, background luminosity of 0.01 is good. There shadow
+        // darkness was 0.9625
+
+        // In House scene, background luminosity of 0.0025 is good. There
+        // shadow darkness was 0.35.
+
+        // Let's play around with a scheme for guessing at the right
+        // background luminosity.
 
         let backgroundLum = 0;
 
@@ -136,13 +93,7 @@ export function setupMesh(mesh: any, objID: string, shadowQuality: string, uniqI
             backgroundLum = 0.013636363636363637 * lightingInfDarkness - 0.0029545454545454545;
         }
 
-        // backgroundLum = 1;
-
         mesh.material.emissiveColor = new BABYLON.Color3(backgroundLum, backgroundLum, backgroundLum);
-        // let ssao = new BABYLON.SSAORenderingPipeline("ssaopipeline", Vars.scene, 0.75);
-
-        // Enable transparency (for fading in and out).
-        // mesh.material.transparencyMode = BABYLON.PBRMaterial.PBRMATERIAL_ALPHABLEND;
 
         // Freeze the material (improves optimization).
         Optimizations.freezeMeshProps(mesh);

@@ -28,7 +28,6 @@ export function setup(): void {
             true,
         );
         DevOrCamera.rotation = cameraFromBabylonFile.rotation.clone();
-        // DevOrCamera.resetToCurrentRotation();
 
         // For debugging.
         // window["cameraFromBabylonFile"] = cameraFromBabylonFile;

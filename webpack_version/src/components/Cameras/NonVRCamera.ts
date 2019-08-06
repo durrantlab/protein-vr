@@ -1,6 +1,5 @@
 // This sets up the non vr camera. Not everyone has a vr headset.
 
-import * as Navigation from "../Navigation/Navigation";
 import * as Vars from "../Vars";
 
 declare var BABYLON: any;
@@ -51,9 +50,6 @@ function setupNonVRCameraObj(): void {
 
     // Slow the camera.
     nonVRCamera.speed = 0.1;
-
-    // Make sure orientation is default
-    // nonVRCamera.rotation = new BABYLON.Vector3(0, 0, 0);
 
     nonVRCamera.attachControl(Vars.canvas, true);
 

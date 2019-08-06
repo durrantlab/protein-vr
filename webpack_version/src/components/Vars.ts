@@ -13,8 +13,6 @@ export interface IVRSetup {
                                     // teleportation. This is also used to
                                     // determine the location of the gaze. If
                                     // not set, an empty is used for tracking.
-    // cameraHeight?: number;          // For some nav states (NoVR), you need to
-                                    // define the height.
     navMode?: Navigation.NavMode;
     menuActive?: boolean;
 }
@@ -93,7 +91,7 @@ export function setup(): void {
 
     scene = new BABYLON.Scene(engine);
 
-    // For debugging
+    // For debugging...
     window["scene"] = scene;
 }
 
@@ -162,8 +160,8 @@ export function setupVR(initParams: IVRSetup): void {
         babylonVRiconbtn.style.filter = "alpha(opacity=0)";  // IE;
     }
 
+    // For debugging....
     // window["vrHelper"] = vrHelper;
-    // console.log(window.vrHelper);
 
     // Save the parameter to params (module-level variable).
     vrVars = initParams;

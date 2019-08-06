@@ -63,6 +63,8 @@ export function setup(data?: any): void {
     if (GUI3DMenuManager === undefined) {
         // Make a manager for the menu
         GUI3DMenuManager = new BABYLON.GUI.GUI3DManager(Vars.scene);
+
+        // For debugging...
         // window["GUI3DMenuManager"] = GUI3DMenuManager;
     }
 
@@ -127,7 +129,6 @@ function createPanelSixteenButtons(): void {
             new Button.ButtonWrapper({
                 clickFunc: (buttonWrapper: Button.ButtonWrapper) => {
                     func();
-
                     // For reasons I don't understand, the radius on this
                     // cylinder (set below) doesn't take. Put it here to
                     // too make sure.
@@ -231,12 +232,10 @@ export function setupSubMenuNavButtons(subMenu: any, breadcrumbs: string[]): voi
 function setupMainMenuToggleButton(): void {
     // Also set up a manager at your feet. This turns the main manager on and
     // off.
-    // gui3DMenuManagers[0] = new BABYLON.GUI.GUI3DManager(Vars.scene);
     let panelToggle = new BABYLON.GUI.StackPanel3D();
     GUI3DMenuManager.addControl(panelToggle);
 
     // Set up the button
-    // let camera = Vars.scene.activeCamera;
     openMainMenuFloorButton = new Button.ButtonWrapper({
         clickFunc: (buttonWrapper: Button.ButtonWrapper) => {
             if (!buttonWrapper.value) {
@@ -257,6 +256,7 @@ function setupMainMenuToggleButton(): void {
         trueTxt: "Hide Menu",
     });
 
+    // For debugging...
     // window["openMainMenuFloorButton"] = openMainMenuFloorButton;
 
     // Set up the button anchor and move/rotate it.
@@ -270,12 +270,10 @@ function setupMainMenuToggleButton(): void {
     mainMenuAnchorToggle.rotation.y = CommonCamera.getCameraRotationY();
 
     Vars.scene.registerBeforeRender(() => {
-    // setInterval(() => {
         mainMenuAnchorToggle.position.copyFrom(VRPoints.groundPointBelowCamera);  // Prob
         mainMenuAnchorToggle.position.y = mainMenuAnchorToggle.position.y + 0.1;     // No prob
         mainMenuAnchorToggle.rotation.y = CommonCamera.getCameraRotationY();  // Prob
         // camera.rotation.y;  // TODO: What about VR camera.
-    // }, 1000);
     });
 }
 
@@ -321,7 +319,8 @@ function showOnlyButtonsOfLevel(breadcrumbs: string[]): void {
 
     // Sort those names
     subMenuItemNames.sort((first: string, second: string) => {
-        // See https://stackoverflow.com/questions/51165/how-to-sort-strings-in-javascript
+        // See
+        // https://stackoverflow.com/questions/51165/how-to-sort-strings-in-javascript
         let firstIsSpecial = specialBtns.indexOf(first) !== -1;
         let secondIsSpecial = specialBtns.indexOf(second) !== -1;
         if (firstIsSpecial && !secondIsSpecial) {

@@ -1,4 +1,5 @@
 // Functions from loading molecules in GLTF format into the scene.
+// DEPRECIATED.
 
 import * as LoadingScreens from "../UI/LoadingScreens";
 import * as Vars from "../Vars";

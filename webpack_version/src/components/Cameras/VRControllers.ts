@@ -26,18 +26,8 @@ export function setup(): void {
 
     // onControllersAttachedObservable doesn't work. I'd prefer that one...
     Vars.vrHelper.webVRCamera.onControllerMeshLoadedObservable.add((webVRController: any) => {
-        // Update navMode
-        // console.re.clear();
-        // console.re.log("moo1");
-
         Vars.vrVars.navMode = Navigation.NavMode.VRWithControllers;
-
-        console.log("controller loaded");
-
         VRCamera.setupGazeTracker();
-
-        console.log("Isnt there on pickable or something");
-
         setupTrigger(webVRController);
         setupPad(webVRController);
     });
@@ -62,10 +52,8 @@ function setupTrigger(webVRController: any): void {
         /** @const {number} */
         const curTime = new Date().getTime();
 
-        // console.log(curTime, lastTriggerTime, curTime - lastTriggerTime, Vars.VR_CONTROLLER_TRIGGER_DELAY_TIME);
         if (curTime - lastTriggerTime > Vars.VR_CONTROLLER_TRIGGER_DELAY_TIME) {
             // Enough time has passed...
-            // console.log("triggered");
             lastTriggerTime = curTime;
             Navigation.actOnStareTrigger();
         }
@@ -78,34 +66,17 @@ function setupTrigger(webVRController: any): void {
  * @returns void
  */
 function setupPad(webVRController: any): void {
-    // console.re.log("moo2");
-
     // Also allow navigation via the pad (non teleporting).
-    // console.log(webVRController);
     webVRController.onPadStateChangedObservable.add((state: any) => {
-        // console.re.log("DEBUG: onPadStateChangedObservable");
         padPressed = state["pressed"];
 
         if ((padPressed) &&
             (Math.abs(padMoveSpeedFactor) < Vars.VR_CONTROLLER_PAD_RATIO_OF_MIDDLE_FOR_CAMERA_RESET) &&
             (Math.abs(padRotateSpeedFactor) < Vars.VR_CONTROLLER_PAD_RATIO_OF_MIDDLE_FOR_CAMERA_RESET)) {
             console.log("Would reset camera view if you didn't get an error below...");
-            // Vars.vrHelper.webVRCamera.resetToCurrentRotation();
             return;
         }
     });
-
-    // webVRController.onMainButtonStateChangedObservable.add((state) => {
-    //     console.re.log("DEBUG: onMainButtonStateChangedObservable");
-    // });
-
-    // webVRController.onSecondaryButtonStateChangedObservable.add((state) => {
-    //     console.re.log("DEBUG: onSecondaryButtonStateChangedObservable");
-    // });
-
-    // webVRController.onMenuButtonStateChangedObservable.add((state) => {
-    //     console.re.log("DEBUG: onMenuButtonStateChangedObservable");
-    // });
 
     webVRController.onPadValuesChangedObservable.add((state: any) => {
         // If it's not a press right in the middle, then save the y value for
@@ -168,7 +139,6 @@ function moveCamera(): void {
         padMoveSpeedFactor * Vars.PAD_MOVE_SPEED * Vars.scene.getAnimationRatio(),
     );
 
-    // console.log(padMoveSpeedFactor, Vars.PAD_MOVE_SPEED, Vars.scene.getAnimationRatio(), deltaVec, vecStarePtCamera);
     CommonCamera.setCameraPosition(cameraPos.subtract(deltaVec));
 }
 

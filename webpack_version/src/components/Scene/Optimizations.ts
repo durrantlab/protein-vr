@@ -185,8 +185,8 @@ export function removeMeshEntirely(mesh: any): void {
 
 class ReportOptimizationChange {
     private priority: number;
-    private apply: any;
-    private getDescription: any;
+    private apply: any;           // Leave these even though not used.
+    private getDescription: any;  // Leave these even though not used.
 
     /**
      * Remove the surface mesh (it takes a lot of resources).
@@ -214,9 +214,9 @@ class ReportOptimizationChange {
 
 // tslint:disable-next-line:max-classes-per-file
 class RemoveSurfaces {
-    private priority: number;
-    private apply: any;
-    private getDescription: any;
+    private priority: number;     // Leave these even though not used.
+    private apply: any;           // Leave these even though not used.
+    private getDescription: any;  // Leave these even though not used.
 
     /**
      * Remove the surface mesh (it takes a lot of resources).
@@ -245,9 +245,9 @@ class RemoveSurfaces {
 
 // tslint:disable-next-line:max-classes-per-file
 class SimplifyMeshes {
-    private priority: number;
-    private apply: any;
-    private getDescription: any;
+    private priority: number;     // Leave these even though not used.
+    private apply: any;           // Leave these even though not used.
+    private getDescription: any;  // Leave these even though not used.
 
     /**
      * A scene optimization to decimate the big meshes.
@@ -276,11 +276,6 @@ class SimplifyMeshes {
                 // recreated.
                 if (mesh.name.indexOf("Decimated") !== -1) { continue; }
 
-                // For now, skip it if it was a wrl file in origin (because
-                // simplification erases colors).
-                // if (mesh.name.indexOf(".wrl") === -1) { continue; }
-                // mesh.material.wireframe = true;
-
                 // Get the number of vertexes.
                 /** @type {number} */
                 let numVertexes = getNumVertices(mesh);
@@ -295,6 +290,7 @@ class SimplifyMeshes {
                 // Simplify the mesh. See
                 // https://doc.babylonjs.com/how_to/in-browser_mesh_simplification
                 // You used to be able to simplify a mesh without LOD.
+                // Apparently you can't now?
 
                 // let decimator = new BABYLON.QuadraticErrorSimplification(mesh);
                 // simplify({
@@ -328,12 +324,8 @@ class SimplifyMeshes {
                 // https://doc.babylonjs.com/api/classes/babylon.mesh#simplify
                 mesh.simplify([{"quality": decimationLvel, "distance": 0.001}],
                     false, BABYLON.SimplificationType.QUADRATIC, () => {
-                        // console.log("GGG2", mesh.name, mesh.getLODLevels().length);
                         // let simpMesh = mesh.getLODLevels()[0]["mesh"];
                         // removeMeshEntirely(mesh);
-                        // console.log(simpMesh);
-                        // window["mesh"] = mesh;
-                        // console.log(mesh.name, decimationLvel);
                     },
                 );
             }

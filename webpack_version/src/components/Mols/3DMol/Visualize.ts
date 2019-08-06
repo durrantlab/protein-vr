@@ -8,13 +8,6 @@ import * as Vars from "../../Vars";
 import * as PositionInScene from "./PositionInScene";
 import * as VRML from "./VRML";
 
-// declare var $3Dmol: any;
-
-// A place to keep track of all the styles. List of [key, vals]
-// let styles: any[] = [];
-
-let currentSurface = undefined;
-
 // Where the meshes generated from 3DMol.js get stored.
 interface IStyleMesh {
     mesh: any;
@@ -88,6 +81,7 @@ let colorSchemeKeyWordTo3DMol = {
 
 // Ligand?
 
+// TODO:
 // All residus? Chains? Elements? Others here... https://3dmol.csb.pitt.edu/doc/types.html#AtomSpec
 
 /**
@@ -124,8 +118,11 @@ export function toggleRep(filters: any[], repName: string, colorScheme: string, 
             }
         }
 
-        // Still need to position the meshes (hiding some reps could make others bigger).
-        PositionInScene.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"));
+        // Still need to position the meshes (hiding some reps could make
+        // others bigger).
+        PositionInScene.positionAll3DMolMeshInsideAnother(
+            undefined, Vars.scene.getMeshByName("protein_box")
+        );
 
         visChanged();
 
@@ -137,8 +134,11 @@ export function toggleRep(filters: any[], repName: string, colorScheme: string, 
         styleMeshes[keys.fullKey].mesh.isVisible = true;
         console.log("showing existing mesh...");
 
-        // Still need to position the meshes (hiding some reps could make others bigger).
-        PositionInScene.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"));
+        // Still need to position the meshes (hiding some reps could make
+        // others bigger).
+        PositionInScene.positionAll3DMolMeshInsideAnother(
+            undefined, Vars.scene.getMeshByName("protein_box")
+        );
 
         visChanged();
 
@@ -148,12 +148,7 @@ export function toggleRep(filters: any[], repName: string, colorScheme: string, 
     // You'll need to use 3DMoljs to generate the mesh, since it's never been
     // generated before. First remove all representations from existing
     // 3Dmoljs.
-    // let viewer = VRML.viewer;
-    // VRML.removeAllSurfaces();
-    // VRML.setStyle({}, undefined);
-    // console.log("Abovee causes an error...");
     VRML.resetAll();
-    // VRML.viewer.render();
 
     // Make the new representation.
     /** @type {string} */
@@ -204,12 +199,6 @@ function toggleRepContinued(keys: any, repName: string, finalCallback: any): voi
         // and delete the surface from 3Dmoljs instance (cleanup).
         if (repName === "Surface") {
             newMesh.material.backFaceCulling = false;
-
-            // if (currentSurface !== undefined) {
-                // debugger;
-                // VRML.viewer.removeSurface(currentSurface["surfid"]);
-                // currentSurface = undefined;
-            // }
         }
 
         // Add this new one.

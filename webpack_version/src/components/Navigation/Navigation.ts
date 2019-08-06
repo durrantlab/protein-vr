@@ -1,10 +1,7 @@
 // This module handles all things navigation related.
 
-// import * as NavTargetMesh from "./NavTargetMesh";
-// import { jQuery } from "../jQuery";
 import * as CommonCamera from "../Cameras/CommonCamera";
 import * as NonVRCamera from "../Cameras/NonVRCamera";
-// import * as VRCamera from "../Cameras/VRCamera";
 import * as Optimizations from "../Scene/Optimizations";
 import * as Vars from "../Vars";
 import * as Navigation from "./Navigation";
@@ -73,10 +70,8 @@ let lastCameraName = "";
  * @returns void
  */
 function keepCameraOverFloor(): void {
-    // lastCameraPt = Vars.scene.activeCamera.position.clone();
     lastCameraPt = CommonCamera.getCameraPosition();
     Vars.scene.registerBeforeRender(() => {
-        // let cameraPt = Vars.scene.activeCamera.position.clone();
         let cameraPt = CommonCamera.getCameraPosition();  // cloned pt.
         let groundPointBelowCamera = Points.groundPointPickingInfo(cameraPt);
         if ((groundPointBelowCamera.pickedMesh === null) && (lastCameraName === Vars.scene.activeCamera.id)) {
@@ -85,14 +80,11 @@ function keepCameraOverFloor(): void {
             // example is if you're using the controllers on a HTC vive to
             // navigate (forward/backward).
 
-            // console.log("Reverting camera position..");
-            // Vars.scene.activeCamera.position = lastCameraPt;
             CommonCamera.setCameraPosition(lastCameraPt);
         } else {
             lastCameraPt = cameraPt;
             lastCameraName = Vars.scene.activeCamera.id;
         }
-        // console.log(groundPointBelowCamera);
     });
 }
 
@@ -229,7 +221,6 @@ function teleport(newLoc: any = undefined, callBack: any = undefined): void {
  * @returns void
  */
 function grow(): void {
-    // let ptBelowStarePt = Points.groundPointPickingInfo(Points.curStarePt).pickedPoint;
     let ptBelowStarePt = Points.groundPointBelowStarePt;
 
     // Get the vector form the stare point to the camera.
@@ -300,16 +291,12 @@ function setupCaptureMouseClicksOutsideBabylon(): void {
 
     // Setup div to intercept clicks if needed. Add clear div over canvas.
     captureMouseClicksDiv = jQuery("#capture-clicks");
-    // captureMouseClicksDiv = jQuery("#renderCanvas");
 
     // Make it clickable.
     captureMouseClicksDiv.click(() => {
         console.log("clicked!");
         actOnStareTrigger();
     });
-    // captureMouseClicksDiv.on("pointerdown", () => {
-    //     alert("hello!");
-    // });
 
     Vars.scene.registerBeforeRender(() => {
         checkCaptureMouseClicksOutsideBabylon();
@@ -339,11 +326,9 @@ function checkCaptureMouseClicksOutsideBabylon(): void {
     if (deviceBeingOriented && !currentlyCapturingMouseClicks) {
         currentlyCapturingMouseClicks = true;
         captureMouseClicksDiv.show();
-        // console.log("show");
     } else if (!deviceBeingOriented && currentlyCapturingMouseClicks) {
         currentlyCapturingMouseClicks = false;
         captureMouseClicksDiv.hide();
-        // console.log("hide");
     } else {
         // console.log("confused");
         // console.log(deviceBeingOriented);
