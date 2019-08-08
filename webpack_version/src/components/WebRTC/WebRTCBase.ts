@@ -19,8 +19,24 @@ export class WebRTCBase {
      */
     private createPeerObj(): void {
         // Create own peer object with connection to shared PeerJS server
-        this.peer = new Peer(null, {
-            debug: 2,
+        let idToUse = "pvr" + Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);  // null and it gets picked for you.
+
+        // Remove some ambiguous ones.
+        for (let c of ["1", "l", "O", "0"]) {
+            idToUse = idToUse.replace(c, "");
+        }
+
+        this.peer = new Peer(idToUse, {
+            "debug": 2,
+            "config": {'iceServers': [
+                {"url": 'stun:0.peerjs.com'},
+                {"url": 'stun:stun.l.google.com:19302'},
+                // {"url": 'stun:stun1.l.google.com:19302'},
+                // {"url": 'stun:stun2.l.google.com:19302'},
+                // {"url": 'stun:stun3.l.google.com:19302'},
+                // {"url": 'stun:stun4.l.google.com:19302'},
+                // {url: 'turn:homeo@turn.bistri.com:80', credential: 'homeo'}
+            ]}
         });
     }
 

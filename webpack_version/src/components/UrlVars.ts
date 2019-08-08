@@ -3,8 +3,10 @@ import * as Visualize from "./Mols/3DMol/Visualize";
 import * as VRML from "./Mols/3DMol/VRML";
 import * as Student from "./WebRTC/Student";
 import * as Vars from "./Vars";
+import * as CommonCamera from "./Cameras/CommonCamera";
 
 declare var jQuery: any;
+declare var BABYLON: any;
 
 let stylesQueue: any[] = [];
 export let webrtc: any = undefined;
@@ -70,27 +72,27 @@ export function setURL(): void {
     /** @type {number} */
     let x = VRML.molRotation.x;
     if (x !== 0) {
-        params.push("x=" + round(x));
+        params.push("rx=" + round(x));
     }
 
     /** @type {number} */
     let y = VRML.molRotation.y;
     if (y !== 0) {
-        params.push("y=" + round(y));
+        params.push("ry=" + round(y));
     }
 
     /** @type {number} */
     let z = VRML.molRotation.z;
     if (z !== 0) {
-        params.push("z=" + round(z));
+        params.push("rz=" + round(z));
     }
 
-    // Set the url.
-    params.push("src=" + ThreeDMol.modelUrl);
+    // Set the url of molecular model.
+    params.push("s=" + ThreeDMol.modelUrl);
 
     if (webrtc !== undefined) {
         console.log("setting webrtc...");
-        params.push("webrtc=" + webrtc);
+        params.push("f=" + webrtc);
     }
 
     // Also get all the representations
@@ -101,11 +103,22 @@ export function setURL(): void {
     for (let i2 = 0; i2 < len; i2++) {
         let key = keys[i2];
         if (Visualize.styleMeshes[key].mesh.isVisible) {
-            styles.push("style" + i.toString() + "=" + key);
+            styles.push("st" + i.toString() + "=" + key);
             i++;
         }
     }
     params = params.concat(styles);
+
+    // Also get the camera position and rotation.
+    let cameraPos = CommonCamera.getCameraPosition();
+    let cameraRot = CommonCamera.getCameraRotationQuaternion();
+    params.push("cx=" + round(cameraPos["x"]))
+    params.push("cy=" + round(cameraPos["y"]))
+    params.push("cz=" + round(cameraPos["z"]))
+    params.push("crx=" + round(cameraRot["x"]))
+    params.push("cry=" + round(cameraRot["y"]))
+    params.push("crz=" + round(cameraRot["z"]))
+    params.push("crw=" + round(cameraRot["w"]))
 
     // Update URL
     window.history.pushState(
@@ -121,14 +134,14 @@ export function setURL(): void {
 /**
  * Gets info from the url parameters and saves/applies it, as appropriate.
  * Note that this gets what molecular styles need to be applied, but does not
- * apply them.
+ * apply them. It should only be run once (the initial read).
  * @returns void
  */
 export function readUrlParams(): void {
     let params = getAllUrlParams(window.location.href);
 
     // Before anything, check if this is a webrtc session.
-    webrtc = params["webrtc"];
+    webrtc = params["f"];
     if (webrtc !== undefined) {
         Student.startFollowing(webrtc);
 
@@ -150,22 +163,22 @@ export function readUrlParams(): void {
 
     // Update the mesh rotations
     /** @type {number} */
-    let x = params["x"];
+    let rx = params["rx"];
 
     /** @type {number} */
-    let y = params["y"];
+    let ry = params["ry"];
 
     /** @type {number} */
-    let z = params["z"];
+    let rz = params["rz"];
 
-    x = (x === undefined) ? 0 : +x;
-    y = (y === undefined) ? 0 : +y;
-    z = (z === undefined) ? 0 : +z;
-    VRML.setMolRotation(x, y, z);
+    rx = (rx === undefined) ? 0 : +rx;
+    ry = (ry === undefined) ? 0 : +ry;
+    rz = (rz === undefined) ? 0 : +rz;
+    VRML.setMolRotation(rx, ry, rz);
 
-    // Set the url if it's present.
+    // Set the protein model if it's present.
     /** @type {string} */
-    let src = params["src"];
+    let src = params["s"];
     if (src !== undefined) {
         if ((src.length === 4) && (src.indexOf(".") === -1)) {
             // Assume it's a pdb id
@@ -180,7 +193,7 @@ export function readUrlParams(): void {
     let len = keys.length;
     for (let i = 0; i < len; i++) {
         let key = keys[i];
-        if (key.slice(0, 5) === "style") {
+        if (key.slice(0, 2) === "st") {
             let repInfo = extractRepInfoFromKey(params[key]);
             stylesQueue.push(repInfo);
         }
@@ -191,6 +204,26 @@ export function readUrlParams(): void {
         stylesQueue.push([["Protein", "All"], "Cartoon", "Spectrum"]);
         stylesQueue.push([["Ligand", "All"], "Stick", "Element"]);
     }
+
+    // Position the camera
+    let cx = params["cx"]
+    let cy = params["cy"]
+    let cz = params["cz"]
+    if ((cx !== undefined) && (cy !== undefined) && (cz !== undefined)) {
+        CommonCamera.setCameraPosition(new BABYLON.Vector3(+cx, +cy, +cz));
+    }
+
+    let crx = params["crx"];
+    let cry = params["cry"];
+    let crz = params["crz"];
+    let crw = params["crw"];
+    if ((crx !== undefined) && (cry !== undefined) && (crz !== undefined) && (crw !== undefined)) {
+        // TODO: ROTATION DOESN'T SEEM TO REALLY WORK...
+        CommonCamera.setCameraRotationQuaternion(new BABYLON.Quaternion(+crx, +cry, +crz, +crw));
+    }
+
+    // Start updating the URL periodically. Because of camera changes.
+    autoUpdateUrl();
 }
 
 /**
@@ -232,9 +265,21 @@ export function startLoadingStyles(): void {
 }
 
 /**
- * Checks if "webrtc=" in url. This works even if UrlVars hasn't been set yet.
+ * Checks if "f=" in url (webrtc). This works even if UrlVars hasn't been set yet.
  * @returns boolean
  */
 export function checkWebrtcInUrl(): boolean {
-    return window.location.href.indexOf("webrtc=") !== -1;
+    return window.location.href.indexOf("f=") !== -1;
+}
+
+/**
+ * Periodically update the url. This is because the camera can change, but I
+ * don't want to update the url with every tick of the loop.
+ * @returns void
+ */
+function autoUpdateUrl(): void {
+    // TODO: Might be good to check if camera has moved.
+    setInterval(() => {
+        setURL();
+    }, 1000);
 }

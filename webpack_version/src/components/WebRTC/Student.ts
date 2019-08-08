@@ -6,6 +6,8 @@ import * as Vars from "../Vars";
 
 declare var BABYLON: any;
 
+let peerId: string;
+
 export class Student extends WebRTCBase.WebRTCBase {
     private dataReceivedFunc: any;
     private conn: any = null;  // The connection (just one).
@@ -37,6 +39,9 @@ export class Student extends WebRTCBase.WebRTCBase {
         this.conn.on("open", () => {
             console.log("Connected to: " + this.conn.peer);
         });
+
+        // Save peerid
+        peerId = id;
     }
 
     /**
@@ -82,13 +87,21 @@ export function startFollowing(id: string): void {
     targetCameraRotationQuaternion = new Float32Array(CommonCamera.getCameraRotationQuaternion().asArray());
 
     let stud = new Student((data: any) => {
-        // console.log("stud1 got data", data);
+        console.log("stud1 got data", data);
         let type = data["type"];
         let val = data["val"];
         switch (type) {
             case "locrot":
                 targetCameraPosition = new Float32Array([val[0], val[1], val[2]]);
                 targetCameraRotationQuaternion = new Float32Array([val[3], val[4], val[5], val[6]]);
+                break;
+            case "initialUrl":
+                // If "nanokid.sdf" in url, you need to redirect...
+                if (window.location.href.indexOf("nanokid.sdf") !== -1) {
+                    // Need to redirect.
+                    let newUrl = val + "&f=" + peerId;
+                    top.location.href = newUrl;
+                }
                 break;
             default:
                 break;

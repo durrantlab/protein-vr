@@ -48,17 +48,6 @@
             // on one of the durrantlab websites.
             var followTheLeaderURLVal = jQuery("#followTheLeaderURL");
             followTheLeaderURLVal.val(url);
-            jQuery.ajax("https://durrantlab.pitt.edu/shrt/short.php?url=" + url)
-            .done(function(txt) {
-                followTheLeaderURLVal.val(txt);
-                followTheLeaderURLVal.focus();
-                followTheLeaderURLVal.select();
-            })
-            .fail(function(txt) {
-                followTheLeaderURLVal.val(url);
-                followTheLeaderURLVal.focus();
-                followTheLeaderURLVal.select();
-            });
         });
     </script>
   </body>

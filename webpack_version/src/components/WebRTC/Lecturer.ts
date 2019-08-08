@@ -85,12 +85,11 @@ export function startBroadcast(): void {
 
     lect.idReady.then((id: string) => {
         OpenPopup.openUrlModal(
-            "Mirroring URL", "pages/follow-the-leader.html?" +
-            window.location.href.split("?", 2)[1] + "&webrtc=" + id,
+            "Mirroring URL", "pages/follow-the-leader.html?f=" + id,
         );
     });
 
-    // Every three seconds send the information about the representations.
+    // Periodically send the information about the representations.
     setInterval(() => {
         let pos = CommonCamera.getCameraPosition();
         let rotQua = CommonCamera.getCameraRotationQuaternion();
@@ -102,6 +101,15 @@ export function startBroadcast(): void {
             "val": val,
         });
     }, 100);
+
+    // Periodically send the current url (to sync initial representations with
+    // remote).
+    setInterval(() => {
+        lect.sendData({
+            "type": "initialUrl",
+            "val": window.location.href
+        });
+    }, 2000);
 }
 
 // For debugging...

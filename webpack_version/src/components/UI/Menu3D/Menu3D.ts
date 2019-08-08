@@ -44,11 +44,7 @@ export function setup(data?: any): void {
     latestBreadcrumbsViewed = [];
     menuInf = {
         "Styles": Styles.buildStylesSubMenu(),
-        "Rotate": Rotations.buildRotationsSubMenu(),
-        "Last": () => {
-            console.log("Going to", latestBreadcrumbsViewed);
-            showOnlyButtonsOfLevel(latestBreadcrumbsViewed);
-        },
+        "Rotate": Rotations.buildRotationsSubMenu()
     };
 
     // Save the scene data so you can reference it in the future, if you
@@ -286,6 +282,12 @@ function showOnlyButtonsOfLevel(breadcrumbs: string[]): void {
     if ((breadcrumbs !== undefined) && (breadcrumbs.length > 0)) {
         // Not the top-level menu or floor button, so enable "Last" button.
         latestBreadcrumbsViewed = breadcrumbs;
+        if (menuInf["Last"] === undefined) {
+            menuInf["Last"] = () => {
+                console.log("Going to", latestBreadcrumbsViewed);
+                showOnlyButtonsOfLevel(latestBreadcrumbsViewed);
+            }
+        }
     }
 
     // Hide all the buttons.
