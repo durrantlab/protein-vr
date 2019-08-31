@@ -8,6 +8,7 @@ import * as Navigation from "./Navigation";
 import * as Pickables from "./Pickables";
 import * as Points from "./Points";
 import * as UrlVars from "../UrlVars";
+import * as Menu3D from "../UI/Menu3D/Menu3D";
 
 declare var BABYLON: any;
 declare var jQuery: any;
@@ -99,6 +100,9 @@ function setupTriggers(): void {
         if (e.charCode === 32) {
             // Space bar
             actOnStareTrigger();
+        } else if (e.charCode === 109) {
+            // M (open 3d menu).
+            Menu3D.openMainMenuFloorButton.toggled();
         }
     });
 
@@ -306,7 +310,7 @@ function setupCaptureMouseClicksOutsideBabylon(): void {
 /**
  * Checks if you should currently be capturing clicks. TODO: Should you be
  * checking this with every render? I don't know that it can change, so maybe
- * you just need to check it once?
+ * you just need to check it once? Maybe could be in setTimeout.
  * @returns void
  */
 function checkCaptureMouseClicksOutsideBabylon(): void {
@@ -335,3 +339,6 @@ function checkCaptureMouseClicksOutsideBabylon(): void {
         // console.log(currentlyCapturingMouseClicks);
     }
 }
+
+// NOTE THAT THE TRACKPAD-CONTROLED FORWARD MOVEMENTS AND ROTATIONS USED IN VR
+// MODE ARE LOCATED IN VRControllers.ts.

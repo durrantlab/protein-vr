@@ -49,6 +49,9 @@ export function load(): void {
             // Also, make sure ground is not visible.
             let groundMesh = Vars.scene.getMeshByID("ground");
             groundMesh.visibility = 0;
+
+            // Also hide navigation sphere.
+            Vars.vrVars.navTargetMesh.isVisible = false;
         }
 
         // Load extra objects
@@ -105,8 +108,7 @@ function vrSetupBeforeBabylonFileLoaded(): void {
 function babylonScene(callBackFunc: any): void {
     LoadingScreens.babylonJSLoadingMsg("Loading the main scene...");
 
-    // TODO: Use LoadAssetContainerAsync instead?
-    BABYLON.SceneLoader.LoadAssetContainer("babylon_scenes/" + Vars.sceneName + "/", "scene.babylon", Vars.scene, (container: any) => {
+    BABYLON.SceneLoader.LoadAssetContainer(Vars.sceneName, "scene.babylon", Vars.scene, (container: any) => {
         LoadingScreens.startFakeLoading(90);
         Vars.scene.executeWhenReady(() => {
             container.addAllToScene();
@@ -127,6 +129,8 @@ function babylonScene(callBackFunc: any): void {
 
             hideObjectsUsedForSceneCreation();
 
+            allMaterialsShadeless();
+
             optimizeMeshesAndMakeClickable();
 
             callBackFunc();
@@ -135,7 +139,7 @@ function babylonScene(callBackFunc: any): void {
         if (progress["lengthComputable"]) {
             // Only to 90 to not give the impression that it's done loading.
             let percent = Math.round(90 * progress["loaded"] / progress["total"]);
-            LoadingScreens.babylonJSLoadingMsg("ALoading the main scene... " + percent.toString() + "%");
+            LoadingScreens.babylonJSLoadingMsg("Loading the main scene... " + percent.toString() + "%");
         }
     });
 }
@@ -185,6 +189,64 @@ function hideObjectsUsedForSceneCreation(): void {
         if (Vars.scene.meshes[meshIdx].name === "protein_box") {
             Vars.scene.getMeshByName("protein_box").isVisible = false;
         }
+    }
+}
+
+/**
+ * All objects with materials that have emissive textures should be shadeless.
+ * @returns void
+ */
+function allMaterialsShadeless(): void {
+    /** @type {number} */
+    let len = Vars.scene.meshes.length;
+    for (let meshIdx = 0; meshIdx < len; meshIdx++) {
+        let mesh = Vars.scene.meshes[meshIdx];
+        if (!mesh.material) { continue; }
+
+        // It has a material
+        if (mesh.material.emissiveTexture) {
+            // I thought problem on oculus was due to pbr material. Turns out
+            // it wasn't the problem. So this "fix" probably isn't necessary.
+            // I've reverted it.
+            mesh.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
+            mesh.material.albedoColor = new BABYLON.Color3(0, 0, 0);
+            mesh.material.ambientColor = new BABYLON.Color3(0, 0, 0);
+
+            // Save the original names to reuse.
+            // let meshName = mesh.name;
+            // let meshID = mesh.id;
+
+            // Make sure it's standard material. PBR material gives problems.
+            // let newMat = new BABYLON.StandardMaterial(meshName, Vars.scene);
+            // newMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
+            // newMat.specularColor = new BABYLON.Color3(0, 0, 0);
+            // newMat.emissiveColor = new BABYLON.Color3(0, 0, 0);
+            // newMat.ambientColor = new BABYLON.Color3(0, 0, 0);
+            // newMat.emissiveTexture = mesh.material.emissiveTexture;
+
+            // Dispose of old material.
+            // mesh.material.dispose();
+
+            // Update name.
+            // newMat.name = meshName;
+            // newMat.id = meshID;
+
+            // mesh.material = newMat;
+        }
+
+        // It has submaterials.
+        /** @type {number} */
+        // if (mesh.material.subMaterials) {
+        //     let len2 = mesh.material.subMaterials.length;
+        //     for (let matIdx = 0; matIdx < len2; matIdx++) {
+        //         let mat = mesh.material.subMaterials[matIdx];
+        //         if (mat.emissiveTexture) {
+        //             mat.emissiveColor = new BABYLON.Color3(1, 1, 1);
+        //             mat.albedoColor = new BABYLON.Color3(0, 0, 0);
+        //             mat.ambientColor = new BABYLON.Color3(0, 0, 0);
+        //         }
+        //     }
+        // }
     }
 }
 

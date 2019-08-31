@@ -3,6 +3,8 @@
 import * as CommonCamera from "../Cameras/CommonCamera";
 import * as WebRTCBase from "./WebRTCBase";
 import * as Vars from "../Vars";
+import * as Visualize from "../Mols/3DMol/Visualize";
+import * as Rotations from "../UI/Menu3D/Rotations";
 
 declare var BABYLON: any;
 
@@ -51,7 +53,7 @@ export class Student extends WebRTCBase.WebRTCBase {
     private setupWebRTCCallbacks(): void {
         this.peer.on("close", () => {
             this.conn = null;
-            console.log("Connection destroyed. Please refresh");
+            WebRTCBase.webRTCStandardErrorMsg();
         });
     }
 
@@ -68,7 +70,7 @@ export class Student extends WebRTCBase.WebRTCBase {
         });
 
         this.conn.on("close", () => {
-            console.log("Connection closed");
+            WebRTCBase.webRTCErrorMsg("Follow-the-leader connection closed.");
         });
     }
 }
@@ -87,7 +89,7 @@ export function startFollowing(id: string): void {
     targetCameraRotationQuaternion = new Float32Array(CommonCamera.getCameraRotationQuaternion().asArray());
 
     let stud = new Student((data: any) => {
-        console.log("stud1 got data", data);
+        // console.log("stud1 got data", data);
         let type = data["type"];
         let val = data["val"];
         switch (type) {
@@ -100,8 +102,27 @@ export function startFollowing(id: string): void {
                 if (window.location.href.indexOf("nanokid.sdf") !== -1) {
                     // Need to redirect.
                     let newUrl = val + "&f=" + peerId;
+
+                    // Followers should never have shadows, because you never
+                    // know what device your students will be viewing on.
+                    newUrl = newUrl.replace(/sh=true/g, "sh=false");
+
                     top.location.href = newUrl;
                 }
+                break;
+            case "toggleRep":
+                Visualize.toggleRep(
+                    val["filters"],
+                    val["repName"],
+                    val["colorScheme"],
+                    undefined
+                )
+                break;
+            case "molAxisRotation":
+                Rotations.axisRotation(val);
+                break;
+            case "molUndoRot":
+                Rotations.undoRotate();
                 break;
             default:
                 break;

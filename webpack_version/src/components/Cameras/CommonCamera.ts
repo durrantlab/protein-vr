@@ -93,7 +93,12 @@ export function setCameraRotationQuaternion(rotQua: any): void {
     (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
         console.log("PROBLEM!");
     } else {
+        // Update the quaternion
         Vars.scene.activeCamera.rotationQuaternion = rotQua.clone();
+
+        // Update the rotation vector accordingly. See
+        // http://www.html5gamedevs.com/topic/16160-retrieving-rotation-after-meshlookat/
+        Vars.scene.activeCamera.rotation = Vars.scene.activeCamera.rotationQuaternion.toEulerAngles();
     }
 }
 

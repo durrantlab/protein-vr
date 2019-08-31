@@ -1,60 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Bootstrap 4, from LayoutIt!</title>
+    <title>ProteinVR: Load Molecule</title>
 
-    <meta name="description" content="Protein-VR: Documentation">
+    <meta name="description" content="ProteinVR: Load Molecule">
     <meta name="author" content="Jacob Durrant">
 
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
 
-  </head>
-  <body>
+</head>
+
+<body>
 
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="form-group">
-                    <label for="exampleInputEmail1">
-                        PDB ID or URL
-                    </label>
-                    <input type="text" class="form-control" id="urlOrPDB" />
-                    <p class="help-block">
-                        Enter a PDB ID (e.g., <a target="_blank" href="https://www.rcsb.org/structure/1xdn">1XDN</a>)
-                        or the URL of a PDB or SDF file (e.g., <a target="_blank" href="https://files.rcsb.org/view/1XDN.pdb">https://files.rcsb.org/.../1XDN.pdb</a>,
-                        <a target="_blank" href="https://www.drugbank.ca/structures/small_molecule_drugs/DB00316.sdf">https://www.drugbank.ca/.../DB00316.sdf</a>).
-                    </p>
+                <div id="will-erase" style="display:none;" class="alert alert-warning" role="alert">
+                    If you open a new molecule, your current molecule will be replaced!
                 </div>
-                <button id="submit" class="btn btn-primary">
-                    Load Molecule
-                </button>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">
+                        Enter a PDB ID (e.g., <a class="link-sim" href="#" data-href="1XDN">1XDN</a>)
+                        or PDB-/SDF-file URL (e.g., <a class="link-sim" href="#" data-href="https://files.rcsb.org/view/1XDN.pdb">https://files.rcsb.org/.../1XDN.pdb</a>,
+                        <a class="link-sim" href="#" data-href="../nanokid.sdf" data-copy="nanokid.sdf">nanokid.sdf</a>).
+                    </label>
+                    <input type="text" class="form-control" id="urlOrPDB" placeholder="PDB ID or URL" />
+                    <!-- <p class="help-block"></p> -->
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <!-- <label for="environments">Environment</label> -->
+                    <label for="environments">
+                        Select an environment to give context to your molecule. Or
+                        <a href="#" onclick="loadMoreModels();">load complex environments</a>
+                        from durrantlab.com.
+                    </label>
+                    <select class="form-control" id="environments"></select>
+                    <!-- <p class="help-block"></p> -->
+                </div>
+            </div>
+        </div>
+        <!-- <div class="row">
+            <div class="col-md-12">
+                <div class="form-check">
+                    <input style="margin-left: 0;" type="checkbox" class="form-check-input" id="privacy-mode">
+                    <label style="padding-left: 1.5rem;" class="form-check-label" for="privacy-mode">Privacy Mode (Warn Before Remote Connections)</label>
+                </div>
+            </div>
+        </div> -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-check">
+                    <label for="environments">
+                        Molecular shadows can slow navigation and may crash
+                        some browsers. Turn on if using a high-end VR system.
+                    </label>
+                    <input style="margin-left: 0;" type="checkbox" class="form-check-input" id="molecular-shadows">
+                    <label style="padding-left: 1.5rem;" class="form-check-label" for="molecular-shadows">Molecules Cast Shadows</label>
+                    <p style="height:5px;">&nbsp;</p>
+                </div>
+            </div>
+        </div>
+        <button id="submit" class="btn btn-primary">
+            Load Molecule
+        </button>
     </div>
+    <hr />
+    <p>
+        ProteinVR is brought to you by the <a href="http://durrantlab.com"
+        target="_blank">Durrant Lab</a> at the University of Pittsburgh. If
+        you use ProteinVR in your research, please cite: {CITATION}.
+    </p>
 
     <script src="scripts/jquery.min.js"></script>
     <script src="scripts/bootstrap.min.js"></script>
     <script src="scripts/scripts.js"></script>
     <script>
         jQuery(document).ready(() => {
-            var submitButton = jQuery("#submit");
-            submitButton.click(() => {
-                let curUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                let newUrl = curUrl.slice(0, curUrl.length - 15) + "?s=" + jQuery("#urlOrPDB").val();
-                top.location.href = newUrl;
+            // Determine whether warning should be displayed. Do this fast.
+            var warning = jQuery("#will-erase");
+            if (window.location.href.indexOf("warning") !== -1) {
+                warning.show();
+            } else {
+                warning.hide();
+            }
+
+            // Load in the html for the default environment options (local).
+            let firstHTML = new Promise((resolve, reject) => {
+                jQuery.getJSON("../environs/environments_list.json").done((data) => {
+                    var html = "";
+                    for (var e of data) {
+                        html += '<option value="' + e["path"] + '">' + e["description"] + ' (Mobile Friendly)</option>';
+                    }
+                    resolve(html);
+                }).fail(function() {
+                    resolve("");  // could use reject too.
+                });
             });
-            jQuery("body").keypress((e) => {
-                if (e.charCode === 13) {
-                    submitButton.trigger("click");
+
+            // Also load html of external (more complex) environments. Note
+            // that you can't use durrantlab.com, because redirects invalidate
+            // CORS.
+            let remoteBaseUrl = "https://durrantlab.pitt.edu/apps/proteinvr/environments/";
+            let secondHTML = new Promise((resolve, reject) => {
+                jQuery.getJSON(remoteBaseUrl + "environments_list.json").done((data) => {
+                    html = "";
+                    for (var e of data) {
+                    }
+                    resolve(html);
+                }).fail(function() {
+                    resolve("");  // could use reject too.
+                });;
+            });
+
+            // When both are resady, add them to the dom.
+            Promise.all([firstHTML, secondHTML]).then((htmls) => {
+                var environmentSelect = jQuery("#environments");
+                environmentSelect.append(htmls[0] + htmls[1]);
+
+                // Get jquery objects for the form elements.
+                var urlOrPDB = jQuery("#urlOrPDB");
+                var shadowsObj = jQuery("#molecular-shadows");
+                var submitButton = jQuery("#submit");
+
+                // Set the values of those form elements if they are in local
+                // storage. Decided not to save url for security reasons.
+                // if (localStorage.getItem("url") !== null) {
+                //     urlOrPDB.val(localStorage.getItem("url"));
+                // }
+                if (localStorage.getItem("environ") !== null) {
+                    environmentSelect.find(
+                        'option[value="' + localStorage.getItem("environ") + '"]'
+                    ).prop('selected', true);
+                }
+                if (localStorage.getItem("shadows") !== null) {
+                    shadowsObj.prop("checked", localStorage.getItem("shadows") === "true");
+                }
+
+                urlOrPDB.focus();
+
+                submitButton.click(() => {
+                    // Get the form values.
+                    var url = urlOrPDB.val();
+                    var environmentSelectOption = environmentSelect.find("option:selected");
+                    var environ = environmentSelectOption.val();
+                    var shadows = shadowsObj.is(':checked');
+
+                    // Save them so they are the same when you reload. Decided
+                    // not to save url for security reasons (could be
+                    // proprietary).
+                    // localStorage.setItem('url', url);
+                    localStorage.setItem('environ', environ);
+                    localStorage.setItem('shadows', shadows);
+
+                    // Constricut the redirect url and redirect.
+                    let curUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                    let newUrl = curUrl.slice(0, curUrl.length - 15) + "?s=" + url + "&e=" + environ + "&sh=" + shadows.toString();
+                    top.location.href = newUrl;
+                });
+
+                jQuery("body").keypress((e) => {
+                    if (e.charCode === 13) {
+                        submitButton.trigger("click");
+                    }
+                });
+            });
+
+            jQuery(".link-sim").click(function(event) {
+                event.preventDefault()
+
+                var This = jQuery(this);
+                var href = This.data("href");
+                var copy = This.data("copy");
+                if (copy === undefined) { copy = href; }
+                jQuery("#urlOrPDB").val(copy);
+
+                if ((href.slice(0, 4) === "http") || (href.indexOf(".sdf") !== -1)) {
+                    window.open(href, '_blank');
                 }
             });
-            jQuery("#urlOrPDB").focus();
         });
+
+        function loadMoreModels() {
+            alert("hi");
+        }
     </script>
-  </body>
+</body>
+
 </html>

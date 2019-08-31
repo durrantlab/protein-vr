@@ -4,11 +4,15 @@ import * as CommonCamera from "../Cameras/CommonCamera";
 import * as OpenPopup from "../UI/OpenPopup/OpenPopup";
 import * as WebRTCBase from "./WebRTCBase";
 
+export let isLecturerBroadcasting: boolean = false;
+
+let lect: any;
+
 export class Lecturer extends WebRTCBase.WebRTCBase {
     public idReady: any = null;
     public gotConn: any = null;
     private conns: any = [];  // The connections (there could be multiple ones
-                         // because this is the lecturer).
+                              // because this is the lecturer).
 
     constructor() {
         super();
@@ -47,7 +51,7 @@ export class Lecturer extends WebRTCBase.WebRTCBase {
         this.peer.on("open", (id: string) => {
             // Workaround for peer.reconnect deleting previous id
             if (this.peer.id === null) {
-                console.log("Received null id from peer open");
+                WebRTCBase.webRTCErrorMsg("Received null id from peer open.");
                 this.peer.id = this.peerId;
             } else {
                 this.peerId = this.peer.id;
@@ -69,7 +73,7 @@ export class Lecturer extends WebRTCBase.WebRTCBase {
             for (let i = 0; i < connsLen; i++) {
                 this.conns[i] = null;
             }
-            console.log("Connection destroyed. Please refresh");
+            WebRTCBase.webRTCStandardErrorMsg();
         });
     }
 }
@@ -80,12 +84,14 @@ export class Lecturer extends WebRTCBase.WebRTCBase {
  * @returns void
  */
 export function startBroadcast(): void {
+    isLecturerBroadcasting = true;
+
     // Contact the peerjs server
-    let lect = new Lecturer();
+    lect = new Lecturer();
 
     lect.idReady.then((id: string) => {
-        OpenPopup.openUrlModal(
-            "Mirroring URL", "pages/follow-the-leader.html?f=" + id,
+        OpenPopup.openModal(
+            "Follow the Leader", "pages/follow-the-leader.html?f=" + id, true, true
         );
     });
 
@@ -110,6 +116,49 @@ export function startBroadcast(): void {
             "val": window.location.href
         });
     }, 2000);
+}
+
+/**
+ * Sends the data to the student so they can run Visualize.toggleRep in their
+ * ProteinVR instance.
+ * @param  {Array<*>}            filters        Can include strings (lookup
+ *                                              sel in selKeyWordTo3DMolSel).
+ *                                              Or a 3DMoljs selection object.
+ * @param  {string}              repName        The representative name. Like
+ *                                              "Surface".
+ * @param  {string}              colorScheme    The name of the color scheme.
+ * @param  {Function|undefined}  finalCallback  Callback to run once the mesh
+ *                                              is entirely done.
+ * @returns void
+ */
+export function sendToggleRepCommand(filters: any[], repName: string, colorScheme: string): void {
+    lect.sendData({
+        "type": "toggleRep",
+        "val":{
+            "filters": filters,
+            "repName": repName,
+            "colorScheme": colorScheme
+        }
+    });
+}
+
+/**
+ * Sends the data to the student so they can run Rotations.axisRotation.
+ * @param  {string} axis The axis to rotate about.
+ * @returns void
+ */
+export function sendUpdateMolRotCommand(axis: string): void {
+    lect.sendData({
+        "type": "molAxisRotation",
+        "val": axis
+    });
+}
+
+export function sendUndoRotCommand(): void {
+    lect.sendData({
+        "type": "molUndoRot",
+        "val": undefined
+    });
 }
 
 // For debugging...

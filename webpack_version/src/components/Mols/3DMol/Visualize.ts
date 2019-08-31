@@ -7,6 +7,7 @@ import * as UrlVars from "../../UrlVars";
 import * as Vars from "../../Vars";
 import * as PositionInScene from "./PositionInScene";
 import * as VRML from "./VRML";
+import * as Lecturer from "../../WebRTC/Lecturer";
 
 // Where the meshes generated from 3DMol.js get stored.
 interface IStyleMesh {
@@ -35,7 +36,7 @@ let selKeyWordTo3DMolSel = {
     "Neutral":     {"resn": lAndU(["VAL", "PHE", "GLN", "TYR", "HIS", "CYS",
                                    "MET", "TRP", "ASX", "GLX", "PCA", "HYP"])},
     "Nucleic":     {"resn": lAndU(["ADE", "A", "GUA", "G", "CYT", "C", "THY",
-                                   "T", "URA", "U"])},
+                                   "T", "URA", "U", "DA", "DG", "DC", "DT"])},
     "Purine":      {"resn": lAndU(["ADE", "A", "GUA", "G"])},
     "Pyrimidine":  {"resn": lAndU(["CYT", "C", "THY", "T", "URA", "U"])},
     "Ions":        {"resn": lAndU(["AL", "BA", "CA", "CAL", "CD", "CES", "CLA",
@@ -79,11 +80,6 @@ let colorSchemeKeyWordTo3DMol = {
     "Yellow": {"color": "yellow"},
 };
 
-// Ligand?
-
-// TODO:
-// All residus? Chains? Elements? Others here... https://3dmol.csb.pitt.edu/doc/types.html#AtomSpec
-
 /**
  * The toggleRep function. Starts the mesh-creation proecss.
  * @param  {Array<*>}            filters        Can include strings (lookup
@@ -97,6 +93,11 @@ let colorSchemeKeyWordTo3DMol = {
  * @returns void
  */
 export function toggleRep(filters: any[], repName: string, colorScheme: string, finalCallback: any = undefined): void {
+    if (Lecturer.isLecturerBroadcasting) {
+        // Let the student know about this change...
+        Lecturer.sendToggleRepCommand(filters, repName, colorScheme);
+    }
+
     // Get the key of this rep request.
     /** @type {Object<string,*>} */
     let keys = getKeys(filters, repName, colorScheme);
@@ -195,17 +196,23 @@ function toggleRepContinued(keys: any, repName: string, finalCallback: any): voi
             }
         }
 
-        // If the new mesh is a surface, make it so each triangle is two sided
-        // and delete the surface from 3Dmoljs instance (cleanup).
-        if (repName === "Surface") {
-            newMesh.material.backFaceCulling = false;
-        }
+        if (newMesh !== undefined) {
+            // newMesh is undefined if you tried to select something not
+            // present in the scene (e.g., trying to select nucleic when there
+            // is no nucleic in the model).
 
-        // Add this new one.
-        styleMeshes[keys.fullKey] = {
-            categoryKey: keys.categoryKey,
-            mesh: newMesh,
-        };
+            // If the new mesh is a surface, make it so each triangle is two
+            // sided and delete the surface from 3Dmoljs instance (cleanup).
+            if (repName === "Surface") {
+                newMesh.material.backFaceCulling = false;
+            }
+
+            // Add this new one.
+            styleMeshes[keys.fullKey] = {
+                categoryKey: keys.categoryKey,
+                mesh: newMesh,
+            };
+        }
 
         visChanged();
 

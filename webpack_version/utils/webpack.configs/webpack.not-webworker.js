@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 var HtmlWebpackExcludeAssetsPlugin = require('html-webpack-exclude-assets-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
+const WorkboxPlugin = require('workbox-webpack-plugin');  // for PWA
 // const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 module.exports = merge(common, {
@@ -30,11 +31,28 @@ module.exports = merge(common, {
             "window.$3Dmol": '3dmol'
         }),
         new CopyWebpackPlugin([
-            {from: 'src/babylon_scenes', to: 'babylon_scenes'},
+            {from: 'src/babylon_scenes', to: 'environs'},
             {from: 'src/js', to: 'js'},
             {from: 'src/components/UI/OpenPopup/pages', to: 'pages'},
-            {from: 'src/components/Mols/3DMol/nanokid.sdf', to: 'nanokid.sdf'}
+            {from: 'src/components/Mols/3DMol/nanokid.sdf', to: 'nanokid.sdf'},
+            {from: 'src/pwa/icon-192.png', to: 'icon-192.png'},
+            {from: 'src/pwa/icon-256.png', to: 'icon-256.png'},
+            {from: 'src/pwa/icon-512.png', to: 'icon-512.png'},
+            {from: 'src/pwa/icon-1024.png', to: 'icon-1024.png'},
+            {from: 'src/pwa/manifest.webmanifest', to: 'manifest.webmanifest'},
         ]),
+        new WorkboxPlugin.GenerateSW({
+            // These options encourage the ServiceWorkers to get in there fast
+            // and not allow any straggling "old" SWs to hang around. See
+            // https://webpack.js.org/guides/progressive-web-application/
+            clientsClaim: true,
+            skipWaiting: true,
+            // swDest: 'sw.js'
+            runtimeCaching: [{
+                urlPattern: /\./,
+                handler: 'NetworkFirst'  // First check the network. If that fails, use cache...
+            }]
+        })
     ],
     module: {
         rules: [
@@ -57,8 +75,13 @@ module.exports = merge(common, {
         ]
     },
     output: {
-        chunkFilename: '[name].[hash].js',  // contenthash
-        filename: "[name].[hash].js"  // contenthash
+        // No longer using hashes. Because google closure compiler makes
+        // copies of files, which then get passed to service worker manifest,
+        // causing all sorts of problems.
+        // chunkFilename: '[name].[hash].js',  // contenthash
+        // filename: "[name].[hash].js"  // contenthash
+        chunkFilename: '[name].js',  // contenthash
+        filename: "[name].js"  // contenthash
     },
     optimization: {
         // Below breaks webworker, because calls window from within it.

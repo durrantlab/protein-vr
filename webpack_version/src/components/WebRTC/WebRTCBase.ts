@@ -1,6 +1,8 @@
 // Functions that are common to the main classes of Lecturer.ts and
 // Student.ts.
 
+import * as OpenPopup from "../UI/OpenPopup/OpenPopup";
+
 declare var Peer: any;
 
 export class WebRTCBase {
@@ -19,18 +21,42 @@ export class WebRTCBase {
      */
     private createPeerObj(): void {
         // Create own peer object with connection to shared PeerJS server
-        let idToUse = "pvr" + Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);  // null and it gets picked for you.
+        // let idToUse = "pvr" + Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);  // null and it gets picked for you.
+
+        let wrds = ["act", "add", "age", "ago", "aid", "aim", "air", "all",
+                    "and", "any", "arm", "art", "ask", "bag", "ban", "bar",
+                    "bed", "bet", "big", "bit", "box", "bus", "but", "buy",
+                    "can", "cap", "car", "cat", "ceo", "cow", "cry", "cup",
+                    "day", "dig", "dna", "rna", "dog", "dry", "due", "ear",
+                    "eat", "egg", "end", "era", "etc", "eye", "fan", "far",
+                    "fee", "few", "fit", "fix", "fly", "for", "fun", "gap",
+                    "get", "guy", "hat", "hey", "hip", "hit", "hot", "how",
+                    "ice", "its", "jet", "job", "joy", "key", "kid", "lab",
+                    "law", "lay", "let", "lie", "lot", "low", "map", "may",
+                    "mix", "net", "new", "nod", "nor", "not", "now", "nut",
+                    "odd", "off", "oil", "old", "one", "our", "out", "owe",
+                    "own", "pan", "pay", "per", "pet", "pie", "pop", "put",
+                    "raw", "red", "rid", "row", "run", "say", "sea", "see",
+                    "set", "sit", "six", "ski", "sky", "sue", "sun", "tap",
+                    "tax", "ten", "the", "toe", "too", "top", "toy", "try",
+                    "two", "use", "via", "war", "way", "wet", "who", "why",
+                    "win", "yes", "yet", "you"]
+        let idToUse = "pvr" + this.randomNumStr();
+        idToUse += wrds[Math.floor(Math.random() * wrds.length)] + this.randomNumStr();
+        // idToUse += wrds[Math.floor(Math.random() * wrds.length)] + this.randomNumStr();
+        idToUse = idToUse.replace(/\./g, "");
 
         // Remove some ambiguous ones.
-        for (let c of ["1", "l", "O", "0"]) {
-            idToUse = idToUse.replace(c, "");
-        }
+        // for (let c of ["1", "l", "O", "0"]) {
+        //     idToUse = idToUse.replace(c, "");
+        // }
 
         this.peer = new Peer(idToUse, {
             "debug": 2,
             "config": {'iceServers': [
                 {"url": 'stun:0.peerjs.com'},
                 {"url": 'stun:stun.l.google.com:19302'},
+                {"url": 'stun:durrantlab.com/apps/proteinvr/stun'}  // not yet implemented
                 // {"url": 'stun:stun1.l.google.com:19302'},
                 // {"url": 'stun:stun2.l.google.com:19302'},
                 // {"url": 'stun:stun3.l.google.com:19302'},
@@ -47,7 +73,8 @@ export class WebRTCBase {
      */
     private setupWebRTCCloseFuncs(): void {
         this.peer.on("disconnected", () => {
-            console.log("Connection lost. Please reconnect");
+            webRTCStandardErrorMsg();
+            // console.log("Connection lost. Please reconnect");
 
             // Workaround for peer.reconnect deleting previous id
             this.peer.id = this.peerId;
@@ -56,7 +83,38 @@ export class WebRTCBase {
         });
 
         this.peer.on("error", (err: any) => {
-            console.log(err);
+            webRTCErrorMsg(err);
         });
     }
+
+    private randomNumStr(): string {
+        return Math.random().toString().replace(/\./g, "").replace(/0/g, "").slice(0, 3);
+    }
+}
+
+/**
+ * Throw a generic error message to let the user know that the connection has
+ * failed.
+ * @param  {string} details  An additional message to display, beyond the
+ *                           default one.
+ * @returns void
+ */
+export function webRTCErrorMsg(details: string = ""): void {
+    let msg = "<p>ProteinVR has encountered an error while running in follow-the-leader mode. ";
+    if (details !== "") {
+        msg += " Here are the details:</p>"
+        msg += "<p><pre>" + details + "</pre></p>";
+    } else {
+        msg += "</p>";
+    }
+
+    OpenPopup.openModal("Follow-the-Leader Error", msg, false);
+}
+
+/**
+ * Show the standard "please refresh" error message.
+ * @returns void
+ */
+export function webRTCStandardErrorMsg(): void {
+    webRTCErrorMsg("Follow-the-leader connection destroyed. Please refresh.");
 }

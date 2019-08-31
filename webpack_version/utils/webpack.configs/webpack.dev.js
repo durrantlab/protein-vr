@@ -9,7 +9,8 @@ let forDev = {
     devServer: {
         contentBase: '../../dist',
         hot: false,  // This breaks webworkers if true.
-        liveReload: true
+        liveReload: true,
+        writeToDisk: true
     },
     plugins: [
         new webpackDashboard(),

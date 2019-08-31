@@ -69,7 +69,7 @@ function after3DMolJsLoaded(sceneInfoData: any): void {
             if (modelUrl === "nanokid.sdf") {
                 setTimeout(() => {
                     // Give them some time to admire nanokid... :)
-                    OpenPopup.openUrlModal("Load Molecule", "pages/load.html");
+                    OpenPopup.openModal("Load Molecule", "pages/load.html");
                 }, 3000);
             }
         });

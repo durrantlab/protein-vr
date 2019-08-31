@@ -21,7 +21,22 @@ export let canvas: any;
 export let engine: any;
 export let scene: any;
 export let vrHelper: any;
-export let sceneName: string = "room";
+export let sceneName: string = "environs/room/";
+
+/**
+ * Setter for sceneName variable.
+ * @param  {string} val  The value to set.
+ */
+export function setSceneName(val: string) { sceneName = val; }
+
+/** @type {boolean} */
+export let positionOnFloor: boolean = false;
+
+/**
+ * Setter for positionOnFloor variable.
+ * @param  {boolean} val  The value to set.
+ */
+export function setPositionOnFloor(val: boolean) { positionOnFloor = val; }
 
 /** @type {number} */
 export let cameraHeight: number;
@@ -134,7 +149,11 @@ export function setCameraHeight(height: number): void {
  * @param  {Object<string,*>} initParams The initial parameters.
  */
 export function setupVR(initParams: IVRSetup): void {
-    // If running in Student mode, do not set up VR camera...
+    // Save the parameter to params (module-level variable).
+    vrVars = initParams;
+
+    // If running in Student mode, do not set up VR camera... But good to
+    // define vrVars first (above) so you can hide the nav sphere elsewhere.
     if (UrlVars.checkWebrtcInUrl()) {
         return;
     }
@@ -162,9 +181,6 @@ export function setupVR(initParams: IVRSetup): void {
 
     // For debugging....
     // window["vrHelper"] = vrHelper;
-
-    // Save the parameter to params (module-level variable).
-    vrVars = initParams;
 
     // Whether the menu system is active. True by default.
     vrVars.menuActive = true;

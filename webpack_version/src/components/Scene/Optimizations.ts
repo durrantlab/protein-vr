@@ -8,12 +8,16 @@ declare var BABYLON: any;
  * @returns void
  */
 export function setup(): void {
-    // Turn on scene optimizer
-    BABYLON.SceneOptimizer.OptimizeAsync(
-        Vars.scene,
-        // BABYLON.SceneOptimizerOptions.HighDegradationAllowed(),
-        sceneOptimizerParameters(),
-    );
+    // Turn on scene optimizer. Note that during loading the fps is bound to
+    // drop, so let's put it on a little delay. TODO: Only run this once the
+    // model and scene are loaded.
+    setTimeout(() => {
+        BABYLON.SceneOptimizer.OptimizeAsync(
+            Vars.scene,
+            // BABYLON.SceneOptimizerOptions.HighDegradationAllowed(),
+            sceneOptimizerParameters(),
+        );
+    }, 5000);
 
     // Assume no part of the scene goes on to empty (skybox?)
     Vars.scene.autoClear = false; // Color buffer
@@ -115,7 +119,8 @@ export function freezeMeshProps(mesh: any, freezeMaterial: boolean = true, world
 }
 
 /**
- * Update the environment shadows. They are frozen otherwise.
+ * Update the environment shadows. They are frozen otherwise. This function
+ * unfreezes them and the freezes them again.
  * @returns void
  */
 export function updateEnvironmentShadows(): void {
@@ -123,6 +128,7 @@ export function updateEnvironmentShadows(): void {
         // Update the shadows. They are frozen otherwise.
         Vars.scene.lights[0].autoUpdateExtends = true;
         Shadows.shadowGenerator.getShadowMap().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
+        // Vars.scene.render();
         Vars.scene.lights[0].autoUpdateExtends = false;
     }
 }

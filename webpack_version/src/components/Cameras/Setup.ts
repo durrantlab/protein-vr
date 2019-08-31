@@ -11,7 +11,8 @@ export let cameraFromBabylonFile: any;
  */
 export function setup(): void {
     // You need to make the camera from the babylon file active. First, get
-    // the babylon camera.
+    // the babylon camera. It's the one that doesn't have "VR" in its name,
+    // because VR cameras are added programatically.
     cameraFromBabylonFile = Vars.scene.cameras.filter(
         (c: any) => c.name.indexOf("VR") === -1,
     )[0];

@@ -13,10 +13,16 @@ declare var jQuery: any;
 export function setup(): void {
     CommonLoader.beforeLoading();
 
-    jQuery.getJSON("babylon_scenes/" + Vars.sceneName + "/scene_info.json", (data: any) => {
-        // Deactivate menu if appropriate.
+    jQuery.getJSON(Vars.sceneName + "scene_info.json", (data: any) => {
+        // Deactivate menu if appropriate. Note that this feature is not
+        // supported (gives an error). Perhaps in the future I will
+        // reimplement it, so I'm leaving the vestigial code here.
         if (data["menuActive"] === false) {
             Vars.vrVars.menuActive = false;
+        }
+
+        if (data["positionOnFloor"] === true) {
+            Vars.setPositionOnFloor(true);
         }
 
         // Load from a pdb file via 3Dmoljs.

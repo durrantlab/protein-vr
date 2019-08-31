@@ -5,6 +5,7 @@ import * as CommonCamera from "../Cameras/CommonCamera";
 import * as Vars from "../Vars";
 import * as Navigation from "./Navigation";
 import * as Pickables from "./Pickables";
+import * as Menu3D from "../UI/Menu3D/Menu3D";
 
 declare var BABYLON: any;
 
@@ -27,6 +28,9 @@ export function setCurStarePt(pt: any): void {
  * @returns void
  */
 export function setup(): void {
+    // Hide menu button if clsoer than this
+    const CLOSE_TO_GROUND_DIST = Vars.BUTTON_SPHERE_RADIUS * 1.5;
+
     // Constantly update the stare point info. Also, position the tracking
     // mesh.
     Vars.scene.registerBeforeRender(() => {
@@ -43,8 +47,22 @@ export function setup(): void {
 
         // Also the point on the ground below the camera should be updated
         // every turn of the render loop (to position the menu button).
-        let pickedGroundPt = groundPointPickingInfo(CommonCamera.getCameraPosition()).pickedPoint;
-        if (pickedGroundPt) { groundPointBelowCamera = pickedGroundPt; }
+        let camPos = CommonCamera.getCameraPosition();
+        let pickedGroundPt = groundPointPickingInfo(camPos).pickedPoint;
+        if (pickedGroundPt) {
+            groundPointBelowCamera = pickedGroundPt;
+
+            // If the pickedgroundPt is close, hide the navigation menu button (to
+            // prevent user from getting trapped).
+            let heightOffGround = camPos.y - pickedGroundPt.y;
+            if (heightOffGround < CLOSE_TO_GROUND_DIST) {
+                Menu3D.openMainMenuFloorButton.button.isVisible = false;
+                Menu3D.openMainMenuFloorButton.containingMesh.isVisible = false;
+            } else {
+                Menu3D.openMainMenuFloorButton.button.isVisible = true;
+                Menu3D.openMainMenuFloorButton.containingMesh.isVisible = true;
+            }
+        }
 
         // Also the point on the ground below the stare point.
         pickedGroundPt = groundPointPickingInfo(curStarePt).pickedPoint;

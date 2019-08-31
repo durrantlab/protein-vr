@@ -35,6 +35,7 @@
         "webpack-dashboard": "^3.0.7",
         "webpack-dev-server": "^3.7.2",
         "webpack-merge": "^4.2.1",
+        "workbox-webpack-plugin": "^4.3.1",
         "worker-loader": "^2.0.0"
     },
     "dependencies": {

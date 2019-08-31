@@ -53,44 +53,47 @@ export function afterLoading(sceneInfoData: any): void {
 /**
  * Sets up a molecule mesh.
  * @param  {*}      mesh           The mesh.
- * @param  {string} objID          A string identifying this mesh.
- * @param  {*}      shadowQuality  The shadow quality. Like "Skip".
  * @param  {number} uniqIntID      A unique numerical id that identifies this
  *                                 mesh.
  * @returns void
  */
-export function setupMesh(mesh: any, objID: string, shadowQuality: string, uniqIntID: number): void {
+export function setupMesh(mesh: any, uniqIntID: number): void {
     if ((mesh.material !== undefined) && (mesh.material !== null)) {
         // Add a small emission color so the dark
         // side of the protein isn't too dark.
-        let lightingInf = Shadows.getBlurDarknessFromLightName();
-
-        // Experience:
-
-        // In Couch scene, background luminosity of 0.01 is good. There shadow
-        // darkness was 0.9625
-
-        // In House scene, background luminosity of 0.0025 is good. There
-        // shadow darkness was 0.35.
-
-        // Let's play around with a scheme for guessing at the right
-        // background luminosity.
-
+        let lightingInf = Shadows.getBlurDarknessAmbientFromLightName();
         let backgroundLum = 0;
 
-        /** @type {number} */
-        let lightingInfDarkness = lightingInf.darkness;
-        if (lightingInfDarkness > 0.95) {
-            backgroundLum = 0.05;
-        } else if (lightingInfDarkness < 0.4) {
-            backgroundLum = 0.0025;
+        if (lightingInf.ambient === undefined) {
+            // Experience:
+
+            // In Couch scene, background luminosity of 0.01 is good. There shadow
+            // darkness was 0.9625
+
+            // In House scene, background luminosity of 0.0025 is good. There
+            // shadow darkness was 0.35.
+
+            // Let's play around with a scheme for guessing at the right
+            // background luminosity.
+
+            /** @type {number} */
+            let lightingInfDarkness = lightingInf.darkness;
+            if (lightingInfDarkness > 0.95) {
+                backgroundLum = 0.05;
+            } else if (lightingInfDarkness < 0.4) {
+                backgroundLum = 0.0025;
+            } else {
+                // Scaled
+                // (0.95, 0.01)
+                // (0.4, 0.0025)
+                // let m = 0.013636363636363637;  // (0.01 - 0.0025) / (0.95 - 0.4);
+                // let b = -0.0029545454545454545;  // 0.01 - 0.013636363636363637 * 0.95;
+                backgroundLum = 0.013636363636363637 * lightingInfDarkness - 0.0029545454545454545;
+            }
         } else {
-            // Scaled
-            // (0.95, 0.01)
-            // (0.4, 0.0025)
-            // let m = 0.013636363636363637;  // (0.01 - 0.0025) / (0.95 - 0.4);
-            // let b = -0.0029545454545454545;  // 0.01 - 0.013636363636363637 * 0.95;
-            backgroundLum = 0.013636363636363637 * lightingInfDarkness - 0.0029545454545454545;
+            // It's given in the name of the light, so no need to try to
+            // calculate it.
+            backgroundLum = lightingInf.ambient;
         }
 
         mesh.material.emissiveColor = new BABYLON.Color3(backgroundLum, backgroundLum, backgroundLum);

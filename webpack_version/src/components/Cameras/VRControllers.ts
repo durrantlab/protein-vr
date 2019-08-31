@@ -119,8 +119,7 @@ function setupPad(webVRController: any): void {
 }
 
 /**
- * Moves the camera slightly forward. TODO: Shouldn't this be in
- * Navigation.ts?
+ * Moves the camera slightly forward.
  * @returns void
  */
 function moveCamera(): void {
@@ -143,7 +142,7 @@ function moveCamera(): void {
 }
 
 /**
- * Rotates the VR camera slightly. TODO: Shouldn't this be in Navigation.ts?
+ * Rotates the VR camera slightly.
  * @returns void
  */
 function rotateCamera(): void {

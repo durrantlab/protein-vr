@@ -4,12 +4,15 @@ import * as VRML from "./Mols/3DMol/VRML";
 import * as Student from "./WebRTC/Student";
 import * as Vars from "./Vars";
 import * as CommonCamera from "./Cameras/CommonCamera";
+// import * as OpenPopup from "./UI/OpenPopup/OpenPopup";
 
 declare var jQuery: any;
 declare var BABYLON: any;
 
 let stylesQueue: any[] = [];
 export let webrtc: any = undefined;
+export let shadows: boolean = false;
+let urlParams: any;
 
 /**
  * Get all the url parameters from a url string.
@@ -120,6 +123,13 @@ export function setURL(): void {
     params.push("crz=" + round(cameraRot["z"]))
     params.push("crw=" + round(cameraRot["w"]))
 
+    // Also get the environment
+    params.push("e=" + Vars.sceneName);
+
+    if (shadows === undefined) { shadows = false; }
+
+    params.push("sh=" + shadows.toString());
+
     // Update URL
     window.history.pushState(
         {
@@ -132,16 +142,30 @@ export function setURL(): void {
 }
 
 /**
+ * This function gets the environment name. It's separated from
+ * readUrlParams() because you need th environment name earlier in the
+ * loadding process.
+ * @returns void
+ */
+export function readEnvironmentNameParam(): void {
+    urlParams = getAllUrlParams(window.location.href);
+
+    // Get the environment.
+    let environ = urlParams["e"];
+    if (environ !== undefined) {
+        Vars.setSceneName(environ);
+    }
+}
+
+/**
  * Gets info from the url parameters and saves/applies it, as appropriate.
  * Note that this gets what molecular styles need to be applied, but does not
  * apply them. It should only be run once (the initial read).
  * @returns void
  */
 export function readUrlParams(): void {
-    let params = getAllUrlParams(window.location.href);
-
     // Before anything, check if this is a webrtc session.
-    webrtc = params["f"];
+    webrtc = urlParams["f"];
     if (webrtc !== undefined) {
         Student.startFollowing(webrtc);
 
@@ -163,13 +187,13 @@ export function readUrlParams(): void {
 
     // Update the mesh rotations
     /** @type {number} */
-    let rx = params["rx"];
+    let rx = urlParams["rx"];
 
     /** @type {number} */
-    let ry = params["ry"];
+    let ry = urlParams["ry"];
 
     /** @type {number} */
-    let rz = params["rz"];
+    let rz = urlParams["rz"];
 
     rx = (rx === undefined) ? 0 : +rx;
     ry = (ry === undefined) ? 0 : +ry;
@@ -178,8 +202,8 @@ export function readUrlParams(): void {
 
     // Set the protein model if it's present.
     /** @type {string} */
-    let src = params["s"];
-    if (src !== undefined) {
+    let src = urlParams["s"];
+    if ((src !== undefined) && (src !== "")) {
         if ((src.length === 4) && (src.indexOf(".") === -1)) {
             // Assume it's a pdb id
             src = "https://files.rcsb.org/view/" + src.toUpperCase() + ".pdb";
@@ -189,12 +213,12 @@ export function readUrlParams(): void {
 
     // Setup the styles as well.
     /** @type {Array<string>} */
-    let keys = Object.keys(params);
+    let keys = Object.keys(urlParams);
     let len = keys.length;
     for (let i = 0; i < len; i++) {
         let key = keys[i];
         if (key.slice(0, 2) === "st") {
-            let repInfo = extractRepInfoFromKey(params[key]);
+            let repInfo = extractRepInfoFromKey(urlParams[key]);
             stylesQueue.push(repInfo);
         }
     }
@@ -202,25 +226,28 @@ export function readUrlParams(): void {
     // If stylesQueue has nothing in it, set up a default rep.
     if (stylesQueue.length === 0) {
         stylesQueue.push([["Protein", "All"], "Cartoon", "Spectrum"]);
+        stylesQueue.push([["Nucleic", "All"], "Stick", "Element"]);
         stylesQueue.push([["Ligand", "All"], "Stick", "Element"]);
     }
 
     // Position the camera
-    let cx = params["cx"]
-    let cy = params["cy"]
-    let cz = params["cz"]
+    let cx = urlParams["cx"]
+    let cy = urlParams["cy"]
+    let cz = urlParams["cz"]
     if ((cx !== undefined) && (cy !== undefined) && (cz !== undefined)) {
         CommonCamera.setCameraPosition(new BABYLON.Vector3(+cx, +cy, +cz));
     }
 
-    let crx = params["crx"];
-    let cry = params["cry"];
-    let crz = params["crz"];
-    let crw = params["crw"];
+    let crx = urlParams["crx"];
+    let cry = urlParams["cry"];
+    let crz = urlParams["crz"];
+    let crw = urlParams["crw"];
     if ((crx !== undefined) && (cry !== undefined) && (crz !== undefined) && (crw !== undefined)) {
-        // TODO: ROTATION DOESN'T SEEM TO REALLY WORK...
         CommonCamera.setCameraRotationQuaternion(new BABYLON.Quaternion(+crx, +cry, +crz, +crw));
     }
+
+    // Determine if shadows or not.
+    shadows = urlParams["sh"];
 
     // Start updating the URL periodically. Because of camera changes.
     autoUpdateUrl();
@@ -273,12 +300,20 @@ export function checkWebrtcInUrl(): boolean {
 }
 
 /**
+ * Checks if "sh=" in url (shadows). This works even if UrlVars hasn't been
+ * set yet.
+ * @returns boolean
+ */
+export function checkShadowInUrl(): boolean {
+    return window.location.href.indexOf("sh=t") !== -1;
+}
+
+/**
  * Periodically update the url. This is because the camera can change, but I
  * don't want to update the url with every tick of the loop.
  * @returns void
  */
 function autoUpdateUrl(): void {
-    // TODO: Might be good to check if camera has moved.
     setInterval(() => {
         setURL();
     }, 1000);

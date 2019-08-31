@@ -5,9 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Mirror Sharing</title>
+    <title>ProteinVR: Follow-the-Leader</title>
 
-    <meta name="description" content="Protein-VR: Follow-the-Leader Sharing">
+    <meta name="description" content="ProteinVR: Follow-the-Leader">
     <meta name="author" content="Jacob Durrant">
 
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -48,6 +48,10 @@
             // on one of the durrantlab websites.
             var followTheLeaderURLVal = jQuery("#followTheLeaderURL");
             followTheLeaderURLVal.val(url);
+            followTheLeaderURLVal.focus();
+            setTimeout(() => {
+                followTheLeaderURLVal.select();
+            }, 0);
         });
     </script>
   </body>

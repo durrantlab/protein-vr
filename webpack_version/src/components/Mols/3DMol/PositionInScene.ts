@@ -108,14 +108,15 @@ export function positionAll3DMolMeshInsideAnother(babylonMesh: any, otherBabylon
 
     Vars.scene.render();  // Needed to get bounding box to recalculate.
 
-    if (true) {
-        let deltaY = moveMolMeshesToGround(thisMesh, targetBox);
+    let deltaY = 0;
+    if (Vars.positionOnFloor) {
+        deltaY = moveMolMeshesToGround(thisMesh, targetBox);
+    }
 
-        for (let i = 0; i < allVisMolMeshesLen; i++) {
-            let allVisMolMesh = allVisMolMeshes[i];
-            allVisMolMesh.position.y = allVisMolMesh.position.y - deltaY;
-            allVisMolMesh.visibility = 1;  // Hide while rotating.
-        }
+    for (let i = 0; i < allVisMolMeshesLen; i++) {
+        let allVisMolMesh = allVisMolMeshes[i];
+        allVisMolMesh.position.y = allVisMolMesh.position.y - deltaY;
+        allVisMolMesh.visibility = 1;  // Hide while rotating.
     }
 
     lastRotationBeforeAnimation = allVisMolMeshesInfo[0].rotation.clone();

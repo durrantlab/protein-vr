@@ -28,7 +28,6 @@ let sceneInfoData: any;
 let GUI3DMenuManager: any;
 let commonMenuAnchor: any;
 
-
 /**
  * Load the 3D GUI. Also reloads the GUI (destroys old version). Reloading is
  * useful when you add a new PDB, for example, and want to update the
@@ -242,7 +241,7 @@ function setupMainMenuToggleButton(): void {
 
             commonMenuAnchor.position.copyFrom(CommonCamera.getCameraPosition());
             commonMenuAnchor.rotation.y = CommonCamera.getCameraRotationY(); //  + Math.PI * 0.5;
-            // camera.rotation.y + Math.PI * 0.5;  // TODO: What about if VR camera?
+            // camera.rotation.y + Math.PI * 0.5;s
         },
         default: false,
         falseTxt: "Show Menu",
@@ -269,7 +268,6 @@ function setupMainMenuToggleButton(): void {
         mainMenuAnchorToggle.position.copyFrom(VRPoints.groundPointBelowCamera);  // Prob
         mainMenuAnchorToggle.position.y = mainMenuAnchorToggle.position.y + 0.1;     // No prob
         mainMenuAnchorToggle.rotation.y = CommonCamera.getCameraRotationY();  // Prob
-        // camera.rotation.y;  // TODO: What about VR camera.
     });
 }
 

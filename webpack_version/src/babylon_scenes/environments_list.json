@@ -1,0 +1,14 @@
+[
+    {
+        "path": "environs/night/",
+        "description": "A nighttime scene."
+    },
+    {
+        "path": "environs/day/",
+        "description": "A daytime scene."
+    },
+    {
+        "path": "environs/room/",
+        "description": "A room with a couch."
+    }
+]

@@ -5,6 +5,7 @@ import * as UrlVars from "../../UrlVars";
 import * as Vars from "../../Vars";
 import * as CommonLoader from "../CommonLoader";
 import * as PositionInScene from "./PositionInScene";
+import * as OpenPopup from "../../UI/OpenPopup/OpenPopup";
 
 declare var $3Dmol;
 
@@ -43,6 +44,10 @@ let hasActiveSurface = false;
  * @returns void
  */
 export function setup(callBack: any): void {
+    // Deactivate 3Dmol.js tracking. This is now done via manual modifications
+    // to the vendor.js code itself.
+    // $3Dmol["notrack"] = true;
+
     // Add a container for 3dmoljs.
     addDiv();
 
@@ -129,7 +134,10 @@ export function loadPDBURL(url: string, callBack: any): void {
          * @param  {string}  err
          */
         "error": (hdr: any, status: any, err: any) => {
-            console.error( "Failed to load molecule " + url + ": " + err );
+            let msg = "<p>Could not load molecule: " + url + "</p>";
+            msg += "<p><pre>" + err + "</pre></p>";
+            msg += '<p>(<a href="' + window.location.href.split("?")[0] + '">Click to restart...</a>)</p>';
+            OpenPopup.openModal("Error Loading Molecule", msg, false, false);
         },
     });
 }
@@ -204,8 +212,9 @@ export function render(updateData: boolean, repName: string, callBack: any = () 
                     // It's undefined if, for example, trying to do cartoon on
                     // ligand.
                     PositionInScene.positionAll3DMolMeshInsideAnother(newMesh, Vars.scene.getMeshByName("protein_box"));
-                    callBack(newMesh);  // Cloned so it won't change with new rep in future.
                 }
+
+                callBack(newMesh);  // Cloned so it won't change with new rep in future.
 
                 // Clean up.
                 modelData = [];
@@ -295,8 +304,17 @@ function loadValsFromVRML(repName: string, callBack: any): void {
             "removeExtraPts": (repName === "Stick"),
         });
     } else {
-        // TODO: Throw proper error here.
         // Sorry! No Web Worker support..
+        OpenPopup.openModal(
+            "Browser Error",
+            `Your browser does not support web workers. Please use a more
+            modern browser when running ProteinVR.`,
+            false
+        );
+        throw "Browser does not support web workers.";
+
+        // Comment below if you ever want to try to make it work without web
+        // workers...
         // modelData = VRMLParserWebWorker.loadValsFromVRML(vrmlStr);
         // callBack();
     }
@@ -387,9 +405,7 @@ export function importIntoBabylonScene(): any {
         babylonMesh.id = babylonMesh.name;
 
         // Work here
-        CommonLoader.setupMesh(
-            babylonMesh, babylonMesh.name, "Skip", 123456789,
-        );
+        CommonLoader.setupMesh(babylonMesh, 123456789);
     }
 
     return babylonMesh;
@@ -410,9 +426,9 @@ export function updateMolRotation(axis: string, amount: number): void {
 
 /**
  * Sets the molRotation object externally. Does not actually rotate anything.
- * @param  {number} x
- * @param  {number} y
- * @param  {number} z
+ * @param  {number} x  Rotation about x axis.
+ * @param  {number} y  Rotation about y axis.
+ * @param  {number} z  Rotation about z axis.
  * @returns void
  */
 export function setMolRotation(x: number, y: number, z: number): void {

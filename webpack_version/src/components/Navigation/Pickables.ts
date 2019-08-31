@@ -140,8 +140,6 @@ export function makeMeshMouseClickable(params: IMakeMeshClickableParams): void {
                 // If it's in VR mode, there are no mouse clicks. This is
                 // important to prevent a double click with controllers.
                 if (Vars.vrVars.navMode !== Navigation.NavMode.NoVR) {
-                    // TODO: What about phones? Still clickable? May need to
-                    // modify above.
                     return;
                 }
 
