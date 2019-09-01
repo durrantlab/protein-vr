@@ -1,7 +1,7 @@
 // A place to put variables that need to be accessed from multiple places.
 // This module is a place to store "global" variables.
 
-import * as Navigation from "./Navigation/Navigation";
+import * as Navigation from "../Navigation/Navigation";
 import * as UrlVars from "./UrlVars";
 
 declare var BABYLON: any;
@@ -21,7 +21,7 @@ export let canvas: any;
 export let engine: any;
 export let scene: any;
 export let vrHelper: any;
-export let sceneName: string = "environs/room/";
+export let sceneName: string = "environs/day/";
 
 /**
  * Setter for sceneName variable.

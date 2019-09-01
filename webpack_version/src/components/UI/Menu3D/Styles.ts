@@ -1,6 +1,6 @@
 import * as ThreeDMol from "../../Mols/3DMol/ThreeDMol";
-import * as Visualize from "../../Mols/3DMol/Visualize";
-import * as UrlVars from "../../UrlVars";
+import * as VisStyles from "../../Mols/3DMol/VisStyles";
+import * as UrlVars from "../../Vars/UrlVars";
 import * as Menu3D from "./Menu3D";
 
 // Define all the possible components.
@@ -27,7 +27,7 @@ let representations = {
     "Water": commonReps,
 };
 
-// You'll need to modify colorSchemeKeyWordTo3DMol in Visualize.ts too.
+// You'll need to modify colorSchemeKeyWordTo3DMol in VisStyles.ts too.
 let colors = [
     "White", "Red", "Blue", "Green", "Orange", "Yellow", "Purple",
 ];
@@ -45,11 +45,11 @@ export function buildStylesSubMenu(): any {
         "Components": {},
         "Selections": {},
         "Clear": () => {
-            let fullKeys = Object.keys(Visualize.styleMeshes);
+            let fullKeys = Object.keys(VisStyles.styleMeshes);
             let len = fullKeys.length;
             for (let i = 0; i < len; i++) {
                 let fullKey = fullKeys[i];
-                let styleMesh = Visualize.styleMeshes[fullKey];
+                let styleMesh = VisStyles.styleMeshes[fullKey];
                 styleMesh.mesh.isVisible = false;
             }
             Menu3D.openMainMenuFloorButton.toggled();
@@ -68,7 +68,7 @@ export function buildStylesSubMenu(): any {
         for (let i2 = 0; i2 < selectionsComponentLen; i2++) {
             let selection = selections[component][i2];
             menu["Components"][component][selection] = makeRepColorSchemeSubMenus({}, component, (rep: any, colorScheme: any) => {
-                Visualize.toggleRep([component, selection], rep, colorScheme);
+                VisStyles.toggleRep([component, selection], rep, colorScheme);
             });
         }
     }
@@ -96,12 +96,12 @@ export function updatePastStylesInMenu(menuInf: any): void {
         ["Styles", "Remove Existing"],
     );
 
-    let repNames = Object.keys(Visualize.styleMeshes);
+    let repNames = Object.keys(VisStyles.styleMeshes);
     /** @type {number} */
     let len = repNames.length;
     for (let i = 0; i < len; i++) {
         let repName = repNames[i];
-        if (Visualize.styleMeshes[repName].mesh.isVisible === true) {
+        if (VisStyles.styleMeshes[repName].mesh.isVisible === true) {
             let lbl = repName.replace(/--/g, " ");
             lbl = lbl.replace(/{/g, "").replace(/}/g, "").replace(/"/g, "");
             menuInf["Styles"]["Remove Existing"][lbl] = () => {
@@ -109,7 +109,7 @@ export function updatePastStylesInMenu(menuInf: any): void {
                 setTimeout(() => {
                     /** @type {Array<*>} */
                     let repInfo = UrlVars.extractRepInfoFromKey(repName);
-                    Visualize.toggleRep(repInfo[0], repInfo[1], "Hide");
+                    VisStyles.toggleRep(repInfo[0], repInfo[1], "Hide");
                 }, 0);
             };
         }
@@ -189,7 +189,7 @@ export function updateModelSpecificSelectionsInMenu(menuInf: any): void {
                     let selKeyword = selKeywords[component];  // See ThreeDMol.ts
                     let it = {};
                     it[selKeyword] = item;
-                    Visualize.toggleRep([it], rep, colorScheme);
+                    VisStyles.toggleRep([it], rep, colorScheme);
                 }, breadcrumbs.concat([item]));
             } else {
                 // Multiple items, so it's a category.

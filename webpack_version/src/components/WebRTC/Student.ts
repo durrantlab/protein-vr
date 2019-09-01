@@ -2,8 +2,8 @@
 
 import * as CommonCamera from "../Cameras/CommonCamera";
 import * as WebRTCBase from "./WebRTCBase";
-import * as Vars from "../Vars";
-import * as Visualize from "../Mols/3DMol/Visualize";
+import * as Vars from "../Vars/Vars";
+import * as VisStyles from "../Mols/3DMol/VisStyles";
 import * as Rotations from "../UI/Menu3D/Rotations";
 
 declare var BABYLON: any;
@@ -111,7 +111,7 @@ export function startFollowing(id: string): void {
                 }
                 break;
             case "toggleRep":
-                Visualize.toggleRep(
+                VisStyles.toggleRep(
                     val["filters"],
                     val["repName"],
                     val["colorScheme"],

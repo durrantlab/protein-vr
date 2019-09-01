@@ -1,7 +1,7 @@
 import * as Navigation from "../Navigation/Navigation";
 import * as Pickables from "../Navigation/Pickables";
 import * as Points from "../Navigation/Points";
-import * as Vars from "../Vars";
+import * as Vars from "../Vars/Vars";
 import * as CommonCamera from "./CommonCamera";
 import * as VRCamera from "./VRCamera";
 

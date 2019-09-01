@@ -1,10 +1,10 @@
-import * as ThreeDMol from "./Mols/3DMol/ThreeDMol";
-import * as Visualize from "./Mols/3DMol/Visualize";
-import * as VRML from "./Mols/3DMol/VRML";
-import * as Student from "./WebRTC/Student";
+import * as ThreeDMol from "../Mols/3DMol/ThreeDMol";
+import * as VisStyles from "../Mols/3DMol/VisStyles";
+import * as VRML from "../Mols/3DMol/VRML";
+import * as Student from "../WebRTC/Student";
 import * as Vars from "./Vars";
-import * as CommonCamera from "./Cameras/CommonCamera";
-// import * as OpenPopup from "./UI/OpenPopup/OpenPopup";
+import * as CommonCamera from "../Cameras/CommonCamera";
+// import * as OpenPopup from "../UI/OpenPopup/OpenPopup";
 
 declare var jQuery: any;
 declare var BABYLON: any;
@@ -101,11 +101,11 @@ export function setURL(): void {
     // Also get all the representations
     let i = 0;
     let styles = [];
-    let keys = Object.keys(Visualize.styleMeshes);
+    let keys = Object.keys(VisStyles.styleMeshes);
     let len = keys.length;
     for (let i2 = 0; i2 < len; i2++) {
         let key = keys[i2];
-        if (Visualize.styleMeshes[key].mesh.isVisible) {
+        if (VisStyles.styleMeshes[key].mesh.isVisible) {
             styles.push("st" + i.toString() + "=" + key);
             i++;
         }
@@ -176,6 +176,7 @@ export function readUrlParams(): void {
         jQuery("#help-button").hide();
         jQuery("#follow-the-leader").hide();
         jQuery("#babylonVRiconbtn").hide();
+        jQuery("#open-button").hide();
         let fullscreenButton = jQuery("#fullscreen-button");
         let top = +fullscreenButton.css("bottom").replace(/px/g, "");
         fullscreenButton.css("bottom", (top - 60).toString() + "px");
@@ -284,7 +285,7 @@ export function startLoadingStyles(): void {
     if (stylesQueue.length > 0) {
         // There are some styles to still run.
         let style = stylesQueue.pop();
-        Visualize.toggleRep(style[0], style[1], style[2], () => {
+        VisStyles.toggleRep(style[0], style[1], style[2], () => {
             // Try to get the next style.
             startLoadingStyles();
         });

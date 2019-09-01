@@ -3,9 +3,9 @@
 import * as Navigation from "../Navigation/Navigation";
 import * as Pickables from "../Navigation/Pickables";
 import * as Optimizations from "../Scene/Optimizations";
-import * as Vars from "../Vars";
+import * as Vars from "../Vars/Vars";
 import * as VRControllers from "./VRControllers";
-import * as UrlVars from "../UrlVars";
+import * as UrlVars from "../Vars/UrlVars";
 
 declare var BABYLON: any;
 

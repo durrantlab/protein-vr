@@ -1,6 +1,6 @@
 import * as PositionInScene from "../../Mols/3DMol/PositionInScene";
 import * as VRML from "../../Mols/3DMol/VRML";
-import * as Vars from "../../Vars";
+import * as Vars from "../../Vars/Vars";
 import * as Lecturer from "../../WebRTC/Lecturer";
 
 /**

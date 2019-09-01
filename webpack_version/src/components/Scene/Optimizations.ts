@@ -1,5 +1,5 @@
-import * as Shadows from "../Mols/Shadows";
-import * as Vars from "../Vars";
+import * as MolShadows from "../Mols/MolShadows";
+import * as Vars from "../Vars/Vars";
 
 declare var BABYLON: any;
 
@@ -124,10 +124,10 @@ export function freezeMeshProps(mesh: any, freezeMaterial: boolean = true, world
  * @returns void
  */
 export function updateEnvironmentShadows(): void {
-    if (Shadows.shadowGenerator) {
+    if (MolShadows.shadowGenerator) {
         // Update the shadows. They are frozen otherwise.
         Vars.scene.lights[0].autoUpdateExtends = true;
-        Shadows.shadowGenerator.getShadowMap().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
+        MolShadows.shadowGenerator.getShadowMap().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
         // Vars.scene.render();
         Vars.scene.lights[0].autoUpdateExtends = false;
     }

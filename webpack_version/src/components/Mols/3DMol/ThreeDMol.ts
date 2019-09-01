@@ -4,8 +4,8 @@
 import * as Menu3D from "../../UI/Menu3D/Menu3D";
 import * as Styles from "../../UI/Menu3D/Styles";
 import * as OpenPopup from "../../UI/OpenPopup/OpenPopup";
-import * as UrlVars from "../../UrlVars";
-import * as CommonLoader from "../CommonLoader";
+import * as UrlVars from "../../Vars/UrlVars";
+import * as Load from "../Load";
 import * as VRML from "./VRML";
 
 // Unfortunately, closure compiler breaks this. So hard code.
@@ -62,7 +62,7 @@ function after3DMolJsLoaded(sceneInfoData: any): void {
             UrlVars.startLoadingStyles();
 
             // Continue...
-            CommonLoader.afterLoading(sceneInfoData);
+            Load.afterLoading(sceneInfoData);
 
             // If it's nanokid, open a popup to let them specify a url or
             // pdbid.

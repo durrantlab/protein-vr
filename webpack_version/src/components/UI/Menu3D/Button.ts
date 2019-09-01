@@ -1,5 +1,5 @@
 import * as Pickables from "../../Navigation/Pickables";
-import * as Vars from "../../Vars";
+import * as Vars from "../../Vars/Vars";
 import * as Menu3D from "./Menu3D";
 
 declare var BABYLON: any;

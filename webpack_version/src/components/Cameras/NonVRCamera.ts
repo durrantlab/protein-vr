@@ -1,6 +1,6 @@
 // This sets up the non vr camera. Not everyone has a vr headset.
 
-import * as Vars from "../Vars";
+import * as Vars from "../Vars/Vars";
 
 declare var BABYLON: any;
 

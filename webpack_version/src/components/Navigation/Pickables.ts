@@ -3,7 +3,7 @@
 
 import * as CommonCamera from "../Cameras/CommonCamera";
 import * as Optimizations from "../Scene/Optimizations";
-import * as Vars from "../Vars";
+import * as Vars from "../Vars/Vars";
 import * as Navigation from "./Navigation";
 
 declare var BABYLON: any;

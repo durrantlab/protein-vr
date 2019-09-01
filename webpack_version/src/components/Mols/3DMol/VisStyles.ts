@@ -3,8 +3,8 @@
 import * as Optimizations from "../../Scene/Optimizations";
 import * as Menu3D from "../../UI/Menu3D/Menu3D";
 import * as Styles from "../../UI/Menu3D/Styles";
-import * as UrlVars from "../../UrlVars";
-import * as Vars from "../../Vars";
+import * as UrlVars from "../../Vars/UrlVars";
+import * as Vars from "../../Vars/Vars";
 import * as PositionInScene from "./PositionInScene";
 import * as VRML from "./VRML";
 import * as Lecturer from "../../WebRTC/Lecturer";

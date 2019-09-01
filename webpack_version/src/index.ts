@@ -1,7 +1,7 @@
 import * as SceneLoader from "./components/Scene/LoadAndSetup";
 import 'bootstrap';
 import * as Styles from "./styles/style.css";
-import * as UrlVars from "./components/UrlVars";
+import * as UrlVars from "./components/Vars/UrlVars";
 
 // Get server workers (for progressive web app). Makes for better experience,
 // especially on iOS. See

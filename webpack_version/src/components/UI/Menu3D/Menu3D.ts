@@ -1,6 +1,6 @@
 import * as CommonCamera from "../../Cameras/CommonCamera";
 import * as VRPoints from "../../Navigation/Points";
-import * as Vars from "../../Vars";
+import * as Vars from "../../Vars/Vars";
 import * as Button from "./Button";
 import * as Rotations from "./Rotations";
 import * as Styles from "./Styles";

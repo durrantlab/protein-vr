@@ -2,7 +2,7 @@
 
 import * as Navigation from "../Navigation/Navigation";
 import * as Points from "../Navigation/Points";
-import * as Vars from "../Vars";
+import * as Vars from "../Vars/Vars";
 
 declare var BABYLON: any;
 

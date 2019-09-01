@@ -2,7 +2,7 @@
 // scene. Note that the camera location is in CommonCamera, not here.
 
 import * as CommonCamera from "../Cameras/CommonCamera";
-import * as Vars from "../Vars";
+import * as Vars from "../Vars/Vars";
 import * as Navigation from "./Navigation";
 import * as Pickables from "./Pickables";
 import * as Menu3D from "../UI/Menu3D/Menu3D";

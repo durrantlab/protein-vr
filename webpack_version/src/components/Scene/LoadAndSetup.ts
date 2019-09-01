@@ -5,10 +5,10 @@ import * as Navigation from "../Navigation/Navigation";
 import * as Pickables from "../Navigation/Pickables";
 import * as LoadingScreens from "../UI/LoadingScreens";
 import * as UI2D from "../UI/UI2D";
-import * as Vars from "../Vars";
+import * as Vars from "../Vars/Vars";
 import * as Lecturer from "../WebRTC/Lecturer";
 import * as Optimizations from "./Optimizations";
-import * as UrlVars from "../UrlVars";
+import * as UrlVars from "../Vars/UrlVars";
 
 declare var BABYLON: any;
 
@@ -127,7 +127,7 @@ function babylonScene(callBackFunc: any): void {
 
             keepOnlyLightWithShadowlightSubstr();
 
-            hideObjectsUsedForSceneCreation();
+            furtherProcessKeyMeshes();
 
             allMaterialsShadeless();
 
@@ -178,16 +178,25 @@ function keepOnlyLightWithShadowlightSubstr(): void {
 }
 
 /**
- * Hides meshes that are only used ofr scene creation.
+ * Hides meshes that are only used for scene creation. Also deals with
+ * skyboxes and other objects.
  * @returns void
  */
-function hideObjectsUsedForSceneCreation(): void {
+function furtherProcessKeyMeshes(): void {
     // Hide objects used for scene creation.
     /** @type {number} */
     let len = Vars.scene.meshes.length;
     for (let meshIdx = 0; meshIdx < len; meshIdx++) {
-        if (Vars.scene.meshes[meshIdx].name === "protein_box") {
-            Vars.scene.getMeshByName("protein_box").isVisible = false;
+        let mesh = Vars.scene.meshes[meshIdx];
+        if (mesh.name === "protein_box") {
+            mesh.isVisible = false;
+        } else if (mesh.name.toLowerCase().indexOf("skybox") !== -1) {
+            mesh.material.disableLighting = true;
+            mesh.infiniteDistance = true;
+
+            // Causes skybox to go black. I think you'd need to set to 0, and
+            // all other meshes to 1.
+            // mesh.renderingGroupId = -1;
         }
     }
 }

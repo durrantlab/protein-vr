@@ -1,6 +1,6 @@
 import * as Optimizations from "../../Scene/Optimizations";
-import * as Vars from "../../Vars";
-import * as Visualize from "./Visualize";
+import * as Vars from "../../Vars/Vars";
+import * as VisStyles from "./VisStyles";
 import * as VRML from "./VRML";
 
 declare var BABYLON: any;
@@ -212,11 +212,11 @@ function moveMolMeshesToGround(biggestMolMesh: any, targetBox: any): number {
  */
 function getVisibleMolMeshes(babylonMesh: any): any[] {
     let allVisMolMeshes = [];
-    let molMeshIds = Object.keys(Visualize.styleMeshes);
+    let molMeshIds = Object.keys(VisStyles.styleMeshes);
     let len = molMeshIds.length;
     for (let i = 0; i < len; i++) {
         let molMeshId = molMeshIds[i];
-        let allVisMolMesh = Visualize.styleMeshes[molMeshId].mesh;
+        let allVisMolMesh = VisStyles.styleMeshes[molMeshId].mesh;
         if (allVisMolMesh.isVisible === true) {
             allVisMolMeshes.push(allVisMolMesh);
         }

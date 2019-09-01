@@ -1,7 +1,7 @@
 // Functions to handle molecule shadows.
 
-import * as Vars from "../Vars";
-import * as UrlVars from "../UrlVars";
+import * as Vars from "../Vars/Vars";
+import * as UrlVars from "../Vars/UrlVars";
 // import * as Optimizations from "../Scene/Optimizations";
 
 declare var BABYLON: any;

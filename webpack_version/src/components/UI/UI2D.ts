@@ -1,7 +1,7 @@
 // Sets up tweaks to the UI.
 
 import * as OpenPopup from "./OpenPopup/OpenPopup";
-import * as Vars from "../Vars";
+import * as Vars from "../Vars/Vars";
 import * as Lecturer from "../WebRTC/Lecturer";
 
 declare var jQuery: any;

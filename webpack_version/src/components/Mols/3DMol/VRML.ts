@@ -1,9 +1,9 @@
 // An module to manage VRML data obtained from 3Dmol.js. Assumes the 3Dmol.js
 // javascript file is already loaded.
 
-import * as UrlVars from "../../UrlVars";
-import * as Vars from "../../Vars";
-import * as CommonLoader from "../CommonLoader";
+import * as UrlVars from "../../Vars/UrlVars";
+import * as Vars from "../../Vars/Vars";
+import * as Load from "../Load";
 import * as PositionInScene from "./PositionInScene";
 import * as OpenPopup from "../../UI/OpenPopup/OpenPopup";
 
@@ -405,7 +405,7 @@ export function importIntoBabylonScene(): any {
         babylonMesh.id = babylonMesh.name;
 
         // Work here
-        CommonLoader.setupMesh(babylonMesh, 123456789);
+        Load.setupMesh(babylonMesh, 123456789);
     }
 
     return babylonMesh;

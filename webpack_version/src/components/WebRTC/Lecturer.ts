@@ -119,7 +119,7 @@ export function startBroadcast(): void {
 }
 
 /**
- * Sends the data to the student so they can run Visualize.toggleRep in their
+ * Sends the data to the student so they can run VisStyles.toggleRep in their
  * ProteinVR instance.
  * @param  {Array<*>}            filters        Can include strings (lookup
  *                                              sel in selKeyWordTo3DMolSel).

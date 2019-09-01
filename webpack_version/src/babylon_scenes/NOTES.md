@@ -19,6 +19,8 @@ The Blender file should contain these elements:
 * `ground`: The mesh the user can walk on.
 * `protein_box`: The box in which the protein will be placed.
 * `Camera`: The camera, already at the starting position and angle.
+* Any mesh containing the substring `skybox` will be treated as a skybox
+  (infiniteDistance, disableLighting, etc.).
 
 To set a mesh to shadeless, just assign it an emissive texture. All emissives
 will be converted to shadeless.

@@ -3,11 +3,11 @@
 import * as CommonCamera from "../Cameras/CommonCamera";
 import * as NonVRCamera from "../Cameras/NonVRCamera";
 import * as Optimizations from "../Scene/Optimizations";
-import * as Vars from "../Vars";
+import * as Vars from "../Vars/Vars";
 import * as Navigation from "./Navigation";
 import * as Pickables from "./Pickables";
 import * as Points from "./Points";
-import * as UrlVars from "../UrlVars";
+import * as UrlVars from "../Vars/UrlVars";
 import * as Menu3D from "../UI/Menu3D/Menu3D";
 
 declare var BABYLON: any;
