@@ -109,7 +109,7 @@ export function positionAll3DMolMeshInsideAnother(babylonMesh: any, otherBabylon
     Vars.scene.render();  // Needed to get bounding box to recalculate.
 
     let deltaY = 0;
-    if (Vars.positionOnFloor) {
+    if (Vars.sceneInfo.positionOnFloor) {
         deltaY = moveMolMeshesToGround(thisMesh, targetBox);
     }
 

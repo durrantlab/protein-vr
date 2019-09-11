@@ -29,14 +29,12 @@ export let sceneName: string = "environs/day/";
  */
 export function setSceneName(val: string) { sceneName = val; }
 
-/** @type {boolean} */
-export let positionOnFloor: boolean = false;
-
-/**
- * Setter for positionOnFloor variable.
- * @param  {boolean} val  The value to set.
- */
-export function setPositionOnFloor(val: boolean) { positionOnFloor = val; }
+// From scene_info.json
+export let sceneInfo = {
+    positionOnFloor: false,
+    infiniteDistanceSkyBox: true,
+    transparentGround: false
+}
 
 /** @type {number} */
 export let cameraHeight: number;
@@ -83,7 +81,7 @@ export const TRANSPARENT_FLOOR_ALPHA: number = 0.05;  // 0.02;
 
 // IOS doesn't support a lot of features!
 /** @const {*} */
-export const IOS: boolean = false;  // TODO: /iPad|iPhone|iPod/.test(navigator.userAgent) && !window["MSStream"];
+// export const IOS: boolean = false;  // TODO: /iPad|iPhone|iPod/.test(navigator.userAgent) && !window["MSStream"];
 
 // Variables that can change.
 export let vrVars: IVRSetup = {};

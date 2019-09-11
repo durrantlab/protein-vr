@@ -49,6 +49,10 @@ function setupEnterAndExitVRCallbacks(): void {
         // shadows in VR otherwise.
         Optimizations.updateEnvironmentShadows();
 
+        // Hide the 2D buttons.
+        jQuery(".ui-button").hide();
+        jQuery(".babylonVRicon").hide();
+
         window["vrHelper"] = Vars.vrHelper;
     });
 
@@ -62,6 +66,10 @@ function setupEnterAndExitVRCallbacks(): void {
         // Let's recalculate the shadows here again too, just to be on the
         // safe side.
         Optimizations.updateEnvironmentShadows();
+
+        // Show the 2D buttons.
+        jQuery(".ui-button").show();
+        jQuery(".babylonVRicon").show();
     });
 }
 
@@ -111,6 +119,8 @@ export function setupGazeTracker(): void {
     Vars.vrHelper.gazeTrackerMesh = makeEmptyMesh();
     Vars.vrHelper.updateGazeTrackerScale = false;  // Babylon 3.3 preview.
     Vars.vrHelper.displayGaze = true;  // Does need to be true. Otherwise, position not updated.
+    Vars.vrHelper.enableGazeEvenWhenNoPointerLock = true;
+    // console.log(Vars.vrHelper);
 
     Vars.vrHelper.enableInteractions();
 

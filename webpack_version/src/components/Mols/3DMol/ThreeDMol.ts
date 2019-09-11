@@ -26,19 +26,17 @@ export function setModelUrl(url: string): void { modelUrl = url; }
 
 /**
  * Load in the extra molecule meshes.
- * @param  {Object<string,*>} sceneInfoData The data from scene_info.json.
  * @returns void
  */
-export function setup(sceneInfoData: any): void {
-    after3DMolJsLoaded(sceneInfoData);
+export function setup(): void {
+    after3DMolJsLoaded();
 }
 
 /**
  * Runs after the 3Dmol.js library is loaded.
- * @param  {Object<string,*>} sceneInfoData The data from scene_info.json.
  * @returns void
  */
-function after3DMolJsLoaded(sceneInfoData: any): void {
+function after3DMolJsLoaded(): void {
     VRML.setup(() => {
         UrlVars.readUrlParams();
 
@@ -62,11 +60,11 @@ function after3DMolJsLoaded(sceneInfoData: any): void {
             UrlVars.startLoadingStyles();
 
             // Continue...
-            Load.afterLoading(sceneInfoData);
+            Load.afterLoading();
 
             // If it's nanokid, open a popup to let them specify a url or
             // pdbid.
-            if (modelUrl === "nanokid.sdf") {
+            if ((modelUrl === "nanokid.sdf") && (UrlVars.checkWebrtcInUrl() === false)){
                 setTimeout(() => {
                     // Give them some time to admire nanokid... :)
                     OpenPopup.openModal("Load Molecule", "pages/load.html");

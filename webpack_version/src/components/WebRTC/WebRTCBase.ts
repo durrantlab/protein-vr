@@ -5,6 +5,8 @@ import * as OpenPopup from "../UI/OpenPopup/OpenPopup";
 
 declare var Peer: any;
 
+export let DEBUG = false;
+
 export class WebRTCBase {
     // Some functions are common to both senders and receivers.
     public peerId: string = null;
@@ -54,9 +56,9 @@ export class WebRTCBase {
         this.peer = new Peer(idToUse, {
             "debug": 2,
             "config": {'iceServers': [
-                {"url": 'stun:0.peerjs.com'},
-                {"url": 'stun:stun.l.google.com:19302'},
-                {"url": 'stun:durrantlab.com/apps/proteinvr/stun'}  // not yet implemented
+                {"urls": 'stun:0.peerjs.com'},
+                {"urls": 'stun:stun.l.google.com:19302'},
+                {"urls": 'stun:durrantlab.com/apps/proteinvr/stun'}  // not yet implemented
                 // {"url": 'stun:stun1.l.google.com:19302'},
                 // {"url": 'stun:stun2.l.google.com:19302'},
                 // {"url": 'stun:stun3.l.google.com:19302'},
@@ -74,7 +76,7 @@ export class WebRTCBase {
     private setupWebRTCCloseFuncs(): void {
         this.peer.on("disconnected", () => {
             webRTCStandardErrorMsg();
-            // console.log("Connection lost. Please reconnect");
+            if (DEBUG === true) { console.log("Connection lost. Please reconnect"); }
 
             // Workaround for peer.reconnect deleting previous id
             this.peer.id = this.peerId;

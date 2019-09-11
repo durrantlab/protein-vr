@@ -39,7 +39,7 @@ export class Student extends WebRTCBase.WebRTCBase {
         this.setConnectionCallbacks();
 
         this.conn.on("open", () => {
-            console.log("Connected to: " + this.conn.peer);
+            if (WebRTCBase.DEBUG === true) { console.log("Connected to: " + this.conn.peer); }
         });
 
         // Save peerid
@@ -66,6 +66,9 @@ export class Student extends WebRTCBase.WebRTCBase {
         // Handle incoming data (messages only since this is the signal
         // sender)
         this.conn.on("data", (data: any) => {
+            if (WebRTCBase.DEBUG === true) {
+                console.log("Received:", data);
+            }
             this.dataReceivedFunc(data);
         });
 
@@ -89,7 +92,7 @@ export function startFollowing(id: string): void {
     targetCameraRotationQuaternion = new Float32Array(CommonCamera.getCameraRotationQuaternion().asArray());
 
     let stud = new Student((data: any) => {
-        // console.log("stud1 got data", data);
+        if (WebRTCBase.DEBUG === true) { console.log("stud1 got data", data); }
         let type = data["type"];
         let val = data["val"];
         switch (type) {

@@ -24,12 +24,22 @@ export function setup(): void {
     // navigation, even if you're not pointing at a protein.
     Pickables.makePadNavigationSphereAroundCamera();
 
-    // onControllersAttachedObservable doesn't work. I'd prefer that one...
-    Vars.vrHelper.webVRCamera.onControllerMeshLoadedObservable.add((webVRController: any) => {
+    // Use various controller detected functions to cover your bases...
+
+    let onControllerLoaded = (webVRController: any) => {
         Vars.vrVars.navMode = Navigation.NavMode.VRWithControllers;
         VRCamera.setupGazeTracker();
         setupTrigger(webVRController);
         setupPad(webVRController);
+    }
+
+    // onControllersAttachedObservable doesn't work. I'd prefer that one...
+    Vars.vrHelper.webVRCamera.onControllerMeshLoadedObservable.add((webVRController: any) => {
+        onControllerLoaded(webVRController);
+    });
+
+    Vars.vrHelper.onControllerMeshLoaded.add((webVRController: any) => {
+        onControllerLoaded(webVRController);
     });
 
     // Doesn't appear to be a detach function...

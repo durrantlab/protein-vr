@@ -1,14 +1,18 @@
 [
     {
         "path": "environs/night/",
-        "description": "A nighttime scene."
+        "description": "Nighttime"
     },
     {
         "path": "environs/day/",
-        "description": "A daytime scene."
+        "description": "Daytime"
     },
     {
         "path": "environs/room/",
-        "description": "A room with a couch."
+        "description": "Couch Room"
+    },
+    {
+        "path": "environs/blood/",
+        "description": "Blood"
     }
 ]

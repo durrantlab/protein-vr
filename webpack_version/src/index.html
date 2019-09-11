@@ -10,11 +10,14 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
     <meta name="theme-color" content="#000000"/>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <title>ProteinVR</title>
 
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
     <![endif]-->
+
+    <link href="style.css" rel="stylesheet" type="text/css">
 
     <style>
         /* Below needs to be hear because you don't want to wait for the js to load... */
@@ -54,6 +57,15 @@
             animation: spin 2s linear infinite;
             width: 60px;
             height: 60px;
+        }
+
+        /* The vr button needs to be closer to the edge (to accomodate small
+        phones) */
+        .babylonVRicon {
+            bottom: 5px !important;
+            top: unset !important;
+            right: 5px !important;
+            left: unset !important;
         }
     </style>
 </head>

@@ -23,7 +23,7 @@ let allButtons: any[];
 let latestBreadcrumbsViewed: string[];
 
 /** @type {Object<string>} */
-let sceneInfoData: any;
+// let sceneInfoData: any;
 
 let GUI3DMenuManager: any;
 let commonMenuAnchor: any;
@@ -48,11 +48,11 @@ export function setup(data?: any): void {
 
     // Save the scene data so you can reference it in the future, if you
     // recreate the menu. If it's not defined, the use the saved data.
-    if (data !== undefined) {
-        sceneInfoData = data;
-    } else {
-        data = sceneInfoData;
-    }
+    // if (data !== undefined) {
+    //     sceneInfoData = data;
+    // } else {
+    //     data = sceneInfoData;
+    // }
 
     // Only required to setup once.
     if (GUI3DMenuManager === undefined) {

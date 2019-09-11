@@ -40,6 +40,8 @@ module.exports = merge(common, {
             {from: 'src/pwa/icon-512.png', to: 'icon-512.png'},
             {from: 'src/pwa/icon-1024.png', to: 'icon-1024.png'},
             {from: 'src/pwa/manifest.webmanifest', to: 'manifest.webmanifest'},
+            {from: 'src/styles/style.css', to: 'style.css'},
+            {from: 'src/styles/favicon.ico', to: 'favicon.ico'},
         ]),
         new WorkboxPlugin.GenerateSW({
             // These options encourage the ServiceWorkers to get in there fast
@@ -80,8 +82,8 @@ module.exports = merge(common, {
         // causing all sorts of problems.
         // chunkFilename: '[name].[hash].js',  // contenthash
         // filename: "[name].[hash].js"  // contenthash
-        chunkFilename: '[name].js',  // contenthash
-        filename: "[name].js"  // contenthash
+        chunkFilename: '[name].[hash].js',  // contenthash
+        filename: "[name].[hash].js"  // contenthash
     },
     optimization: {
         // Below breaks webworker, because calls window from within it.

@@ -67,7 +67,7 @@ if (inWebWorker) {
  * @returns Array<Object<string, Array<number>>>   The model data.
  */
 export function loadValsFromVRML(vrmlStr: string, removeExtraPts: boolean = false): any[] {
-    /** @type {Array<Objecet<string,*>>} */
+    /** @type {Array<Object<string,*>>} */
     let modelData: any[] = [];
 
     // A given VRML file could have multiple IndexedFaceSets. Divide and

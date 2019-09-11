@@ -89,6 +89,7 @@ export function setStarePointInfo(): void {
     } else if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
                (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
 
+
         // Find the valid gazetracker mesh.
         /** @type {*} */
         let gazeTrackerMesh;

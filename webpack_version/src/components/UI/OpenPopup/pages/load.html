@@ -44,9 +44,9 @@
                 <div class="form-group">
                     <!-- <label for="environments">Environment</label> -->
                     <label for="environments">
-                        Select an environment to give context to your molecule. Or
+                        Select an environment to give context to your molecule. <!-- Or
                         <a href="#" onclick="loadMoreModels();">load complex environments</a>
-                        from durrantlab.com.
+                        from durrantlab.com. --> <!-- Now loading automatically. -->
                     </label>
                     <select class="form-control" id="environments"></select>
                     <!-- <p class="help-block"></p> -->
@@ -77,13 +77,13 @@
         <button id="submit" class="btn btn-primary">
             Load Molecule
         </button>
+        <hr />
+        <p>
+            ProteinVR is brought to you by the <a href="http://durrantlab.com"
+            target="_blank">Durrant Lab</a> at the University of Pittsburgh. If
+            you use ProteinVR in your research, please cite: {CITATION}.
+        </p>
     </div>
-    <hr />
-    <p>
-        ProteinVR is brought to you by the <a href="http://durrantlab.com"
-        target="_blank">Durrant Lab</a> at the University of Pittsburgh. If
-        you use ProteinVR in your research, please cite: {CITATION}.
-    </p>
 
     <script src="scripts/jquery.min.js"></script>
     <script src="scripts/bootstrap.min.js"></script>
@@ -103,7 +103,7 @@
                 jQuery.getJSON("../environs/environments_list.json").done((data) => {
                     var html = "";
                     for (var e of data) {
-                        html += '<option value="' + e["path"] + '">' + e["description"] + ' (Mobile Friendly)</option>';
+                        html += '<option value="' + e["path"] + '">' + e["description"] + ' (Mobile)</option>';
                     }
                     resolve(html);
                 }).fail(function() {
@@ -119,6 +119,7 @@
                 jQuery.getJSON(remoteBaseUrl + "environments_list.json").done((data) => {
                     html = "";
                     for (var e of data) {
+                        html += '<option value="' + e["path"] + '">' + e["description"] + ' (Complex)</option>';
                     }
                     resolve(html);
                 }).fail(function() {

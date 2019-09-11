@@ -178,8 +178,11 @@ export function readUrlParams(): void {
         jQuery("#babylonVRiconbtn").hide();
         jQuery("#open-button").hide();
         let fullscreenButton = jQuery("#fullscreen-button");
-        let top = +fullscreenButton.css("bottom").replace(/px/g, "");
-        fullscreenButton.css("bottom", (top - 60).toString() + "px");
+        let bottom = fullscreenButton.css("bottom")
+        if (bottom !== undefined) {
+            let top = +bottom.replace(/px/g, "");
+            fullscreenButton.css("bottom", (top - 60).toString() + "px");
+        }
 
         // Make sure clicking on the screen doesn't move either. Basically
         // disable all teleportation.

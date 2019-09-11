@@ -74,7 +74,10 @@ export function setCameraPosition(pt: any): void {
 export function getCameraRotationQuaternion(): any {
     if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
         (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
-        return Vars.vrHelper.webVRCamera.deviceRotationQuaternion;
+
+        // Cover all devices using the below... (Android, Chrome, Carboard)
+        let quat = Vars.vrHelper.webVRCamera.deviceRotationQuaternion;
+        return (quat.x !== 0) ? quat : Vars.scene.activeCamera.rotationQuaternion;
     } else {
         // Regular (Universal) camera.
         return Vars.scene.activeCamera.rotationQuaternion;

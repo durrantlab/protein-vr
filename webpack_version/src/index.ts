@@ -1,6 +1,6 @@
 import * as SceneLoader from "./components/Scene/LoadAndSetup";
 import 'bootstrap';
-import * as Styles from "./styles/style.css";
+// import * as Styles from "./styles/style.css";
 import * as UrlVars from "./components/Vars/UrlVars";
 
 // Get server workers (for progressive web app). Makes for better experience,
@@ -19,8 +19,8 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-document.getElementById("renderCanvas").classList.add(Styles.renderCanvas);
-document.getElementById("container").classList.add(Styles.container);
+// document.getElementById("renderCanvas").classList.add(Styles.renderCanvas);
+// document.getElementById("container").classList.add(Styles.container);
 
 UrlVars.readEnvironmentNameParam();
 

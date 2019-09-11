@@ -1,3 +1,7 @@
 body {
     margin: 15px !important;
 }
+
+.form-group {
+    word-break: break-word;
+}

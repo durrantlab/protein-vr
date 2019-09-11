@@ -81,6 +81,7 @@ function vrSetupBeforeBabylonFileLoaded(): void {
     let navMeshMat = new BABYLON.StandardMaterial("myMaterial", Vars.scene);
     navMeshMat.diffuseColor = new BABYLON.Color3(1, 0, 1);
     navMeshToUse.material = navMeshMat;
+    navMeshToUse.renderingGroupId = 1;  // So always visible, in theory.
 
     // Setup the VR here. Set up the parameters (filling in missing values,
     // for example). Also saves the modified params to the params module
@@ -111,29 +112,55 @@ function babylonScene(callBackFunc: any): void {
     BABYLON.SceneLoader.LoadAssetContainer(Vars.sceneName, "scene.babylon", Vars.scene, (container: any) => {
         LoadingScreens.startFakeLoading(90);
         Vars.scene.executeWhenReady(() => {
-            container.addAllToScene();
+            // Now load scene_info.json too.
+            jQuery.getJSON(Vars.sceneName + "scene_info.json", (data: any) => {
+                // Save variables from scene_info.json so they can be accessed
+                // elsewhere (throughout the app).
 
-            // There should be only one camera at this point, because the VR
-            // stuff is in the callback. Make that that one camera is the
-            // active one.
-            // Vars.scene.activeCamera =  Vars.scene.cameras[0];
+                // Deactivate menu if appropriate. Note that this feature is
+                // not supported (gives an error). Perhaps in the future I
+                // will reimplement it, so I'm leaving the vestigial code
+                // here.
+                if (data["menuActive"] === false) {
+                    Vars.vrVars.menuActive = false;
+                }
 
-            // Make sure the active camera is the one loaded from the babylon
-            // file. Should be the only one without the string VR in it.
-            Vars.scene.activeCamera = Vars.scene.cameras.filter((c: any) => c.name.indexOf("VR") === -1)[0];
+                if (data["positionOnFloor"] !== undefined) {
+                    Vars.sceneInfo.positionOnFloor = data["positionOnFloor"];
+                }
 
-            // Attach camera to canvas inputs
-            // Vars.scene.activeCamera.attachControl(Vars.canvas);
+                if (data["infiniteDistanceSkyBox"] !== undefined) {
+                    Vars.sceneInfo.infiniteDistanceSkyBox = data["infiniteDistanceSkyBox"];
+                }
 
-            keepOnlyLightWithShadowlightSubstr();
+                if (data["transparentGround"] !== undefined) {
+                    Vars.sceneInfo.transparentGround = data["transparentGround"];
+                }
 
-            furtherProcessKeyMeshes();
+                container.addAllToScene();
 
-            allMaterialsShadeless();
+                // There should be only one camera at this point, because the VR
+                // stuff is in the callback. Make that that one camera is the
+                // active one.
+                // Vars.scene.activeCamera =  Vars.scene.cameras[0];
 
-            optimizeMeshesAndMakeClickable();
+                // Make sure the active camera is the one loaded from the babylon
+                // file. Should be the only one without the string VR in it.
+                Vars.scene.activeCamera = Vars.scene.cameras.filter((c: any) => c.name.indexOf("VR") === -1)[0];
 
-            callBackFunc();
+                // Attach camera to canvas inputs
+                // Vars.scene.activeCamera.attachControl(Vars.canvas);
+
+                keepOnlyLightWithShadowlightSubstr();
+
+                furtherProcessKeyMeshes();
+
+                allMaterialsShadeless();
+
+                optimizeMeshesAndMakeClickable();
+
+                callBackFunc();
+            });
         });
     }, (progress: any) => {
         if (progress["lengthComputable"]) {
@@ -191,8 +218,10 @@ function furtherProcessKeyMeshes(): void {
         if (mesh.name === "protein_box") {
             mesh.isVisible = false;
         } else if (mesh.name.toLowerCase().indexOf("skybox") !== -1) {
-            mesh.material.disableLighting = true;
-            mesh.infiniteDistance = true;
+            if (Vars.sceneInfo.infiniteDistanceSkyBox) {
+                mesh.material.disableLighting = true;
+                mesh.infiniteDistance = true;
+            }
 
             // Causes skybox to go black. I think you'd need to set to 0, and
             // all other meshes to 1.

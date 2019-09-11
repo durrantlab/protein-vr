@@ -16,28 +16,15 @@ declare var BABYLON: any;
 export function setup(): void {
     beforeLoading();
 
-    jQuery.getJSON(Vars.sceneName + "scene_info.json", (data: any) => {
-        // Deactivate menu if appropriate. Note that this feature is not
-        // supported (gives an error). Perhaps in the future I will
-        // reimplement it, so I'm leaving the vestigial code here.
-        if (data["menuActive"] === false) {
-            Vars.vrVars.menuActive = false;
-        }
+    // Load from a pdb file via 3Dmoljs.
+    ThreeDMol.setup();
 
-        if (data["positionOnFloor"] === true) {
-            Vars.setPositionOnFloor(true);
-        }
+    if (Vars.vrVars.menuActive) {
+        Menu3D.setup();
+    }
 
-        // Load from a pdb file via 3Dmoljs.
-        ThreeDMol.setup(data);
-
-        if (Vars.vrVars.menuActive) {
-            Menu3D.setup(data);
-        }
-
-        // Update the shadows.
-        Optimizations.updateEnvironmentShadows();
-    });
+    // Update the shadows.
+    Optimizations.updateEnvironmentShadows();
 }
 
 /**
@@ -53,15 +40,14 @@ function beforeLoading(): void {
 }
 
 /**
- * @param  {Object<string,*>} sceneInfoData The data from scene_info.json.
  * @returns void
  */
-export function afterLoading(sceneInfoData: any): void {
+export function afterLoading(): void {
     MolShadows.setupShadowCatchers();  // Related to extras, so keep it here.
 
     // Do you need to make the ground glass instead of invisible? See
     // scene_info.json, which can have transparentGround: true.
-    if ((sceneInfoData["transparentGround"] !== undefined) && (sceneInfoData["transparentGround"] === true)) {
+    if (Vars.sceneInfo.transparentGround === true) {
         if (Vars.vrVars.groundMesh) {
             Vars.vrVars.groundMesh.visibility = 1;
 

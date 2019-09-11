@@ -86,6 +86,7 @@ jQuery.Event.key = function() {};
 jQuery.prototype.DataTable = function(a) {};
 jQuery.prototype.draggable = function(a) {};
 jQuery.prototype.makeCssInline = function() {};  /** custom added */
+jQuery.prototype.slideUp = function() {};
 // jQuery.prototype.modal = function(a) {};
 jQuery.modal = function(a) {};
 jQuery.html = function(a) {};
@@ -213,6 +214,7 @@ BABYLON.Material.alpha;
 BABYLON.Material.freeze = function() {};
 BABYLON.Material.albedoColor;
 BABYLON.Material.backFaceCulling;
+BABYLON.Material.disableLighting
 
 BABYLON.SSAORenderingPipeline = function(a,b,c) {};
 
@@ -345,6 +347,7 @@ BABYLON.Mesh.getBoundingInfo.boundingBox.centerWorld;
 BABYLON.Mesh.refreshBoundingInfo = function() {};
 BABYLON.Mesh.animations;
 BABYLON.Mesh.getWorldMatrix = function() {};
+BABYLON.Mesh.infiniteDistance;
 
 BABYLON.Matrix;
 BABYLON.Matrix.Translation = function(a) {};
@@ -470,11 +473,14 @@ BABYLON.Scene.prototype.render = function() {};
 BABYLON.Scene.prototype.createDefaultVRExperience.rightControllerGazeTrackerMesh;
 BABYLON.Scene.prototype.createDefaultVRExperience.leftControllerGazeTrackerMesh;
 BABYLON.Scene.prototype.createDefaultVRExperience.gazeTrackerMesh;
+BABYLON.Scene.prototype.createDefaultVRExperience.enableGazeEvenWhenNoPointerLock;
 BABYLON.Scene.prototype.createDefaultVRExperience.gazeTrackerMesh.isVisible;
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera;
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.deviceRotationQuaternion;
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLoadedObservable = function() {};
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLoadedObservable.add = function(a) {};
+BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLoaded = function() {};
+BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLoaded.add = function(a) {};
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.rotationQuaternion;
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.rotationQuaternion.toEulerAngles = function() {};
 BABYLON.Scene.prototype.createDefaultVRExperience.teleportCamera = function(a) {};

@@ -45,7 +45,7 @@ export function openModal(title: string, val: string, iframed: boolean = true, c
 
                     <!-- Modal body -->
                     <div class="modal-body">
-                        <div id="iframe-container" style="height:350px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch">
+                        <div id="iframe-container" style="height:350px;overflow-y:hidden;overflow-x:hidden;-webkit-overflow-scrolling:touch"><!-- TODO: Check if works on both iPhone and Firefox. Used to be overflow-y:auto;overflow-x:hidden; -->
                             <iframe frameBorder="0" src="" style="width:100%;height:100%;"></iframe>
                         </div>
                         <span id="msg-container"></span>
@@ -100,7 +100,7 @@ function openUrlModalContinue(title: string, val: string, iframed: boolean, clos
 
     myTitle.html(title);
 
-    if (iframed) {
+    if (iframed === true) {
         msgContainer.hide();
         myIFrame.attr("src", val);
         if (closeBtn === undefined) {
@@ -113,6 +113,17 @@ function openUrlModalContinue(title: string, val: string, iframed: boolean, clos
     } else {
         msgContainer.show();
         iFrameContainer.hide();
+
+        // On some rare occasions, a previous iframe may take too long to
+        // load, so the iFramEContainer.show() can open after this hide. Put
+        // in a timeout to fix this. It's hashish, but works. Slideup just to
+        // make it look a little better (less like the bug that it is!).
+        setTimeout(() => {
+            if (msgContainer.css("display") === "inline") {
+                iFrameContainer.slideUp();
+            }
+        }, 1000);
+
         msgContainer.html(val);
         if (closeBtn === undefined) {
             footer.show();

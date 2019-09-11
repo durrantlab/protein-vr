@@ -31,6 +31,10 @@ export class Lecturer extends WebRTCBase.WebRTCBase {
      * @returns void
      */
     public sendData(data: any): void {
+        if (WebRTCBase.DEBUG === true) {
+            console.log("Send:", data);
+        }
+
         /** @type {number} */
         let connsLen = this.conns.length;
         for (let i = 0; i < connsLen; i++) {
@@ -57,14 +61,15 @@ export class Lecturer extends WebRTCBase.WebRTCBase {
                 this.peerId = this.peer.id;
             }
             idReadyResolve(this.peerId);
-            console.log(this.peerId);
+
+            if (WebRTCBase.DEBUG === true) { console.log(this.peerId); }
         });
 
         // Below only needed on lecturer. It's when a connection is received.
         this.peer.on("connection", (c: any) => {
             this.conns.push(c);
             gotConnResolve();
-            console.log("Lecturer: added a connection");
+            if (WebRTCBase.DEBUG === true) { console.log("Lecturer: added a connection"); }
         });
 
         this.peer.on("close", () => {

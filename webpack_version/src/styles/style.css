@@ -1,4 +1,4 @@
-.container {
+/* .container {
   width: 100%;
   height: 100%;
 }
@@ -7,7 +7,7 @@
   width: 100%;
   height: 100%;
   touch-action: none;
-}
+} */
 
 @keyframes spin {
   0% {
@@ -26,4 +26,50 @@ pre {
   white-space: -pre-wrap;      /* Opera 4-6 */
   white-space: -o-pre-wrap;    /* Opera 7 */
   word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+html, body {
+    overflow: hidden;
+    width   : 100%;
+    height  : 100%;
+    margin  : 0;
+    padding : 0;
+    background-color: black;
+}
+
+#container {
+    position: relative;
+    width   : 100%;
+    height  : 100%;
+    z-index: 1;
+}
+
+#container #renderCanvas {
+    width   : 100%;
+    height  : 100%;
+    touch-action: none;
+    position: absolute;
+    z-index: 2 !important;
+    left: 0;
+}
+
+#container #capture-clicks {
+    position: absolute;
+    display: none;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    /* background-color: red; */
+    z-index: 3 !important;
+}
+
+#babylonVRiconbtn, .ui-button {
+    z-index: 4;
+}
+
+#babylonjsLoadingDiv {
+    z-index: 3;
+    background-color: rgba(0, 0, 0, 0.6) !important;
 }

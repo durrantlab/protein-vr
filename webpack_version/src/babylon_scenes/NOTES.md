@@ -40,7 +40,8 @@ looks like this:
 ```json
 {
     "transparentGround": false,
-    "positionOnFloor": true
+    "positionOnFloor": true,
+    "infiniteDistanceSkyBox": false
 }
 ```
 
@@ -50,8 +51,12 @@ looks like this:
   bottom of the protein_box. Otherwise, it will be centered around the middle
   of the protein_box. (Note, for example, that rotation about the middle, the
   default, might be ideal for positioning a protein in a lipid bilayer.)
+* If `infiniteDistanceSkyBox` is false, the skybox will not move with the
+  camera. It will be like any other object in the scene. Otherwise, it will
+  move with the camera, so that it always appears fixed "in the sky."
 
 environments_list.json
 ----------------------
 
-Be sure to update this file if you add any new scenes.
+Be sure to update this file if you add any new scenes. Scene names should be
+kept as short as possible (even one word if you can).
