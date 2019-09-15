@@ -26,12 +26,12 @@ export function setup(): void {
 
     // Use various controller detected functions to cover your bases...
 
-    let onControllerLoaded = (webVRController: any) => {
+    const onControllerLoaded = (webVRController: any) => {
         Vars.vrVars.navMode = Navigation.NavMode.VRWithControllers;
         VRCamera.setupGazeTracker();
         setupTrigger(webVRController);
         setupPad(webVRController);
-    }
+    };
 
     // onControllersAttachedObservable doesn't work. I'd prefer that one...
     Vars.vrHelper.webVRCamera.onControllerMeshLoadedObservable.add((webVRController: any) => {
@@ -141,10 +141,10 @@ function moveCamera(): void {
     // Get the vector form the stare point to the camera. TODO: This is also
     // calculated elsewhere. Could put it in its own function or even cache it
     // for speed.
-    let cameraPos = CommonCamera.getCameraPosition();
-    let vecStarePtCamera = Points.curStarePt.subtract(cameraPos);
+    const cameraPos = CommonCamera.getCameraPosition();
+    const vecStarePtCamera = Points.curStarePt.subtract(cameraPos);
     vecStarePtCamera.normalize();
-    let deltaVec = vecStarePtCamera.scale(
+    const deltaVec = vecStarePtCamera.scale(
         padMoveSpeedFactor * Vars.PAD_MOVE_SPEED * Vars.scene.getAnimationRatio(),
     );
 
@@ -161,7 +161,7 @@ function rotateCamera(): void {
         return;
     }
 
-    let nowTime = new Date().getTime();
+    const nowTime = new Date().getTime();
     if (nowTime - lastPadRotationTime < Vars.VR_CONTROLLER_PAD_ROTATION_DELAY_TIME) {
         // Avoid rapid/continuous rotations. I tested this. It makes people
         // want to vomit.
@@ -171,7 +171,7 @@ function rotateCamera(): void {
     lastPadRotationTime = nowTime;
 
     // Get the camera's current rotation.
-    let curAngles = Vars.vrHelper.webVRCamera.rotationQuaternion.toEulerAngles();
+    const curAngles = Vars.vrHelper.webVRCamera.rotationQuaternion.toEulerAngles();
 
     // Rotate it slightly about up axis.
     // curAngles.y += 0.1 * padRotateSpeedFactor * Vars.PAD_MOVE_SPEED * Vars.scene.getAnimationRatio();

@@ -51,7 +51,7 @@ export function afterLoading(): void {
         if (Vars.vrVars.groundMesh) {
             Vars.vrVars.groundMesh.visibility = 1;
 
-            let transparentGround = new BABYLON.StandardMaterial("transparentGround", Vars.scene);
+            const transparentGround = new BABYLON.StandardMaterial("transparentGround", Vars.scene);
 
             transparentGround.diffuseColor = new BABYLON.Color3(1, 1, 1);
             transparentGround.specularColor = new BABYLON.Color3(0, 0, 0);
@@ -79,7 +79,7 @@ export function setupMesh(mesh: any, uniqIntID: number): void {
     if ((mesh.material !== undefined) && (mesh.material !== null)) {
         // Add a small emission color so the dark
         // side of the protein isn't too dark.
-        let lightingInf = MolShadows.getBlurDarknessAmbientFromLightName();
+        const lightingInf = MolShadows.getBlurDarknessAmbientFromLightName();
         let backgroundLum = 0;
 
         if (lightingInf.ambient === undefined) {
@@ -95,7 +95,7 @@ export function setupMesh(mesh: any, uniqIntID: number): void {
             // background luminosity.
 
             /** @type {number} */
-            let lightingInfDarkness = lightingInf.darkness;
+            const lightingInfDarkness = lightingInf.darkness;
             if (lightingInfDarkness > 0.95) {
                 backgroundLum = 0.05;
             } else if (lightingInfDarkness < 0.4) {

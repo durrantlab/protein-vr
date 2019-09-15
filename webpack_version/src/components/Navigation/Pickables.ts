@@ -8,9 +8,9 @@ import * as Navigation from "./Navigation";
 
 declare var BABYLON: any;
 
-let pickableMeshes: any[] = [];
-let pickableButtons: any[] = [];
-let pickableMolecules: any[] = [];
+const pickableMeshes: any[] = [];
+const pickableButtons: any[] = [];
+const pickableMolecules: any[] = [];
 
 // A sphere placed around the camera to aid navigation.
 export let padNavSphereAroundCamera: any;
@@ -162,7 +162,7 @@ export function makePadNavigationSphereAroundCamera(): void {
     );
     padNavSphereAroundCamera.flipFaces(true);
 
-    let mat = new BABYLON.StandardMaterial("padNavSphereAroundCameraMat", Vars.scene);
+    const mat = new BABYLON.StandardMaterial("padNavSphereAroundCameraMat", Vars.scene);
     mat.diffuseColor = new BABYLON.Color3(1, 1, 1);
     mat.specularColor = new BABYLON.Color3(0, 0, 0);
     mat.opacityTexture = null;

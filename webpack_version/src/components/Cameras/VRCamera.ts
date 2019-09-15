@@ -9,6 +9,8 @@ import * as UrlVars from "../Vars/UrlVars";
 
 declare var BABYLON: any;
 
+let lastTimeJSRunningChecked: number;
+
 /**
  * Sets up the VR camera.
  * @returns void
@@ -22,6 +24,65 @@ export function setup(): void {
     // Setup different trigger VR functions (changes state, etc.)
     setupEnterAndExitVRCallbacks();
     VRControllers.setup();
+
+    // When you gain or loose focus, always exit VR mode. Doing this for
+    // iphone pwa, which otherwise can't exit VR mode.
+    // jQuery(window).focus(() => {
+    //     exitVRAndFS();
+    // });
+
+    // jQuery(window).blur(() => {
+    //     exitVRAndFS();
+    // });
+
+    // jQuery("body").focus(() => {
+    //     exitVRAndFS();
+    // });
+
+    // jQuery("body").blur(() => {
+    //     exitVRAndFS();
+    // });
+
+    // document.addEventListener("visibilitychange", () => {
+    //     exitVRAndFS();
+    // }, false);
+
+    // Surprizingly, none of the above are triggering on ios pwa! Let's try an
+    // additional approach...
+    setInterval(() => {
+        let now = new Date().getTime();
+        if (lastTimeJSRunningChecked === undefined) {
+            lastTimeJSRunningChecked = now;
+        }
+        let deltaTime = now - lastTimeJSRunningChecked;
+        if (deltaTime > 2000) {
+            // Javascript must have stopped recently.
+            exitVRAndFS();
+        }
+        lastTimeJSRunningChecked = now;
+    }, 1000);
+}
+
+/**
+ * Exits VR and/or full-screen mode, if necessary.
+ * @returns void
+ */
+function exitVRAndFS(): void {
+    if (Vars.vrHelper === undefined) {
+        return;
+    }
+
+    // I wondered if the if statements below prevented ios pwa from working.
+    // Could be wrong, but doesn't hurt to omit them. Leave them commented in
+    // case you need them in the future.
+
+    // if (Vars.vrHelper.isInVRMode) {
+        Vars.vrHelper.exitVR();
+    // }
+
+    // if (Vars.vrHelper._fullscreenVRpresenting) {
+    Vars.scene.getEngine().exitFullscreen();
+    // }
 }
 
 /**

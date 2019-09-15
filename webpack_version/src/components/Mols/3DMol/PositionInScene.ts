@@ -7,7 +7,7 @@ declare var BABYLON: any;
 
 export let lastRotationBeforeAnimation = new BABYLON.Vector3(0, 0, 0);
 let lastRotationVec: any = undefined;
-let cachedDeltaYs = {};
+const cachedDeltaYs = {};
 
 /**
  * Positions a given molecular mesh within a specified box.
@@ -18,16 +18,16 @@ let cachedDeltaYs = {};
  *                                       false.
  * @returns void
  */
-export function positionAll3DMolMeshInsideAnother(babylonMesh: any, otherBabylonMesh: any, animate: boolean = false): void {
+export function positionAll3DMolMeshInsideAnother(babylonMesh: any, otherBabylonMesh: any, animate = false): void {
     /** @type {Array<*>} */
-    let allVisMolMeshes = getVisibleMolMeshes(babylonMesh);
+    const allVisMolMeshes = getVisibleMolMeshes(babylonMesh);
 
     // Save all information about each of the visible meshes, for later
     // animation.
     if (lastRotationVec === undefined) {
         lastRotationVec = VRML.molRotation.clone();
     }
-    let allVisMolMeshesInfo = allVisMolMeshes.map((m: any) => {
+    const allVisMolMeshesInfo = allVisMolMeshes.map((m: any) => {
         return {
             mesh: m,
             position: m.position.clone(),
@@ -49,8 +49,8 @@ export function positionAll3DMolMeshInsideAnother(babylonMesh: any, otherBabylon
 
     // Get the bounding box of the other mesh and it's dimensions
     // (protein_box).
-    let targetBox = otherBabylonMesh.getBoundingInfo().boundingBox;
-    let targetBoxDimens = Object.keys(targetBox.maximumWorld).map(
+    const targetBox = otherBabylonMesh.getBoundingInfo().boundingBox;
+    const targetBoxDimens = Object.keys(targetBox.maximumWorld).map(
         (k) => targetBox.maximumWorld[k] - targetBox.minimumWorld[k],
     );
 
@@ -63,16 +63,16 @@ export function positionAll3DMolMeshInsideAnother(babylonMesh: any, otherBabylon
 
     let thisMesh;  // biggest mesh
     /** @type {number} */
-    let allVisMolMeshesLen = allVisMolMeshes.length;
+    const allVisMolMeshesLen = allVisMolMeshes.length;
     for (let i = 0; i < allVisMolMeshesLen; i++) {
-        let allVisMolMesh = allVisMolMeshes[i];
+        const allVisMolMesh = allVisMolMeshes[i];
 
         // Get the bounding box of this mesh.
-        let thisBoxTmp = allVisMolMesh.getBoundingInfo().boundingBox;
-        let thisBoxDimensTmp = Object.keys(thisBoxTmp.maximumWorld).map(
+        const thisBoxTmp = allVisMolMesh.getBoundingInfo().boundingBox;
+        const thisBoxDimensTmp = Object.keys(thisBoxTmp.maximumWorld).map(
             (k) => thisBoxTmp.maximumWorld[k] - thisBoxTmp.minimumWorld[k],
         );
-        let volume = thisBoxDimensTmp[0] * thisBoxDimensTmp[1] * thisBoxDimensTmp[2];
+        const volume = thisBoxDimensTmp[0] * thisBoxDimensTmp[1] * thisBoxDimensTmp[2];
 
         if (volume > maxVol) {
             maxVol = volume;
@@ -83,26 +83,26 @@ export function positionAll3DMolMeshInsideAnother(babylonMesh: any, otherBabylon
     }
 
     // Get the scales
-    let scales = targetBoxDimens.map((targetBoxDimen, i) =>
+    const scales = targetBoxDimens.map((targetBoxDimen, i) =>
         targetBoxDimen / thisBoxDimens[i],
     );
 
     // Get the minimum scale
-    let minScale = Math.min.apply(null, scales);
-    let meshScaling = new BABYLON.Vector3(minScale, minScale, minScale);
+    const minScale = Math.min.apply(null, scales);
+    const meshScaling = new BABYLON.Vector3(minScale, minScale, minScale);
 
     // Scale the meshes.
     for (let i = 0; i < allVisMolMeshesLen; i++) {
-        let allVisMolMesh = allVisMolMeshes[i];
+        const allVisMolMesh = allVisMolMeshes[i];
         allVisMolMesh.scaling = meshScaling;
     }
 
     Vars.scene.render();  // Needed to get bounding box to recalculate.
 
     // Translate the meshes.
-    let meshTranslation = thisBox.centerWorld.subtract(targetBox.centerWorld);
+    const meshTranslation = thisBox.centerWorld.subtract(targetBox.centerWorld);
     for (let i = 0; i < allVisMolMeshesLen; i++) {
-        let allVisMolMesh = allVisMolMeshes[i];
+        const allVisMolMesh = allVisMolMeshes[i];
         allVisMolMesh.position = allVisMolMesh.position.subtract(meshTranslation);
     }
 
@@ -114,7 +114,7 @@ export function positionAll3DMolMeshInsideAnother(babylonMesh: any, otherBabylon
     }
 
     for (let i = 0; i < allVisMolMeshesLen; i++) {
-        let allVisMolMesh = allVisMolMeshes[i];
+        const allVisMolMesh = allVisMolMeshes[i];
         allVisMolMesh.position.y = allVisMolMesh.position.y - deltaY;
         allVisMolMesh.visibility = 1;  // Hide while rotating.
     }
@@ -124,29 +124,29 @@ export function positionAll3DMolMeshInsideAnother(babylonMesh: any, otherBabylon
     // Now do the animations, if not moving from origin (as is the case if the
     // style just changed).
     if (animate === true) {
-        let len = allVisMolMeshesInfo.length;
+        const len = allVisMolMeshesInfo.length;
         for (let i = 0; i < len; i++) {
-            let allVisMolMeshInfo = allVisMolMeshesInfo[i];
-            let mesh = allVisMolMeshInfo.mesh;
-            let pos = mesh.position.clone();
-            let sca = mesh.scaling.clone();
-            let rot = mesh.rotation.clone();
+            const allVisMolMeshInfo = allVisMolMeshesInfo[i];
+            const mesh = allVisMolMeshInfo.mesh;
+            const pos = mesh.position.clone();
+            const sca = mesh.scaling.clone();
+            const rot = mesh.rotation.clone();
 
-            let posX = makeBabylonAnim("posX", "position.x", allVisMolMeshInfo.position.x, pos.x);
-            let posY = makeBabylonAnim("posY", "position.y", allVisMolMeshInfo.position.y, pos.y);
-            let posZ = makeBabylonAnim("posZ", "position.z", allVisMolMeshInfo.position.z, pos.z);
+            const posX = makeBabylonAnim("posX", "position.x", allVisMolMeshInfo.position.x, pos.x);
+            const posY = makeBabylonAnim("posY", "position.y", allVisMolMeshInfo.position.y, pos.y);
+            const posZ = makeBabylonAnim("posZ", "position.z", allVisMolMeshInfo.position.z, pos.z);
 
-            let scaX = makeBabylonAnim("scaX", "scaling.x", allVisMolMeshInfo.scaling.x, sca.x);
-            let scaY = makeBabylonAnim("scaY", "scaling.y", allVisMolMeshInfo.scaling.y, sca.y);
-            let scaZ = makeBabylonAnim("scaZ", "scaling.z", allVisMolMeshInfo.scaling.z, sca.z);
+            const scaX = makeBabylonAnim("scaX", "scaling.x", allVisMolMeshInfo.scaling.x, sca.x);
+            const scaY = makeBabylonAnim("scaY", "scaling.y", allVisMolMeshInfo.scaling.y, sca.y);
+            const scaZ = makeBabylonAnim("scaZ", "scaling.z", allVisMolMeshInfo.scaling.z, sca.z);
 
-            let rotX = makeBabylonAnim("rotX", "rotation.x", allVisMolMeshInfo.rotation.x, rot.x);
-            let rotY = makeBabylonAnim("rotY", "rotation.y", allVisMolMeshInfo.rotation.y, rot.y);
-            let rotZ = makeBabylonAnim("rotZ", "rotation.z", allVisMolMeshInfo.rotation.z, rot.z);
+            const rotX = makeBabylonAnim("rotX", "rotation.x", allVisMolMeshInfo.rotation.x, rot.x);
+            const rotY = makeBabylonAnim("rotY", "rotation.y", allVisMolMeshInfo.rotation.y, rot.y);
+            const rotZ = makeBabylonAnim("rotZ", "rotation.z", allVisMolMeshInfo.rotation.z, rot.z);
 
             mesh.animations = [posX, posY, posZ, scaX, scaY, scaZ, rotX, rotY, rotZ];
 
-            let anim = Vars.scene.beginAnimation(mesh, 0, 15, false, 1, () => {
+            const anim = Vars.scene.beginAnimation(mesh, 0, 15, false, 1, () => {
                 // You need to recalculate the shadows.
                 Optimizations.updateEnvironmentShadows();
             });
@@ -170,8 +170,8 @@ function moveMolMeshesToGround(biggestMolMesh: any, targetBox: any): number {
     // are actually on the ground (all other meshes).
 
     // Check and see if the deltaY has already been calculated.
-    let PI = Math.PI;
-    let key: string = biggestMolMesh.name + "-" +
+    const PI = Math.PI;
+    const key: string = biggestMolMesh.name + "-" +
               (biggestMolMesh.rotation.x % PI).toFixed(3) + "-" +
               (biggestMolMesh.rotation.y % PI).toFixed(3) + "-" +
               (biggestMolMesh.rotation.z % PI).toFixed(3);
@@ -184,11 +184,11 @@ function moveMolMeshesToGround(biggestMolMesh: any, targetBox: any): number {
     // minimum z of any vertex. Let's loop through the biggest mesh and find
     // its lowest vertex, because positioning over the ground needs to be more
     // exact.
-    let verts = biggestMolMesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+    const verts = biggestMolMesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
     let thisMinY = 1000000.0;
-    let vertsLength = verts.length;
-    let thisMeshWorldMatrix = biggestMolMesh.getWorldMatrix();
-    let amntToSkipToGet1000Pts = Math.max(1, 3 * Math.floor(vertsLength / 3000));
+    const vertsLength = verts.length;
+    const thisMeshWorldMatrix = biggestMolMesh.getWorldMatrix();
+    const amntToSkipToGet1000Pts = Math.max(1, 3 * Math.floor(vertsLength / 3000));
     for (let i = 0; i < vertsLength; i = i + amntToSkipToGet1000Pts) {
         let vec = new BABYLON.Vector3(verts[i], verts[i + 1], verts[i + 2]);
         vec = BABYLON.Vector3.TransformCoordinates(vec, thisMeshWorldMatrix);
@@ -198,9 +198,9 @@ function moveMolMeshesToGround(biggestMolMesh: any, targetBox: any): number {
     }
 
     // The min z of the target box should be ok.
-    let targetMinY = targetBox.minimumWorld.y;
+    const targetMinY = targetBox.minimumWorld.y;
 
-    let deltaY = thisMinY - targetMinY - 0.1;
+    const deltaY = thisMinY - targetMinY - 0.1;
     cachedDeltaYs[key] = deltaY;
     return deltaY;
 }
@@ -211,12 +211,12 @@ function moveMolMeshesToGround(biggestMolMesh: any, targetBox: any): number {
  * @returns Array<*>  A list of all visible meshes.
  */
 function getVisibleMolMeshes(babylonMesh: any): any[] {
-    let allVisMolMeshes = [];
-    let molMeshIds = Object.keys(VisStyles.styleMeshes);
-    let len = molMeshIds.length;
+    const allVisMolMeshes = [];
+    const molMeshIds = Object.keys(VisStyles.styleMeshes);
+    const len = molMeshIds.length;
     for (let i = 0; i < len; i++) {
-        let molMeshId = molMeshIds[i];
-        let allVisMolMesh = VisStyles.styleMeshes[molMeshId].mesh;
+        const molMeshId = molMeshIds[i];
+        const allVisMolMesh = VisStyles.styleMeshes[molMeshId].mesh;
         if (allVisMolMesh.isVisible === true) {
             allVisMolMeshes.push(allVisMolMesh);
         }
@@ -238,9 +238,9 @@ function getVisibleMolMeshes(babylonMesh: any): any[] {
 function resetMeshes(allVisMolMeshes: any[]): void {
     // Reset the scaling, position, and rotation of all the visible molecular
     // meshes.
-    let len = allVisMolMeshes.length;
+    const len = allVisMolMeshes.length;
     for (let i = 0; i < len; i++) {
-        let allVisMolMesh = allVisMolMeshes[i];
+        const allVisMolMesh = allVisMolMeshes[i];
         allVisMolMesh.animations = [];
 
         if (allVisMolMesh.isVisible === true) {
@@ -263,7 +263,7 @@ function resetMeshes(allVisMolMeshes: any[]): void {
  * @param  {number} endVal    The ending value.
  */
 function makeBabylonAnim(name: string, prop: string, startVal: number, endVal: number) {
-    let anim = new BABYLON.Animation(
+    const anim = new BABYLON.Animation(
         name, prop, 60,
         BABYLON.Animation.ANIMATIONTYPE_FLOAT,
         BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE,
@@ -275,4 +275,4 @@ function makeBabylonAnim(name: string, prop: string, startVal: number, endVal: n
     ]);
 
     return anim;
-};
+}

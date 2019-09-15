@@ -33,7 +33,7 @@ export function load(): void {
         CamerasSetup.setup();
 
         if (!UrlVars.checkWebrtcInUrl()) {
-            // The below are run if not in webrtc (follow-the-leader) mode.
+            // The below are run if not in webrtc (leader) mode.
 
             // Setup the general things that apply regardless of the mode used.
             // Here because it requires a ground mesh. Set up the floor mesh
@@ -47,7 +47,7 @@ export function load(): void {
             Vars.vrVars.navMode = Navigation.NavMode.NoVR;
 
             // Also, make sure ground is not visible.
-            let groundMesh = Vars.scene.getMeshByID("ground");
+            const groundMesh = Vars.scene.getMeshByID("ground");
             groundMesh.visibility = 0;
 
             // Also hide navigation sphere.
@@ -77,8 +77,8 @@ export function load(): void {
  */
 function vrSetupBeforeBabylonFileLoaded(): void {
     // You'll need a navigation mesh.
-    let navMeshToUse = BABYLON.Mesh.CreateSphere("navTargetMesh", 4, 0.1, Vars.scene);
-    let navMeshMat = new BABYLON.StandardMaterial("myMaterial", Vars.scene);
+    const navMeshToUse = BABYLON.Mesh.CreateSphere("navTargetMesh", 4, 0.1, Vars.scene);
+    const navMeshMat = new BABYLON.StandardMaterial("myMaterial", Vars.scene);
     navMeshMat.diffuseColor = new BABYLON.Color3(1, 0, 1);
     navMeshToUse.material = navMeshMat;
     navMeshToUse.renderingGroupId = 1;  // So always visible, in theory.
@@ -165,7 +165,7 @@ function babylonScene(callBackFunc: any): void {
     }, (progress: any) => {
         if (progress["lengthComputable"]) {
             // Only to 90 to not give the impression that it's done loading.
-            let percent = Math.round(90 * progress["loaded"] / progress["total"]);
+            const percent = Math.round(90 * progress["loaded"] / progress["total"]);
             LoadingScreens.babylonJSLoadingMsg("Loading the main scene... " + percent.toString() + "%");
         }
     });
@@ -181,9 +181,9 @@ function keepOnlyLightWithShadowlightSubstr(): void {
     let foundFirstShadowLight = false;
     let indexToUse = 0;
     while (Vars.scene.lights.length > 1) {
-        let light = Vars.scene.lights[indexToUse];
-        let lightName = light.name.toLowerCase();
-        let isShadowLight = (
+        const light = Vars.scene.lights[indexToUse];
+        const lightName = light.name.toLowerCase();
+        const isShadowLight = (
             (lightName.indexOf("shadowlight") !== -1) ||
             (lightName.indexOf("shadow_light") !== -1)
         );
@@ -212,9 +212,9 @@ function keepOnlyLightWithShadowlightSubstr(): void {
 function furtherProcessKeyMeshes(): void {
     // Hide objects used for scene creation.
     /** @type {number} */
-    let len = Vars.scene.meshes.length;
+    const len = Vars.scene.meshes.length;
     for (let meshIdx = 0; meshIdx < len; meshIdx++) {
-        let mesh = Vars.scene.meshes[meshIdx];
+        const mesh = Vars.scene.meshes[meshIdx];
         if (mesh.name === "protein_box") {
             mesh.isVisible = false;
         } else if (mesh.name.toLowerCase().indexOf("skybox") !== -1) {
@@ -236,9 +236,9 @@ function furtherProcessKeyMeshes(): void {
  */
 function allMaterialsShadeless(): void {
     /** @type {number} */
-    let len = Vars.scene.meshes.length;
+    const len = Vars.scene.meshes.length;
     for (let meshIdx = 0; meshIdx < len; meshIdx++) {
-        let mesh = Vars.scene.meshes[meshIdx];
+        const mesh = Vars.scene.meshes[meshIdx];
         if (!mesh.material) { continue; }
 
         // It has a material
@@ -296,10 +296,10 @@ function optimizeMeshesAndMakeClickable(): void {
     // Optimize and make meshes clickable. Also, make sure all meshes
     // are emmissive.
     /** @type {number} */
-    let len = Vars.scene.meshes.length;
+    const len = Vars.scene.meshes.length;
     for (let meshIdx = 0; meshIdx < len; meshIdx++) {
         if (Vars.scene.meshes[meshIdx].material) {
-            let mesh = Vars.scene.meshes[meshIdx];
+            const mesh = Vars.scene.meshes[meshIdx];
 
             // It needs to be emmisive (so always baked).
             if ((mesh.material.emissiveTexture === undefined) || (mesh.material.emissiveTexture === null)) {

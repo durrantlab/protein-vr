@@ -47,14 +47,14 @@ export function setup(): void {
 
         // Also the point on the ground below the camera should be updated
         // every turn of the render loop (to position the menu button).
-        let camPos = CommonCamera.getCameraPosition();
+        const camPos = CommonCamera.getCameraPosition();
         let pickedGroundPt = groundPointPickingInfo(camPos).pickedPoint;
         if (pickedGroundPt) {
             groundPointBelowCamera = pickedGroundPt;
 
             // If the pickedgroundPt is close, hide the navigation menu button (to
             // prevent user from getting trapped).
-            let heightOffGround = camPos.y - pickedGroundPt.y;
+            const heightOffGround = camPos.y - pickedGroundPt.y;
             if (heightOffGround < CLOSE_TO_GROUND_DIST) {
                 Menu3D.openMainMenuFloorButton.button.isVisible = false;
                 Menu3D.openMainMenuFloorButton.containingMesh.isVisible = false;
@@ -112,7 +112,7 @@ export function setStarePointInfo(): void {
 
         // Construct a ray from the camera to the stare obj
         /** @type {*} */
-        let camPos = CommonCamera.getCameraPosition();
+        const camPos = CommonCamera.getCameraPosition();
         ray = new BABYLON.Ray(camPos, curStarePt.subtract(camPos));
     } else {
         console.log("Unexpected error.");
@@ -131,7 +131,7 @@ function cancelStareIfFarAway(): void {
         Pickables.setCurPickedMesh(undefined);
     } else {
         /** @type {number} */
-        let dist = BABYLON.Vector3.Distance(
+        const dist = BABYLON.Vector3.Distance(
             CommonCamera.getCameraPosition(), curStarePt,
         );
         if (dist > 10) {
@@ -155,7 +155,7 @@ function setPickPointAndObjInScene(ray: any, updatePos = true): void {
     });
 
     /** @type {number} */
-    let pickingInfoDist = pickingInfo.distance;
+    const pickingInfoDist = pickingInfo.distance;
 
     if ((pickingInfo.hit) && (pickingInfoDist < Vars.MAX_TELEPORT_DIST)) {
         // It does hit the floor or some other pickable object. Return the

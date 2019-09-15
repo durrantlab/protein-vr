@@ -5,9 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>ProteinVR: Follow-the-Leader</title>
+    <title>ProteinVR: Leader</title>
 
-    <meta name="description" content="ProteinVR: Follow-the-Leader">
+    <meta name="description" content="ProteinVR: Leader">
     <meta name="author" content="Jacob Durrant">
 
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -19,7 +19,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <!-- <h3>
-                        Follow-the-Leader Sharing
+                        Leader Sharing
                     </h3> -->
                     <p>
                         Others can use the URL below to view the ProteinVR scene through your eyes:
@@ -27,10 +27,10 @@
                     <form role="form">
                         <div class="form-group">
 
-                            <!-- <label for="followTheLeaderURL">
-                                Follow-the-Leader URL
+                            <!-- <label for="leaderURL">
+                                Leader URL
                             </label> -->
-                            <input type="text" class="form-control" id="followTheLeaderURL" />
+                            <input type="text" class="form-control" id="leaderURL" />
                         </div>
                     </form>
                 </div>
@@ -42,15 +42,15 @@
     <script src="scripts/scripts.js"></script>
     <script>
         jQuery(document).ready(() => {
-            let url = window.location.href.replace("pages/follow-the-leader.html", "");
+            let url = window.location.href.replace("pages/leader.html", "");
 
             // Let's try to shorten it. This will only work it's being hosted
             // on one of the durrantlab websites.
-            var followTheLeaderURLVal = jQuery("#followTheLeaderURL");
-            followTheLeaderURLVal.val(url);
-            followTheLeaderURLVal.focus();
+            var leaderURLVal = jQuery("#leaderURL");
+            leaderURLVal.val(url);
+            leaderURLVal.focus();
             setTimeout(() => {
-                followTheLeaderURLVal.select();
+                leaderURLVal.select();
             }, 0);
         });
     </script>

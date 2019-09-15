@@ -27,5 +27,5 @@ build
 **/web/*
 node_modules
 rsync.sh
-dist
 old2*
+.vscode

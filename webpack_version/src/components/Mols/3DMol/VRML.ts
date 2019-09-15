@@ -32,7 +32,7 @@ let config: any;
 /** @type {string} */
 let vrmlStr: string;
 
-let vrmlParserWebWorker = new Worker("vrmlWebWorker.js")
+const vrmlParserWebWorker = new Worker("vrmlWebWorker.js");
 
 let molTxt = "";
 let molTxtType = "pdb";
@@ -65,12 +65,12 @@ export function setup(callBack: any): void {
  * @returns void
  */
 function addDiv(): void {
-    let molContainer = jQuery("#mol-container");
+    const molContainer = jQuery("#mol-container");
     if (molContainer) {
         molContainer.remove();
     }
 
-    let extraStyle = "display:none;";
+    const extraStyle = "display:none;";
     jQuery("body").append(`<div
         id="mol-container"
         class="mol-container"
@@ -122,7 +122,7 @@ export function loadPDBURL(url: string, callBack: any): void {
                 molTxtType = "sdf";
             }
 
-            let mdl = viewer.addModel(data, molTxtType);
+            const mdl = viewer.addModel(data, molTxtType);
 
             callBack(mdl);
         },
@@ -206,7 +206,7 @@ export function render(updateData: boolean, repName: string, callBack: any = () 
                 // manipulations above should be performed on the mesh.
                 // Babylon is going to have better functions for this than I
                 // can come up with.
-                let newMesh = importIntoBabylonScene();
+                const newMesh = importIntoBabylonScene();
 
                 if (newMesh !== undefined) {
                     // It's undefined if, for example, trying to do cartoon on
@@ -249,21 +249,21 @@ function loadValsFromVRML(repName: string, callBack: any): void {
         vrmlParserWebWorker.onmessage = (event: any) => {
             // Msg back from web worker
             /** @type {Object<string,*>} */
-            let resp = event.data;
+            const resp = event.data;
 
-            let chunk = resp["chunk"];
+            const chunk = resp["chunk"];
 
             /** @type {string} */
-            let status = resp["status"];
+            const status = resp["status"];
 
             if (chunk !== undefined) {
                 /** @type {number} */
-                let modelIdx: number = chunk[0];
+                const modelIdx: number = chunk[0];
 
                 /** @type {string} */
-                let dataType = chunk[1];
+                const dataType = chunk[1];
 
-                let vals = chunk[2];
+                const vals = chunk[2];
 
                 if (modelData.length === modelIdx) {
                     modelData.push({
@@ -311,7 +311,7 @@ function loadValsFromVRML(repName: string, callBack: any): void {
             modern browser when running ProteinVR.`,
             false
         );
-        throw "Browser does not support web workers.";
+        throw new Error("Browser does not support web workers.");
 
         // Comment below if you ever want to try to make it work without web
         // workers...
@@ -332,18 +332,18 @@ function typedArrayConcat(resultConstructor: any, listOfArrays: any[]): any {
     let totalLength = 0;
 
     /** @type {number} */
-    let listOfArraysLen = listOfArrays.length;
+    const listOfArraysLen = listOfArrays.length;
     for (let i = 0; i < listOfArraysLen; i++) {
         /** @type {Array<*>} */
-        let arr = listOfArrays[i];
+        const arr = listOfArrays[i];
         totalLength += arr.length;
     }
 
-    let result = new resultConstructor(totalLength);
+    const result = new resultConstructor(totalLength);
     let offset = 0;
     for (let i = 0; i < listOfArraysLen; i++) {
         /** @type {Array<*>} */
-        let arr = listOfArrays[i];
+        const arr = listOfArrays[i];
         result.set(arr, offset);
         offset += arr.length;
     }
@@ -357,35 +357,35 @@ function typedArrayConcat(resultConstructor: any, listOfArrays: any[]): any {
  */
 export function importIntoBabylonScene(): any {
     // The material to add to all meshes.
-    let mat = new BABYLON.StandardMaterial("Material", Vars.scene);
+    const mat = new BABYLON.StandardMaterial("Material", Vars.scene);
     mat.diffuseColor = new BABYLON.Color3(1, 1, 1);
     mat.emissiveColor = new BABYLON.Color3(0, 0, 0);
     mat.specularColor = new BABYLON.Color3(0, 0, 0);
 
-    let meshes = [];
+    const meshes = [];
 
     /** @type {number} */
-    let len = modelData.length;
+    const len = modelData.length;
 
     for (let modelIdx = 0; modelIdx < len; modelIdx++) {
-        let modelDatum = modelData[modelIdx];
+        const modelDatum = modelData[modelIdx];
 
         // Calculate normals instead? It's not necessary. Doesn't chang over
         // 3dmoljs calculated normals.
-        let norms: any[] = [];
+        const norms: any[] = [];
         BABYLON.VertexData.ComputeNormals(
             modelDatum["coors"], modelDatum["trisIdxs"], norms,
         );
 
         // Compile all that into vertex data.
-        let vertexData = new BABYLON.VertexData();
+        const vertexData = new BABYLON.VertexData();
         vertexData["positions"] = modelDatum["coors"];  // In quotes because from webworker (external)
         vertexData["indices"] = modelDatum["trisIdxs"];
         vertexData["normals"] = norms;
         vertexData["colors"] = modelDatum["colors"];
 
         // Make the new mesh
-        let babylonMeshTmp = new BABYLON.Mesh("mesh_3dmol_tmp" + modelIdx, Vars.scene);
+        const babylonMeshTmp = new BABYLON.Mesh("mesh_3dmol_tmp" + modelIdx, Vars.scene);
         vertexData.applyToMesh(babylonMeshTmp);
 
         // Add a material.

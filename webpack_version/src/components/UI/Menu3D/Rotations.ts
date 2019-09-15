@@ -44,7 +44,7 @@ export function buildRotationsSubMenu(): any {
  * @returns void
  */
 export function axisRotation(axis: string): void {
-    let amt = 15.0 * Math.PI / 180.0;
+    const amt = 15.0 * Math.PI / 180.0;
     VRML.updateMolRotation(axis, amt);
     PositionInScene.positionAll3DMolMeshInsideAnother(
         undefined, Vars.scene.getMeshByName("protein_box"), true
@@ -61,7 +61,7 @@ export function axisRotation(axis: string): void {
  * @returns void
  */
 export function undoRotate(): void {
-    let vec = PositionInScene.lastRotationBeforeAnimation;
+    const vec = PositionInScene.lastRotationBeforeAnimation;
     VRML.setMolRotation(vec.x, vec.y, vec.z);
     PositionInScene.positionAll3DMolMeshInsideAnother(
         undefined, Vars.scene.getMeshByName("protein_box"), true

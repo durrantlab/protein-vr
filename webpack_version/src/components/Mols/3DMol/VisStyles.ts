@@ -16,7 +16,7 @@ interface IStyleMesh {
 }
 export let styleMeshes: {[s: string]: IStyleMesh} = {};
 
-let selKeyWordTo3DMolSel = {
+const selKeyWordTo3DMolSel = {
     // See VMD output TCL files for good ideas. You may nee to look at
     // Styles.ts too.
     "All":         {},
@@ -65,7 +65,7 @@ selKeyWordTo3DMolSel["Ligand Context"] = {
     },
 };
 
-let colorSchemeKeyWordTo3DMol = {
+const colorSchemeKeyWordTo3DMol = {
     "Amino Acid": {"colorscheme": "amino"},
     "Blue": {"color": "blue"},
     "Chain": {"colorscheme": "chain"},
@@ -100,7 +100,7 @@ export function toggleRep(filters: any[], repName: string, colorScheme: string, 
 
     // Get the key of this rep request.
     /** @type {Object<string,*>} */
-    let keys = getKeys(filters, repName, colorScheme);
+    const keys = getKeys(filters, repName, colorScheme);
 
     if (finalCallback === undefined) {
         finalCallback = () => { return; };
@@ -108,11 +108,11 @@ export function toggleRep(filters: any[], repName: string, colorScheme: string, 
 
     // If it's "Hide", then just hide the mesh
     if (colorScheme === "Hide") {
-        let fullKeys = Object.keys(styleMeshes);
-        let len = fullKeys.length;
+        const fullKeys = Object.keys(styleMeshes);
+        const len = fullKeys.length;
         for (let i = 0; i < len; i++) {
-            let fullKey = fullKeys[i];
-            let styleMesh = styleMeshes[fullKey];
+            const fullKey = fullKeys[i];
+            const styleMesh = styleMeshes[fullKey];
             if (styleMesh.categoryKey === keys.categoryKey) {
                 styleMesh.mesh.isVisible = false;
                 console.log("Hiding existing mesh...");
@@ -153,8 +153,8 @@ export function toggleRep(filters: any[], repName: string, colorScheme: string, 
 
     // Make the new representation.
     /** @type {string} */
-    let colorSccheme = colorSchemeKeyWordTo3DMol[colorScheme];
-    let sels = {"and": filters.map((i: number) => {
+    const colorSccheme = colorSchemeKeyWordTo3DMol[colorScheme];
+    const sels = {"and": filters.map((i: number) => {
         // "i" can be a keyword or a selection json itself.
         return (selKeyWordTo3DMolSel[i] !== undefined) ? selKeyWordTo3DMolSel[i] : i;
     })};
@@ -164,7 +164,7 @@ export function toggleRep(filters: any[], repName: string, colorScheme: string, 
             toggleRepContinued(keys, repName, finalCallback);
         });
     } else {
-        let rep = {};
+        const rep = {};
         rep[repName.toLowerCase()] = colorSccheme;
         VRML.setStyle(sels, rep);
         toggleRepContinued(keys, repName, finalCallback);
@@ -184,11 +184,11 @@ function toggleRepContinued(keys: any, repName: string, finalCallback: any): voi
     VRML.render(true, repName, (newMesh: any) => {
         // Remove any other meshes that have the same category key (so could
         // be different color... that would be removed.)
-        let ks = Object.keys(styleMeshes);
-        let len = ks.length;
+        const ks = Object.keys(styleMeshes);
+        const len = ks.length;
         for (let i = 0; i < len; i++) {
-            let key = ks[i];
-            let styleMesh = styleMeshes[key];
+            const key = ks[i];
+            const styleMesh = styleMeshes[key];
             if (styleMesh.categoryKey === keys.categoryKey) {
                 Optimizations.removeMeshEntirely(styleMesh.mesh);
                 delete styleMeshes[key];
@@ -233,7 +233,7 @@ function toggleRepContinued(keys: any, repName: string, finalCallback: any): voi
  */
 function getKeys(filters: string[], repName: string, colorScheme: string): any {
     filters.sort();
-    let filtersStr = filters.map((f: any) => {
+    const filtersStr = filters.map((f: any) => {
         if (typeof f === "string") {
             return f;
         } else {
@@ -254,9 +254,9 @@ function getKeys(filters: string[], repName: string, colorScheme: string): any {
  */
 function lAndU(lst: string[]): string[] {
     let newLst = lst.map((s) => s);
-    let len = lst.length;
+    const len = lst.length;
     for (let i = 0; i < len; i++) {
-        let s = lst[i];
+        const s = lst[i];
         newLst.push(s.toUpperCase());
         newLst.push(s.toLowerCase());
     }

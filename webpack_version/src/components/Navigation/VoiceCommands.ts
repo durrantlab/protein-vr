@@ -13,8 +13,8 @@ declare var annyang: any;
 
 export let moleculeNameInfos: any;
 
-let uniqModelNames: string[] = [];
-let uniqRepresentations: any[] = [];
+const uniqModelNames: string[] = [];
+const uniqRepresentations: any[] = [];
 // let uniqModelNamesFuseLib;
 // let uniqRepresentationsFuseLib;
 let isAnnyangAlreadyLoaded = false;
@@ -39,7 +39,7 @@ export function setup(data: any): void {
 }
 
 function _setup(data: any) {
-    let commands: any = {};
+    const commands: any = {};
 
     // Populates the moleculeNameInfos variable if necessary.
     if (moleculeNameInfos === undefined) {
@@ -48,15 +48,15 @@ function _setup(data: any) {
 
     // Populate hide and show commands.
     for (let i = 0; i < 3; i++) {
-        let cmd = ["hide", "show", "high"][i];
-        let isVisible = cmd === "show";
+        const cmd = ["hide", "show", "high"][i];
+        const isVisible = cmd === "show";
 
         // Presence of below probes this never runs...
         debugger;
 
-        for (let modelNameIdx in uniqModelNames) {
+        for (const modelNameIdx in uniqModelNames) {
             if (uniqModelNames.hasOwnProperty(modelNameIdx)) {
-                let modelName = uniqModelNames[modelNameIdx];
+                const modelName = uniqModelNames[modelNameIdx];
                 if (modelName !== "") {
                     commands[cmd + " " + modelName] = () => {
                         interpretHideShowCommands([modelName], isVisible);
@@ -65,9 +65,9 @@ function _setup(data: any) {
             }
         }
 
-        for (let repIdx in uniqRepresentations) {
+        for (const repIdx in uniqRepresentations) {
             if (uniqRepresentations.hasOwnProperty(repIdx)) {
-                let rep = uniqRepresentations[repIdx];
+                const rep = uniqRepresentations[repIdx];
                 if (rep !== "") {
                     commands[cmd + " " + rep] = () => {
                         interpretHideShowCommands([rep], isVisible);
@@ -76,13 +76,13 @@ function _setup(data: any) {
             }
         }
 
-        for (let modelNameIdx in uniqModelNames) {
+        for (const modelNameIdx in uniqModelNames) {
             if (uniqModelNames.hasOwnProperty(modelNameIdx)) {
-                let modelName = uniqModelNames[modelNameIdx];
+                const modelName = uniqModelNames[modelNameIdx];
                 if (modelName !== "") {
-                    for (let repIdx in uniqRepresentations) {
+                    for (const repIdx in uniqRepresentations) {
                         if (uniqRepresentations.hasOwnProperty(repIdx)) {
-                            let rep = uniqRepresentations[repIdx];
+                            const rep = uniqRepresentations[repIdx];
                             if (rep !== "") {
                                 commands[cmd + " " + modelName + " " + rep] = () => {
                                     interpretHideShowCommands([modelName, rep], isVisible);
@@ -148,7 +148,7 @@ function objIDToMolNameInfo(objID: string): any {
     let txtStr = objID.replace(/.sdf/g, "").replace(/.pdb/g, "");
     txtStr = txtStr.replace(/.wrl/g, "");
     txtStr = txtStr.replace(/surfaces/g, "Surfaces");
-    let prts = txtStr.split("_");
+    const prts = txtStr.split("_");
     let modelName = prts[0];
     if (modelName === "Surfaces") {
         return {
@@ -157,16 +157,16 @@ function objIDToMolNameInfo(objID: string): any {
             representation: "",
         };
     } else {
-        let desc = prts[1].replace(/[A-Z]/g, (match: string) => {
+        const desc = prts[1].replace(/[A-Z]/g, (match: string) => {
             return "_" + match;
         });
-        let descPrts = desc.split(/_/g);
+        const descPrts = desc.split(/_/g);
         // let component = descPrts[0];  // This will be ignored in the end.
         let representation = descPrts[1];
 
         modelName = capitalize(modelName);
         representation = capitalize(representation);
-        let key = modelName + "_" + representation;
+        const key = modelName + "_" + representation;
         return {
             key,
             modelName,
@@ -183,10 +183,10 @@ function objIDToMolNameInfo(objID: string): any {
 export function setMoleculeNameInfos(data: any): void {
     moleculeNameInfos = {};
 
-    for (let idx in data["objIDs"]) {
+    for (const idx in data["objIDs"]) {
         if (data["objIDs"].hasOwnProperty(idx)) {
-            let objID = data["objIDs"][idx];
-            let inf = objIDToMolNameInfo(objID);
+            const objID = data["objIDs"][idx];
+            const inf = objIDToMolNameInfo(objID);
 
             if (moleculeNameInfos[inf.key] === undefined) {
                 moleculeNameInfos[inf.key] = {
@@ -259,9 +259,9 @@ export function setMoleculeNameInfos(data: any): void {
 // }
 
 function isLst1SubsetOfLst2(lst1: any[], lst2: any[]): boolean {
-    for (let i1 in lst1) {
+    for (const i1 in lst1) {
         if (lst1.hasOwnProperty(i1)) {
-            let item1 = lst1[i1];
+            const item1 = lst1[i1];
             if (lst2.indexOf(item1) === -1) {
                 // It is not in the second list!
                 return false;
@@ -274,9 +274,9 @@ function isLst1SubsetOfLst2(lst1: any[], lst2: any[]): boolean {
 
 export function interpretHideShowCommands(filterWrds: string[], isVisible: boolean) {
     // Go through all the keys and remove the ones that don't match the words.
-    for (let i in moleculeNameInfos) {
+    for (const i in moleculeNameInfos) {
         if (moleculeNameInfos.hasOwnProperty(i)) {
-            let moleculeNameInfo = moleculeNameInfos[i];
+            const moleculeNameInfo = moleculeNameInfos[i];
             if (isLst1SubsetOfLst2(filterWrds,
                                    [moleculeNameInfo.modelName,
                                     moleculeNameInfo.representation])) {
@@ -306,10 +306,10 @@ export function showOrHideModel(modelName: string, representation: string, isVis
     // Remember there could be multiple meshes associated with a given key.
     // (For example, if voice command is to hide "protein"). So you need to
     // look through everything that matches.
-    for (let idx in moleculeNameInfos[key].meshNames) {
+    for (const idx in moleculeNameInfos[key].meshNames) {
         if (moleculeNameInfos[key].meshNames.hasOwnProperty(idx)) {
-            let meshName = moleculeNameInfos[key].meshNames[idx];
-            let mesh = Vars.scene.getMeshByName(meshName);
+            const meshName = moleculeNameInfos[key].meshNames[idx];
+            const mesh = Vars.scene.getMeshByName(meshName);
 
             mesh.isVisible = isVisible;
 
@@ -385,14 +385,14 @@ class Speech {
 
     public speak(text: string): void {
         if (this.voices !== null) {
-            let speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
+            const speechSynthesisUtterance = new SpeechSynthesisUtterance(text);
 
             speechSynthesisUtterance.rate = 1;
 
             // console.log(this.voices.map((v) => v.name));
 
             // Prefer Samantha if available.
-            let samanthaVoice = this.voices.filter((voice: any) => {
+            const samanthaVoice = this.voices.filter((voice: any) => {
                 return voice.name.toUpperCase().indexOf("SAMANTHA") > -1;
             });
             if (samanthaVoice.length > 0) {
@@ -414,7 +414,7 @@ class Speech {
           }
     }
 }
-let speech = new Speech();
+const speech = new Speech();
 
 // $("#button1").on("click", function() {
 //   let speech = new Speech();

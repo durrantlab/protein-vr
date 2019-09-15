@@ -4,7 +4,7 @@ import * as Menu3D from "./Menu3D";
 
 declare var BABYLON: any;
 
-let btnScale = new BABYLON.Vector3(0.75, 0.75, 0.75);
+const btnScale = new BABYLON.Vector3(0.75, 0.75, 0.75);
 
 interface IButtonWrapper {
     panel: any;

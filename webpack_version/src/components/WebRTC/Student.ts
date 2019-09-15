@@ -1,4 +1,4 @@
-// Functions for follow-the-leader mode, that the follower (student) uses.
+// Functions for leader mode, that the follower (student) uses.
 
 import * as CommonCamera from "../Cameras/CommonCamera";
 import * as WebRTCBase from "./WebRTCBase";
@@ -73,7 +73,7 @@ export class Student extends WebRTCBase.WebRTCBase {
         });
 
         this.conn.on("close", () => {
-            WebRTCBase.webRTCErrorMsg("Follow-the-leader connection closed.");
+            WebRTCBase.webRTCErrorMsg("Leader connection closed.");
         });
     }
 }
@@ -91,10 +91,10 @@ export function startFollowing(id: string): void {
     targetCameraPosition = new Float32Array(CommonCamera.getCameraPosition().asArray());
     targetCameraRotationQuaternion = new Float32Array(CommonCamera.getCameraRotationQuaternion().asArray());
 
-    let stud = new Student((data: any) => {
+    const stud = new Student((data: any) => {
         if (WebRTCBase.DEBUG === true) { console.log("stud1 got data", data); }
-        let type = data["type"];
-        let val = data["val"];
+        const type = data["type"];
+        const val = data["val"];
         switch (type) {
             case "locrot":
                 targetCameraPosition = new Float32Array([val[0], val[1], val[2]]);
@@ -119,7 +119,7 @@ export function startFollowing(id: string): void {
                     val["repName"],
                     val["colorScheme"],
                     undefined
-                )
+                );
                 break;
             case "molAxisRotation":
                 Rotations.axisRotation(val);
@@ -135,20 +135,20 @@ export function startFollowing(id: string): void {
 
     // Start moving the camera in sync
     Vars.scene.registerBeforeRender(() => {
-        let cameraLoc = new Float32Array(CommonCamera.getCameraPosition().asArray());
-        let newPos = moveVecTowards(
+        const cameraLoc = new Float32Array(CommonCamera.getCameraPosition().asArray());
+        const newPos = moveVecTowards(
             cameraLoc,
             targetCameraPosition
         );
-        let newPosAsVec = BABYLON.Vector3.FromArray(newPos);
+        const newPosAsVec = BABYLON.Vector3.FromArray(newPos);
         CommonCamera.setCameraPosition(newPosAsVec);
 
-        let cameraRotQuat = new Float32Array(CommonCamera.getCameraRotationQuaternion().asArray());
-        let newRot = moveVecTowards(
+        const cameraRotQuat = new Float32Array(CommonCamera.getCameraRotationQuaternion().asArray());
+        const newRot = moveVecTowards(
             cameraRotQuat,
             targetCameraRotationQuaternion
-        )
-        let newRotAsVec = BABYLON.Quaternion.FromArray(newRot);
+        );
+        const newRotAsVec = BABYLON.Quaternion.FromArray(newRot);
         CommonCamera.setCameraRotationQuaternion(newRotAsVec);
     });
 }
@@ -160,17 +160,17 @@ export function startFollowing(id: string): void {
  * @param  {any} targetVec  The target vector.
  */
 function moveVecTowards(curVec: any, targetVec: any) {
-    let numEntries = curVec.length;
+    const numEntries = curVec.length;
 
     // Now get the distance between curVec and this newPos.
-    let deltaPos = new Float32Array(numEntries);
+    const deltaPos = new Float32Array(numEntries);
     for (let i = 0; i < numEntries; i++) { deltaPos[i] = targetVec[i] - curVec[i]; }
 
-    let fac = 0.02;
-    let animRatio = Vars.scene.getAnimationRatio();
+    const fac = 0.02;
+    const animRatio = Vars.scene.getAnimationRatio();
 
     // A variable that will contain the new position
-    let newPos = new Float32Array(numEntries);
+    const newPos = new Float32Array(numEntries);
 
     // Scale the delta and add it to the curVec. That's the newPos.
     for (let i = 0; i < numEntries; i++) { newPos[i] =  curVec[i] + animRatio * fac * deltaPos[i]; }

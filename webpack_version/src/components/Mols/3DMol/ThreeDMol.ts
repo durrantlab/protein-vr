@@ -46,7 +46,7 @@ function after3DMolJsLoaded(): void {
             UrlVars.setURL();
 
             if (!UrlVars.checkWebrtcInUrl()) {
-                // It's not follow-the-leader mode, set setup menu.
+                // It's not leader mode, set setup menu.
 
                 // Get additional selection information about the loaded molecule.
                 // Like residue name.
@@ -83,7 +83,7 @@ function after3DMolJsLoaded(): void {
 function getAdditionalSels(mdl3DMol: any): void {
     // Get all the atoms.
     /** @type {Array<Object<string,*>>} */
-    let atoms = mdl3DMol.selectedAtoms({});
+    const atoms = mdl3DMol.selectedAtoms({});
 
     atomicInfo = {
         "Atom Name": [],
@@ -95,10 +95,10 @@ function getAdditionalSels(mdl3DMol: any): void {
     };
 
     /** @type {number} */
-    let atomsLen = atoms.length;
+    const atomsLen = atoms.length;
     for (let i = 0; i < atomsLen; i++) {
         /** @type {Object<string,*>} */
-        let atom = atoms[i];
+        const atom = atoms[i];
         atomicInfo["Atom Name"].push(atom["atom"]);
         atomicInfo["Chain"].push(atom["chain"]);
         atomicInfo["Element"].push(atom["elem"]);
@@ -108,10 +108,10 @@ function getAdditionalSels(mdl3DMol: any): void {
     }
 
     // We want just unique values.
-    let lbls = Object.keys(atomicInfo);
-    let len = lbls.length;
+    const lbls = Object.keys(atomicInfo);
+    const len = lbls.length;
     for (let i = 0; i < len; i++) {
-        let lbl = lbls[i];
+        const lbl = lbls[i];
         atomicInfo[lbl] = uniq(atomicInfo[lbl]);
     }
 }
@@ -124,11 +124,11 @@ function getAdditionalSels(mdl3DMol: any): void {
 function uniq(arr: string[]): any[] {
     // see
     // https://stackoverflow.com/questions/11688692/how-to-create-a-list-of-unique-items-in-javascript
-    let u = {};
-    let a = [];
+    const u = {};
+    const a = [];
 
     /** @type {number} */
-    let len = arr.length;
+    const len = arr.length;
     for (let i = 0, l = len; i < l; ++i) {
         if (!u.hasOwnProperty(arr[i])) {
             a.push(arr[i]);

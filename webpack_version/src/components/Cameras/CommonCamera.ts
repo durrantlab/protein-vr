@@ -24,7 +24,7 @@ export function getCameraPosition(): any {
     /** @const {*} */
     const activeCam = Vars.scene.activeCamera;
 
-    let activeCamPos = activeCam.position.clone();
+    const activeCamPos = activeCam.position.clone();
 
     if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
         (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
@@ -49,12 +49,12 @@ export function getCameraPosition(): any {
 export function setCameraPosition(pt: any): void {
     if (Vars.vrVars.navMode === Navigation.NavMode.NoVR) {
         // A regular camera. Just move it there.
-        let activeCam = Vars.scene.activeCamera;
+        const activeCam = Vars.scene.activeCamera;
         activeCam.position.copyFrom(pt);
     } else if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
                (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
         // Not ever tested... not sure it works...
-        let activeCam = Vars.vrHelper.webVRCamera;
+        const activeCam = Vars.vrHelper.webVRCamera;
 
         // A VR camera. Need to account for the fact that the eye might not be
         // at the same place as the camera.
@@ -76,7 +76,7 @@ export function getCameraRotationQuaternion(): any {
         (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
 
         // Cover all devices using the below... (Android, Chrome, Carboard)
-        let quat = Vars.vrHelper.webVRCamera.deviceRotationQuaternion;
+        const quat = Vars.vrHelper.webVRCamera.deviceRotationQuaternion;
         return (quat.x !== 0) ? quat : Vars.scene.activeCamera.rotationQuaternion;
     } else {
         // Regular (Universal) camera.
@@ -114,7 +114,7 @@ export function getCameraRotationY(): any {
         (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
 
         // Complicated in the case of a VR camera.
-        let groundPtVec = Points.groundPointBelowStarePt.subtract(Points.groundPointBelowCamera);
+        const groundPtVec = Points.groundPointBelowStarePt.subtract(Points.groundPointBelowCamera);
 
         /** @type {number} */
         let angle = BABYLON.Vector3.GetAngleBetweenVectors(groundPtVec, forwardVec, upVec);
@@ -136,8 +136,8 @@ export function getCameraRotationY(): any {
         return angle;
     } else {
         // This is much simplier with a non-VR camera.
-        let activeCam = Vars.scene.activeCamera;
-        let activeCamRot = activeCam.rotation.clone();
+        const activeCam = Vars.scene.activeCamera;
+        const activeCamRot = activeCam.rotation.clone();
         return activeCamRot.y;  // + Math.PI * 0.5;
     }
 }
@@ -155,10 +155,10 @@ export function getVecFromEyeToCamera(): any {
 
     // Note that some VR cameras don't track position, only orientation.
     // Google cardboard is an example.
-    let activeCam = Vars.vrHelper.webVRCamera;
+    const activeCam = Vars.vrHelper.webVRCamera;
     let deltaVec;
     if (activeCam.leftCamera) {
-        let leftEyePos = activeCam.leftCamera.globalPosition;
+        const leftEyePos = activeCam.leftCamera.globalPosition;
         deltaVec = leftEyePos.subtract(activeCam.position);
     } else {
         deltaVec = new BABYLON.Vector3(0, 0, 0);

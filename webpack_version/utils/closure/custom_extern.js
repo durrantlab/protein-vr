@@ -484,9 +484,12 @@ BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLo
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.rotationQuaternion;
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.rotationQuaternion.toEulerAngles = function() {};
 BABYLON.Scene.prototype.createDefaultVRExperience.teleportCamera = function(a) {};
+BABYLON.Scene.prototype.createDefaultVRExperience.exitVR = function() {};
+BABYLON.Scene.prototype.createDefaultVRExperience._fullscreenVRpresenting;
 BABYLON.Scene.prototype.getEngine = function() {};
 BABYLON.Scene.prototype.getEngine.getCaps = function() {};
 BABYLON.Scene.prototype.getEngine.getCaps.multiview;
+BABYLON.Scene.prototype.getEngine.exitFullscreen = function() {};
 BABYLON.Scene.prototype.WebVRController;
 BABYLON.Scene.prototype.WebVRController.onTriggerStateChangedObservable = function() {};
 BABYLON.Scene.prototype.WebVRController.onTriggerStateChangedObservable.add = function(a) {};
@@ -498,14 +501,10 @@ BABYLON.Scene.prototype.debugLayer;
 BABYLON.Scene.prototype.debugLayer.show = function() {};
 BABYLON.Scene.prototype.WebVRController.onMainButtonStateChangedObservable= function() {};
 BABYLON.Scene.prototype.WebVRController.onMainButtonStateChangedObservable.add = function(a) {};
-
 BABYLON.Scene.prototype.WebVRController.onSecondaryButtonStateChangedObservable= function() {};
 BABYLON.Scene.prototype.WebVRController.onSecondaryButtonStateChangedObservable.add = function(a) {};
-
 BABYLON.Scene.prototype.WebVRController.onMenuButtonStateChangedObservable= function() {};
 BABYLON.Scene.prototype.WebVRController.onMenuButtonStateChangedObservable.add = function(a) {};
-
-
 BABYLON.Scene.prototype.WebVRController.pad;
 BABYLON.Scene.prototype.createDefaultVRExperience.onEnteringVRObservable = function() {};
 BABYLON.Scene.prototype.createDefaultVRExperience.onEnteringVRObservable.add = function(a) {};
@@ -515,7 +514,8 @@ BABYLON.Scene.prototype.createDefaultVRExperience.onAfterEnteringVRObservable = 
 BABYLON.Scene.prototype.createDefaultVRExperience.onAfterEnteringVRObservable.add = function(a) {};
 BABYLON.Scene.prototype.createDefaultVRExperience.raySelectionPredicate;
 BABYLON.Scene.prototype.createDefaultVRExperience.updateGazeTrackerScale;
-BABYLON.Scene.prototype.createDefaultVRExperience.displayGaze
+BABYLON.Scene.prototype.createDefaultVRExperience.displayGaze;
+BABYLON.Scene.prototype.createDefaultVRExperience.isInVRMode;
 BABYLON.Scene.prototype.createDefaultVRExperience.enableInteractions = function() {};
 BABYLON.Scene.prototype.collisionsEnabled;
 BABYLON.Scene.prototype.autoClear;

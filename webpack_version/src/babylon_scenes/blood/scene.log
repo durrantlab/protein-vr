@@ -38,19 +38,19 @@ Exporter version: 6.1.2, Blender version: 2.80 (sub 75)
 		num colors         :  0
 		num indices        :  6
 	processing begun of mesh:  skybox.baked
-		processing begun of material:  Material
-			processing texture env_skybox5
+		processing begun of material:  baked.001
+			processing texture Baked
 				texture type:  emissiveTexture, mapped using: "UVMap"
-		num positions      :  27
-		num normals        :  27
+		num positions      :  31
+		num normals        :  31
 		num tangents       :  0
-		num uvs            :  54
+		num uvs            :  62
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  36
 	processing begun of camera (UniversalCamera):  Camera
-	processing begun of light (POINT):  ShadowLight_Sun_dark_0.95_blur_64
+	processing begun of light (POINT):  ShadowLight_Sun_dark_0.95_blur_64_ambient_0.1
 ========= Writing of JSON file started =========
 ========= Writing of JSON file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 0.9295 secs
+elapsed time:  0 min, 0.4199 secs

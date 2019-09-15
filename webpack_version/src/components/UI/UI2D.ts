@@ -30,9 +30,9 @@ function addRunModeButtons(): void {
     // bottom. Doesn't include VR button, because that's added elsewhere.
     // Icons should fit within 80px x 50px.
 
-    let dimen = "48";  // The icon dimensions (square).
+    const dimen = "48";  // The icon dimensions (square).
 
-    let btns: I2DButton[] = [
+    const btns: I2DButton[] = [
         {
             // https://pixabay.com/vectors/folder-directory-open-computer-26694/
             svg: `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -74,8 +74,8 @@ function addRunModeButtons(): void {
              	    l-13.1-7.3c0.5-0.9,0.7-2,0.7-2.9c0-0.5,0-1.4-0.2-2l13.3-7.3c1,0.9,2.5,1.5,4.1,1.5c3.2,0,5.9-2.5,5.9-5.4l0,0
              	    C41.3,6.9,38.5,4.6,35.4,4.6L35.4,4.6L35.4,4.6z"/>
                  </svg>`,
-            title: "Share (Follow-the-Leader)",
-            id: "follow-the-leader",
+            title: "Share (Leader)",
+            id: "leader",
             clickFunc: () => {
                 Lecturer.startBroadcast();
             }
@@ -95,12 +95,12 @@ function addRunModeButtons(): void {
                 jQuery("#renderCanvas").focus();  // So keypress will work.
             }
         }
-    ]
+    ];
 
     // Reverse the buttons.
     let html = "";
     let curBottom = 60;
-    for (let btn of btns.reverse()) {
+    for (const btn of btns.reverse()) {
         html += `
             <button
                 title="${btn.title}"
@@ -125,14 +125,14 @@ function addRunModeButtons(): void {
     jQuery("body").append(html);
 
     // Make buttons clickable
-    for (let btn of btns) {
+    for (const btn of btns) {
         jQuery("#" + btn.id).click(() => {
             btn.clickFunc();
         });
     }
 
     // Also make VR button visible.
-    let babylonVRiconbtn = document.getElementById("babylonVRiconbtn");
+    const babylonVRiconbtn = document.getElementById("babylonVRiconbtn");
     if (babylonVRiconbtn !== null) {
         babylonVRiconbtn.style.opacity = "1.0";  // Non IE;
         babylonVRiconbtn.style.filter = "alpha(opacity=1.0)";  // IE;

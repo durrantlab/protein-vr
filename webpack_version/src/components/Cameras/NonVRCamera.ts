@@ -7,7 +7,7 @@ declare var BABYLON: any;
 /** @type {*} */
 let nonVRCamera: any;
 
-let lastCameraPosAboveGroundMesh: any = new BABYLON.Vector3(0, 0, 0);
+const lastCameraPosAboveGroundMesh: any = new BABYLON.Vector3(0, 0, 0);
 
 /**
  * Sets up the nonVR camera (not everyone has a VR headset).

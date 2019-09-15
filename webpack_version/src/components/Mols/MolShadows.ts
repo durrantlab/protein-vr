@@ -14,10 +14,10 @@ export let shadowGenerator: any;
  */
 export function setupShadowGenerator(): void {
     // Get the light that will cast the shadows.
-    let light = Vars.scene.lights[0];
+    const light = Vars.scene.lights[0];
 
     /** @type {Object<string,number>} */
-    let shadowInf = getBlurDarknessAmbientFromLightName();
+    const shadowInf = getBlurDarknessAmbientFromLightName();
     // shadowInf.T = 0;
     // shadowInf.blur = 2;
 
@@ -68,7 +68,7 @@ export function setupShadowGenerator(): void {
  * @returns Object<string,number>
  */
 export function getBlurDarknessAmbientFromLightName(): any {
-    let light = Vars.scene.lights[0];
+    const light = Vars.scene.lights[0];
 
     // Set some default values for the shadows.
     let blur = 64;
@@ -76,18 +76,18 @@ export function getBlurDarknessAmbientFromLightName(): any {
     let ambient = undefined;
 
     // Now overwrite those values if reason to do so in the name of the light.
-    let blurMatches = light.name.match(/blur_([0-9\.]+)/g);
+    const blurMatches = light.name.match(/blur_([0-9\.]+)/g);
     if (blurMatches !== null) {
         blur = +blurMatches[0].substr(5);
     }
 
     /** @type Array<string> */
-    let darknessMatches = light.name.match(/dark_([0-9\.]+)/g);
+    const darknessMatches = light.name.match(/dark_([0-9\.]+)/g);
     if (darknessMatches !== null) {
         darkness = +darknessMatches[0].substr(5);
     }
 
-    let ambientMatches = light.name.match(/ambient_([0-9\.]+)/g);
+    const ambientMatches = light.name.match(/ambient_([0-9\.]+)/g);
     if (ambientMatches !== null) {
         ambient = +ambientMatches[0].substr(8);
     }
@@ -102,9 +102,9 @@ export function getBlurDarknessAmbientFromLightName(): any {
 export function setupShadowCatchers(): void {
     // Go through and find the shdow catchers
     /** @type {number} */
-    let len = Vars.scene.meshes.length;
+    const len = Vars.scene.meshes.length;
     for (let idx = 0; idx < len; idx++) {
-        let mesh = Vars.scene.meshes[idx];
+        const mesh = Vars.scene.meshes[idx];
         if ((mesh.name.toLowerCase().indexOf("shadowcatcher") !== -1) || (
             mesh.name.toLowerCase().indexOf("shadow_catcher") !== -1)) {
 

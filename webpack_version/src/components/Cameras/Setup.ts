@@ -22,20 +22,20 @@ export function setup(): void {
     if (true) {
         // Create a device orientation camera that matches the one loaded from
         // the babylon file.
-        let DevOrCamera = new BABYLON.DeviceOrientationCamera(
+        const devOrCamera = new BABYLON.DeviceOrientationCamera(
             "DevOr_camera",
             cameraFromBabylonFile.position.clone(),
             Vars.scene,
             true,
         );
-        DevOrCamera.rotation = cameraFromBabylonFile.rotation.clone();
+        devOrCamera.rotation = cameraFromBabylonFile.rotation.clone();
 
         // For debugging.
         // window["cameraFromBabylonFile"] = cameraFromBabylonFile;
-        // window["DevOrCamera"] = DevOrCamera;
+        // window["devOrCamera"] = devOrCamera;
 
         // Update the active camera to be the device orientation one.
-        Vars.scene.activeCamera = DevOrCamera; // cameraFromBabylonFile
+        Vars.scene.activeCamera = devOrCamera; // cameraFromBabylonFile
 
         // Make sure device orientation camera pointing in direction of
         // original camera.

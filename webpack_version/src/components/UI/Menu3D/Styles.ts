@@ -4,10 +4,10 @@ import * as UrlVars from "../../Vars/UrlVars";
 import * as Menu3D from "./Menu3D";
 
 // Define all the possible components.
-let components = ["Protein", "Ligand", "Ligand Context", "Water", "Nucleic"];
+const components = ["Protein", "Ligand", "Ligand Context", "Water", "Nucleic"];
 
 // For each of those components, get the possible selections.
-let selections = {
+const selections = {
     "Ligand": ["All"],
     "Ligand Context": ["All"],
     "Nucleic": ["All"],
@@ -18,8 +18,8 @@ let selections = {
 };
 
 // For each of those components, specify the associated representations.
-let commonReps = ["Stick", "Sphere", "Surface"];
-let representations = {
+const commonReps = ["Stick", "Sphere", "Surface"];
+const representations = {
     "Ligand": commonReps,
     "Ligand Context": ["Cartoon"].concat(commonReps),
     "Nucleic": commonReps,
@@ -28,11 +28,11 @@ let representations = {
 };
 
 // You'll need to modify colorSchemeKeyWordTo3DMol in VisStyles.ts too.
-let colors = [
+const colors = [
     "White", "Red", "Blue", "Green", "Orange", "Yellow", "Purple",
 ];
 
-let colorSchemes = [
+const colorSchemes = [
     "Element", "Amino Acid", "Chain", "Nucleic", "Spectrum",
 ];
 
@@ -41,15 +41,15 @@ let colorSchemes = [
  * @returns Object
  */
 export function buildStylesSubMenu(): any {
-    let menu = {
+    const menu = {
         "Components": {},
         "Selections": {},
         "Clear": () => {
-            let fullKeys = Object.keys(VisStyles.styleMeshes);
-            let len = fullKeys.length;
+            const fullKeys = Object.keys(VisStyles.styleMeshes);
+            const len = fullKeys.length;
             for (let i = 0; i < len; i++) {
-                let fullKey = fullKeys[i];
-                let styleMesh = VisStyles.styleMeshes[fullKey];
+                const fullKey = fullKeys[i];
+                const styleMesh = VisStyles.styleMeshes[fullKey];
                 styleMesh.mesh.isVisible = false;
             }
             Menu3D.openMainMenuFloorButton.toggled();
@@ -59,14 +59,14 @@ export function buildStylesSubMenu(): any {
 
     // Add in the components (ligand, protein, etc).
     /** @type {number} */
-    let componentsLen = components.length;
+    const componentsLen = components.length;
     for (let i = 0; i < componentsLen; i++) {
-        let component = components[i];
+        const component = components[i];
         menu["Components"][component] = {};
         /** @type {number} */
-        let selectionsComponentLen = selections[component].length;
+        const selectionsComponentLen = selections[component].length;
         for (let i2 = 0; i2 < selectionsComponentLen; i2++) {
-            let selection = selections[component][i2];
+            const selection = selections[component][i2];
             menu["Components"][component][selection] = makeRepColorSchemeSubMenus({}, component, (rep: any, colorScheme: any) => {
                 VisStyles.toggleRep([component, selection], rep, colorScheme);
             });
@@ -84,8 +84,7 @@ export function buildStylesSubMenu(): any {
  */
 export function updatePastStylesInMenu(menuInf: any): void {
     if (UrlVars.checkWebrtcInUrl()) {
-        // Follow-the-leader mode. So no need to update menu (it doesn't
-        // exist).
+        // Leader mode. So no need to update menu (it doesn't exist).
         return;
     }
 
@@ -96,11 +95,11 @@ export function updatePastStylesInMenu(menuInf: any): void {
         ["Styles", "Remove Existing"],
     );
 
-    let repNames = Object.keys(VisStyles.styleMeshes);
+    const repNames = Object.keys(VisStyles.styleMeshes);
     /** @type {number} */
-    let len = repNames.length;
+    const len = repNames.length;
     for (let i = 0; i < len; i++) {
-        let repName = repNames[i];
+        const repName = repNames[i];
         if (VisStyles.styleMeshes[repName].mesh.isVisible === true) {
             let lbl = repName.replace(/--/g, " ");
             lbl = lbl.replace(/{/g, "").replace(/}/g, "").replace(/"/g, "");
@@ -108,7 +107,7 @@ export function updatePastStylesInMenu(menuInf: any): void {
                 Menu3D.openMainMenuFloorButton.toggled();
                 setTimeout(() => {
                     /** @type {Array<*>} */
-                    let repInfo = UrlVars.extractRepInfoFromKey(repName);
+                    const repInfo = UrlVars.extractRepInfoFromKey(repName);
                     VisStyles.toggleRep(repInfo[0], repInfo[1], "Hide");
                 }, 0);
             };
@@ -131,7 +130,7 @@ export function updateModelSpecificSelectionsInMenu(menuInf: any): void {
     );
 
     // Selection keywords
-    let selKeywords = {
+    const selKeywords = {
         "Atom Name": "atom",
         "Chain": "chain",
         "Element": "elem",
@@ -140,7 +139,7 @@ export function updateModelSpecificSelectionsInMenu(menuInf: any): void {
         "Secondary Structure": "ss",
     };
 
-    let maxNumPerGroup = 14;
+    const maxNumPerGroup = 14;
 
     /**
      * @param  {string}      component
@@ -148,7 +147,7 @@ export function updateModelSpecificSelectionsInMenu(menuInf: any): void {
      * @param  {Array<*>}    items
      * @param  {Array<string>} breadcrumbs
      */
-    let addToMenuRecurse = (component: string, menuBranch: any, items: any[], breadcrumbs: string[]) => {
+    const addToMenuRecurse = (component: string, menuBranch: any, items: any[], breadcrumbs: string[]) => {
         items.sort(
             /**
              * @param  {number} x
@@ -170,30 +169,30 @@ export function updateModelSpecificSelectionsInMenu(menuInf: any): void {
         );
 
         // So divide it into maxNumPerGroup groups.
-        let chunks = chunkify(items, maxNumPerGroup);
+        const chunks = chunkify(items, maxNumPerGroup);
 
         // Add the items and recurse if necessary.
 
         /** @type {number} */
-        let chunksLen = chunks.length;
+        const chunksLen = chunks.length;
         for (let i = 0; i < chunksLen; i++) {
             /** @type {Array<*>} */
-            let chunk = chunks[i];
+            const chunk = chunks[i];
             if (chunk.length === 1) {
                 // Just a single item, so make the rep/color submenus.
-                let item = chunk[0];
+                const item = chunk[0];
                 menuBranch[item] = {};
                 // MOOSE
                 menuBranch[item] = makeRepColorSchemeSubMenus(menuBranch[item], component, (rep: any, colorScheme: any) => {
                     /** @type {string} */
-                    let selKeyword = selKeywords[component];  // See ThreeDMol.ts
-                    let it = {};
+                    const selKeyword = selKeywords[component];  // See ThreeDMol.ts
+                    const it = {};
                     it[selKeyword] = item;
                     VisStyles.toggleRep([it], rep, colorScheme);
                 }, breadcrumbs.concat([item]));
             } else {
                 // Multiple items, so it's a category.
-                let lbl = "[" + chunk[0].toString() + "-" + chunk[chunk.length - 1].toString() + "]";
+                const lbl = "[" + chunk[0].toString() + "-" + chunk[chunk.length - 1].toString() + "]";
                 menuBranch[lbl] = {};
                 addToMenuRecurse(component, menuBranch[lbl], chunk, breadcrumbs.concat([lbl]));
             }
@@ -206,13 +205,13 @@ export function updateModelSpecificSelectionsInMenu(menuInf: any): void {
     };
 
     // Add in selections specific to this protein.
-    let cs = Object.keys(ThreeDMol.atomicInfo);
-    let len = cs.length;
+    const cs = Object.keys(ThreeDMol.atomicInfo);
+    const len = cs.length;
     for (let i = 0; i < len; i++) {
-        let component = cs[i];
+        const component = cs[i];
         // component is like "Element"
 
-        let sels = ThreeDMol.atomicInfo[component];
+        const sels = ThreeDMol.atomicInfo[component];
         menuInf["Styles"]["Selections"][component] = {};
 
         addToMenuRecurse(
@@ -236,8 +235,8 @@ function chunkify(arr: any[], numChunks: number): any[] {
         return [arr];
     }
 
-    let len = arr.length;
-    let out = [];
+    const len = arr.length;
+    const out = [];
     let i = 0;
     let size;
 
@@ -272,24 +271,24 @@ function makeRepColorSchemeSubMenus(menuBranch: any, component: string, clickFun
     // What representations can you use? Default to Protein because it
     // contains them all.
     /** @type Object<string,*> */
-    let repsToUse = (representations[component] === undefined) ?
+    const repsToUse = (representations[component] === undefined) ?
                     representations["Protein"] :
                     representations[component];  // Like ["Cartoon"]
 
     /** @type {number} */
-    let repsToUseLen = repsToUse.length;
+    const repsToUseLen = repsToUse.length;
     for (let i = 0; i < repsToUseLen; i++) {
         /** @type {string} */
-        let rep = repsToUse[i];
+        const rep = repsToUse[i];
         menuBranch[rep] = {
             "Colors": {},
             "Color Schemes": {},
         };
 
-        let colorSchemesLen = colorSchemes.length;
+        const colorSchemesLen = colorSchemes.length;
         for (let i = 0; i < colorSchemesLen; i++) {
             /** @type {string} */
-            let colorScheme = colorSchemes[i];
+            const colorScheme = colorSchemes[i];
             menuBranch[rep]["Color Schemes"][colorScheme] = () => {
                 clickFunc(rep, colorScheme);
                 Menu3D.openMainMenuFloorButton.toggled();
@@ -297,10 +296,10 @@ function makeRepColorSchemeSubMenus(menuBranch: any, component: string, clickFun
         }
 
         /** @type {number} */
-        let colorsLen = colors.length;
+        const colorsLen = colors.length;
         for (let i = 0; i < colorsLen; i++) {
             /** @type {string} */
-            let color = colors[i];
+            const color = colors[i];
             menuBranch[rep]["Colors"][color] = () => {
                 clickFunc(rep, color);
                 Menu3D.openMainMenuFloorButton.toggled();

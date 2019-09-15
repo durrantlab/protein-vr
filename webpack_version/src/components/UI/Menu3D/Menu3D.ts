@@ -25,7 +25,7 @@ let latestBreadcrumbsViewed: string[];
 /** @type {Object<string>} */
 // let sceneInfoData: any;
 
-let GUI3DMenuManager: any;
+let gui3DMenuManager: any;
 let commonMenuAnchor: any;
 
 /**
@@ -55,12 +55,12 @@ export function setup(data?: any): void {
     // }
 
     // Only required to setup once.
-    if (GUI3DMenuManager === undefined) {
+    if (gui3DMenuManager === undefined) {
         // Make a manager for the menu
-        GUI3DMenuManager = new BABYLON.GUI.GUI3DManager(Vars.scene);
+        gui3DMenuManager = new BABYLON.GUI.GUI3DManager(Vars.scene);
 
         // For debugging...
-        // window["GUI3DMenuManager"] = GUI3DMenuManager;
+        // window["gui3DMenuManager"] = gui3DMenuManager;
     }
 
     setupMainMenu();
@@ -105,20 +105,20 @@ function setupMainMenu(): void {
  */
 function createPanelSixteenButtons(): void {
     // let panel = new BABYLON.GUI.CylinderPanel();
-    let panel = new BABYLON.GUI.SpherePanel();
+    const panel = new BABYLON.GUI.SpherePanel();
 
     panel.radius = Vars.MENU_RADIUS;
     panel.margin = Vars.MENU_MARGIN;
 
-    GUI3DMenuManager.addControl(panel);
+    gui3DMenuManager.addControl(panel);
     panel.blockLayout = true;
 
     // Add buttons
     for (let idx = 0; idx < 16; idx++) {
-        let func = () => { return; };
-        let txt = idx.toString();
-        let color = "yellow";
-        let levelInt = 1;
+        const func = () => { return; };
+        const txt = idx.toString();
+        const color = "yellow";
+        const levelInt = 1;
 
         allButtons.push(
             new Button.ButtonWrapper({
@@ -137,7 +137,7 @@ function createPanelSixteenButtons(): void {
                 },
                 level: levelInt,
                 name: "menu-visible-button-" + txt,
-                panel: panel,
+                panel,
                 trueTxt: txt, //  + "\n(Show)",
                 color,
             }),
@@ -167,14 +167,14 @@ function applyFuncToAllMenuLevels(funcToApply: any): void {
      *                                         this point in the menu.
      * @returns void
      */
-    let recurse = (subMenu: any, breadcrumbs: string[]): void => {
+    const recurse = (subMenu: any, breadcrumbs: string[]): void => {
         funcToApply(subMenu, breadcrumbs);
 
-        let keys = Object.keys(subMenu);
-        let keysLen = keys.length;
+        const keys = Object.keys(subMenu);
+        const keysLen = keys.length;
         for (let i = 0; i < keysLen; i++) {
-            let key = keys[i];
-            let subMenuItems = subMenu[key];
+            const key = keys[i];
+            const subMenuItems = subMenu[key];
             switch (typeof(subMenuItems)) {
                 case "object":
                     recurse(subMenuItems, breadcrumbs.concat([key]));
@@ -211,7 +211,7 @@ export function setupSubMenuNavButtons(subMenu: any, breadcrumbs: string[]): voi
     if (breadcrumbs.length > 0) {
         // No back button on top-level menu.
         subMenu["Back ⇦"] = () => {
-            let newBreadcrumbs = breadcrumbs.slice(0, breadcrumbs.length - 1);
+            const newBreadcrumbs = breadcrumbs.slice(0, breadcrumbs.length - 1);
             showOnlyButtonsOfLevel(newBreadcrumbs);
         };
     }
@@ -227,8 +227,8 @@ export function setupSubMenuNavButtons(subMenu: any, breadcrumbs: string[]): voi
 function setupMainMenuToggleButton(): void {
     // Also set up a manager at your feet. This turns the main manager on and
     // off.
-    let panelToggle = new BABYLON.GUI.StackPanel3D();
-    GUI3DMenuManager.addControl(panelToggle);
+    const panelToggle = new BABYLON.GUI.StackPanel3D();
+    gui3DMenuManager.addControl(panelToggle);
 
     // Set up the button
     openMainMenuFloorButton = new Button.ButtonWrapper({
@@ -255,7 +255,7 @@ function setupMainMenuToggleButton(): void {
     // window["openMainMenuFloorButton"] = openMainMenuFloorButton;
 
     // Set up the button anchor and move/rotate it.
-    let mainMenuAnchorToggle = new BABYLON.TransformNode(""); // this can be a mesh, too
+    const mainMenuAnchorToggle = new BABYLON.TransformNode(""); // this can be a mesh, too
     panelToggle.linkToTransformNode(mainMenuAnchorToggle);
     mainMenuAnchorToggle.rotation.x = Math.PI * 0.5;
 
@@ -284,14 +284,14 @@ function showOnlyButtonsOfLevel(breadcrumbs: string[]): void {
             menuInf["Last"] = () => {
                 console.log("Going to", latestBreadcrumbsViewed);
                 showOnlyButtonsOfLevel(latestBreadcrumbsViewed);
-            }
+            };
         }
     }
 
     // Hide all the buttons.
-    let allButtonsLen = allButtons.length;
+    const allButtonsLen = allButtons.length;
     for (let i = 0; i < allButtonsLen; i++) {
-        let btn = allButtons[i];
+        const btn = allButtons[i];
         btn.isVisible(false);
     }
 
@@ -303,26 +303,26 @@ function showOnlyButtonsOfLevel(breadcrumbs: string[]): void {
 
     // Find the submenu
     let subMenu = menuInf;
-    let breadcrumbsLen = breadcrumbs.length;
+    const breadcrumbsLen = breadcrumbs.length;
     for (let i = 0; i < breadcrumbsLen; i++) {
-        let breadcrumb = breadcrumbs[i];
+        const breadcrumb = breadcrumbs[i];
         subMenu = subMenu[breadcrumb];
     }
 
     // Get the names of the submenu items.
-    let subMenuItemNames = Object.keys(subMenu);
+    const subMenuItemNames = Object.keys(subMenu);
 
     // Set some names aside as "special".
-    let redBtns = ["Close Menu ×"];
-    let yellowBtns = ["Back ⇦"];
-    let specialBtns = redBtns.concat(yellowBtns);
+    const redBtns = ["Close Menu ×"];
+    const yellowBtns = ["Back ⇦"];
+    const specialBtns = redBtns.concat(yellowBtns);
 
     // Sort those names
     subMenuItemNames.sort((first: string, second: string) => {
         // See
         // https://stackoverflow.com/questions/51165/how-to-sort-strings-in-javascript
-        let firstIsSpecial = specialBtns.indexOf(first) !== -1;
-        let secondIsSpecial = specialBtns.indexOf(second) !== -1;
+        const firstIsSpecial = specialBtns.indexOf(first) !== -1;
+        const secondIsSpecial = specialBtns.indexOf(second) !== -1;
         if (firstIsSpecial && !secondIsSpecial) {
             return 1;
         } else if (!firstIsSpecial && secondIsSpecial) {
@@ -345,12 +345,12 @@ function showOnlyButtonsOfLevel(breadcrumbs: string[]): void {
     }
 
     // Update and show the buttons.
-    let len = subMenuItemNames.length;
+    const len = subMenuItemNames.length;
     for (let i = 0; i < len; i++) {
-        let subMenuItemName = subMenuItemNames[i];
-        let subMenuItem = subMenu[subMenuItemName];
-        let btnidx = btnIdxOrder[i];
-        let btn = allButtons[btnidx];
+        const subMenuItemName = subMenuItemNames[i];
+        const subMenuItem = subMenu[subMenuItemName];
+        const btnidx = btnIdxOrder[i];
+        const btn = allButtons[btnidx];
         btn.updateTxt(subMenuItemName);
 
         switch (typeof(subMenuItem)) {
@@ -377,7 +377,7 @@ function showOnlyButtonsOfLevel(breadcrumbs: string[]): void {
 
         btn.isVisible(true);
     }
-};
+}
 
 /**
  * If a given submenu has only one item, condense the menu.
@@ -390,13 +390,13 @@ function reduceSingleItemSubMenus(): void {
      *                                         this point in the menu.
      * @returns void
      */
-    let recurse = (subMenu: any, breadcrumbs: string[]): void => {
+    const recurse = (subMenu: any, breadcrumbs: string[]): void => {
         let keys = Object.keys(subMenu);
 
         // There should be three items in a one-item submenu, including back
         // and close.
         if (keys.length === 3) {
-            let keysToKeep = keys.filter((k: string) => {
+            const keysToKeep = keys.filter((k: string) => {
                 if (k === "Close Menu ×") {
                     return false;
                 } else if (k === "Back ⇦") {
@@ -407,12 +407,12 @@ function reduceSingleItemSubMenus(): void {
             });
             if (keysToKeep.length === 1) {
                 // Only one item remains. That's the one to collpase.
-                let keyToKeep = keysToKeep[0];
+                const keyToKeep = keysToKeep[0];
 
                 // Get the name of the new key (one up with keyToKeep added to
                 // end).
-                let lastKey = breadcrumbs[breadcrumbs.length - 1];
-                let newKey = lastKey + ": " + keyToKeep;
+                const lastKey = breadcrumbs[breadcrumbs.length - 1];
+                const newKey = lastKey + ": " + keyToKeep;
 
                 // Redefine the breadcrumbs
                 breadcrumbs = breadcrumbs.slice(0, breadcrumbs.length - 1).concat([newKey]);
@@ -420,10 +420,10 @@ function reduceSingleItemSubMenus(): void {
                 // Go through the menu keys to get to the submenu above this
                 // one.
                 subMenu = menuInf;
-                let breadcrumbsButLast = breadcrumbs.slice(0, breadcrumbs.length - 1);
-                let breadcrumbsButLastLen = breadcrumbsButLast.length;
+                const breadcrumbsButLast = breadcrumbs.slice(0, breadcrumbs.length - 1);
+                const breadcrumbsButLastLen = breadcrumbsButLast.length;
                 for (let i = 0; i < breadcrumbsButLastLen; i++) {
-                    let breadcrumb = breadcrumbsButLast[i];
+                    const breadcrumb = breadcrumbsButLast[i];
                     subMenu = subMenu[breadcrumb];
                 }
 
@@ -439,10 +439,10 @@ function reduceSingleItemSubMenus(): void {
             }
         }
 
-        let keysLen = keys.length;
+        const keysLen = keys.length;
         for (let i = 0; i < keysLen; i++) {
-            let key = keys[i];
-            let subMenuItems = subMenu[key];
+            const key = keys[i];
+            const subMenuItems = subMenu[key];
             switch (typeof(subMenuItems)) {
                 case "object":
                     recurse(subMenuItems, breadcrumbs.concat([key]));

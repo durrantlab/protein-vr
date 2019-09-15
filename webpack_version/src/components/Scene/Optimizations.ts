@@ -25,8 +25,8 @@ export function setup(): void {
 
     // Modify some meshes
     /** @type {number} */
-    let len = Vars.scene.meshes.length;
-    let zeroVec = new BABYLON.Color3(0, 0, 0);
+    const len = Vars.scene.meshes.length;
+    const zeroVec = new BABYLON.Color3(0, 0, 0);
     for (let idx = 0; idx < len; idx++) {
         /** @const {*} */
         const mesh = Vars.scene.meshes[idx];
@@ -61,7 +61,7 @@ function getNumVertices(mesh: any): number|null {
     let numVertexes = 0;
     if (mesh !== undefined) {
         /** @type {Array<*>} */
-        let vertexData = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+        const vertexData = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
         if (vertexData === null) { return null; }  // Something like __root__
         numVertexes = vertexData.length / 3;
     } else {
@@ -78,7 +78,7 @@ function getNumVertices(mesh: any): number|null {
 export function optimizeMeshPicking(mesh: any): void {
     // First, get the number of vertexes.
     /** @type {number} */
-    let numVertexes = getNumVertices(mesh);
+    const numVertexes = getNumVertices(mesh);
     if (numVertexes === null) { return; }  // Something like __root__
 
     // If there are very few vertexes, don't use this optimization. This
@@ -86,7 +86,7 @@ export function optimizeMeshPicking(mesh: any): void {
     if (numVertexes < 100) { return; }
 
     // Now get the number of submeshes to use.
-    let numSubMeshes = 1 + Math.floor(numVertexes / Vars.MAX_VERTS_PER_SUBMESH);
+    const numSubMeshes = 1 + Math.floor(numVertexes / Vars.MAX_VERTS_PER_SUBMESH);
 
     // Subdivide the mesh if necessary.
     if (numSubMeshes > 1) {
@@ -105,7 +105,7 @@ export function optimizeMeshPicking(mesh: any): void {
  * @param  {boolean} [worldMatrix=true]     Whether to freeze the world matrix.
  * @returns void
  */
-export function freezeMeshProps(mesh: any, freezeMaterial: boolean = true, worldMatrix: boolean = true): void {
+export function freezeMeshProps(mesh: any, freezeMaterial = true, worldMatrix = true): void {
     if (freezeMaterial) {
         mesh.material.freeze();
         // material.unfreeze();
@@ -141,7 +141,7 @@ function sceneOptimizerParameters(): any {
     // See https://doc.babylonjs.com/how_to/how_to_use_sceneoptimizer
     // The goal here is to maintain a frame rate of 60. Check every two
     // seconds. Very similar to HighDegradationAllowed
-    let result = new BABYLON.SceneOptimizerOptions(25, 2000);
+    const result = new BABYLON.SceneOptimizerOptions(25, 2000);
 
     let priority = 0;
     result.optimizations.push(new BABYLON.ShadowsOptimization(priority));
@@ -238,7 +238,7 @@ class RemoveSurfaces {
         this["apply"] = (scene: any) => {
             // Delete the surface mesh. Note that it will still be visible in the
             // main menu, but oh well.
-            let surfaces = Vars.scene.getMeshByName("surfaces.wrl");
+            const surfaces = Vars.scene.getMeshByName("surfaces.wrl");
             removeMeshEntirely(surfaces);
             return true;
         };
@@ -272,11 +272,11 @@ class SimplifyMeshes {
         this["priority"] = priority;
         this["apply"] = (scene: any) => {
             /** @type {Array<Array<number,*,number>>} */
-            let meshesToConsider = [];
+            const meshesToConsider = [];
             /** @type {number} */
-            let len = Vars.scene.meshes.length;
+            const len = Vars.scene.meshes.length;
             for (let meshIdx = 0; meshIdx < len; meshIdx++) {
-                let mesh = Vars.scene.meshes[meshIdx];
+                const mesh = Vars.scene.meshes[meshIdx];
 
                 // If it's decimated, skip it. It will be deleted and
                 // recreated.
@@ -284,7 +284,7 @@ class SimplifyMeshes {
 
                 // Get the number of vertexes.
                 /** @type {number} */
-                let numVertexes = getNumVertices(mesh);
+                const numVertexes = getNumVertices(mesh);
                 if (numVertexes === null) { continue; }  // Something like __root__
                 if (numVertexes < minNumVertsThatIsProblem) { continue; }
 
@@ -311,18 +311,18 @@ class SimplifyMeshes {
             meshesToConsider.sort((a, b) => b[0] - a[0]);
 
             // Simplify those meshes.
-            let meshesToConsiderLen = meshesToConsider.length;
+            const meshesToConsiderLen = meshesToConsider.length;
             for (let i = 0; i < meshesToConsiderLen; i++) {
                 /** @type {Array<number,*,number>} */
-                let meshToConsider = meshesToConsider[i];
-                let mesh = meshToConsider[1];
+                const meshToConsider = meshesToConsider[i];
+                const mesh = meshToConsider[1];
 
                 /** @type {number} */
-                let decimationLvel = meshToConsider[2];
+                const decimationLvel = meshToConsider[2];
 
                 // Remove the existing LODs if they exist.
                 while (mesh.getLODLevels().length > 0) {
-                    let firstLODMesh = mesh.getLODLevels()[0]["mesh"];
+                    const firstLODMesh = mesh.getLODLevels()[0]["mesh"];
                     mesh.removeLODLevel(firstLODMesh);
                     removeMeshEntirely(firstLODMesh);
                 }

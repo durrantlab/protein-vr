@@ -9,9 +9,9 @@ import * as CommonCamera from "../Cameras/CommonCamera";
 declare var jQuery: any;
 declare var BABYLON: any;
 
-let stylesQueue: any[] = [];
+const stylesQueue: any[] = [];
 export let webrtc: any = undefined;
-export let shadows: boolean = false;
+export let shadows = false;
 let urlParams: any;
 
 /**
@@ -27,7 +27,7 @@ function getAllUrlParams(url: string): any {
     let queryString = url ? url.split("?")[1] : window.location.search.slice(1);
 
     // we'll store the parameters here
-    let obj = {};
+    const obj = {};
 
     // if query string exists
     if (queryString) {
@@ -36,17 +36,17 @@ function getAllUrlParams(url: string): any {
         queryString = queryString.split("#")[0];
 
         // split our query string into its component parts
-        let arr: string[] = queryString.split("&");
+        const arr: string[] = queryString.split("&");
 
-        let arrLen = arr.length;
+        const arrLen = arr.length;
         for (let i = 0; i < arrLen; i++) {
-            let a = arr[i];
+            const a = arr[i];
             // separate the keys and the values
-            let keyValPair = a.split("=");
+            const keyValPair = a.split("=");
 
             // set parameter name and value (use 'true' if empty)
-            let paramName = keyValPair[0];
-            let paramValue = (keyValPair[1] === undefined) ? true : keyValPair[1];
+            const paramName = keyValPair[0];
+            const paramValue = (keyValPair[1] === undefined) ? true : keyValPair[1];
 
             obj[paramName] = paramValue;
         }
@@ -73,19 +73,19 @@ export function setURL(): void {
 
     // Get the rotations.
     /** @type {number} */
-    let x = VRML.molRotation.x;
+    const x = VRML.molRotation.x;
     if (x !== 0) {
         params.push("rx=" + round(x));
     }
 
     /** @type {number} */
-    let y = VRML.molRotation.y;
+    const y = VRML.molRotation.y;
     if (y !== 0) {
         params.push("ry=" + round(y));
     }
 
     /** @type {number} */
-    let z = VRML.molRotation.z;
+    const z = VRML.molRotation.z;
     if (z !== 0) {
         params.push("rz=" + round(z));
     }
@@ -100,11 +100,11 @@ export function setURL(): void {
 
     // Also get all the representations
     let i = 0;
-    let styles = [];
-    let keys = Object.keys(VisStyles.styleMeshes);
-    let len = keys.length;
+    const styles = [];
+    const keys = Object.keys(VisStyles.styleMeshes);
+    const len = keys.length;
     for (let i2 = 0; i2 < len; i2++) {
-        let key = keys[i2];
+        const key = keys[i2];
         if (VisStyles.styleMeshes[key].mesh.isVisible) {
             styles.push("st" + i.toString() + "=" + key);
             i++;
@@ -113,15 +113,15 @@ export function setURL(): void {
     params = params.concat(styles);
 
     // Also get the camera position and rotation.
-    let cameraPos = CommonCamera.getCameraPosition();
-    let cameraRot = CommonCamera.getCameraRotationQuaternion();
-    params.push("cx=" + round(cameraPos["x"]))
-    params.push("cy=" + round(cameraPos["y"]))
-    params.push("cz=" + round(cameraPos["z"]))
-    params.push("crx=" + round(cameraRot["x"]))
-    params.push("cry=" + round(cameraRot["y"]))
-    params.push("crz=" + round(cameraRot["z"]))
-    params.push("crw=" + round(cameraRot["w"]))
+    const cameraPos = CommonCamera.getCameraPosition();
+    const cameraRot = CommonCamera.getCameraRotationQuaternion();
+    params.push("cx=" + round(cameraPos["x"]));
+    params.push("cy=" + round(cameraPos["y"]));
+    params.push("cz=" + round(cameraPos["z"]));
+    params.push("crx=" + round(cameraRot["x"]));
+    params.push("cry=" + round(cameraRot["y"]));
+    params.push("crz=" + round(cameraRot["z"]));
+    params.push("crw=" + round(cameraRot["w"]));
 
     // Also get the environment
     params.push("e=" + Vars.sceneName);
@@ -151,7 +151,7 @@ export function readEnvironmentNameParam(): void {
     urlParams = getAllUrlParams(window.location.href);
 
     // Get the environment.
-    let environ = urlParams["e"];
+    const environ = urlParams["e"];
     if (environ !== undefined) {
         Vars.setSceneName(environ);
     }
@@ -174,13 +174,13 @@ export function readUrlParams(): void {
 
         // Also hide/move some of the buttons.
         jQuery("#help-button").hide();
-        jQuery("#follow-the-leader").hide();
+        jQuery("#leader").hide();
         jQuery("#babylonVRiconbtn").hide();
         jQuery("#open-button").hide();
-        let fullscreenButton = jQuery("#fullscreen-button");
-        let bottom = fullscreenButton.css("bottom")
+        const fullscreenButton = jQuery("#fullscreen-button");
+        const bottom = fullscreenButton.css("bottom");
         if (bottom !== undefined) {
-            let top = +bottom.replace(/px/g, "");
+            const top = +bottom.replace(/px/g, "");
             fullscreenButton.css("bottom", (top - 60).toString() + "px");
         }
 
@@ -217,12 +217,12 @@ export function readUrlParams(): void {
 
     // Setup the styles as well.
     /** @type {Array<string>} */
-    let keys = Object.keys(urlParams);
-    let len = keys.length;
+    const keys = Object.keys(urlParams);
+    const len = keys.length;
     for (let i = 0; i < len; i++) {
-        let key = keys[i];
+        const key = keys[i];
         if (key.slice(0, 2) === "st") {
-            let repInfo = extractRepInfoFromKey(urlParams[key]);
+            const repInfo = extractRepInfoFromKey(urlParams[key]);
             stylesQueue.push(repInfo);
         }
     }
@@ -235,17 +235,17 @@ export function readUrlParams(): void {
     }
 
     // Position the camera
-    let cx = urlParams["cx"]
-    let cy = urlParams["cy"]
-    let cz = urlParams["cz"]
+    const cx = urlParams["cx"];
+    const cy = urlParams["cy"];
+    const cz = urlParams["cz"];
     if ((cx !== undefined) && (cy !== undefined) && (cz !== undefined)) {
         CommonCamera.setCameraPosition(new BABYLON.Vector3(+cx, +cy, +cz));
     }
 
-    let crx = urlParams["crx"];
-    let cry = urlParams["cry"];
-    let crz = urlParams["crz"];
-    let crw = urlParams["crw"];
+    const crx = urlParams["crx"];
+    const cry = urlParams["cry"];
+    const crz = urlParams["crz"];
+    const crw = urlParams["crw"];
     if ((crx !== undefined) && (cry !== undefined) && (crz !== undefined) && (crw !== undefined)) {
         CommonCamera.setCameraRotationQuaternion(new BABYLON.Quaternion(+crx, +cry, +crz, +crw));
     }
@@ -264,10 +264,10 @@ export function readUrlParams(): void {
  * @returns Array<*>
  */
 export function extractRepInfoFromKey(key: string): any[] {
-    let prts = key.split("--");
-    let rep = decodeURIComponent(prts[prts.length - 2]);
-    let colorScheme = decodeURIComponent(prts[prts.length - 1]);
-    let sels = prts.slice(0, prts.length - 2).map(
+    const prts = key.split("--");
+    const rep = decodeURIComponent(prts[prts.length - 2]);
+    const colorScheme = decodeURIComponent(prts[prts.length - 1]);
+    const sels = prts.slice(0, prts.length - 2).map(
         (i: string) => {
             i = decodeURIComponent(i);
             if (i.slice(0, 1) === "{") {
@@ -287,7 +287,7 @@ export function extractRepInfoFromKey(key: string): any[] {
 export function startLoadingStyles(): void {
     if (stylesQueue.length > 0) {
         // There are some styles to still run.
-        let style = stylesQueue.pop();
+        const style = stylesQueue.pop();
         VisStyles.toggleRep(style[0], style[1], style[2], () => {
             // Try to get the next style.
             startLoadingStyles();

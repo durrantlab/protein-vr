@@ -21,7 +21,7 @@ export let canvas: any;
 export let engine: any;
 export let scene: any;
 export let vrHelper: any;
-export let sceneName: string = "environs/day/";
+export let sceneName = "environs/day/";
 
 /**
  * Setter for sceneName variable.
@@ -34,50 +34,50 @@ export let sceneInfo = {
     positionOnFloor: false,
     infiniteDistanceSkyBox: true,
     transparentGround: false
-}
+};
 
 /** @type {number} */
 export let cameraHeight: number;
 
 // Also some constants
 /** @const {number} */
-export const TRANSPORT_DURATION: number = 11;
+export const TRANSPORT_DURATION = 11;
 
 /** @const {number} */
-export const MAX_DIST_TO_MOL_ON_TELEPORT: number = 1.5;
+export const MAX_DIST_TO_MOL_ON_TELEPORT = 1.5;
 
 /** @const {number} */
-export const MIN_DIST_TO_MOL_ON_TELEPORT: number = 1.0;
+export const MIN_DIST_TO_MOL_ON_TELEPORT = 1.0;
 
 /** @const {number} */
-export const MAX_VERTS_PER_SUBMESH: number = 2000;  // This is kind of an arbitrary number.
+export const MAX_VERTS_PER_SUBMESH = 2000;  // This is kind of an arbitrary number.
 
 /** @const {number} */
-export const BUTTON_SPHERE_RADIUS: number = 1.2;  // the radius of the spheres around buttons used to detect clicks.
+export const BUTTON_SPHERE_RADIUS = 1.2;  // the radius of the spheres around buttons used to detect clicks.
 
 /** @const {number} */
-export const MENU_RADIUS: number = 2.5;  // 3 is comfortable, but doesn't work in crowded environments.
+export const MENU_RADIUS = 2.5;  // 3 is comfortable, but doesn't work in crowded environments.
 
 /** @const {number} */
-export const MENU_MARGIN: number = 0.05;  // 0.15;  // 0.1;
+export const MENU_MARGIN = 0.05;  // 0.15;  // 0.1;
 
 /** @const {number} */
-export const PAD_MOVE_SPEED: number = 0.01;
+export const PAD_MOVE_SPEED = 0.01;
 
 /** @const {number} */
-export const VR_CONTROLLER_TRIGGER_DELAY_TIME: number = 500;  // time to wait between triggers.
+export const VR_CONTROLLER_TRIGGER_DELAY_TIME = 500;  // time to wait between triggers.
 
 /** @const {number} */
-export const VR_CONTROLLER_PAD_ROTATION_DELAY_TIME: number = 750;  // time to wait between triggers.
+export const VR_CONTROLLER_PAD_ROTATION_DELAY_TIME = 750;  // time to wait between triggers.
 
 /** @const {number} */
-export const VR_CONTROLLER_PAD_RATIO_OF_MIDDLE_FOR_CAMERA_RESET: number = 0.1;
+export const VR_CONTROLLER_PAD_RATIO_OF_MIDDLE_FOR_CAMERA_RESET = 0.1;
 
 /** @const {number} */
-export const MAX_TELEPORT_DIST: number = 15;
+export const MAX_TELEPORT_DIST = 15;
 
 /** @const {number} */
-export const TRANSPARENT_FLOOR_ALPHA: number = 0.05;  // 0.02;
+export const TRANSPARENT_FLOOR_ALPHA = 0.05;  // 0.02;
 
 // IOS doesn't support a lot of features!
 /** @const {*} */
@@ -157,7 +157,7 @@ export function setupVR(initParams: IVRSetup): void {
     }
 
     // Create the vr helper. See http://doc.babylonjs.com/how_to/webvr_helper
-    let params = {
+    const params = {
         // "createDeviceOrientationCamera": false,  // This makes phone ignore motion sensor. No good.
         "createDeviceOrientationCamera": true,
         "useMultiview": false
@@ -171,7 +171,7 @@ export function setupVR(initParams: IVRSetup): void {
     vrHelper = scene.createDefaultVRExperience(params);
 
     // Hide the vrHelper icon initially.
-    let babylonVRiconbtn = document.getElementById("babylonVRiconbtn");
+    const babylonVRiconbtn = document.getElementById("babylonVRiconbtn");
     if (babylonVRiconbtn !== null) {
         babylonVRiconbtn.style.opacity = "0.0";  // Non IE;
         babylonVRiconbtn.style.filter = "alpha(opacity=0)";  // IE;

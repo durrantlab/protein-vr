@@ -3,7 +3,7 @@ declare var jQuery: any;
 let bootstrapLoaded = false;
 
 /** @type {Function} */
-let modalFunc: any;
+// let modalFunc: any;
 
 let msgModal: any;
 let myTitle: any;
@@ -22,7 +22,7 @@ let footer: any;
  *                             false if iframed, true otherwise.
  * @returns void
  */
-export function openModal(title: string, val: string, iframed: boolean = true, closeBtn?: boolean): void {
+export function openModal(title: string, val: string, iframed = true, closeBtn?: boolean): void {
     // Load the css if needed.
     if (!bootstrapLoaded) {
         bootstrapLoaded = true;
@@ -45,7 +45,7 @@ export function openModal(title: string, val: string, iframed: boolean = true, c
 
                     <!-- Modal body -->
                     <div class="modal-body">
-                        <div id="iframe-container" style="height:350px;overflow-y:hidden;overflow-x:hidden;-webkit-overflow-scrolling:touch"><!-- TODO: Check if works on both iPhone and Firefox. Used to be overflow-y:auto;overflow-x:hidden; -->
+                        <div id="iframe-container" style="height:350px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch"><!-- TODO: Check if works on both iPhone and Firefox. Used to be overflow-y:auto;overflow-x:hidden; -->
                             <iframe frameBorder="0" src="" style="width:100%;height:100%;"></iframe>
                         </div>
                         <span id="msg-container"></span>
@@ -107,7 +107,7 @@ function openUrlModalContinue(title: string, val: string, iframed: boolean, clos
             footer.hide();
         }
         // Only show once loaded.
-        myIFrame.on("load", function() {
+        myIFrame.on("load", () => {
             iFrameContainer.show();
         });
     } else {

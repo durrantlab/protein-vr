@@ -18,14 +18,14 @@ export class WebRTCBase {
     }
 
     /**
-     * Creates a peer.js object for use in follow-the-leader mode.
+     * Creates a peer.js object for use in leader mode.
      * @returns void
      */
     private createPeerObj(): void {
         // Create own peer object with connection to shared PeerJS server
         // let idToUse = "pvr" + Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);  // null and it gets picked for you.
 
-        let wrds = ["act", "add", "age", "ago", "aid", "aim", "air", "all",
+        const wrds = ["act", "add", "age", "ago", "aid", "aim", "air", "all",
                     "and", "any", "arm", "art", "ask", "bag", "ban", "bar",
                     "bed", "bet", "big", "bit", "box", "bus", "but", "buy",
                     "can", "cap", "car", "cat", "ceo", "cow", "cry", "cup",
@@ -42,7 +42,7 @@ export class WebRTCBase {
                     "set", "sit", "six", "ski", "sky", "sue", "sun", "tap",
                     "tax", "ten", "the", "toe", "too", "top", "toy", "try",
                     "two", "use", "via", "war", "way", "wet", "who", "why",
-                    "win", "yes", "yet", "you"]
+                    "win", "yes", "yet", "you"];
         let idToUse = "pvr" + this.randomNumStr();
         idToUse += wrds[Math.floor(Math.random() * wrds.length)] + this.randomNumStr();
         // idToUse += wrds[Math.floor(Math.random() * wrds.length)] + this.randomNumStr();
@@ -101,16 +101,16 @@ export class WebRTCBase {
  *                           default one.
  * @returns void
  */
-export function webRTCErrorMsg(details: string = ""): void {
-    let msg = "<p>ProteinVR has encountered an error while running in follow-the-leader mode. ";
+export function webRTCErrorMsg(details = ""): void {
+    let msg = "<p>ProteinVR has encountered an error while running in leader mode. ";
     if (details !== "") {
-        msg += " Here are the details:</p>"
+        msg += " Here are the details:</p>";
         msg += "<p><pre>" + details + "</pre></p>";
     } else {
         msg += "</p>";
     }
 
-    OpenPopup.openModal("Follow-the-Leader Error", msg, false);
+    OpenPopup.openModal("Leader Error", msg, false);
 }
 
 /**
@@ -118,5 +118,5 @@ export function webRTCErrorMsg(details: string = ""): void {
  * @returns void
  */
 export function webRTCStandardErrorMsg(): void {
-    webRTCErrorMsg("Follow-the-leader connection destroyed. Please refresh.");
+    webRTCErrorMsg("Leader connection destroyed. Please refresh.");
 }

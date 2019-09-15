@@ -11,7 +11,7 @@ const DATA_CHUNK_SIZE = 10000000;
 /** @type {Array<*>} */
 let dataToSendBack: any[] = [];
 
-let numRegex = new RegExp("(^|-| )[0-9\.]{1,8}", "g");
+const numRegex = new RegExp("(^|-| )[0-9\.]{1,8}", "g");
 let geoCenter: any = undefined;
 
 // Determine if we're in a webworker. See
@@ -27,10 +27,10 @@ if (inWebWorker) {
         /** @type {string} */
         let cmd = e.data["cmd"];
 
-        let data = e.data["data"];
+        const data = e.data["data"];
 
         /** @type {boolean} */
-        let removeExtraPts = e.data["removeExtraPts"];
+        const removeExtraPts = e.data["removeExtraPts"];
 
         if (cmd === "start") {
             // This will populate dataToSendBack
@@ -39,7 +39,7 @@ if (inWebWorker) {
         }
 
         if (cmd === "sendDataChunk") {
-            let chunkToSend = dataToSendBack.shift();
+            const chunkToSend = dataToSendBack.shift();
             let status = (dataToSendBack.length === 0) ? "done" : "more";
 
             if (chunkToSend === undefined) {
@@ -66,16 +66,16 @@ if (inWebWorker) {
  *                                     representations.
  * @returns Array<Object<string, Array<number>>>   The model data.
  */
-export function loadValsFromVRML(vrmlStr: string, removeExtraPts: boolean = false): any[] {
+export function loadValsFromVRML(vrmlStr: string, removeExtraPts = false): any[] {
     /** @type {Array<Object<string,*>>} */
     let modelData: any[] = [];
 
     // A given VRML file could have multiple IndexedFaceSets. Divide and
     // handle separately.
-    let vrmlChunks = vrmlStr.split("geometry IndexedFaceSet {").splice(1);
-    let vrmlChunksLen = vrmlChunks.length;
+    const vrmlChunks = vrmlStr.split("geometry IndexedFaceSet {").splice(1);
+    const vrmlChunksLen = vrmlChunks.length;
     for (let i = 0; i < vrmlChunksLen; i++) {
-        let vrmlChunk = vrmlChunks[i];
+        const vrmlChunk = vrmlChunks[i];
         // Extract the coordinates from the vrml text
         let coors = strToCoors(betweenbookends("point [", "]", vrmlChunk));
 
@@ -107,19 +107,19 @@ export function loadValsFromVRML(vrmlStr: string, removeExtraPts: boolean = fals
         // Now you need to chunk all the data. This is because you can only
         // transfer so much data back to the main thread at a time.
         dataToSendBack = [];
-        let dataTypes = ["colors", "coors", "trisIdxs"];
-        let dataTypesLen = dataTypes.length;
+        const dataTypes = ["colors", "coors", "trisIdxs"];
+        const dataTypesLen = dataTypes.length;
 
         /** @type {number} */
-        let len = modelData.length;
+        const len = modelData.length;
         for (let modelIdx = 0; modelIdx < len; modelIdx++) {
             for (let i = 0; i < dataTypesLen; i++) {
                 /** @type {string} */
-                let dataType = dataTypes[i];
-                let chunks = chunk(modelData[modelIdx][dataType]);
-                let chunksLen = chunks.length;
+                const dataType = dataTypes[i];
+                const chunks = chunk(modelData[modelIdx][dataType]);
+                const chunksLen = chunks.length;
                 for (let i2 = 0; i2 < chunksLen; i2++) {
-                    let chunk = chunks[i2];
+                    const chunk = chunks[i2];
                     dataToSendBack.push([modelIdx, dataType, chunk]);
                 }
             }
@@ -138,20 +138,20 @@ export function removeStrayPoints(pts: any): any {
     console.log("Removing extra points.");
 
     /** @type {number} */
-    let firstX = pts[0];
+    const firstX = pts[0];
 
     /** @type {number} */
-    let firstY = pts[1];
+    const firstY = pts[1];
 
     /** @type {number} */
-    let firstZ = pts[2];
+    const firstZ = pts[2];
 
     /** @type {number} */
-    let coorsLen = pts.length;
+    const coorsLen = pts.length;
 
     for (let coorIdx = 0; coorIdx < coorsLen; coorIdx = coorIdx + 3) {
-        let idx2 = coorIdx + 1;
-        let idx3 = coorIdx + 2;
+        const idx2 = coorIdx + 1;
+        const idx3 = coorIdx + 2;
         if ((pts[coorIdx] === 0) && (pts[idx2] === 0) && (pts[idx3] === 0)) {
             pts[coorIdx] = firstX;
             pts[idx2] = firstY;
@@ -169,9 +169,9 @@ export function removeStrayPoints(pts: any): any {
  */
 function chunk(arr: any[]): any[] {
     // See https://stackoverflow.com/questions/8495687/split-array-into-chunks
-    let chunks = [];
+    const chunks = [];
     let i = 0;
-    let n = arr.length;
+    const n = arr.length;
 
     while (i < n) {
         chunks.push(arr.slice(i, i += DATA_CHUNK_SIZE));
@@ -188,9 +188,9 @@ function chunk(arr: any[]): any[] {
  */
 function strToCoors(str: string): any {
     // Convert coordinates in string form to arrays.
-    let coorStrs = str.match(numRegex);
-    let coorLen = coorStrs.length;
-    let coors = new Float32Array(coorLen);
+    const coorStrs = str.match(numRegex);
+    const coorLen = coorStrs.length;
+    const coors = new Float32Array(coorLen);
 
     for (let i = 0; i < coorLen; i = i + 3) {
         // Note the order here. To convert to left-handed coor system. Note
@@ -203,7 +203,7 @@ function strToCoors(str: string): any {
 
     // Now convert it to a typed array, which is much faster.
     return coors;
-};
+}
 
 /**
  * Converts colors in string format to list of numbers. Similar to
@@ -213,13 +213,13 @@ function strToCoors(str: string): any {
  */
 function strToColors(str: string): any {
     // Convert coordinates in string form to arrays.
-    let colorStrs = str.match(numRegex);
-    let colorStrsLen = colorStrs.length;
-    let colors = new Float32Array(4 * colorStrsLen / 3);
-    let colorLen = colors.length;
+    const colorStrs = str.match(numRegex);
+    const colorStrsLen = colorStrs.length;
+    const colors = new Float32Array(4 * colorStrsLen / 3);
+    const colorLen = colors.length;
 
     for (let i = 0; i < colorLen; i = i + 4) {
-        let i2 = 3 * i / 4;
+        const i2 = 3 * i / 4;
         colors[i] = +colorStrs[i2];
         colors[i + 1] = +colorStrs[i2 + 1];
         colors[i + 2] = +colorStrs[i2 + 2];
@@ -228,7 +228,7 @@ function strToColors(str: string): any {
 
     // Now convert it to a typed array, which is much faster.
     return colors;
-};
+}
 
 /**
  * Converts coordIndex in string format to list of numbers. Similar to
@@ -238,20 +238,20 @@ function strToColors(str: string): any {
  */
 function strToTris(str: string): any {
     // Convert coordinates in string form to arrays.
-    let indexStrs = str.match(numRegex);
-    let indexStrsLen = indexStrs.length;
-    let indexLen = 3 * indexStrsLen / 4;
-    let indexes = new Uint32Array(indexLen);
+    const indexStrs = str.match(numRegex);
+    const indexStrsLen = indexStrs.length;
+    const indexLen = 3 * indexStrsLen / 4;
+    const indexes = new Uint32Array(indexLen);
 
     for (let i = 0; i < indexLen; i = i + 3) {
-        let i2 = 4 * i / 3;
+        const i2 = 4 * i / 3;
         indexes[i] = +indexStrs[i2];
         indexes[i + 1] = +indexStrs[i2 + 1];
         indexes[i + 2] = +indexStrs[i2 + 2];
     }
 
     return indexes;
-};
+}
 
 /**
  * Gets the text betwen two strings.
@@ -267,7 +267,7 @@ function betweenbookends(bookend1: string, bookend2: string, str: string): strin
         return "";
     }
     strArr = strArr[1].split(bookend2, 2);
-    let strBetween = strArr[0];
+    const strBetween = strArr[0];
 
     return strBetween;
 }
@@ -284,10 +284,10 @@ function betweenbookends(bookend1: string, bookend2: string, str: string): strin
  *                                                 the coordinates translated.
  */
 function translateBeforeBabylonImport(delta: number[], modelData: any[]): any[] {
-    let numModels = modelData.length;
+    const numModels = modelData.length;
     for (let modelIdx = 0; modelIdx < numModels; modelIdx++) {
         /** @type {number} */
-        let coorsLen = modelData[modelIdx]["coors"].length;
+        const coorsLen = modelData[modelIdx]["coors"].length;
         for (let coorIdx = 0; coorIdx < coorsLen; coorIdx = coorIdx + 3) {
             modelData[modelIdx]["coors"][coorIdx] = modelData[modelIdx]["coors"][coorIdx] - delta[0];
             modelData[modelIdx]["coors"][coorIdx + 1] = modelData[modelIdx]["coors"][coorIdx + 1] - delta[1];
@@ -313,7 +313,7 @@ function getGeometricCenter(modelData: any[]): any {
     }
 
     /** @type {number} */
-    let coorCountAllModels = modelData.map((m) => m["coors"].length).reduce((a: number, b: number) => a + b);
+    const coorCountAllModels = modelData.map((m) => m["coors"].length).reduce((a: number, b: number) => a + b);
     if (coorCountAllModels === 0) {
         // No coordinates... it's an empty mesh.
         return new Float32Array([0.0, 0.0, 0.0]);
@@ -322,13 +322,13 @@ function getGeometricCenter(modelData: any[]): any {
     let xTotal = 0;
     let yTotal = 0;
     let zTotal = 0;
-    let numModels = modelData.length;
+    const numModels = modelData.length;
 
     for (let modelIdx = 0; modelIdx < numModels; modelIdx++) {
-        let modelDatum = modelData[modelIdx];
-        let coors = modelDatum["coors"];
+        const modelDatum = modelData[modelIdx];
+        const coors = modelDatum["coors"];
         /** @type {number} */
-        let coorsLen = coors.length;
+        const coorsLen = coors.length;
         for (let coorIdx = 0; coorIdx < coorsLen; coorIdx = coorIdx + 3) {
             xTotal = xTotal + coors[coorIdx];
             yTotal = yTotal + coors[coorIdx + 1];
@@ -336,7 +336,7 @@ function getGeometricCenter(modelData: any[]): any {
         }
     }
 
-    let numCoors = coorCountAllModels / 3.0;
+    const numCoors = coorCountAllModels / 3.0;
     xTotal = xTotal / numCoors;
     yTotal = yTotal / numCoors;
     zTotal = zTotal / numCoors;

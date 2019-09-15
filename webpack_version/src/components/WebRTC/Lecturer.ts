@@ -1,10 +1,10 @@
-// Functions for follow-the-leader mode, that the leader (lecturer) uses.
+// Functions for leader mode, that the leader (lecturer) uses.
 
 import * as CommonCamera from "../Cameras/CommonCamera";
 import * as OpenPopup from "../UI/OpenPopup/OpenPopup";
 import * as WebRTCBase from "./WebRTCBase";
 
-export let isLecturerBroadcasting: boolean = false;
+export let isLecturerBroadcasting = false;
 
 let lect: any;
 
@@ -36,9 +36,9 @@ export class Lecturer extends WebRTCBase.WebRTCBase {
         }
 
         /** @type {number} */
-        let connsLen = this.conns.length;
+        const connsLen = this.conns.length;
         for (let i = 0; i < connsLen; i++) {
-            let conn = this.conns[i];
+            const conn = this.conns[i];
             conn.send(data);
         }
     }
@@ -74,7 +74,7 @@ export class Lecturer extends WebRTCBase.WebRTCBase {
 
         this.peer.on("close", () => {
             /** @type {number} */
-            let connsLen = this.conns.length;
+            const connsLen = this.conns.length;
             for (let i = 0; i < connsLen; i++) {
                 this.conns[i] = null;
             }
@@ -96,17 +96,17 @@ export function startBroadcast(): void {
 
     lect.idReady.then((id: string) => {
         OpenPopup.openModal(
-            "Follow the Leader", "pages/follow-the-leader.html?f=" + id, true, true
+            "Leader", "pages/leader.html?f=" + id, true, true
         );
     });
 
     // Periodically send the information about the representations.
     setInterval(() => {
-        let pos = CommonCamera.getCameraPosition();
-        let rotQua = CommonCamera.getCameraRotationQuaternion();
+        const pos = CommonCamera.getCameraPosition();
+        const rotQua = CommonCamera.getCameraRotationQuaternion();
 
-        let rotFac = 1.0;
-        let val = [pos.x, pos.y, pos.z, rotFac * rotQua.x, rotFac * rotQua.y, rotFac * rotQua.z, rotFac * rotQua.w];
+        const rotFac = 1.0;
+        const val = [pos.x, pos.y, pos.z, rotFac * rotQua.x, rotFac * rotQua.y, rotFac * rotQua.z, rotFac * rotQua.w];
         lect.sendData({
             "type": "locrot",
             "val": val,

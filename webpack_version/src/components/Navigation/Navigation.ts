@@ -73,8 +73,8 @@ let lastCameraName = "";
 function keepCameraOverFloor(): void {
     lastCameraPt = CommonCamera.getCameraPosition();
     Vars.scene.registerBeforeRender(() => {
-        let cameraPt = CommonCamera.getCameraPosition();  // cloned pt.
-        let groundPointBelowCamera = Points.groundPointPickingInfo(cameraPt);
+        const cameraPt = CommonCamera.getCameraPosition();  // cloned pt.
+        const groundPointBelowCamera = Points.groundPointPickingInfo(cameraPt);
         if ((groundPointBelowCamera.pickedMesh === null) && (lastCameraName === Vars.scene.activeCamera.id)) {
             // You're not above the ground! This shouldn't happen, but it can
             // occasionally. Return the camera to its previous position. One
@@ -95,7 +95,7 @@ function keepCameraOverFloor(): void {
  */
 function setupTriggers(): void {
     // Space always triggers
-    let body = jQuery("body");
+    const body = jQuery("body");
     body.keypress((e: any) => {
         if (e.charCode === 32) {
             // Space bar
@@ -109,7 +109,7 @@ function setupTriggers(): void {
     // Mouse clicks are handled elsewhere...
 }
 
-let lastTrigger: number = 0;
+let lastTrigger = 0;
 
 /**
  * Triggers an action, based on the mesh you're currently looking at.
@@ -117,12 +117,12 @@ let lastTrigger: number = 0;
  */
 export function actOnStareTrigger(): void {
     if (UrlVars.webrtc !== undefined) {
-        // If in follow-the-leader mode, don't ever trigger.
+        // If in leader mode, don't ever trigger.
         return;
     }
 
     // There is a refractory period to prevent rapid trigger fires.
-    let curTime = new Date().getTime();
+    const curTime = new Date().getTime();
     if (curTime - lastTrigger < 250) {
         return;
     } else {
@@ -190,7 +190,7 @@ function teleport(newLoc: any = undefined, callBack: any = undefined): void {
     }
 
     // Correct if VR camera.
-    let eyeToCamVec = CommonCamera.getVecFromEyeToCamera();
+    const eyeToCamVec = CommonCamera.getVecFromEyeToCamera();
     newLoc = newLoc.subtract(eyeToCamVec);
     startLoc = startLoc.subtract(eyeToCamVec);
 
@@ -225,14 +225,14 @@ function teleport(newLoc: any = undefined, callBack: any = undefined): void {
  * @returns void
  */
 function grow(): void {
-    let ptBelowStarePt = Points.groundPointBelowStarePt;
+    const ptBelowStarePt = Points.groundPointBelowStarePt;
 
     // Get the vector form the stare point to the camera.
-    let cameraPos = CommonCamera.getCameraPosition();
-    let vecStarePtCamera = Points.curStarePt.subtract(cameraPos);
+    const cameraPos = CommonCamera.getCameraPosition();
+    const vecStarePtCamera = Points.curStarePt.subtract(cameraPos);
 
     /** @type {number} */
-    let vecStarePtDist = vecStarePtCamera.length();
+    const vecStarePtDist = vecStarePtCamera.length();
 
     let newPt;
     if (0.1 * vecStarePtDist < Vars.MIN_DIST_TO_MOL_ON_TELEPORT) {
@@ -314,7 +314,7 @@ function setupCaptureMouseClicksOutsideBabylon(): void {
  * @returns void
  */
 function checkCaptureMouseClicksOutsideBabylon(): void {
-    let deviceOrientation = Vars.scene.activeCamera.inputs.attached.deviceOrientation;
+    const deviceOrientation = Vars.scene.activeCamera.inputs.attached.deviceOrientation;
     let deviceBeingOriented;
 
     if (!deviceOrientation) {
