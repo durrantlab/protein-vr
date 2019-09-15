@@ -8,10 +8,6 @@
         "description": "Daytime"
     },
     {
-        "path": "environs/room/",
-        "description": "Couch Room"
-    },
-    {
         "path": "environs/blood/",
         "description": "Blood"
     },
