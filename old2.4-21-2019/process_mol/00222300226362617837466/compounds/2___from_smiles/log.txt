@@ -1,1 +1,0 @@
-1541572073	Obtained model from SMILES string: C1CCCC1

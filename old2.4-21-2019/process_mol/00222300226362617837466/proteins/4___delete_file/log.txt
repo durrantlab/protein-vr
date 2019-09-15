@@ -1,3 +1,0 @@
-1541571247	Obtained model from Protein Data Bank: 1xdn
-1541571255	Created new model (1xdn.2) by deleting selected atoms from 1xdn. Atoms matching the following selection were removed: invert: false; resn: WAT HOH H2O TIP TIP3
-1541571356	Deleted file: 1xdn.pdb

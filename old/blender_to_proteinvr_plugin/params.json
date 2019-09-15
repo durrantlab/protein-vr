@@ -1,9 +1,0 @@
-{
-    "min_verts_to_decimate": 10,
-    "max_obj_verts_allowed": 75000,
-    "max_scene_verts_allowed": 250000,
-    "LOD_decimation_ratio": 0.2,
-    "shadow_maps_resolution": 512,
-    "cycles_samples": 500,
-    "blender_exec": "/Applications/blender-2.78c-OSX_10.6-x86_64/blender.app/Contents/MacOS/blender"
-}
