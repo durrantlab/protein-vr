@@ -23,9 +23,9 @@ influenza.good
 webapp-compiled
 scoria
 *.cache
-build
 **/web/*
 node_modules
 rsync.sh
 old2*
 .vscode
+biotite_app/build/
