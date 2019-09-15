@@ -7,9 +7,9 @@
 /source/notes.txt
 *.blend
 *.tar.gz
-*.png
-*.jpg
-*.mp3
+biotite_app/**/*.png
+biotite_app/**/*.jpg
+biotite_app/**/*.mp3
 *.pyc
 *.blend1
 **/__pycache__/**
@@ -29,3 +29,4 @@ rsync.sh
 old2*
 .vscode
 biotite_app/build/
+*.psd
