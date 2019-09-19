@@ -1,6 +1,6 @@
 {"producer":{"name":"Blender","version":"2.80 (sub 74)","exporter_version":"6.1.2","file":"scene.babylon"},
 "autoClear":true,"clearColor":[0.0509,0.0509,0.0509],"gravity":[0,-9.81,0],
-"materials":[{"name":"baked.001","id":"baked.001","customType":"BABYLON.PBRMaterial","backFaceCulling":true,"checkReadyOnlyOnce":false,"maxSimultaneousLights":4,"environmentIntensity":1,"roughness":0.2,"alpha":1,"transparencyMode":1, 
+"materials":[{"name":"baked.001","id":"baked.001","customType":"BABYLON.PBRMaterial","backFaceCulling":true,"checkReadyOnlyOnce":false,"maxSimultaneousLights":4,"environmentIntensity":1,"roughness":0.2,"alpha":1,"transparencyMode":1,
 "emissiveTexture":{"name":"Baked.jpg","level":1,"hasAlpha":true,"coordinatesMode":0,"uOffset":0,"vOffset":0,"uScale":1,"vScale":1,"uAng":0,"vAng":0,"wAng":0,"wrapU":1,"wrapV":1,"coordinatesIndex":0}}],
 "multiMaterials":[],
 "skeletons":[],

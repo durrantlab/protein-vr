@@ -481,11 +481,16 @@ BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLo
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLoadedObservable.add = function(a) {};
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLoaded = function() {};
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllerMeshLoaded.add = function(a) {};
+BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllersAttachedObservable = function() {};
+BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.onControllersAttachedObservable.add = function(a) {};
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.rotationQuaternion;
 BABYLON.Scene.prototype.createDefaultVRExperience.webVRCamera.rotationQuaternion.toEulerAngles = function() {};
 BABYLON.Scene.prototype.createDefaultVRExperience.teleportCamera = function(a) {};
 BABYLON.Scene.prototype.createDefaultVRExperience.exitVR = function() {};
 BABYLON.Scene.prototype.createDefaultVRExperience._fullscreenVRpresenting;
+BABYLON.Scene.prototype.createDefaultVRExperience.currentVRCamera;
+BABYLON.Scene.prototype.createDefaultVRExperience.currentVRCamera.initControllers = function() {};
+BABYLON.Scene.prototype.createDefaultVRExperience.currentVRCamera.controllers;
 BABYLON.Scene.prototype.getEngine = function() {};
 BABYLON.Scene.prototype.getEngine.getCaps = function() {};
 BABYLON.Scene.prototype.getEngine.getCaps.multiview;

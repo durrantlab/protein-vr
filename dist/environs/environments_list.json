@@ -22,5 +22,9 @@
     {
         "path": "environs/er/",
         "description": "ER"
+    },
+    {
+        "path": "environs/lipid_bilayer/",
+        "description": "Lipid Bilayer"
     }
 ]

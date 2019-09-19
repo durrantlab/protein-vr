@@ -27,34 +27,20 @@ export function setup(): void {
 
     // When you gain or loose focus, always exit VR mode. Doing this for
     // iphone pwa, which otherwise can't exit VR mode.
-    // jQuery(window).focus(() => {
-    //     exitVRAndFS();
-    // });
-
-    // jQuery(window).blur(() => {
-    //     exitVRAndFS();
-    // });
-
-    // jQuery("body").focus(() => {
-    //     exitVRAndFS();
-    // });
-
-    // jQuery("body").blur(() => {
-    //     exitVRAndFS();
-    // });
-
-    // document.addEventListener("visibilitychange", () => {
-    //     exitVRAndFS();
-    // }, false);
+    // jQuery(window).focus(() => { exitVRAndFS(); });
+    // jQuery(window).blur(() => { exitVRAndFS(); });
+    // jQuery("body").focus(() => { exitVRAndFS(); });
+    // jQuery("body").blur(() => { exitVRAndFS(); });
+    // document.addEventListener("visibilitychange", () => { exitVRAndFS(); }, false);
 
     // Surprizingly, none of the above are triggering on ios pwa! Let's try an
     // additional approach...
     setInterval(() => {
-        let now = new Date().getTime();
+        const now = new Date().getTime();
         if (lastTimeJSRunningChecked === undefined) {
             lastTimeJSRunningChecked = now;
         }
-        let deltaTime = now - lastTimeJSRunningChecked;
+        const deltaTime = now - lastTimeJSRunningChecked;
         if (deltaTime > 2000) {
             // Javascript must have stopped recently.
             exitVRAndFS();
@@ -113,6 +99,10 @@ function setupEnterAndExitVRCallbacks(): void {
         // Hide the 2D buttons.
         jQuery(".ui-button").hide();
         jQuery(".babylonVRicon").hide();
+
+        // Start trying to initialive the controllers (in case they weren't
+        // initalized already).
+        VRControllers.startCheckingForControlers();
 
         window["vrHelper"] = Vars.vrHelper;
     });

@@ -4,6 +4,7 @@ import * as Points from "../Navigation/Points";
 import * as Vars from "../Vars/Vars";
 import * as CommonCamera from "./CommonCamera";
 import * as VRCamera from "./VRCamera";
+// import * as DebugMsg from "../UI/DebugMsg";
 
 declare var BABYLON: any;
 
@@ -13,6 +14,9 @@ let lastPadRotationTime = 0;
 let padMoveSpeedFactor = 0.0;
 let padRotateSpeedFactor = 0.0;
 let padPressed = false;
+
+// let controllerLoaded = false;
+// let startedCheckingForControllers = false;
 
 /**
  * Sets up the enter and exit functions when controllers load. No unload
@@ -31,6 +35,7 @@ export function setup(): void {
         VRCamera.setupGazeTracker();
         setupTrigger(webVRController);
         setupPad(webVRController);
+        // controllerLoaded = true;
     };
 
     // onControllersAttachedObservable doesn't work. I'd prefer that one...
@@ -42,8 +47,59 @@ export function setup(): void {
         onControllerLoaded(webVRController);
     });
 
+    // Vars.vrHelper.webVRCamera.onControllersAttachedObservable.add((v) => {
+    //     Vars.scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
+    // });
+
     // Doesn't appear to be a detach function...
 }
+
+/**
+ * Runs once user enters VR mode. Starts trying to init controllers and nav
+ * sphere. Stops when it succeeds.
+ * @returns void
+ */
+export function startCheckingForControlers(): void {
+    // On different devices (e.g., Oculus Go), the controllers don't start by
+    // default. Try initializing them every once in a while just in case.
+    // if (startedCheckingForControllers === false) {
+    //     startedCheckingForControllers = true;
+    //     setTimeout(keepTryingToPrepControllers, 3000);
+    // }
+}
+
+
+// function keepTryingToPrepControllers(): void {
+//     // console.log(Vars.vrHelper, Vars.vrHelper.currentVRCamera, Vars.vrHelper.currentVRCamera.initControllers);
+//     // console.log("yo");
+//     if ((Vars.vrHelper !== undefined) &&
+//         (Vars.vrHelper.currentVRCamera !== undefined) &&
+//         (Vars.vrHelper.currentVRCamera.initControllers) !== undefined) {
+
+
+//             // It does get here.
+
+//             // Try initializing the controllers if necessary.
+//         // if (controllerLoaded === false) {
+//         //     Vars.scene.getMeshByName("skybox.baked").isVisible = false;
+//         //     console.log("Trying to initialize controllers...");
+//         //     Vars.vrHelper.currentVRCamera.initControllers();
+//         //     setTimeout(keepTryingToPrepControllers, 3000);
+//         //     return;
+//         // }
+
+//         // Also initialize interactions if you need to...
+//         // if (Vars.vrHelper._interactionsEnabled !== true) {
+//             // Vars.vrHelper.enableInteractions();
+//             VRCamera.setupGazeTracker();
+//             // Note eno more setTimeout here. Because you've succeeded.
+//             // setTimeout(keepTryingToPrepControllers, 3000);
+//             return;
+//         // }
+//     }
+
+//     setTimeout(keepTryingToPrepControllers, 3000);
+// }
 
 /**
  * Sets up the trigger button.

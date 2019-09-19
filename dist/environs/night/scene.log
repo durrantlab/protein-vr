@@ -1,4 +1,4 @@
-Exporter version: 6.1.2, Blender version: 2.80 (sub 75)
+Exporter version: 6.1.2, Blender version: 2.80 (sub 74)
 ========= Conversion from Blender to Babylon.js =========
 	Scene settings used :
 		inline textures     :  false
@@ -8,7 +8,7 @@ Exporter version: 6.1.2, Blender version: 2.80 (sub 75)
 		UVs Precision       :  3
 		Vert Color Precision:  3
 		Mat Weight Precision:  2
-		texture directory   :  /Users/jdurrant/Documents/Work/durrant_git/protein-vr/webpack_version/src/babylon_scenes/blood/
+		texture directory   :  /Users/jdurrant/Documents/Work/durrant_git/protein-vr/webpack_version/src/babylon_scenes/night/
 	Python World class constructor completed
 	processing begun of mesh:  protein_box
 		WARNING: No materials have been assigned: 
@@ -49,8 +49,8 @@ Exporter version: 6.1.2, Blender version: 2.80 (sub 75)
 		num colors         :  0
 		num indices        :  36
 	processing begun of camera (UniversalCamera):  Camera
-	processing begun of light (POINT):  ShadowLight_Sun_dark_0.95_blur_64_ambient_0.1
+	processing begun of light (POINT):  ShadowLight_Sun_dark_0.95_blur_64
 ========= Writing of JSON file started =========
 ========= Writing of JSON file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 0.4199 secs
+elapsed time:  0 min, 0.3638 secs

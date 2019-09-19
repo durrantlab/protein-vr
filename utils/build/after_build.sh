@@ -26,7 +26,7 @@ cd -
 # You need to closure compile vendor..js too. Let's use js version for maximal
 # compatibility.
 echo "Check for errors above. Enter to start compiling vendor js and other js files..."
-read -p "Press enter to continue"
+# read -p "Press enter to continue"
 cd dist
 
 node ../node_modules/google-closure-compiler/cli.js $(ls vendors*.js) > t
@@ -71,3 +71,5 @@ find dist -name "tmp" -exec rm -r '{}' \;
 cd dist
 python ../utils/build/remove_entries_file_no_exist.py
 cd -
+
+say "Beep"

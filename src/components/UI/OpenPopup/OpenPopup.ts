@@ -45,7 +45,8 @@ export function openModal(title: string, val: string, iframed = true, closeBtn?:
 
                     <!-- Modal body -->
                     <div class="modal-body">
-                        <div id="iframe-container" style="height:350px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch"><!-- TODO: Check if works on both iPhone and Firefox. Used to be overflow-y:auto;overflow-x:hidden; -->
+                        <!-- TODO: Check if works on both iPhone and Firefox. Used to be overflow-y:auto;overflow-x:hidden; -->
+                        <div id="iframe-container" style="height:350px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch">
                             <iframe frameBorder="0" src="" style="width:100%;height:100%;"></iframe>
                         </div>
                         <span id="msg-container"></span>

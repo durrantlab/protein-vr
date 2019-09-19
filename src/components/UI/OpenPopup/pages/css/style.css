@@ -5,3 +5,7 @@ body {
 .form-group {
     word-break: break-word;
 }
+
+/* html {
+    overflow-y: hidden;
+} */
