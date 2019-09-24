@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,145 +14,289 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
 
-  </head>
-  <body>
+</head>
 
-    <script>
-        // Data for the tabs.
-        var chromeFlag = " If you have troubles or want to improve performance, navigate to <b>chrome://flags</b> and enable the settings related to WebVR. ";
-        function asideFromInBrowser(deviceName) {
-            return "Aside from in-browser visualization, " + deviceName + " works.";
-        }
-        var iOSNoFullScreen = " Apple prevents browsers from going full screen on iPhones, so VR will not work. "
-        var voiceCommandsNotAvailable = "Voice commands are not available."
-        function knownLimitations(limits, newPara=false) {
-            return (newPara ? "</p><p>" : "") + "Known limitations:<ul><li>" + limits.join("</li><li>") + "</li></ul>";
-        }
-        var tabs = [
-            {
-                title: "Desktop Chrome",
-                desc: asideFromInBrowser("the HTC Vive VR headset") + chromeFlag
-            },
-            {
-                title: "Android Chrome",
-                desc: asideFromInBrowser("any Google-cardboard device") + chromeFlag
-            },
-            {
-                title: "iOS Chrome",
-                desc: knownLimitations([
-                    iOSNoFullScreen + " But the in-browser view does update based on the phone's physical orientation.",
-                    voiceCommandsNotAvailable
-                ])
-                // "Note that https://en.wikipedia.org/wiki/Google_Chrome#iOS"
-            },
-            {
-                title: "Desktop Firefox",
-                desc: asideFromInBrowser("the HTC Vive VR headset") + " " + knownLimitations([
-                    voiceCommandsNotAvailable
-                ])
-            },
-            {
-                title: "Android Firefox",
-                desc: asideFromInBrowser("any Google-cardboard device")+ " " + knownLimitations([
-                    voiceCommandsNotAvailable
-                ])
-            },
-            {
-                title: "iOS Firefox",
-                desc: "We have not tested ProteinVR on iOS Firefox. " + knownLimitations([
-                    iOSNoFullScreen, // + " But the in-browser view does update based on the phone's physical orientation.",
-                    voiceCommandsNotAvailable
-                ])
-            },
-            {
-                title: "iOS Safari",
-                desc: knownLimitations([
-                    iOSNoFullScreen,
-                    voiceCommandsNotAvailable,
-                    "The in-browser view does not update based on the phone's physical orientation unless you go to [Settings] > [Safari] and enable [Motion & Orientation Access]. This feature is turned off by default.",
-                ])
-            },
-        ]
-    </script>
-
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <h3>
-                    Program Description
-                </h3>
-                <p>
-                    Protein Virtual Reality (ProteinVR) is an innovative tool
-                    for teaching micro and structural biology. Traditionally,
-                    instructors have used 2D schema that obscure the 3D nature
-                    of microscopic systems. ProteinVR leverages new and
-                    emerging technologies such as 3D web graphics and
-                    virtual-reality headsets to display these systems in full
-                    3D.
-                </p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <h3>
-                    Troubleshooting
-                </h3>
-                <p>
-                    If you wish to view ProteinVR scenes through a VR
-                    headset, <a href="https://webvr.rocks">your browser must
-                    support WebVR</a>. Otherwise, you can still view the
-                    scenes using regular (2D) in-browser visualization. Voice
-                    commands are only supported in Google Chrome. We generally
-                    recommend Chrome over other browsers, running on Windows
-                    desktops or Android phones.
-
-                    If you're having trouble using ProteinVR, please click on
-                    your browser below for further instructions.
-                </p>
-                <div class="tabbable">
-                    <ul class="nav nav-tabs">
-                        <script>
-                            for (var i=0; i<tabs.length; i++) {
-                                document.write(
-                                    '<li class="nav-item"><a href="#tab' + (i+1).toString() +
-                                    '" class="nav-link ' + (i===0 ? 'active' : "") +
-                                    ' show" data-toggle="tab">'
-                                );
-                                document.write(tabs[i].title);
-                                document.write('</a></li>')
-                            }
-                        </script>
-                    </ul>
-                    <div class="tab-content">
-                        <script>
-                            for (var i=0; i<tabs.length; i++) {
-                                document.write(
-                                    '<div class="tab-pane ' + (i===0 ? 'active' : "") +
-                                    '" id="tab' + (i+1).toString() +
-                                    '"><p>'
-                                );
-                                document.write(tabs[i].desc);
-                                document.write('</p></div>')
-                            }
-                        </script>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <h3>
-                    Dedication
-                </h3>
-                <p>
-                    ProteinVR is dedicated to the memory of Dr. Karen Curto.
-                </p>
-            </div>
-        </div>
+<body>
+    <h3 class="likesectionHead"><a id="x1-1000"></a>Contents</h3>
+    <div class="tableofcontents">
+        <span class="sectionToc">1 <a href="#x1-20001" id="QQ2-1-2">Introduction</a></span>
+        <br /> <span class="sectionToc">2 <a href="#x1-30002" id="QQ2-1-3">Description of Use</a></span>
+        <br /> &#x00A0;&#x00A0;&#x00A0;&#x00A0;<span class="subsectionToc">2.1 <a href="#x1-40002.1" id="QQ2-1-4">Loading Screen</a></span>
+        <br /> &#x00A0;&#x00A0;&#x00A0;&#x00A0;<span class="subsectionToc">2.2 <a href="#x1-50002.2" id="QQ2-1-6">2D Menu</a></span>
+        <br /> &#x00A0;&#x00A0;&#x00A0;&#x00A0;<span class="subsectionToc">2.3 <a href="#x1-60002.3" id="QQ2-1-7">3D Menu</a></span>
+        <br /> &#x00A0;&#x00A0;&#x00A0;&#x00A0;<span class="subsectionToc">2.4 <a href="#x1-70002.4" id="QQ2-1-9">URL Tracking</a></span>
+        <br /> <span class="sectionToc">3 <a href="#x1-80003" id="QQ2-1-10">Display Modes</a></span>
+        <br /> &#x00A0;&#x00A0;&#x00A0;&#x00A0;<span class="subsectionToc">3.1 <a href="#x1-90003.1" id="QQ2-1-11">VR Mode</a></span>
+        <br /> &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;<span class="subsubsectionToc">3.1.1 <a href="#x1-100003.1.1" id="QQ2-1-12">Description and Navigation</a></span>
+        <br /> &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;<span class="subsubsectionToc">3.1.2 <a href="#x1-110003.1.2" id="QQ2-1-14">Caveats</a></span>
+        <br /> &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;<span class="subsubsectionToc">3.1.3 <a href="#x1-120003.1.3" id="QQ2-1-15">Windows</a></span>
+        <br /> &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;<span class="subsubsectionToc">3.1.4 <a href="#x1-130003.1.4" id="QQ2-1-16">macOS</a></span>
+        <br /> &#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;<span class="subsubsectionToc">3.1.5 <a href="#x1-140003.1.5" id="QQ2-1-17">Mobile</a></span>
+        <br /> &#x00A0;&#x00A0;&#x00A0;&#x00A0;<span class="subsectionToc">3.2 <a href="#x1-150003.2" id="QQ2-1-18">Device-Orientation Mode</a></span>
+        <br /> &#x00A0;&#x00A0;&#x00A0;&#x00A0;<span class="subsectionToc">3.3 <a href="#x1-160003.3" id="QQ2-1-19">Desktop Mode</a></span>
+        <br /> &#x00A0;&#x00A0;&#x00A0;&#x00A0;<span class="subsectionToc">3.4 <a href="#x1-170003.4" id="QQ2-1-20">Leader Mode</a></span>
+        <br /> <span class="sectionToc">4 <a href="#x1-180004" id="QQ2-1-21">Dedication</a></span>
     </div>
+    <!--l. 95-->
+    <p class="noindent"></p>
+    <h3 class="sectionHead"><span class="titlemark">1 </span> <a id="x1-20001"></a>Introduction</h3>
+    <!--l. 97-->
+    <p class="noindent">Protein Virtual Reality (ProteinVR) is an innovative tool for teaching micro and structural biology. Traditionally,
+        instructors have used 2D schema that obscure the 3D nature of microscopic systems. ProteinVR leverages new and
+        emerging technologies such as 3D web graphics and virtual-reality headsets to display these systems in full
+        3D.</p>
+    <!--l. 101-->
+    <p class="indent"> To accommodate a broad range of devices and use cases, ProteinVR runs in four modes: virtual reality (VR) mode,
+        device-orientation mode, desktop mode, and leader mode. In all four, ProteinVR uses video-game-style navigation.
+        Objects reside at fixed positions in a 3D environment, and the camera moves (or teleports) to different locations
+        in the scene. In this sense ProteinVR differs from most other molecular-visualization programs, which allow
+        users to rotate molecules floating before them. Both navigation systems are effective, but, given the ubiquity of
+        video games, many users will find ProteinVR&#8217;s system both intuitive and familiar. This is especially true of
+        younger scientists and students, who are often particularly comfortable with virtual environments and video
+        games.</p>
+
+
+    <!--l. 108-->
+    <p class="noindent"></p>
+    <h3 class="sectionHead"><span class="titlemark">2 </span> <a id="x1-30002"></a>Description of Use</h3>
+    <!--l. 110-->
+    <p class="noindent"></p>
+    <h4 class="subsectionHead"><span class="titlemark">2.1 </span> <a id="x1-40002.1"></a>Loading Screen</h4>
+    <div class="wrapfig-r"><a id="x1-40011"></a>
+        <div class="center">
+            <!--l. 114-->
+            <p class="noindent"></p>
+            <!--l. 115-->
+            <p class="noindent"><img src="imgs/environment.jpg" alt="PIC"></p>
+        </div>
+        <br />
+        <div class="caption"><span class="id">Figure 1: </span><span class="content">An illustration of a ProteinVR scene with
+                the default NanoKid molecule visualized. Several buttons
+                are available from the main screen. A) Load a new
+                molecule and environment. B) Provide help. C) Enter
+                follow-the-leader mode. D) View in full screen. E) Enter
+                VR mode.</span></div>
+        <!--tex4ht:label?: x1-40011 -->
+    </div>
+    <!--l. 122-->
+    <p class="noindent">When users first open ProteinVR, the application displays the default molecule (NanoKid, Figure <a href="#x1-40011">1
+            <!--tex4ht:ref: fig:environment --></a>). After a few seconds, a
+        simple popup form appears where users can type the PDB ID or URL of the molecular model they wish to visualize. The same
+        form also allows users to indicate the 3D environment in which to place the molecular model, as well as whether the molecule
+        should cast shadows. After clicking the "Load Molecule" button, NanoKid is replaced with the desired molecular
+        structure.</p>
+    <!--l. 127-->
+    <p class="noindent"></p>
+    <h4 class="subsectionHead"><span class="titlemark">2.2 </span> <a id="x1-50002.2"></a>2D Menu</h4>
+    <!--l. 129-->
+    <p class="noindent">Several buttons appear on the right of the screen that are only accessible when not in VR mode (Figure <a href="#x1-40011">1
+            <!--tex4ht:ref: fig:environment --></a>A-E). The first allows
+        users to load a new molecule and environment; the second provides a useful help system; the third generates a sharable URL
+        that others can use to mirror the ProteinVR scene on their own devices (see "Leader Mode" below); and the fourth and fifth put
+        ProteinVR into full-screen and VR mode, respectively.</p>
+    <!--l. 132-->
+    <p class="noindent"></p>
+    <h4 class="subsectionHead"><span class="titlemark">2.3 </span> <a id="x1-60002.3"></a>3D Menu</h4>
+    <!--l. 134-->
+    <p class="noindent">All other ProteinVR functionality is accessible through the in-world 3D menu system (Figure <a href="#x1-60012">2
+            <!--tex4ht:ref: fig:3dbtn --></a>). ProteinVR places a simple
+        button at the user&#8217;s feet with the text "Show Menu" (Figure <a href="#x1-60012">2
+            <!--tex4ht:ref: fig:3dbtn --></a>A). Users on laptop/desktop computers can click this button using
+        a mouse or keyboard (space bar); users on mobile devices without VR headsets can simply tap their screens; and users with VR
+        headsets can pull the VR-headset or VR-controller trigger button.</p>
+    <!--l. 138-->
+    <p class="indent"> Once clicked, a hierarchical 3D menu appears, embedded in the 3D scene itself. At the top-most level, this menu is divided
+        into two broad categories (Figure <a href="#x1-60012">2
+            <!--tex4ht:ref: fig:3dbtn --></a>B-C). The "Rotate" submenu allows users to rotate the molecule about the X, Y, or Z axis.
+        The "Styles" submenu contains further submenus that allow users to change how the molecule is displayed, both in
+        terms of the molecular representation (e.g., cartoon, sphere, stick, surface) and the color (e.g., white, color by
+        element, etc.) (Figure <a href="#x1-60012">2
+            <!--tex4ht:ref: fig:3dbtn --></a>D-F). "Styles <span class="zptmcm7m-">> </span>Components" applies these changes to common, pre-defined molecular
+        components (e.g., proteins, ligands, nucleic acids, water molecules). "Styles <span class="zptmcm7m-">> </span>Selections" applies changes to the
+        model using characteristics specific to the loaded molecule itself (e.g., specific residues, elements, chains, etc.).
+        And "Styles <span class="zptmcm7m-">> </span>Remove Existing" allows users to remove previously specified representations/colors (Figure
+
+
+        <a href="#x1-60012">2
+            <!--tex4ht:ref: fig:3dbtn --></a>G).</p>
+    <div class="wrapfig-r"><a id="x1-60012"></a>
+        <div class="center">
+            <!--l. 148-->
+            <p class="noindent"></p>
+            <!--l. 149-->
+            <p class="noindent"><img src="imgs/3d_buttons.png" alt="PIC">
+        </div>
+        <br />
+        <div class="caption"><span class="id">Figure 2: </span><span class="content">A schematic of the menu buttons available
+                from within the 3D environment. A) Open the menu
+                system (located at the user&#8217;s feet). B) Access the "Rotate"
+                submenu. C) Access the "Styles" submenu. D) Change the
+                style of common, pre-defined molecular components. E)
+                Change the style of selected atoms specific to the loaded
+                molecule itself. F) Remove previously specified styles.
+                G) Change the representation and/or color of the selected
+                atoms/components.</span></div>
+        </p>
+        <!--tex4ht:label?: x1-60012 -->
+    </div>
+    <!--l. 156-->
+    <p class="noindent"></p>
+    <h4 class="subsectionHead"><span class="titlemark">2.4 </span> <a id="x1-70002.4"></a>URL Tracking</h4>
+    <!--l. 158-->
+    <p class="noindent">ProteinVR makes it easy to save molecular scenes with custom visualizations such as these. Every time a molecular
+        representation is loaded, rotated, or otherwise altered, ProteinVR updates the browser URL to track the change. Copying
+        the URL at any point into a new browser tab&#8211;even on a different device&#8211;recreates the exact same ProteinVR
+        scene.</p>
+    <!--l. 162-->
+    <p class="noindent"></p>
+    <h3 class="sectionHead"><span class="titlemark">3 </span> <a id="x1-80003"></a>Display Modes</h3>
+    <!--l. 164-->
+    <p class="noindent">To accommodate a broad range of devices and use cases, ProteinVR runs in four modes: VR mode, device-orientation mode,
+        desktop mode, and leader mode. In all four, ProteinVR uses video-game-style navigation. Objects reside at fixed positions in a
+        3D environment, and the camera moves (or teleports) to different locations in the scene.</p>
+    <!--l. 168-->
+    <p class="noindent"></p>
+    <h4 class="subsectionHead"><span class="titlemark">3.1 </span> <a id="x1-90003.1"></a>VR Mode</h4>
+    <!--l. 170-->
+    <p class="noindent"></p>
+    <h5 class="subsubsectionHead"><span class="titlemark">3.1.1 </span> <a id="x1-100003.1.1"></a>Description and Navigation</h5>
+    <!--l. 172-->
+    <p class="noindent">If you wish to view ProteinVR scenes through a VR headset (e.g., an Oculus Rift, Oculus Go, HTC Vive, or Google-Cardboard
+        compatible viewer), <a href="https://webvr.rocks" target="_blank">your browser must support WebVR</a>. This mode provides a fully
+        immersive experience wherein users can view their molecular structures in stereoscopic 3D. The 3D environments are
+        particularly useful in VR mode, as they improve the sense of realism and immersion. By allowing viewers to orient themselves
+        spatially, 3D environments may also reduce VR sickness, which occurs when users perceive a disconnect between
+        the 3D scene presented to the eyes and the movement/orientation of the head. To enter VR mode, users must
+        first attach a VR headset as well as any hand controllers. They then click the VR button in the main ProteinVR
+        screen.</p>
+
+
+    <!--l. 179-->
+    <p class="indent"> In VR mode, users can look about the scene by physically moving their heads. Some VR headsets also allow users to
+        navigate to nearby locations by physically moving about the room. Teleportation navigation enables movement to distant points
+        in the virtual world. A simple navigation sphere indicates the current teleport destination. When using a VR headset that
+        lacks hand controllers (e.g., Google Cardboard), this sphere appears on the object immediately in front of the
+        user&#8217;s gaze. When using a headset with hand controllers (e.g., the HTC Vive, Oculus Rift, or Oculus Go), the
+        sphere appears at the location where the user is pointing. To teleport to the location of the sphere, the user simply
+        presses the VR-headset button, the VR-controller trigger (Figure <a href="#x1-100013">3
+            <!--tex4ht:ref: fig:controller --></a>A), the keyboard space bar, or the mouse click
+        button.</p>
+    <!--l. 187-->
+    <p class="indent"> VR controllers with trackpads enable more fine-grained movements (Figure <a href="#x1-100013">3
+            <!--tex4ht:ref: fig:controller --></a>B). To slowly move forward or backward in
+        the direction of the navigation sphere, users can simply press the top or bottom of the trackpad. To rotate left or right
+        without having to rotate the head (e.g., to reset the view), users can press the left and right side of the trackpad,
+        respectively.</p>
+    <div class="wrapfig-r"><a id="x1-100013"></a>
+        <div class="center">
+            <!--l. 193-->
+            <p class="noindent"></p>
+            <!--l. 194-->
+            <p class="noindent"><img src="imgs/controller.png" alt="PIC"></p>
+        </div>
+        <br />
+        <div class="caption"><span class="id">Figure 3: </span><span class="content">An illustration of the VR-controller buttons that
+                enable navigation in VR mode.</span></div>
+        <!--tex4ht:label?: x1-100013 -->
+    </div>
+    <!--l. 201-->
+    <p class="noindent"></p>
+    <h5 class="subsubsectionHead"><span class="titlemark">3.1.2 </span> <a id="x1-110003.1.2"></a>Caveats</h5>
+    <!--l. 203-->
+    <p class="noindent">We have tested VR-mode on multiple operating-system, web-browser, and VR-headset setups. In some cases, it is necessary to
+        explicitly enable the WebVR application programming interface (API) and/or browser access to the device-orientation sensors.
+        We have also found that WebVR access to the VR controllers can be finicky. We recommend turning on the controllers
+        <span class="ptmri8t-">before </span>entering VR. On VR systems that have multiple controllers (e.g., one for each hand), we also recommend
+        turning on all controllers, even though teleportation navigation requires only one. VR technology is rapidly
+        evolving; we recommend a web search to learn the steps necessary (if any) to fully enable VR in a given browser of
+        choice.</p>
+    <!--l. 210-->
+    <p class="noindent"></p>
+    <h5 class="subsubsectionHead"><span class="titlemark">3.1.3 </span> <a id="x1-120003.1.3"></a>Windows</h5>
+    <!--l. 212-->
+    <p class="noindent">We have verified that VR mode works well on Windows 10. We currently recommend the Firefox web browser, which provides
+        a stable WebVR implementation that is enabled by default.</p>
+    <!--l. 215-->
+    <p class="noindent"></p>
+    <h5 class="subsubsectionHead"><span class="titlemark">3.1.4 </span> <a id="x1-130003.1.4"></a>macOS</h5>
+    <!--l. 217-->
+    <p class="noindent">VR support in macOS is currently limited, though Apple has plans to expand support in the future. In preliminary tests, we did
+        once manage to get ProteinVR working (albeit with a very low frame rate) on an HTC Vive connected to a MacBook Pro with
+        an external graphics card. But we have not been able to reproduce that preliminary success and so cannot currently recommend
+        macOS for VR.</p>
+
+
+    <!--l. 221-->
+    <p class="noindent"></p>
+    <h5 class="subsubsectionHead"><span class="titlemark">3.1.5 </span> <a id="x1-140003.1.5"></a>Mobile</h5>
+    <!--l. 223-->
+    <p class="noindent">VR mode also works well on most mobile devices. The WebVR API on Android is easy to access. In contrast, WebVR access
+        on iOS is currently challenging. iOS mobile Safari does not allow webpages to hide the browser address bar, as required for VR
+        visualization using mobile (e.g., Google Cardboard) headsets. Additionally, iOS does not allow the mobile Safari browser to
+        access the device&#8217;s orientation sensors by default, making it impossible for ProteinVR to respond to head movements.
+        Apple requires all third-party browsers on iOS (e.g., Chrome, Firefox) to use the same WebKit framework and
+        JavaScript engine that Safari does, so it is not possible to overcome these challenges by switching to another
+        browser.</p>
+    <!--l. 230-->
+    <p class="indent"> To eliminate the address bar on iOS, users should install ProteinVR as a progressive web app (PWA). PWA installation
+        places a ProteinVR icon on the device&#8217;s home screen and allows ProteinVR to run in full-screen mode. Simply visit the
+        ProteinVR website via mobile Safari and use the browser&#8217;s "Share<span class="zptmcm7m-">> </span>Add to Home Screen" menu item. Additionally, users must
+        enable access to the device-orientation sensors (even if running ProteinVR as a PWA) via Settings <span class="zptmcm7m-">> </span>Safari <span class="zptmcm7m-">> </span>Motion
+        &amp; Orientation Access. We are hopeful that Apple will simplify this process in the future as it expands its VR
+        support.</p>
+    <!--l. 236-->
+    <p class="noindent"></p>
+    <h4 class="subsectionHead"><span class="titlemark">3.2 </span> <a id="x1-150003.2"></a>Device-Orientation Mode</h4>
+    <!--l. 238-->
+    <p class="noindent">Device-orientation mode is ideal when viewing ProteinVR scenes on mobile devices with orientation sensors. If ProteinVR
+        detects such sensors, it automatically updates its viewport to match the orientation of the device itself. Users can thus view their
+        molecular structures from different angles by physically reorienting their devices. ProteinVR also uses teleportation navigation
+        in device-orientation mode. A similar navigation sphere (placed in the direction the mobile device is pointing) indicates the
+        current teleport destination. To teleport to the location of the sphere, the user simply taps on the mobile-device
+        screen.</p>
+    <!--l. 245-->
+    <p class="indent"> In our experience, Google Chrome on Android provides the easiest device-orientation experience. On iOS, users
+        must explicitly enable access to the device-orientation sensors via Settings <span class="zptmcm7m-">> </span>Safari <span class="zptmcm7m-">> </span>Motion &amp; Orientation
+        Access.</p>
+    <!--l. 248-->
+    <p class="noindent"></p>
+    <h4 class="subsectionHead"><span class="titlemark">3.3 </span> <a id="x1-160003.3"></a>Desktop Mode</h4>
+    <!--l. 250-->
+    <p class="noindent">If neither a VR headset nor an orientation sensor is available, ProteinVR runs in desktop mode. Desktop mode uses a
+        standard keyboard-and-mouse navigation system similar to that commonly used in video games. The arrow keys
+        (or WASD keys) move forward, backward, and sideways. Clicking and dragging with the mouse changes the
+        viewing angle. If the user clicks on the full-screen button in the main window (Figure <a href="#x1-40011">1
+            <!--tex4ht:ref: fig:environment --></a>D), ProteinVR instead
+        changes the viewing angle whenever the mouse moves, without requiring an accompanying click. Teleportation
+        navigation is also available for those who wish to use it. To teleport to the navigation sphere, the user need only press
+        the space bar. As desktop mode uses only well-established web technologies, it runs on virtually any modern
+        browser.</p>
+    <!--l. 259-->
+    <p class="noindent"></p>
+
+
+    <h4 class="subsectionHead"><span class="titlemark">3.4 </span> <a id="x1-170003.4"></a>Leader Mode</h4>
+    <!--l. 261-->
+    <p class="noindent">Finally, ProteinVR can run in "leader mode." This mode transforms the program into a powerful presentation tool. In many
+        scenarios, multiple users may wish to visualize the same ProteinVR scene together. A technology called WebRTC enables
+        direct communication between leader and follower instances. When running in "leader" mode, ProteinVR broadcasts the user&#8217;s
+        location in the 3D scene, as well as information about how the molecule of interest is currently represented. Broadcasting is
+        available from any of the devices that ProteinVR supports (e.g., VR headsets, phones, laptops, desktops, etc.). When
+        running in "follower" mode, ProteinVR receives this information from the designated leader and automatically
+        updates the scene to match whatever the leader is currently seeing. Only 2D (desktop-mode-style) viewing is
+        available in follower mode because VR viewing-angle updates independent of head movements often cause VR
+        sickness.</p>
+    <!--l. 269-->
+    <p class="indent"> <span class="ptmb8t-">JACOB: Is the safari webrtc issue problematic on both ios and mac?</span></p>
+    <!--l. 271-->
+    <p class="noindent"></p>
+    <h3 class="sectionHead"><span class="titlemark">4 </span> <a id="x1-180004"></a>Dedication</h3>
+    <!--l. 273-->
+    <p class="noindent">ProteinVR is dedicated to the memory of Dr. Karen Curto.</p>
 
     <script src="scripts/jquery.min.js"></script>
     <script src="scripts/bootstrap.min.js"></script>
     <script src="scripts/scripts.js"></script>
-  </body>
+</body>
+
 </html>

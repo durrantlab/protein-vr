@@ -1,11 +1,39 @@
 body {
-    margin: 15px !important;
+  margin: 15px !important;
 }
 
 .form-group {
-    word-break: break-word;
+  word-break: break-word;
 }
 
 /* html {
     overflow-y: hidden;
 } */
+
+
+/* For the help (latex-based) system. */
+.wrapfig-r {
+  max-width: 100%;
+  /* float: right; */
+  /* clear: both; */
+  /* padding-left: 20px; */
+  /* padding-bottom: 20px; */
+  padding: 20px;
+}
+
+img {
+  width: 100%;
+}
+
+.thinner-figure {
+  max-width: 25%;
+}
+
+.ptmb8t- {
+  color: red;
+  font-weight: bold;
+}
+
+.wrapfig-r br {
+  display: none;
+}
