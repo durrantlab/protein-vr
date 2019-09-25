@@ -50,7 +50,8 @@ function addRunModeButtons(): void {
             id: "open-button",
             clickFunc: () => {
                 // Give them some time to admire nanokid... :)
-                OpenPopup.openModal("Load Molecule", "pages/load.html?warning");
+                window["PVR_warning"] = true;
+                OpenPopup.openModal("Load Molecule", "pages/load.html");
             }
         },
         {
@@ -63,7 +64,7 @@ function addRunModeButtons(): void {
                   </svg>`,
             title: "Help",
             id: "help-button",
-            clickFunc: () => { OpenPopup.openModal("Help", "pages/index.html", true, true); }
+            clickFunc: () => { OpenPopup.openModal("Help: ProteinVR " + Vars.VERSION, "pages/help.html", true, true); }
         },
         {
             svg: `<svg version="1.2" baseProfile="tiny" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"

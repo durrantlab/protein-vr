@@ -1,8 +1,8 @@
-body {
+/* body {
   margin: 15px !important;
-}
+} */
 
-.form-group {
+#msg-container .form-group {
   word-break: break-word;
 }
 
@@ -12,7 +12,7 @@ body {
 
 
 /* For the help (latex-based) system. */
-.wrapfig-r {
+#msg-container .wrapfig-r {
   max-width: 100%;
   /* float: right; */
   /* clear: both; */
@@ -21,19 +21,19 @@ body {
   padding: 20px;
 }
 
-img {
+#msg-container img {
   width: 100%;
 }
 
-.thinner-figure {
+#msg-container .thinner-figure {
   max-width: 25%;
 }
 
-.ptmb8t- {
+#msg-container .ptmb8t- {
   color: red;
   font-weight: bold;
 }
 
-.wrapfig-r br {
+#msg-container .wrapfig-r br {
   display: none;
 }

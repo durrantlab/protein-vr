@@ -17,6 +17,8 @@ export interface IVRSetup {
     menuActive?: boolean;
 }
 
+export const VERSION = "1.0.0";
+
 export let canvas: any;
 export let engine: any;
 export let scene: any;

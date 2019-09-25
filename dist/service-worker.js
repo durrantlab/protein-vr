@@ -1,1 +1,32 @@
-importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");importScripts("precache-manifest.f2d5aa05149a4e3b19693bb9914bf515.js");workbox.core.skipWaiting();workbox.core.clientsClaim();self.__precacheManifest=[].concat(self.__precacheManifest||[]);workbox.precaching.precacheAndRoute(self.__precacheManifest,{});workbox.routing.registerRoute(/\./,new workbox.strategies.NetworkFirst,"GET");
+/**
+ * Welcome to your Workbox-powered service worker!
+ *
+ * You'll need to register this file in your web app and you should
+ * disable HTTP caching for this file too.
+ * See https://goo.gl/nhQhGp
+ *
+ * The rest of the code is auto-generated. Please don't update this file
+ * directly; instead, make changes to your Workbox build configuration
+ * and re-run your build process.
+ * See https://goo.gl/2aRDsh
+ */
+
+importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
+
+importScripts(
+  "precache-manifest.9e6e3f0f1dbb12ecd40b0616821f50dd.js"
+);
+
+workbox.core.skipWaiting();
+
+workbox.core.clientsClaim();
+
+/**
+ * The workboxSW.precacheAndRoute() method efficiently caches and responds to
+ * requests for URLs in the manifest.
+ * See https://goo.gl/S9QRab
+ */
+self.__precacheManifest = [].concat(self.__precacheManifest || []);
+workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
+
+workbox.routing.registerRoute(/\./, new workbox.strategies.NetworkFirst(), 'GET');

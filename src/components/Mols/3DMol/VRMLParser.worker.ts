@@ -135,8 +135,6 @@ export function loadValsFromVRML(vrmlStr: string, removeExtraPts = false): any[]
  * @returns * Float32Array
  */
 export function removeStrayPoints(pts: any): any {
-    console.log("Removing extra points.");
-
     /** @type {number} */
     const firstX = pts[0];
 

@@ -1,7 +1,12 @@
-import * as SceneLoader from "./components/Scene/LoadAndSetup";
+import * as LoadAndSetup from "./components/Scene/LoadAndSetup";
 import 'bootstrap';
 // import * as Styles from "./styles/style.css";
 import * as UrlVars from "./components/Vars/UrlVars";
+import * as Vars from "./components/Vars/Vars";
+
+// Report version
+console.log("ProteinVR " + Vars.VERSION);
+document.title = "ProteinVR " + Vars.VERSION;
 
 // Get server workers (for progressive web app). Makes for better experience,
 // especially on iOS. See
@@ -24,4 +29,4 @@ if ('serviceWorker' in navigator) {
 
 UrlVars.readEnvironmentNameParam();
 
-SceneLoader.load();
+LoadAndSetup.load();

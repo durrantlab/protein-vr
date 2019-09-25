@@ -217,8 +217,6 @@ function toggleRepContinued(keys: any, repName: string, finalCallback: any): voi
         visChanged();
 
         finalCallback();
-
-        console.log("added new mesh");
     });
 }
 

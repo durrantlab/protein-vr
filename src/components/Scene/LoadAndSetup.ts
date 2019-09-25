@@ -28,6 +28,7 @@ export function load(): void {
     // https://forum.babylonjs.com/t/createdefaultvrexperience-android-chrome-vr-mode-change-material-unusual-error/2738/4
     vrSetupBeforeBabylonFileLoaded();
 
+
     babylonScene(() => {
         // Setup the cameras.
         CamerasSetup.setup();

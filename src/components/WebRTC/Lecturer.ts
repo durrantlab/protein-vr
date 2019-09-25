@@ -95,8 +95,9 @@ export function startBroadcast(): void {
     lect = new Lecturer();
 
     lect.idReady.then((id: string) => {
+        window["PVR_webRTCID"] = id;
         OpenPopup.openModal(
-            "Leader", "pages/leader.html?f=" + id, true, true
+            "Leader", "pages/leader.html", true, true
         );
     });
 

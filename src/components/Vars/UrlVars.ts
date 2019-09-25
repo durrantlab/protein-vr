@@ -137,7 +137,7 @@ export function setURL(): void {
             // "pageTitle": response.pageTitle,
         },
         document.title,
-        window.location.href.split("?")[0] + "?" + params.join("&"),
+        window.location.href.split("?")[0] + "?" + params.join("&")
     );
 }
 
@@ -319,6 +319,11 @@ export function checkShadowInUrl(): boolean {
  */
 function autoUpdateUrl(): void {
     setInterval(() => {
-        setURL();
+        // As long as the modal isn't open, update the url. Important to only
+        // do it when modal is closed. Otherwise firefox mobile environment
+        // select auto closes.
+        if (jQuery("#msgModal").css("display") !== "block") {
+            setURL();
+        }
     }, 1000);
 }

@@ -1,58 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- <h3>
+                Leader Sharing
+            </h3> -->
+            <p>
+                Others can use the URL below to view the ProteinVR scene through your eyes:
+            </p>
+            <form role="form">
+                <div class="form-group">
 
-    <title>ProteinVR: Leader</title>
-
-    <meta name="description" content="ProteinVR: Leader">
-    <meta name="author" content="Jacob Durrant">
-
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-
-  </head>
-  <body>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <!-- <h3>
-                        Leader Sharing
-                    </h3> -->
-                    <p>
-                        Others can use the URL below to view the ProteinVR scene through your eyes:
-                    </p>
-                    <form role="form">
-                        <div class="form-group">
-
-                            <!-- <label for="leaderURL">
-                                Leader URL
-                            </label> -->
-                            <input type="text" class="form-control" id="leaderURL" />
-                        </div>
-                    </form>
+                    <!-- <label for="leaderURL">
+                        Leader URL
+                    </label> -->
+                    <input type="text" class="form-control" id="leaderURL" />
                 </div>
-            </div>
+            </form>
         </div>
-
-    <script src="scripts/jquery.min.js"></script>
-    <script src="scripts/bootstrap.min.js"></script>
-    <script src="scripts/scripts.js"></script>
-    <script>
-        jQuery(document).ready(() => {
-            let url = window.location.href.replace("pages/leader.html", "");
-
-            // Let's try to shorten it. This will only work it's being hosted
-            // on one of the durrantlab websites.
-            var leaderURLVal = jQuery("#leaderURL");
-            leaderURLVal.val(url);
-            leaderURLVal.focus();
-            setTimeout(() => {
-                leaderURLVal.select();
-            }, 0);
-        });
-    </script>
-  </body>
-</html>
+    </div>
+</div>
