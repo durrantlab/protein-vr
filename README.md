@@ -14,10 +14,10 @@ themselves in 3D space.
 
 ![Figure
 1](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/raw/master/src/components/UI/OpenPopup/pages/imgs/environment.jpg
-Figure 1: An illustration of a ProteinVR scene with the default NanoKid
+"Figure 1: An illustration of a ProteinVR scene with the default NanoKid
 molecule visualized. Several buttons are available from the main screen. A)
 Load a new molecule and environment. B) Provide help. C) Enter
-follow-the-leader mode. D) View in full screen. E) Enter VR mode.)
+follow-the-leader mode. D) View in full screen. E) Enter VR mode.")
 
 When users first open ProteinVR, the application displays the default molecule
 (NanoKid, Figure 1). After a few seconds, a simple popup form appears where
