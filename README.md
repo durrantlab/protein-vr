@@ -17,7 +17,7 @@ themselves in 3D space.
   They must be compiled.
 * `utils/`, `package.json`, `package-lock.json`, `tsconfig.json`: Files used
   to compile the contents of the `src/` to the `dist/` directory.
-* `CHANGES.md`, `CONTRIBUTORS.md`, `README.md`: Documentation files.
+* `CHANGES.md`, `CONTRIBUTORS.md`,  `README.md`: Documentation files.
 
 ## Description of Use ##
 
