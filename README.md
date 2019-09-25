@@ -16,10 +16,10 @@ themselves in 3D space.
 1](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/raw/master/src/components/UI/OpenPopup/pages/imgs/environment.jpg
 "Figure 1")
 
-__Figure 1: An illustration of a ProteinVR scene with the default NanoKid
+_Figure 1: An illustration of a ProteinVR scene with the default NanoKid
 molecule visualized. Several buttons are available from the main screen. A)
 Load a new molecule and environment. B) Provide help. C) Enter
-follow-the-leader mode. D) View in full screen. E) Enter VR mode.__
+follow-the-leader mode. D) View in full screen. E) Enter VR mode._
 
 When users first open ProteinVR, the application displays the default molecule
 (NanoKid, Figure 1). After a few seconds, a simple popup form appears where
@@ -60,6 +60,18 @@ changes to the model using characteristics specific to the loaded molecule
 itself (e.g., specific residues, elements, chains, etc.). And "Styles > Remove
 Existing" allows users to remove previously specified representations/colors
 (Figure 2G).
+
+![Figure
+2](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/raw/master/src/components/UI/OpenPopup/pages/imgs/3d_buttons.png
+"Figure 2")
+
+_Figure 2: A schematic of the menu buttons available from within the 3D
+environment. A) Open the menu system (located at the user's feet). B) Access
+the "Rotate" submenu. C) Access the "Styles" submenu. D) Change the style of
+common, pre-defined molecular components. E) Change the style of selected
+atoms specific to the loaded molecule itself. F) Remove previously specified
+styles. G) Change the representation and/or color of the selected
+atoms/components._
 
 ### URL Tracking ###
 
@@ -111,6 +123,13 @@ To slowly move forward or backward in the direction of the navigation sphere,
 users can simply press the top or bottom of the trackpad. To rotate left or
 right without having to rotate the head (e.g., to reset the view), users can
 press the left and right side of the trackpad, respectively.
+
+![Figure
+3](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/raw/master/src/components/UI/OpenPopup/pages/imgs/controller.png
+"Figure 3")
+
+_Figure 3: An illustration of the VR-controller buttons that enable navigation
+in VR mode._
 
 #### Caveats ####
 
