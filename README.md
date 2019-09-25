@@ -19,23 +19,6 @@ themselves in 3D space.
   to compile the contents of the `src/` to the `dist/` directory.
 * `CHANGES.md`, `CONTRIBUTORS.md`, `README.md`: Documentation files.
 
-## Running ProteinVR on Your Own Computer ##
-
-Most users will wish to simply access the publicly available ProteinVR web app
-at ___XXXX___. If you want to run ProteinVR on your own UNIX-like computer
-(LINUX, macOS, etc.), follow these instructions:
-
-1. Download the `proteinvr_web_app.zip` file
-2. Uncompress the file: `unzip proteinvr_web_app.zip`
-3. Change to the new `proteinvr/` directory: `cd proteinvr`
-4. Start a local server. Python provides one out of the box: `python -m
-   SimpleHTTPServer 8000`
-5. Access the server from your web-browser: `http://localhost:8000/` or
-   perhaps `http://0.0.0.0:8000/`
-
-Running ProteinVR on other operating systems (e.g., Windows) should be
-similar.
-
 ## Description of Use ##
 
 ### Loading Screen ###
@@ -250,6 +233,40 @@ from the designated leader and automatically updates the scene to match
 whatever the leader is currently seeing. Only 2D (desktop-mode-style) viewing
 is available in follower mode because VR viewing-angle updates independent of
 head movements often cause VR sickness.
+
+## Running ProteinVR on Your Own Computer ##
+
+Most users will wish to simply access the publicly available ProteinVR web app
+at ___XXXX___. If you wish to instead run ProteinVR on your own UNIX-like
+computer (LINUX, macOS, etc.), follow these instructions:
+
+1. Download the `proteinvr_web_app.zip` file
+2. Uncompress the file: `unzip proteinvr_web_app.zip`
+3. Change to the new `proteinvr/` directory: `cd proteinvr`
+4. Start a local server. Python provides one out of the box: `python -m
+   SimpleHTTPServer 8000`
+5. Access the server from your web-browser: `http://localhost:8000/` or
+   perhaps `http://0.0.0.0:8000/`
+
+Running ProteinVR on other operating systems (e.g., Windows) should be
+similar.
+
+## Compiling ProteinVR ##
+
+The vast majority of users will not need to compile ProteinVR on their own.
+Simply use the compiled files in `dist/` or `proteinvr_web_app.zip`. If you
+need to make modifications to the source code, these instructions should help
+with compiling on UNIX-like systems:
+
+1. Clone or download the git repository: `git clone
+   http://git.durrantlab.com/jdurrant/protein-vr.git`
+2. Change into the new `protein-vr` directory: `cd protein-vr`
+3. Install the required `npm` packages: `npm install`
+4. Fix any vulnerabilities: `npm audit fix`
+5. Make sure ImageMagick and Python are installed system wide, and that
+   `convert` and `python` work from the command line
+6. To deploy a dev server: `npm run start`
+7. To compile the contents of `src/` to `dist/`: `npm run build`
 
 ## Dedication ##
 
