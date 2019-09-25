@@ -8,6 +8,14 @@ VR-headset-based web browsers. The molecular structures are displayed within
 3D environments that give useful biological context and allow users to situate
 themselves in 3D space.
 
+___LICENSE INFO HERE___
+
+___CITATIION HERE___
+
+Most users will wish to simply access the already compiled, publicly available
+ProteinVR web app at ___XXXX___. This code repository is designed to help
+developers.
+
 ## Repository Contents ##
 
 * `dist/`: The production (distribution) files. If you wish to run ProteinVR
@@ -16,8 +24,8 @@ themselves in 3D space.
 * `src/`: The ProteinVR source files. You cannot use these files directly.
   They must be compiled.
 * `utils/`, `package.json`, `package-lock.json`, `tsconfig.json`: Files used
-  to compile the contents of the `src/` to the `dist/` directory.
-* `CHANGES.md`, `CONTRIBUTORS.md`,  `README.md`: Documentation files.
+  to compile the contents of the `src/` directory to the `dist/` directory.
+* `CHANGES.md`, `CONTRIBUTORS.md`, `README.md`: Documentation files.
 
 ## Description of Use ##
 
@@ -236,9 +244,9 @@ head movements often cause VR sickness.
 
 ## Running ProteinVR on Your Own Computer ##
 
-Most users will wish to simply access the publicly available ProteinVR web app
-at ___XXXX___. If you wish to instead run ProteinVR on your own UNIX-like
-computer (LINUX, macOS, etc.), follow these instructions:
+Most users will wish to simply access the already compiled, publicly available
+ProteinVR web app at ___XXXX___. If you wish to instead run ProteinVR on your
+own UNIX-like computer (LINUX, macOS, etc.), follow these instructions:
 
 1. Download the `proteinvr_web_app.zip` file
 2. Uncompress the file: `unzip proteinvr_web_app.zip`
@@ -254,12 +262,11 @@ similar.
 ## Compiling ProteinVR ##
 
 The vast majority of users will not need to compile ProteinVR on their own.
-Simply use the compiled files in `dist/` or `proteinvr_web_app.zip`. If you
-need to make modifications to the source code, these instructions should help
-with compiling on UNIX-like systems:
+Simply use the already compiled files in `dist/` or `proteinvr_web_app.zip`.
+If you need to make modifications to the source code, these instructions
+should help with re-compiling on UNIX-like systems:
 
-1. Clone or download the git repository: `git clone
-   http://git.durrantlab.com/jdurrant/protein-vr.git`
+1. Clone or download the git repository: `git clone http://git.durrantlab.com/jdurrant/protein-vr.git`
 2. Change into the new `protein-vr` directory: `cd protein-vr`
 3. Install the required `npm` packages: `npm install`
 4. Fix any vulnerabilities: `npm audit fix`
