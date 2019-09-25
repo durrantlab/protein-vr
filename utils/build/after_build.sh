@@ -12,10 +12,6 @@ cat t | tr '`' '\n' > $(ls precache-manifest*.js)
 rm t tmp
 cd -
 
-# Ssh it over to alien for VR testing. Note that you'll need to start the ssh
-# server there.
-# . ~/rsync_protein_vr_to_local.sh
-
 # Prevent 3Dmol.js from reporting back to the mother ship. I thought I could
 # set this programmatically, but couldn't get it to work. Best just to modify
 # the code to prevent it.
@@ -72,4 +68,10 @@ cd dist
 python ../utils/build/remove_entries_file_no_exist.py
 cd -
 
+# Also create a ZIP file of the dist directory, for convenient distribution.
+mv dist proteinvr
+zip -r proteinvr_web_app.zip proteinvr
+mv proteinvr dist
+
+# Let the user know that compilation is finished. Works only on macOS.
 say "Beep"

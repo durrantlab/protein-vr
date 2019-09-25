@@ -8,6 +8,34 @@ VR-headset-based web browsers. The molecular structures are displayed within
 3D environments that give useful biological context and allow users to situate
 themselves in 3D space.
 
+## Repository Contents ##
+
+* `dist/`: The production (distribution) files. If you wish to run ProteinVR
+  on your own web server, these are the only files you need. For convenience,
+  the `proteinvr_web_app.zip` contains the contents of the `dist/` directory.
+* `src/`: The ProteinVR source files. You cannot use these files directly.
+  They must be compiled.
+* `utils/`, `package.json`, `package-lock.json`, `tsconfig.json`: Files used
+  to compile the contents of the `src/` to the `dist/` directory.
+* `CHANGES.md`, `CONTRIBUTORS.md`, `README.md`: Documentation files.
+
+## Running ProteinVR on Your Own Computer ##
+
+Most users will wish to simply access the publicly available ProteinVR web app
+at ___XXXX___. If you want to run ProteinVR on your own UNIX-like computer
+(LINUX, macOS, etc.), follow these instructions:
+
+1. Download the `proteinvr_web_app.zip` file
+2. Uncompress the file: `unzip proteinvr_web_app.zip`
+3. Change to the new `proteinvr/` directory: `cd proteinvr`
+4. Start a local server. Python provides one out of the box: `python -m
+   SimpleHTTPServer 8000`
+5. Access the server from your web-browser: `http://localhost:8000/` or
+   perhaps `http://0.0.0.0:8000/`
+
+Running ProteinVR on other operating systems (e.g., Windows) should be
+similar.
+
 ## Description of Use ##
 
 ### Loading Screen ###
