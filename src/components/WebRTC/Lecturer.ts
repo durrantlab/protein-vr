@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // Functions for leader mode, that the leader (lecturer) uses.
 
 import * as CommonCamera from "../Cameras/CommonCamera";

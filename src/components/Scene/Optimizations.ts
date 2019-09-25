@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 import * as MolShadows from "../Mols/MolShadows";
 import * as Vars from "../Vars/Vars";
 

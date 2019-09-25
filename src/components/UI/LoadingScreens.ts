@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 import * as Vars from "../Vars/Vars";
 
 let intervalID: any;

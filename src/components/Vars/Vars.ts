@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // A place to put variables that need to be accessed from multiple places.
 // This module is a place to store "global" variables.
 

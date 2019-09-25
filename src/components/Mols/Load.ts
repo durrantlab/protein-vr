@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 import * as Optimizations from "../Scene/Optimizations";
 import * as Menu3D from "../UI/Menu3D/Menu3D";
 import * as Vars from "../Vars/Vars";

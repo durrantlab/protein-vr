@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 import * as Navigation from "../Navigation/Navigation";
 import * as Pickables from "../Navigation/Pickables";
 import * as Points from "../Navigation/Points";

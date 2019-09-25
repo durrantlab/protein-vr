@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // This sets up the non vr camera. Not everyone has a vr headset.
 
 import * as Vars from "../Vars/Vars";

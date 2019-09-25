@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // Functions to display messages in the VR world. To make debugging easier on
 // devices like Oculus Go.
 

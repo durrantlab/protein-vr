@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 import * as ThreeDMol from "../Mols/3DMol/ThreeDMol";
 import * as VisStyles from "../Mols/3DMol/VisStyles";
 import * as VRML from "../Mols/3DMol/VRML";

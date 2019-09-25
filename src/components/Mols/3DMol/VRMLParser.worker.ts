@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // import { groundPointBelowCamera } from "../../Navigation/Points";
 // import * as VRML from "./VRML";
 

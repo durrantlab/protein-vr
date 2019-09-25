@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // Functions to handle molecule shadows.
 
 import * as Vars from "../Vars/Vars";

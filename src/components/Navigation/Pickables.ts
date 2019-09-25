@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // This module includes functions to manage which meshes in the scene are
 // pickable.
 

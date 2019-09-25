@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // This module handles all things navigation related.
 
 import * as CommonCamera from "../Cameras/CommonCamera";

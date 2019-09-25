@@ -8,7 +8,7 @@ VR-headset-based web browsers. The molecular structures are displayed within
 3D environments that give useful biological context and allow users to situate
 themselves in 3D space.
 
-___LICENSE INFO HERE___
+ProteinVR is released under the terms of the open-source BSD-3-Clause license.
 
 ___CITATIION HERE___
 

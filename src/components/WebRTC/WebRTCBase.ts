@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // Functions that are common to the main classes of Lecturer.ts and
 // Student.ts.
 

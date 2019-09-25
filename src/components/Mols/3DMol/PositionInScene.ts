@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 import * as Optimizations from "../../Scene/Optimizations";
 import * as Vars from "../../Vars/Vars";
 import * as VisStyles from "./VisStyles";

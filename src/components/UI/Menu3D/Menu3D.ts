@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 import * as CommonCamera from "../../Cameras/CommonCamera";
 import * as VRPoints from "../../Navigation/Points";
 import * as Vars from "../../Vars/Vars";

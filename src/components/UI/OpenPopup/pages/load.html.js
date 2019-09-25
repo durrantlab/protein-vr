@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 (function(context) {
     // Determine whether warning should be displayed. Do this fast.
     var warning = document.getElementById("will-erase");

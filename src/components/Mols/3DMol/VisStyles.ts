@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // Functions to create a protein visualization using 3DMol.js
 
 import * as Optimizations from "../../Scene/Optimizations";

@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // This module sets up the VR camera.
 
 import * as Navigation from "../Navigation/Navigation";

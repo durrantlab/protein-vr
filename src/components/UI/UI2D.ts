@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // Sets up tweaks to the UI.
 
 import * as OpenPopup from "./OpenPopup/OpenPopup";

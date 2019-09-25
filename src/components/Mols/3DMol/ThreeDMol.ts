@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // Functions from loading molecules directly from a 3Dmol.js instance. See
 // VRML.ts for additional functions related to the mesh itself.
 

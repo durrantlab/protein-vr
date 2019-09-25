@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 import * as CamerasSetup from "../Cameras/Setup";
 import * as VRCamera from "../Cameras/VRCamera";
 import * as MolsLoad from "../Mols/Load";

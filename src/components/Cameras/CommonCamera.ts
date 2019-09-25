@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // These functions include camera functions common to all kinds of cameras.
 
 import * as Navigation from "../Navigation/Navigation";

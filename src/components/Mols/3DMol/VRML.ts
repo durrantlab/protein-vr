@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 // An module to manage VRML data obtained from 3Dmol.js. Assumes the 3Dmol.js
 // javascript file is already loaded.
 

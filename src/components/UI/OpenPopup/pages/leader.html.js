@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 (function(context) {
     // Get the URL for following.
     let url = window.location.href.split("?")[0] + "?f=" + window["PVR_webRTCID"];

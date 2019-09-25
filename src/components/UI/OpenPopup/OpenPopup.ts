@@ -1,3 +1,5 @@
+// Copyright 2019 Jacob D. Durrant
+
 declare var jQuery: any;
 
 let bootstrapLoaded = false;

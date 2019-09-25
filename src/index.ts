@@ -1,6 +1,7 @@
+// Copyright 2019 Jacob D. Durrant
+
 import * as LoadAndSetup from "./components/Scene/LoadAndSetup";
 import 'bootstrap';
-// import * as Styles from "./styles/style.css";
 import * as UrlVars from "./components/Vars/UrlVars";
 import * as Vars from "./components/Vars/Vars";
 
@@ -23,9 +24,6 @@ if ('serviceWorker' in navigator) {
         });
     });
 }
-
-// document.getElementById("renderCanvas").classList.add(Styles.renderCanvas);
-// document.getElementById("container").classList.add(Styles.container);
 
 UrlVars.readEnvironmentNameParam();
 
