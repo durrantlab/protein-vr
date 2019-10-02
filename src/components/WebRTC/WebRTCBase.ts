@@ -60,7 +60,7 @@ export class WebRTCBase {
             "config": {'iceServers': [
                 {"urls": 'stun:0.peerjs.com'},
                 {"urls": 'stun:stun.l.google.com:19302'},
-                {"urls": 'stun:durrantlab.com/apps/proteinvr/stun'}  // not yet implemented
+                {"urls": 'stun:durrantlab.com/apps/protein-vr/stun'}  // not yet implemented
                 // {"url": 'stun:stun1.l.google.com:19302'},
                 // {"url": 'stun:stun2.l.google.com:19302'},
                 // {"url": 'stun:stun3.l.google.com:19302'},

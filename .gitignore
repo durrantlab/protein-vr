@@ -30,3 +30,5 @@ old2*
 .vscode
 biotite_app/build/
 *.psd
+dist/environs/**/*.log
+dist/environs/**/*.txt

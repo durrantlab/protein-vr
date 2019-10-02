@@ -73,3 +73,21 @@ html, body {
     z-index: 3;
     background-color: rgba(0, 0, 0, 0.6) !important;
 }
+
+/* Full screen, make sure no cursor. */
+
+html:-moz-full-screen {
+    cursor: none;
+}
+
+html:-webkit-full-screen {
+    cursor: none;
+}
+
+html:-ms-fullscreen {
+    cursor: none;
+}
+
+html:fullscreen {
+    cursor: none;
+}

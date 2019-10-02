@@ -689,3 +689,5 @@ var MSStream;
 var Peer = function(a,b) {};
 
 // var webpackJsonp;
+
+var ga = function(a,b,c) {};

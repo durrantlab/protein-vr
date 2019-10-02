@@ -11,6 +11,7 @@ import * as Vars from "../Vars/Vars";
 import * as Lecturer from "../WebRTC/Lecturer";
 import * as Optimizations from "./Optimizations";
 import * as UrlVars from "../Vars/UrlVars";
+// import * as Fullscreen from "../Navigation/Fullscreen";
 
 declare var BABYLON: any;
 
@@ -34,6 +35,9 @@ export function load(): void {
     babylonScene(() => {
         // Setup the cameras.
         CamerasSetup.setup();
+
+        // Setup full-screen functions.
+        // Fullscreen.setup();
 
         if (!UrlVars.checkWebrtcInUrl()) {
             // The below are run if not in webrtc (leader) mode.

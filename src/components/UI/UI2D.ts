@@ -95,6 +95,7 @@ function addRunModeButtons(): void {
             id: "fullscreen-button",
             clickFunc: () => {
                 Vars.engine.switchFullscreen(true);
+                // jQuery(document).css("cursor")
                 jQuery("#renderCanvas").focus();  // So keypress will work.
             }
         }

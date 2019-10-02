@@ -164,17 +164,17 @@ export function startFollowing(id: string): void {
 function moveVecTowards(curVec: any, targetVec: any) {
     const numEntries = curVec.length;
 
-    // Now get the distance between curVec and this newPos.
+    // Distance between curVec and newPos.
     const deltaPos = new Float32Array(numEntries);
     for (let i = 0; i < numEntries; i++) { deltaPos[i] = targetVec[i] - curVec[i]; }
 
     const fac = 0.02;
     const animRatio = Vars.scene.getAnimationRatio();
 
-    // A variable that will contain the new position
+    // New position
     const newPos = new Float32Array(numEntries);
 
-    // Scale the delta and add it to the curVec. That's the newPos.
+    // Scale the delta, add to curVec.
     for (let i = 0; i < numEntries; i++) { newPos[i] =  curVec[i] + animRatio * fac * deltaPos[i]; }
 
     return newPos;
