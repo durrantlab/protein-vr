@@ -10,8 +10,6 @@ themselves in 3D space.
 
 ProteinVR is released under the terms of the open-source BSD-3-Clause license.
 
-___CITATION HERE___
-
 Most users will wish to simply access the already compiled, publicly available
 ProteinVR web app at [http://durrantlab.com/pvr/](http://durrantlab.com/pvr/).
 This code repository is designed to help developers.
