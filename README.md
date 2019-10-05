@@ -10,11 +10,11 @@ themselves in 3D space.
 
 ProteinVR is released under the terms of the open-source BSD-3-Clause license.
 
-___CITATIION HERE___
+___CITATION HERE___
 
 Most users will wish to simply access the already compiled, publicly available
-ProteinVR web app at ___XXXX___. This code repository is designed to help
-developers.
+ProteinVR web app at [http://durrantlab.com/pvr/](http://durrantlab.com/pvr/).
+This code repository is designed to help developers.
 
 ## Repository Contents ##
 
@@ -245,8 +245,9 @@ head movements often cause VR sickness.
 ## Running ProteinVR on Your Own Computer ##
 
 Most users will wish to simply access the already compiled, publicly available
-ProteinVR web app at ___XXXX___. If you wish to instead run ProteinVR on your
-own UNIX-like computer (LINUX, macOS, etc.), follow these instructions:
+ProteinVR web app at [http://durrantlab.com/pvr/](http://durrantlab.com/pvr/).
+If you wish to instead run ProteinVR on your own UNIX-like computer (LINUX,
+macOS, etc.), follow these instructions:
 
 1. Download the `proteinvr_web_app.zip` file
 2. Uncompress the file: `unzip proteinvr_web_app.zip`
