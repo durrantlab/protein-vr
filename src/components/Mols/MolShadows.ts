@@ -61,7 +61,7 @@ export function setupShadowGenerator(): void {
         // window.shadowGenerator = shadowGenerator;
 
     } else {
-        console.log("iOS, so not generating shadows... causes an error... See https://forum.babylonjs.com/t/issues-between-shadowgenerator-and-ios-osx/795");
+        // console.log("iOS, so not generating shadows... causes an error... See https://forum.babylonjs.com/t/issues-between-shadowgenerator-and-ios-osx/795");
     }
 }
 

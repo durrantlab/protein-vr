@@ -5,6 +5,7 @@
 import * as OpenPopup from "./OpenPopup/OpenPopup";
 import * as Vars from "../Vars/Vars";
 import * as Lecturer from "../WebRTC/Lecturer";
+import * as UrlVars from "../Vars/UrlVars";
 
 declare var jQuery: any;
 
@@ -13,6 +14,7 @@ interface I2DButton {
     title: string;
     id: string;
     clickFunc: any;
+    showInFollowerMode: boolean;
 }
 
 /**
@@ -50,6 +52,7 @@ function addRunModeButtons(): void {
                     </svg>`,
             title: "open",
             id: "open-button",
+            showInFollowerMode: false,
             clickFunc: () => {
                 // Give them some time to admire nanokid... :)
                 window["PVR_warning"] = true;
@@ -66,6 +69,7 @@ function addRunModeButtons(): void {
                   </svg>`,
             title: "Help",
             id: "help-button",
+            showInFollowerMode: false,
             clickFunc: () => { OpenPopup.openModal("Help: ProteinVR " + Vars.VERSION, "pages/help.html", true, true); }
         },
         {
@@ -79,6 +83,7 @@ function addRunModeButtons(): void {
                  </svg>`,
             title: "Share (Leader)",
             id: "leader",
+            showInFollowerMode: false,
             clickFunc: () => {
                 Lecturer.startBroadcast();
             }
@@ -93,6 +98,7 @@ function addRunModeButtons(): void {
                   </svg>`,
             title: "Full Screen",
             id: "fullscreen-button",
+            showInFollowerMode: true,
             clickFunc: () => {
                 Vars.engine.switchFullscreen(true);
                 // jQuery(document).css("cursor")
@@ -105,24 +111,26 @@ function addRunModeButtons(): void {
     let html = "";
     let curBottom = 60;
     for (const btn of btns.reverse()) {
-        html += `
-            <button
-                title="${btn.title}"
-                id="${btn.id}"
-                class="ui-button"
-                style="color:white;
-                    width:80px;
-                    height:50px;
-                    right:5px;
-                    position:absolute;
-                    bottom:${curBottom.toString()}px;
-                    background-color:rgba(51,51,51,0.7);
-                    border:none;
-                    outline:none;
-                    cursor:pointer;">
-                    ${btn.svg}
-            </button>`;
-        curBottom += 55;
+        if ((UrlVars.webrtc === undefined) || (btn.showInFollowerMode === true)) {
+            html += `
+                <button
+                    title="${btn.title}"
+                    id="${btn.id}"
+                    class="ui-button"
+                    style="color:white;
+                        width:80px;
+                        height:50px;
+                        right:5px;
+                        position:absolute;
+                        bottom:${curBottom.toString()}px;
+                        background-color:rgba(51,51,51,0.7);
+                        border:none;
+                        outline:none;
+                        cursor:pointer;">
+                        ${btn.svg}
+                </button>`;
+            curBottom += 55;
+        }
     }
 
     // Add to DOM.

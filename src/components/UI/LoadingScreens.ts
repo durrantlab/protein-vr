@@ -41,7 +41,7 @@ export function startFakeLoading(initialVal: number): void {
     intervalID = setInterval(() => {
         fakeVal = fakeVal + 0.02 * (99 - fakeVal);
         Vars.engine.displayLoadingUI();  // Keep it up while progressing...
-        Vars.engine.loadingUIText = "Loading the main scene... " + fakeVal.toFixed(0) + "%";
+        Vars.engine.loadingUIText = "Loading the main scene... " + fakeVal.toFixed(0) + "%<br /><br />(Loading too slow? Reload page, use Incognito<br />mode, or clear browser cache.)";
     }, 100);
 }
 

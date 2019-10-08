@@ -1,4 +1,4 @@
-Exporter version: 6.1.2, Blender version: 2.80 (sub 74)
+Exporter version: 6.1.2, Blender version: 2.80 (sub 75)
 ========= Conversion from Blender to Babylon.js =========
 	Scene settings used :
 		inline textures     :  false
@@ -8,7 +8,7 @@ Exporter version: 6.1.2, Blender version: 2.80 (sub 74)
 		UVs Precision       :  3
 		Vert Color Precision:  3
 		Mat Weight Precision:  2
-		texture directory   :  /Users/jdurrant/Documents/Work/durrant_git/protein-vr/webpack_version/src/babylon_scenes/night/
+		texture directory   :  /Users/jdurrant/Documents/Work/durrant_git/protein-vr/src/babylon_scenes/night/
 	Python World class constructor completed
 	processing begun of mesh:  protein_box
 		WARNING: No materials have been assigned: 
@@ -41,10 +41,10 @@ Exporter version: 6.1.2, Blender version: 2.80 (sub 74)
 		processing begun of material:  baked.001
 			processing texture Baked
 				texture type:  emissiveTexture, mapped using: "UVMap"
-		num positions      :  31
-		num normals        :  31
+		num positions      :  32
+		num normals        :  32
 		num tangents       :  0
-		num uvs            :  62
+		num uvs            :  64
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  36
@@ -53,4 +53,4 @@ Exporter version: 6.1.2, Blender version: 2.80 (sub 74)
 ========= Writing of JSON file started =========
 ========= Writing of JSON file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 0.3638 secs
+elapsed time:  0 min, 0.3644 secs

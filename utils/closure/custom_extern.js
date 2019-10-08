@@ -101,6 +101,8 @@ jQuery.getJSON = function(a, b) {};
 jQuery.ajax = function(a,b) {};
 jQuery.hide = function() {};
 jQuery.css = function(a,b) {};
+jQuery.fadeIn  = function(a) {};
+jQuery.fadeOut  = function(a) {};
 
 function _(astr) {};
 function __(astr) {};
@@ -689,5 +691,6 @@ var MSStream;
 var Peer = function(a,b) {};
 
 // var webpackJsonp;
+
 
 var ga = function(a,b,c) {};

@@ -91,3 +91,25 @@ html:-ms-fullscreen {
 html:fullscreen {
     cursor: none;
 }
+
+#followerModeWarningContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#followerModeWarning {
+    position: relative;
+    z-index: 10;
+    background-color: rgba(255,255,255,0.5);
+    user-select: none;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    display: none;
+}

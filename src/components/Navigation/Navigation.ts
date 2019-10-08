@@ -135,7 +135,7 @@ export function actOnStareTrigger(): void {
     switch (Pickables.getCategoryOfCurMesh()) {
         case Pickables.PickableCategory.Ground:
             // It's the ground, so teleport there.
-            console.log("teleport");
+            // console.log("teleport");
             teleport();
             break;
         case Pickables.PickableCategory.Molecule:
@@ -300,7 +300,7 @@ function setupCaptureMouseClicksOutsideBabylon(): void {
 
     // Make it clickable.
     captureMouseClicksDiv.click(() => {
-        console.log("clicked!");
+        // console.log("clicked!");
         actOnStareTrigger();
     });
 

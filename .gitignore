@@ -32,3 +32,4 @@ biotite_app/build/
 *.psd
 dist/environs/**/*.log
 dist/environs/**/*.txt
+scene.log

@@ -27,7 +27,7 @@
                         selectedTxt = "selected ";
                     }
 
-                    html += '<option ' + selectedTxt + 'value="' + e["path"] + '">' + e["description"] + ' (Mobile)</option>';
+                    html += '<option ' + selectedTxt + 'value="' + e["path"] + '">' + e["description"] + '</option>';
                 }
 
                 resolve(html);

@@ -189,6 +189,14 @@ export function readUrlParams(): void {
         // Make sure clicking on the screen doesn't move either. Basically
         // disable all teleportation.
         jQuery("#capture-clicks").remove();
+
+        // Show a warning message.
+        let followerModeWarning = jQuery("#followerModeWarning");
+        followerModeWarning.fadeIn(500);
+
+        setTimeout(() => {
+            followerModeWarning.fadeOut(500);
+        }, 8000);
     }
 
     // Update the mesh rotations
