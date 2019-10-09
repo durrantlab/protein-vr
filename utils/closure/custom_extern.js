@@ -100,6 +100,7 @@ jQuery.keypress = function(a) {};
 jQuery.getJSON = function(a, b) {};
 jQuery.ajax = function(a,b) {};
 jQuery.hide = function() {};
+jQuery.unbind = function(a) {};
 jQuery.css = function(a,b) {};
 jQuery.fadeIn  = function(a) {};
 jQuery.fadeOut  = function(a) {};

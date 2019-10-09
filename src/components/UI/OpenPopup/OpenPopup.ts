@@ -16,14 +16,16 @@ let footer: any;
 
 /**
  * Opens a modal.
- * @param  {string}  title     The tittle.
- * @param  {string}  val       The URL. A message otherwise.
- * @param  {boolean} isUrl     Whether val is a url.
- * @param  {boolean} closeBtn  Whether to include a close button. Defaults to
- *                             false if isUrl, true otherwise.
+ * @param  {string}  title       The tittle.
+ * @param  {string}  val         The URL. A message otherwise.
+ * @param  {boolean} isUrl       Whether val is a url.
+ * @param  {boolean} closeBtn    Whether to include a close button. Defaults
+ *                               to false if isUrl, true otherwise.
+ * @param  {boolean} unClosable  If true, modal cannot be closed. Effectively
+ *                               ends the program.
  * @returns void
  */
-export function openModal(title: string, val: string, isUrl = true, closeBtn?: boolean): void {
+export function openModal(title: string, val: string, isUrl = true, closeBtn?: boolean, unClosable = false): void {
     // Load the css if needed.
     if (!bootstrapLoaded) {
         bootstrapLoaded = true;
@@ -41,7 +43,7 @@ export function openModal(title: string, val: string, isUrl = true, closeBtn?: b
                     <!-- Modal Header -->
                     <div class="modal-header">
                         <h4 class="modal-title">Modal Heading</h4>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <button id="modal-close-button" type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
 
                     <!-- Modal body -->
@@ -68,22 +70,24 @@ export function openModal(title: string, val: string, isUrl = true, closeBtn?: b
         // </div> -->
 
         // Add the javascript
-        openUrlModalContinue(title, val, isUrl, closeBtn);
+        openUrlModalContinue(title, val, isUrl, closeBtn, unClosable);
     } else {
-        openUrlModalContinue(title, val, isUrl, closeBtn);
+        openUrlModalContinue(title, val, isUrl, closeBtn, unClosable);
     }
 }
 
 /**
  * A follow-up function for opening the url modal.
- * @param  {string}  title     The title.
- * @param  {string}  val       The URL if isUrl. A message otherwise.
- * @param  {boolean} isUrl     Whether val is a url.
- * @param  {boolean} closeBtn  Whether to include a close button. Defaults to
- *                             false if isUrl, true otherwise.
+ * @param  {string}  title       The title.
+ * @param  {string}  val         The URL if isUrl. A message otherwise.
+ * @param  {boolean} isUrl       Whether val is a url.
+ * @param  {boolean} closeBtn    Whether to include a close button. Defaults
+ *                               to false if isUrl, true otherwise.
+ * @param  {boolean} unClosable  If true, modal cannot be closed. Effectively
+ *                               ends the program.
  * @returns void
  */
-function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeBtn: boolean): void {
+function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeBtn: boolean, unClosable: boolean): void {
     if (msgModal === undefined) {
         msgModal = jQuery("#msgModal");
         myTitle = msgModal.find("h4.modal-title");
@@ -166,7 +170,16 @@ function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeB
         footer.hide();
     }
 
-    msgModal.modal();
+    let options = {};
+    if (unClosable === true) {
+        jQuery("#modal-close-button").hide();
+        msgModal.on('shown.bs.modal', function (e) {
+            jQuery(".modal-backdrop.show").css("opacity", 1);
+        })
+
+        options = {"backdrop": "static", "keyboard": false}
+    }
+    msgModal.modal(options);
 }
 
 // For debugging...

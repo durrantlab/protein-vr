@@ -139,7 +139,7 @@ export function loadPDBURL(url: string, callBack: any): void {
             let msg = "<p>Could not load molecule: " + url + "</p>";
             msg += "<p><pre>" + err + "</pre></p>";
             msg += '<p>(<a href="' + window.location.href.split("?")[0] + '">Click to restart...</a>)</p>';
-            OpenPopup.openModal("Error Loading Molecule", msg, false, false);
+            OpenPopup.openModal("Error Loading Molecule", msg, false, false, true);
         },
     });
 }
