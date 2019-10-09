@@ -331,7 +331,8 @@ function autoUpdateUrl(): void {
     setInterval(() => {
         // As long as the modal isn't open, update the url. Important to only
         // do it when modal is closed. Otherwise firefox mobile environment
-        // select auto closes.
+        // select auto closes. TODO: Could use OpenPopup.modalCurrentlyOpen
+        // instead. Would be better.
         if (jQuery("#msgModal").css("display") !== "block") {
             setURL();
         }

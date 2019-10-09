@@ -11,6 +11,7 @@ import * as Pickables from "./Pickables";
 import * as Points from "./Points";
 import * as UrlVars from "../Vars/UrlVars";
 import * as Menu3D from "../UI/Menu3D/Menu3D";
+import * as OpenPopup from "../UI/OpenPopup/OpenPopup";
 
 declare var BABYLON: any;
 declare var jQuery: any;
@@ -99,12 +100,14 @@ function setupTriggers(): void {
     // Space always triggers
     const body = jQuery("body");
     body.keypress((e: any) => {
-        if (e.charCode === 32) {
-            // Space bar
-            actOnStareTrigger();
-        } else if (e.charCode === 109) {
-            // M (open 3d menu).
-            Menu3D.openMainMenuFloorButton.toggled();
+        if (OpenPopup.modalCurrentlyOpen === false) {
+            if (e.charCode === 32) {
+                // Space bar
+                actOnStareTrigger();
+            } else if (e.charCode === 109) {
+                // M (open 3d menu).
+                Menu3D.openMainMenuFloorButton.toggled();
+            }
         }
     });
 

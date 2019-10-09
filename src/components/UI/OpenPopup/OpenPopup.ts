@@ -13,6 +13,7 @@ let myTitle: any;
 // let iFrameContainer: any;
 let msgContainer: any;
 let footer: any;
+export let modalCurrentlyOpen: boolean = false;
 
 /**
  * Opens a modal.
@@ -95,6 +96,14 @@ function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeB
         msgContainer = msgModal.find("#msg-container");
         // myIFrame = iFrameContainer.find("iframe");
         footer = msgModal.find("#modal-footer");
+
+        // First time, so also set up callbacks
+        msgModal.on('shown.bs.modal', function (e) {
+            modalCurrentlyOpen = true;
+        });
+        msgModal.on('hidden.bs.modal', function (e) {
+            modalCurrentlyOpen = false;
+        });
     }
 
     // Immediately hide.
@@ -175,7 +184,7 @@ function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeB
         jQuery("#modal-close-button").hide();
         msgModal.on('shown.bs.modal', function (e) {
             jQuery(".modal-backdrop.show").css("opacity", 1);
-        })
+        });
 
         options = {"backdrop": "static", "keyboard": false}
     }
