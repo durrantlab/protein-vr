@@ -39,6 +39,14 @@ mv t service-worker.js
 
 cd -
 
+# Add the license to the top of the app..js file. Tries using @license, but
+# closure compiler didn't put it right at the top.
+cd dist
+echo "/**" > t; cat ../LICENSE.md  | grep -v "\=\=\=\=" | sed "s/The 3-Clause BSD License/ProteinVR (The 3-Clause BSD License)/g" | awk '{print " * " $0}' >> t; echo " */" >> t
+ls app*.js | awk '{print "cat t > t2; cat " $1 " >> t2; mv t2 " $1}' | bash
+rm t
+cd -
+
 # All babylon files should use jpg, not png. It downloads faster for phones.
 # So note that transparent textures aren't allowed. Also, ImageMagik must be
 # installed to make this part work.

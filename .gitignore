@@ -33,3 +33,6 @@ biotite_app/build/
 dist/environs/**/*.log
 dist/environs/**/*.txt
 scene.log
+update_node_etc.sh
+TODO.md
+*.old

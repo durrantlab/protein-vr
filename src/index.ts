@@ -1,4 +1,6 @@
-// Copyright 2019 Jacob D. Durrant
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2019 Jacob D. Durrant.
 
 import * as LoadAndSetup from "./components/Scene/LoadAndSetup";
 import 'bootstrap';

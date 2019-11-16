@@ -1,4 +1,7 @@
-// Copyright 2019 Jacob D. Durrant
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2019 Jacob D. Durrant.
+
 
 // An module to manage VRML data obtained from 3Dmol.js. Assumes the 3Dmol.js
 // javascript file is already loaded.
@@ -92,7 +95,7 @@ export function resetAll(): void {
         // whole thing.
         viewer = null;
         setup(() => {
-            viewer.addModel(molTxt, "pdb");
+            viewer.addModel(molTxt, "pdb", {"keepH": true});
         });
     }
 
@@ -124,7 +127,7 @@ export function loadPDBURL(url: string, callBack: any): void {
                 molTxtType = "sdf";
             }
 
-            const mdl = viewer.addModel(data, molTxtType);
+            const mdl = viewer.addModel(data, molTxtType, {"keepH": true});
 
             callBack(mdl);
         },
