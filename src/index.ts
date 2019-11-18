@@ -57,12 +57,19 @@ if (window.location.href.indexOf("durrantlab") !== -1) {
             'name': 'proteinvr'
         });
 
+        // Remove anything after "?" (to avoid identifying what users are
+        // specifically looking at).
+        let eventLabel = window.location.href;
+        if (eventLabel.indexOf("?") !== -1) {
+            eventLabel = eventLabel.split("?")[0] + "?PARAMS_REMOVED"
+        }
+
         // UA-144382730-1 reports to pcaviz account.
         ga('proteinvr.send', {
             "hitType": 'event',
             "eventCategory": 'proteinvr',
             "eventAction": 'pageview',
-            "eventLabel": window.location.href
+            "eventLabel": eventLabel
         });
     }, 0)
 }
