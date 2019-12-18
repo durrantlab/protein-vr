@@ -1,6 +1,15 @@
 CHANGES
 =======
 
+1.0.2
+-----
+
+* Removed support for the WebGL Multiview extension in VR mode. This
+  optimization has the potential to speed render times, but it appears to be
+  broken on the latest version of FireFox (Windows). Future versions of
+  ProteinVR may revisit the Multiview extension.
+* Fixed a bug that caused an error when rendering large molecular surfaces.
+
 1.0.1
 -----
 

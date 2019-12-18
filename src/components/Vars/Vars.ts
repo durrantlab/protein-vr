@@ -22,7 +22,7 @@ export interface IVRSetup {
     menuActive?: boolean;
 }
 
-export const VERSION = "1.0.1";
+export const VERSION = "1.0.2";
 
 export let canvas: any;
 export let engine: any;
@@ -169,12 +169,15 @@ export function setupVR(initParams: IVRSetup): void {
         "createDeviceOrientationCamera": true,
         "useMultiview": false
     };
-    if (scene.getEngine().getCaps().multiview) {
+
+    // TODO: No multiview for now because causes errors on latest FireFox.
+    // Good to revist this in the future as WebVR progresses.
+    // if (scene.getEngine().getCaps().multiview) {
         // Much faster according to
         // https://doc.babylonjs.com/how_to/multiview, but not supported in
         // all browsers.
-        params["useMultiview"] = true;
-    }
+        // params["useMultiview"] = true;
+    // }
     vrHelper = scene.createDefaultVRExperience(params);
 
     // Hide the vrHelper icon initially.

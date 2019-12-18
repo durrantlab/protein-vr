@@ -81,6 +81,7 @@ export function loadValsFromVRML(vrmlStr: string, removeExtraPts = false): any[]
     const vrmlChunksLen = vrmlChunks.length;
     for (let i = 0; i < vrmlChunksLen; i++) {
         const vrmlChunk = vrmlChunks[i];
+
         // Extract the coordinates from the vrml text
         let coors = strToCoors(betweenbookends("point [", "]", vrmlChunk));
 
@@ -192,6 +193,12 @@ function chunk(arr: any[]): any[] {
 function strToCoors(str: string): any {
     // Convert coordinates in string form to arrays.
     const coorStrs = str.match(numRegex);
+
+    if (coorStrs === null) {
+        // Sometimes there are no matches, e.g., 2HU4 surface.
+        return new Float32Array(0);
+    }
+
     const coorLen = coorStrs.length;
     const coors = new Float32Array(coorLen);
 
@@ -217,6 +224,12 @@ function strToCoors(str: string): any {
 function strToColors(str: string): any {
     // Convert coordinates in string form to arrays.
     const colorStrs = str.match(numRegex);
+
+    if (colorStrs === null) {
+        // Sometimes there are no matches, e.g., 2HU4 surface.
+        return new Float32Array(0);
+    }
+
     const colorStrsLen = colorStrs.length;
     const colors = new Float32Array(4 * colorStrsLen / 3);
     const colorLen = colors.length;
@@ -242,6 +255,12 @@ function strToColors(str: string): any {
 function strToTris(str: string): any {
     // Convert coordinates in string form to arrays.
     const indexStrs = str.match(numRegex);
+
+    if (indexStrs === null) {
+        // Sometimes there are no matches, e.g., 2HU4 surface.
+        return new Float32Array(0);
+    }
+
     const indexStrsLen = indexStrs.length;
     const indexLen = 3 * indexStrsLen / 4;
     const indexes = new Uint32Array(indexLen);

@@ -270,7 +270,8 @@ function loadValsFromVRML(repName: string, callBack: any): void {
 
                 const vals = chunk[2];
 
-                if (modelData.length === modelIdx) {
+                while (modelData.length <= modelIdx) {
+                // if (modelData.length === modelIdx) {
                     modelData.push({
                         "coors": new Float32Array(0),
                         "colors": new Float32Array(0),
