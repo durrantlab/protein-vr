@@ -21,95 +21,128 @@
 
 /* See https://stackoverflow.com/questions/248011/how-do-i-wrap-text-in-a-pre-tag */
 pre {
-  white-space: pre-wrap;       /* Since CSS 2.1 */
-  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-  white-space: -pre-wrap;      /* Opera 4-6 */
-  white-space: -o-pre-wrap;    /* Opera 7 */
-  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  white-space: pre-wrap;
+  /* Since CSS 2.1 */
+  white-space: -moz-pre-wrap;
+  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;
+  /* Opera 4-6 */
+  white-space: -o-pre-wrap;
+  /* Opera 7 */
+  word-wrap: break-word;
+  /* Internet Explorer 5.5+ */
 }
 
-html, body {
-    overflow: hidden;
-    width   : 100%;
-    height  : 100%;
-    margin  : 0;
-    padding : 0;
-    background-color: black;
+html,
+body {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: black;
 }
 
 #container {
-    position: relative;
-    width   : 100%;
-    height  : 100%;
-    z-index: 1;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }
 
 #container #renderCanvas {
-    width   : 100%;
-    height  : 100%;
-    touch-action: none;
-    position: absolute;
-    z-index: 2 !important;
-    left: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  position: absolute;
+  z-index: 2 !important;
+  left: 0;
 }
 
 #container #capture-clicks {
-    position: absolute;
-    display: none;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    touch-action: none;
-    /* background-color: red; */
-    z-index: 3 !important;
+  position: absolute;
+  display: none;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  /* background-color: red; */
+  z-index: 3 !important;
 }
 
-#babylonVRiconbtn, .ui-button {
-    z-index: 4;
+#babylonVRiconbtn,
+.ui-button {
+  z-index: 4;
 }
 
 #babylonjsLoadingDiv {
-    z-index: 3;
-    background-color: rgba(0, 0, 0, 0.6) !important;
+  z-index: 3;
+  background-color: rgba(0, 0, 0, 0.6) !important;
 }
 
 /* Full screen, make sure no cursor. */
 
 html:-moz-full-screen {
-    cursor: none;
+  cursor: none;
 }
 
 html:-webkit-full-screen {
-    cursor: none;
+  cursor: none;
 }
 
 html:-ms-fullscreen {
-    cursor: none;
+  cursor: none;
 }
 
 html:fullscreen {
-    cursor: none;
+  cursor: none;
 }
 
 #followerModeWarningContainer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    margin: 0;
-    padding: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 #followerModeWarning {
-    position: relative;
-    z-index: 10;
-    background-color: rgba(255,255,255,0.5);
-    user-select: none;
-    margin: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    font-size: 18px;
-    font-weight: bold;
-    display: none;
+  position: relative;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.5);
+  user-select: none;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  display: none;
+}
+
+/* To get the 2D menu working. */
+.pad10 {
+  padding: 10px;
+}
+
+.accrd div.btn {
+  cursor: pointer;
+}
+
+.card {
+  margin-top: -1px;
+}
+
+.inpath {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.modal-header {
+  cursor: move;
+}
+
+.hidden-modal {
+    background-color: transparent;
 }

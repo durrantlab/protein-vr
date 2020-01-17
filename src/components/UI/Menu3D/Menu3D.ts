@@ -164,7 +164,7 @@ function createPanelSixteenButtons(): void {
  * apply.
  * @returns void
  */
-function applyFuncToAllMenuLevels(funcToApply: any): void {
+export function applyFuncToAllMenuLevels(funcToApply: any): void {
 
     /**
      * @param  {Object}           subMenu      The submenu data.

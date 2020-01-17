@@ -2,7 +2,6 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 declare var jQuery: any;
 
 let bootstrapLoaded = false;
@@ -12,6 +11,7 @@ let bootstrapLoaded = false;
 
 let msgModal: any;
 let myTitle: any;
+let backdropDOM: any;
 // let myIFrame: any;
 // let iFrameContainer: any;
 let msgContainer: any;
@@ -27,71 +27,78 @@ export let modalCurrentlyOpen: boolean = false;
  *                               to false if isUrl, true otherwise.
  * @param  {boolean} unClosable  If true, modal cannot be closed. Effectively
  *                               ends the program.
- * @returns void
+ * @param  {boolean} backdrop    Whether to show the backdrop. Defaults to
+ *                               true.
+ * @returns A promise that is fulfilled when the modal is shown.
  */
-export function openModal(title: string, val: string, isUrl = true, closeBtn?: boolean, unClosable = false): void {
+export function openModal(title: string, val: string, isUrl = true, closeBtn?: boolean, unClosable = false, backdrop = true): Promise<any> {
     // Load the css if needed.
-    if (!bootstrapLoaded) {
-        bootstrapLoaded = true;
+    return new Promise((resolve, reject) => {
+        if (!bootstrapLoaded) {
+            bootstrapLoaded = true;
 
-        // Add the css
-        document.head.insertAdjacentHTML( "beforeend", "<link rel=stylesheet href=pages/css/bootstrap.min.css>" );
+            // Add the css. Now in index.html. It's better here than in html
+            // header.
+            document.head.insertAdjacentHTML("beforeend", "<link rel=stylesheet href=pages/css/bootstrap.min.css>" );
 
-        // Add the DOM for a modal
-        document.body.insertAdjacentHTML("beforeend", `
-            <!-- The Modal -->
-            <div class="modal fade" id="msgModal" role="dialog">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
+            // Add the DOM for a modal
+            document.body.insertAdjacentHTML("beforeend", `
+                <!-- The Modal -->
+                <div class="modal fade" id="msgModal" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
 
-                    <!-- Modal Header -->
-                    <div class="modal-header">
-                        <h4 class="modal-title">Modal Heading</h4>
-                        <button id="modal-close-button" type="button" class="close" data-dismiss="modal">&times;</button>
-                    </div>
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Modal Heading</h4>
+                            <button id="modal-close-button" type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
 
-                    <!-- Modal body -->
-                    <div class="modal-body">
-                        <!-- <div id="iframe-container" style="height:350px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch">
-                            <iframe frameBorder="0" src="" style="width:100%;height:100%;"></iframe>
-                        </div> -->
-                        <span id="msg-container"></span>
-                    </div>
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            <!-- <div id="iframe-container" style="height:350px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch">
+                                <iframe frameBorder="0" src="" style="width:100%;height:100%;"></iframe>
+                            </div> -->
+                            <span id="msg-container"></span>
+                        </div>
 
-                    <!-- Modal footer -->
-                    <div id="modal-footer" class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                        <!-- Modal footer -->
+                        <div id="modal-footer" class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <link rel="stylesheet" type="text/css" href="pages/css/style.css">
-        `);
+                <link rel="stylesheet" type="text/css" href="pages/css/style.css">
+            `);
 
-        // Note re. traditional bootstrap iframe. I'm using a different format
-        // to make sure iphone compatible.
-        // <!-- <div id="iframe-container" class="embed-responsive embed-responsive-1by1">
-        //     <iframe class="embed-responsive-item" src=""></iframe>
-        // </div> -->
+            // Note re. traditional bootstrap iframe. I'm using a different format
+            // to make sure iphone compatible.
+            // <!-- <div id="iframe-container" class="embed-responsive embed-responsive-1by1">
+            //     <iframe class="embed-responsive-item" src=""></iframe>
+            // </div> -->
 
-        // Add the javascript
-        openUrlModalContinue(title, val, isUrl, closeBtn, unClosable);
-    } else {
-        openUrlModalContinue(title, val, isUrl, closeBtn, unClosable);
-    }
+            // Add the javascript
+            openUrlModalContinue(title, val, isUrl, closeBtn, unClosable, backdrop, resolve);
+        } else {
+            openUrlModalContinue(title, val, isUrl, closeBtn, unClosable, backdrop, resolve);
+        }
+    });
 }
 
 /**
  * A follow-up function for opening the url modal.
- * @param  {string}  title       The title.
- * @param  {string}  val         The URL if isUrl. A message otherwise.
- * @param  {boolean} isUrl       Whether val is a url.
- * @param  {boolean} closeBtn    Whether to include a close button. Defaults
- *                               to false if isUrl, true otherwise.
- * @param  {boolean} unClosable  If true, modal cannot be closed. Effectively
- *                               ends the program.
+ * @param  {string}   title       The title.
+ * @param  {string}   val         The URL if isUrl. A message otherwise.
+ * @param  {boolean}  isUrl       Whether val is a url.
+ * @param  {boolean}  closeBtn    Whether to include a close button. Defaults
+ *                                to false if isUrl, true otherwise.
+ * @param  {boolean}  unClosable  If true, modal cannot be closed. Effectively
+ *                                ends the program.
+ * @param  {boolean}  backdrop    Whether to show the backdrop.
+ * @param  {Function} resolveFunc A function that is called when the modal is shown.
  * @returns void
  */
-function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeBtn: boolean, unClosable: boolean): void {
+function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeBtn: boolean, unClosable: boolean, backdrop: boolean, resolveFunc: Function): void {
     if (msgModal === undefined) {
         msgModal = jQuery("#msgModal");
         myTitle = msgModal.find("h4.modal-title");
@@ -101,11 +108,28 @@ function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeB
         footer = msgModal.find("#modal-footer");
 
         // First time, so also set up callbacks
-        msgModal.on('shown.bs.modal', function (e) {
-            modalCurrentlyOpen = true;
-        });
         msgModal.on('hidden.bs.modal', function (e) {
             modalCurrentlyOpen = false;
+        });
+
+        // Make it draggable without jquery-ui. Inspired by
+        // https://stackoverflow.com/questions/12571922/make-bootstrap-twitter-dialog-modal-draggable
+        jQuery(".modal-header").on("mousedown", function(e) {
+            var draggable = jQuery(this);
+            var x = e.pageX - draggable.offset().left,
+                y = e.pageY - draggable.offset().top;
+                jQuery("body").on("mousemove.draggable", function(e) {
+                draggable.closest(".modal-dialog").offset({
+                    "left": e.pageX - x,
+                    "top": e.pageY - y
+                });
+            });
+            jQuery("body").one("mouseup", function() {
+                jQuery("body").off("mousemove.draggable");
+            });
+            draggable.closest(".modal").one("bs.modal.hide", function() {
+                jQuery("body").off("mousemove.draggable");
+            });
         });
     }
 
@@ -182,6 +206,8 @@ function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeB
         footer.hide();
     }
 
+    msgModal.unbind('shown.bs.modal');
+
     let options = {};
     if (unClosable === true) {
         jQuery("#modal-close-button").hide();
@@ -191,6 +217,25 @@ function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeB
 
         options = {"backdrop": "static", "keyboard": false}
     }
+
+    msgModal.on('shown.bs.modal', () => {
+        modalCurrentlyOpen = true;
+        if (backdropDOM === undefined) {
+            backdropDOM = jQuery(".modal-backdrop");
+        }
+
+        if (backdrop === true) {
+            backdropDOM.css("background-color", "rgb(0,0,0)");
+        } else {
+            backdropDOM.css("background-color", "transparent");
+        }
+
+        resolveFunc();
+    });
+
+    // jQshow.bs.modal
+
+    // background-color: transparent;
     msgModal.modal(options);
 }
 

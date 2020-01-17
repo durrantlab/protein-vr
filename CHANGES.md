@@ -1,6 +1,14 @@
 CHANGES
 =======
 
+1.0.3
+-----
+
+* The 3D menu no longer closes after executing a given function. The user must
+  now explicitly close it using the "Close Menu" or "Hide Menu" (floor)
+  buttons. So it is now possible to change multiple styles without having to
+  reopen the menu every time.
+
 1.0.2
 -----
 

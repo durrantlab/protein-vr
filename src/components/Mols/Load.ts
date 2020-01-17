@@ -2,9 +2,9 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 import * as Optimizations from "../Scene/Optimizations";
 import * as Menu3D from "../UI/Menu3D/Menu3D";
+import * as Menu2D from "../UI/Menu2D";
 import * as Vars from "../Vars/Vars";
 import * as ThreeDMol from "./3DMol/ThreeDMol";
 import * as MolShadows from "./MolShadows";
@@ -16,20 +16,23 @@ declare var BABYLON: any;
 
 /**
  * Load in the molecules.
- * @returns void
+ * @returns A promise that is fulfilled when the molecule is loaded.
  */
-export function setup(): void {
+export function setup(): Promise<any> {
     beforeLoading();
 
     // Load from a pdb file via 3Dmoljs.
-    ThreeDMol.setup();
+    Menu3D.setup();  // This populates Menu3D.menuInf.
+    return ThreeDMol.setup().then(() => {  // This needs Menu3D.menuInf.
+        if (Vars.vrVars.menuActive) {
+            Menu2D.setup();
+        }
 
-    if (Vars.vrVars.menuActive) {
-        Menu3D.setup();
-    }
+        // Update the shadows.
+        Optimizations.updateEnvironmentShadows();
 
-    // Update the shadows.
-    Optimizations.updateEnvironmentShadows();
+        return Promise.resolve();
+    });
 }
 
 /**
@@ -48,7 +51,7 @@ function beforeLoading(): void {
  * @returns void
  */
 export function afterLoading(): void {
-    MolShadows.setupShadowCatchers();  // Related to extras, so keep it here.
+    MolShadows.setupShadowCatchers(); // Related to extras, so keep it here.
 
     // Do you need to make the ground glass instead of invisible? See
     // scene_info.json, which can have transparentGround: true.
@@ -56,7 +59,10 @@ export function afterLoading(): void {
         if (Vars.vrVars.groundMesh) {
             Vars.vrVars.groundMesh.visibility = 1;
 
-            const transparentGround = new BABYLON.StandardMaterial("transparentGround", Vars.scene);
+            const transparentGround = new BABYLON.StandardMaterial(
+                "transparentGround",
+                Vars.scene
+            );
 
             transparentGround.diffuseColor = new BABYLON.Color3(1, 1, 1);
             transparentGround.specularColor = new BABYLON.Color3(0, 0, 0);
@@ -81,7 +87,7 @@ export function afterLoading(): void {
  * @returns void
  */
 export function setupMesh(mesh: any, uniqIntID: number): void {
-    if ((mesh.material !== undefined) && (mesh.material !== null)) {
+    if (mesh.material !== undefined && mesh.material !== null) {
         // Add a small emission color so the dark
         // side of the protein isn't too dark.
         const lightingInf = MolShadows.getBlurDarknessAmbientFromLightName();
@@ -111,7 +117,9 @@ export function setupMesh(mesh: any, uniqIntID: number): void {
                 // (0.4, 0.0025)
                 // let m = 0.013636363636363637;  // (0.01 - 0.0025) / (0.95 - 0.4);
                 // let b = -0.0029545454545454545;  // 0.01 - 0.013636363636363637 * 0.95;
-                backgroundLum = 0.013636363636363637 * lightingInfDarkness - 0.0029545454545454545;
+                backgroundLum =
+                    0.013636363636363637 * lightingInfDarkness -
+                    0.0029545454545454545;
             }
         } else {
             // It's given in the name of the light, so no need to try to
@@ -119,7 +127,11 @@ export function setupMesh(mesh: any, uniqIntID: number): void {
             backgroundLum = lightingInf.ambient;
         }
 
-        mesh.material.emissiveColor = new BABYLON.Color3(backgroundLum, backgroundLum, backgroundLum);
+        mesh.material.emissiveColor = new BABYLON.Color3(
+            backgroundLum,
+            backgroundLum,
+            backgroundLum
+        );
 
         // Freeze the material (improves optimization).
         Optimizations.freezeMeshProps(mesh);

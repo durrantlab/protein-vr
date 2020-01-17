@@ -1,96 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <!-- <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js" async></script> -->
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, user-scalable=no" />
+        <meta name="description" content="ProteinVR Scene" />
+        <meta name="author" content="DurrantLab" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <link rel="manifest" href="manifest.webmanifest" />
+        <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+        <meta name="theme-color" content="#000000" />
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+        <title>ProteinVR</title>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no">
-    <meta name="description" content="ProteinVR Scene">
-    <meta name="author" content="DurrantLab">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="manifest" href="manifest.webmanifest">
-    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
-    <meta name="theme-color" content="#000000"/>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <title>ProteinVR</title>
+        <!--[if lt IE 9]>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+        <![endif]-->
 
-    <!--[if lt IE 9]>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
-    <![endif]-->
+        <link href="style.css" rel="stylesheet" type="text/css" />
+        <!-- <link href="pages/css/bootstrap.min.css" rel="stylesheet" type="text/css"> -->
 
-    <link href="style.css" rel="stylesheet" type="text/css">
+        <style>
+            /* Below needs to be hear because you don't want to wait for the js to load... */
+            html,
+            body {
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+                background-color: black;
+            }
 
-    <style>
-        /* Below needs to be hear because you don't want to wait for the js to load... */
-        html, body {
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-            background-color: black;
-        }
+            #loadingContainer {
+                position: absolute;
+                width: 60px;
+                height: 60px;
+                top: 50%;
+                left: 50%;
+                margin-left: -30px;
+                margin-top: -30px;
+            }
 
-        #loadingContainer {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            top: 50%;
-            left: 50%;
-            margin-left: -30px;
-            margin-top: -30px;
-        }
+            #loadingContainer p {
+                display: block;
+                width: 100px;
+                color: white;
+                text-align: center;
+            }
 
-        #loadingContainer p {
-            display: block;
-            width: 100px;
-            color: white;
-            text-align: center;
-        }
+            #loading {
+                border: 16px solid #f3f3f3;
+                /* Light grey */
+                border-top: 16px solid #3498db;
+                /* Blue */
+                border-radius: 50%;
+                animation: spin 2s linear infinite;
+                width: 60px;
+                height: 60px;
+            }
 
-        #loading {
-            border: 16px solid #f3f3f3;
-            /* Light grey */
-            border-top: 16px solid #3498db;
-            /* Blue */
-            border-radius: 50%;
-            animation: spin 2s linear infinite;
-            width: 60px;
-            height: 60px;
-        }
-
-        /* The vr button needs to be closer to the edge (to accomodate small
+            /* The vr button needs to be closer to the edge (to accomodate small
         phones) */
-        .babylonVRicon {
-            bottom: 5px !important;
-            top: unset !important;
-            right: 5px !important;
-            left: unset !important;
-        }
-    </style>
-</head>
+            .babylonVRicon {
+                bottom: 5px !important;
+                top: unset !important;
+                right: 5px !important;
+                left: unset !important;
+            }
+        </style>
+    </head>
 
-<body>
-    <div id="loadingContainer">
-        <div id="loading"></div>
-        <p>Loading ProteinVR...</p>
-    </div>
+    <body>
+        <div id="loadingContainer">
+            <div id="loading"></div>
+            <p>Loading ProteinVR...</p>
+        </div>
 
-    <div id="followerModeWarningContainer">
-        <div id="followerModeWarning">Follower (view only) mode. Movement controlled by a remote user.</div>
-    </div>
+        <div id="followerModeWarningContainer">
+            <div id="followerModeWarning">
+                Follower (view only) mode. Movement controlled by a remote user.
+            </div>
+        </div>
 
-    <div id="container">
-        <canvas id="renderCanvas" touch-action="none"></canvas>
-        <div id="capture-clicks" touch-action="none"></div>
-    </div>
+        <div id="menu2d"></div>
 
-    <script src="js/jsfile.1.pep.min.js"></script>
-    <script src="js/jsfile.2.babylon.js"></script>
-    <script src="js/jsfile.3.babylonjs.loaders.min.js"></script>
-    <script src="js/jsfile.4.babylonjs.materials.min.js"></script>
-    <script src="js/jsfile.5.babylon.gui.min.js"></script>
-    <script src="js/peer.min.js" async></script>
-</body>
+        <div id="container">
+            <canvas id="renderCanvas" touch-action="none"></canvas>
+            <div id="capture-clicks" touch-action="none"></div>
+        </div>
 
+        <script src="js/jsfile.1.pep.min.js"></script>
+        <script src="js/jsfile.2.babylon.js"></script>
+        <script src="js/jsfile.3.babylonjs.loaders.min.js"></script>
+        <script src="js/jsfile.4.babylonjs.materials.min.js"></script>
+        <script src="js/jsfile.5.babylon.gui.min.js"></script>
+        <script src="js/peer.min.js" async></script>
+    </body>
 </html>

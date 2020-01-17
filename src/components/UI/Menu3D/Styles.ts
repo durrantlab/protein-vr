@@ -57,7 +57,7 @@ export function buildStylesSubMenu(): any {
                 const styleMesh = VisStyles.styleMeshes[fullKey];
                 styleMesh.mesh.isVisible = false;
             }
-            Menu3D.openMainMenuFloorButton.toggled();
+            // Menu3D.openMainMenuFloorButton.toggled();
         },
         "Remove Existing": {},
     };
@@ -109,7 +109,7 @@ export function updatePastStylesInMenu(menuInf: any): void {
             let lbl = repName.replace(/--/g, " ");
             lbl = lbl.replace(/{/g, "").replace(/}/g, "").replace(/"/g, "");
             menuInf["Styles"]["Remove Existing"][lbl] = () => {
-                Menu3D.openMainMenuFloorButton.toggled();
+                // Menu3D.openMainMenuFloorButton.toggled();
                 setTimeout(() => {
                     /** @type {Array<*>} */
                     const repInfo = UrlVars.extractRepInfoFromKey(repName);
@@ -127,6 +127,8 @@ export function updatePastStylesInMenu(menuInf: any): void {
  * @returns void
  */
 export function updateModelSpecificSelectionsInMenu(menuInf: any): void {
+    // debugger; MOOSEdebugger;
+
     // Reset this part of the menu.
     menuInf["Styles"]["Selections"] = {};
     Menu3D.setupSubMenuNavButtons(
@@ -296,7 +298,7 @@ function makeRepColorSchemeSubMenus(menuBranch: any, component: string, clickFun
             const colorScheme = colorSchemes[i];
             menuBranch[rep]["Color Schemes"][colorScheme] = () => {
                 clickFunc(rep, colorScheme);
-                Menu3D.openMainMenuFloorButton.toggled();
+                // Menu3D.openMainMenuFloorButton.toggled();
             };
         }
 
@@ -307,13 +309,13 @@ function makeRepColorSchemeSubMenus(menuBranch: any, component: string, clickFun
             const color = colors[i];
             menuBranch[rep]["Colors"][color] = () => {
                 clickFunc(rep, color);
-                Menu3D.openMainMenuFloorButton.toggled();
+                // Menu3D.openMainMenuFloorButton.toggled();
             };
         }
 
         menuBranch[rep]["Hide"] = () => {
             clickFunc(rep, "Hide");
-            Menu3D.openMainMenuFloorButton.toggled();
+            // Menu3D.openMainMenuFloorButton.toggled();
         };
 
         // Also add in things like back buttons.

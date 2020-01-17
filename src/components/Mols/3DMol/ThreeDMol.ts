@@ -31,17 +31,21 @@ export function setModelUrl(url: string): void { modelUrl = url; }
 
 /**
  * Load in the extra molecule meshes.
- * @returns void
+ * @returns  A promise that fulfills when the selection data has been loaded.
  */
-export function setup(): void {
-    after3DMolJsLoaded();
+export function setup(): Promise<any> {
+    return new Promise((resolve, reject) => {
+        after3DMolJsLoaded(resolve);
+    });
 }
 
 /**
  * Runs after the 3Dmol.js library is loaded.
+ * @param  {Function} resolveFunc  A promise resolve function that is called
+ *                                 when the selection data is loaded.
  * @returns void
  */
-function after3DMolJsLoaded(): void {
+function after3DMolJsLoaded(resolveFunc: Function): void {
     VRML.setup(() => {
         UrlVars.readUrlParams();
 
@@ -53,8 +57,8 @@ function after3DMolJsLoaded(): void {
             if (!UrlVars.checkWebrtcInUrl()) {
                 // It's not leader mode, set setup menu.
 
-                // Get additional selection information about the loaded molecule.
-                // Like residue name.
+                // Get additional selection information about the loaded
+                // molecule. Like residue name.
                 getAdditionalSels(mdl3DMol);
 
                 // Now that the pdb is loaded, you need to update the menu.
@@ -75,13 +79,16 @@ function after3DMolJsLoaded(): void {
                     OpenPopup.openModal("Load Molecule", "pages/load.html");
                 }, 3000);
             }
+
+            resolveFunc();
         });
     });
 }
 
 /**
  * Generates additional possible selections from the properties of the atoms
- * themselves (like residue names).
+ * themselves (like residue names). Puts this information into atomicInfo
+ * (exported module variable).
  * @param  {*} mdl3DMol  A 3dmoljs molecule object.
  * @returns void
  */

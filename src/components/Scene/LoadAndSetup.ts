@@ -65,12 +65,13 @@ export function load(): void {
         }
 
         // Load extra objects
-        MolsLoad.setup();
+        MolsLoad.setup().then(() => {
+            // loadingAssetsDone(), below, will run once all assets loaded.
 
-        // loadingAssetsDone(), below, will run once all assets loaded.
+            // Sets up nav selection buttons in DOM.
+            UI2D.setup();
+        });
 
-        // Sets up nav selection buttons in DOM.
-        UI2D.setup();
     });
 
     // Watch for browser/canvas resize events
