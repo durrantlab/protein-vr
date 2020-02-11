@@ -1,0 +1,10 @@
+// A list where loaded plugins are stored.
+export let loadedPlugins: any[] = [];
+
+/**
+ * Loads all plugins. If you add a new plugin, you must load it from here.
+ * @returns void
+ */
+export function loadAll(): void {
+
+}

@@ -11,12 +11,15 @@ let bootstrapLoaded = false;
 
 let msgModal: any;
 let myTitle: any;
-let backdropDOM: any;
+let modalDialog: any;
 // let myIFrame: any;
 // let iFrameContainer: any;
 let msgContainer: any;
 let footer: any;
 export let modalCurrentlyOpen: boolean = false;
+let showBackdrop = true;
+let resolveFunc;
+let skinnyModal = false;
 
 /**
  * Opens a modal.
@@ -29,17 +32,22 @@ export let modalCurrentlyOpen: boolean = false;
  *                               ends the program.
  * @param  {boolean} backdrop    Whether to show the backdrop. Defaults to
  *                               true.
+ * @param  {boolean} skinny      Whether the modal should be skinny.
  * @returns A promise that is fulfilled when the modal is shown.
  */
-export function openModal(title: string, val: string, isUrl = true, closeBtn?: boolean, unClosable = false, backdrop = true): Promise<any> {
+export function openModal(title: string, val: string, isUrl = true, closeBtn?: boolean, unClosable = false, backdrop = true, skinny = false): Promise<any> {
+    showBackdrop = backdrop;
+    skinnyModal = skinny;
+
     // Load the css if needed.
     return new Promise((resolve, reject) => {
+        resolveFunc = resolve;
         if (!bootstrapLoaded) {
             bootstrapLoaded = true;
 
             // Add the css. Now in index.html. It's better here than in html
             // header.
-            document.head.insertAdjacentHTML("beforeend", "<link rel=stylesheet href=pages/css/bootstrap.min.css>" );
+            document.head.insertAdjacentHTML("beforeend", "<link rel=stylesheet href=pages/css/bootstrap.min.css>");
 
             // Add the DOM for a modal
             document.body.insertAdjacentHTML("beforeend", `
@@ -78,9 +86,9 @@ export function openModal(title: string, val: string, isUrl = true, closeBtn?: b
             // </div> -->
 
             // Add the javascript
-            openUrlModalContinue(title, val, isUrl, closeBtn, unClosable, backdrop, resolve);
+            openUrlModalContinue(title, val, isUrl, closeBtn, unClosable);
         } else {
-            openUrlModalContinue(title, val, isUrl, closeBtn, unClosable, backdrop, resolve);
+            openUrlModalContinue(title, val, isUrl, closeBtn, unClosable);
         }
     });
 }
@@ -94,13 +102,13 @@ export function openModal(title: string, val: string, isUrl = true, closeBtn?: b
  *                                to false if isUrl, true otherwise.
  * @param  {boolean}  unClosable  If true, modal cannot be closed. Effectively
  *                                ends the program.
- * @param  {boolean}  backdrop    Whether to show the backdrop.
- * @param  {Function} resolveFunc A function that is called when the modal is shown.
  * @returns void
  */
-function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeBtn: boolean, unClosable: boolean, backdrop: boolean, resolveFunc: Function): void {
+function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeBtn: boolean, unClosable: boolean): void {
     if (msgModal === undefined) {
+        // This is run the first time. Like an init.
         msgModal = jQuery("#msgModal");
+        modalDialog = msgModal.find(".modal-dialog");
         myTitle = msgModal.find("h4.modal-title");
         // iFrameContainer = msgModal.find("#iframe-container");
         msgContainer = msgModal.find("#msg-container");
@@ -130,6 +138,11 @@ function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeB
             draggable.closest(".modal").one("bs.modal.hide", function() {
                 jQuery("body").off("mousemove.draggable");
             });
+        });
+
+        msgModal.on('shown.bs.modal', () => {
+            modalCurrentlyOpen = true;
+            resolveFunc();
         });
     }
 
@@ -206,8 +219,6 @@ function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeB
         footer.hide();
     }
 
-    msgModal.unbind('shown.bs.modal');
-
     let options = {};
     if (unClosable === true) {
         jQuery("#modal-close-button").hide();
@@ -215,28 +226,30 @@ function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeB
             jQuery(".modal-backdrop.show").css("opacity", 1);
         });
 
-        options = {"backdrop": "static", "keyboard": false}
+        options = {"backdrop": "static", "keyboard": false};
+
+        // This is unclosable. So no need to worry about restoring any
+        // previous settings once closed.
     }
 
-    msgModal.on('shown.bs.modal', () => {
-        modalCurrentlyOpen = true;
-        if (backdropDOM === undefined) {
-            backdropDOM = jQuery(".modal-backdrop");
-        }
-
-        if (backdrop === true) {
-            backdropDOM.css("background-color", "rgb(0,0,0)");
-        } else {
-            backdropDOM.css("background-color", "transparent");
-        }
-
-        resolveFunc();
-    });
-
-    // jQshow.bs.modal
-
-    // background-color: transparent;
     msgModal.modal(options);
+
+    // Need to redefine backdropDOM every time (because it gets removed, I
+    // think).
+    let backdropDOM = jQuery(".modal-backdrop");
+
+    if (showBackdrop === true) {
+        backdropDOM.css("background-color", "rgb(0,0,0)");
+    } else {
+        backdropDOM.css("background-color", "transparent");
+    }
+
+    // Also make modal skinny if necessary.
+    if (skinnyModal === true) {
+        modalDialog.addClass("skinny-modal");
+    } else {
+        modalDialog.removeClass("skinny-modal");
+    }
 }
 
 // For debugging...

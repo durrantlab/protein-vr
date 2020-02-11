@@ -11,6 +11,7 @@ import * as Optimizations from "../Scene/Optimizations";
 import * as Vars from "../Vars/Vars";
 import * as VRControllers from "./VRControllers";
 import * as UrlVars from "../Vars/UrlVars";
+import * as Menu3D from "../UI/Menu3D/Menu3D";
 
 declare var BABYLON: any;
 
@@ -58,7 +59,7 @@ export function setup(): void {
  * Exits VR and/or full-screen mode, if necessary.
  * @returns void
  */
-function exitVRAndFS(): void {
+export function exitVRAndFS(): void {
     if (Vars.vrHelper === undefined) {
         return;
     }
@@ -109,6 +110,9 @@ function setupEnterAndExitVRCallbacks(): void {
         // initalized already).
         VRControllers.startCheckingForControlers();
 
+        // Update menu, too, so there's an exit VR button.
+        Menu3D.menuInf["Exit VR ×"] = () => { exitVRAndFS(); }
+
         window["vrHelper"] = Vars.vrHelper;
     });
 
@@ -126,6 +130,10 @@ function setupEnterAndExitVRCallbacks(): void {
         // Show the 2D buttons.
         jQuery(".ui-button").show();
         jQuery(".babylonVRicon").show();
+
+        // Update menu, too, so there's an exit VR button.
+        delete Menu3D.menuInf["Exit VR ×"];
+        console.log(Menu3D.menuInf);
     });
 }
 

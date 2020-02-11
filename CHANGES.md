@@ -8,6 +8,17 @@ CHANGES
   now explicitly close it using the "Close Menu" or "Hide Menu" (floor)
   buttons. So it is now possible to change multiple styles without having to
   reopen the menu every time.
+* The "Hide Menu" (floor) button is no longer directly below the camera. The
+  location of the 3D menu depends on the orientation of this button when it is
+  pressed. It was difficult to control the orientation of the button when it
+  was directly below the user's feet. It is now easier to control that
+  orientation because the button location is offset.
+* There is now a 2D menu with the same options as the in-game 3D menu. In many
+  circumstances, it will be easier to setup your molecular visualizations
+  outside of VR.
+* A small arrow at the player's feet now points in the direction of the
+  protein, to help the user avoid getting lost in the 3D scene.
+* Added an "Exit VR" item to the menu.
 
 1.0.2
 -----

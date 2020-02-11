@@ -127,8 +127,6 @@ export function updatePastStylesInMenu(menuInf: any): void {
  * @returns void
  */
 export function updateModelSpecificSelectionsInMenu(menuInf: any): void {
-    // debugger; MOOSEdebugger;
-
     // Reset this part of the menu.
     menuInf["Styles"]["Selections"] = {};
     Menu3D.setupSubMenuNavButtons(
@@ -187,16 +185,20 @@ export function updateModelSpecificSelectionsInMenu(menuInf: any): void {
             const chunk = chunks[i];
             if (chunk.length === 1) {
                 // Just a single item, so make the rep/color submenus.
-                const item = chunk[0];
-                menuBranch[item] = {};
-                // MOOSE
-                menuBranch[item] = makeRepColorSchemeSubMenus(menuBranch[item], component, (rep: any, colorScheme: any) => {
-                    /** @type {string} */
-                    const selKeyword = selKeywords[component];  // See ThreeDMol.ts
-                    const it = {};
-                    it[selKeyword] = item;
-                    VisStyles.toggleRep([it], rep, colorScheme);
-                }, breadcrumbs.concat([item]));
+                let item = chunk[0];
+                if (item === undefined) {
+                    item = "N/A";
+                    menuBranch[item] = function() { return; };
+                } else {
+                    menuBranch[item] = {};
+                    menuBranch[item] = makeRepColorSchemeSubMenus(menuBranch[item], component, (rep: any, colorScheme: any) => {
+                        /** @type {string} */
+                        const selKeyword = selKeywords[component];  // See ThreeDMol.ts
+                        const it = {};
+                        it[selKeyword] = item;
+                        VisStyles.toggleRep([it], rep, colorScheme);
+                    }, breadcrumbs.concat([item]));
+                }
             } else {
                 // Multiple items, so it's a category.
                 const lbl = "[" + chunk[0].toString() + "-" + chunk[chunk.length - 1].toString() + "]";

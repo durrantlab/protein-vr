@@ -163,6 +163,13 @@ export function setStyle(sels: any, rep: any): void {
         sels = sels["and"][1];
     }
 
+    // You need to make sure the selection isn't empty.
+    let numAtoms = viewer.selectedAtoms(sels).length;
+    if (numAtoms === 0) {
+        // No atoms in selection.
+        return;
+    }
+
     viewer.setStyle(sels, rep);
     viewer.render();
 }
@@ -175,6 +182,13 @@ export function setStyle(sels: any, rep: any): void {
  * @returns void
  */
 export function addSurface(colorScheme: any, sels: any, callBack: any): void {
+    // You need to make sure the selection isn't empty.
+    let numAtoms = viewer.selectedAtoms(sels).length;
+    if (numAtoms === 0) {
+        // No atoms in selection.
+        return;
+    }
+
     hasActiveSurface = true;
     viewer.addSurface(
         $3Dmol.SurfaceType.MS,

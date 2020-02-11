@@ -135,8 +135,8 @@ html:fullscreen {
 }
 
 .inpath {
-  font-weight: bold;
-  text-decoration: underline;
+  font-weight: bold !important;
+  text-decoration: underline !important;
 }
 
 .modal-header {
@@ -145,4 +145,18 @@ html:fullscreen {
 
 .hidden-modal {
     background-color: transparent;
+}
+
+div.btn {
+    overflow: hidden;
+}
+
+/* To make the modal skinny (for menu) */
+.skinny-modal {
+    max-width: 350px !important;
+}
+
+/* No selecting text */
+* {
+    user-select: none;
 }

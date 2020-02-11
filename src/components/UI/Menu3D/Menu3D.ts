@@ -5,6 +5,7 @@
 
 import * as CommonCamera from "../../Cameras/CommonCamera";
 import * as VRPoints from "../../Navigation/Points";
+import * as VRCamera from "../../Cameras/VRCamera";
 import * as Vars from "../../Vars/Vars";
 import * as Button from "./Button";
 import * as Rotations from "./Rotations";
@@ -256,6 +257,11 @@ function setupMainMenuToggleButton(): void {
         trueTxt: "Hide Menu",
     });
 
+    // Offset the button so it's not right below the camera.
+    openMainMenuFloorButton.button.position.y = 0.75;
+    openMainMenuFloorButton.button.position.z = 0.75;
+    // openMainMenuFloorButton.button.rotation.x = 0.25 * Math.PI;
+
     // For debugging...
     // window["openMainMenuFloorButton"] = openMainMenuFloorButton;
 
@@ -267,7 +273,11 @@ function setupMainMenuToggleButton(): void {
     // Update button position with each turn of the render loop.
     mainMenuAnchorToggle.position.copyFrom(VRPoints.groundPointBelowCamera);
     mainMenuAnchorToggle.position.y = mainMenuAnchorToggle.position.y + 0.1;
-    mainMenuAnchorToggle.rotation.y = CommonCamera.getCameraRotationY();
+    mainMenuAnchorToggle.rotation.y = CommonCamera.getCameraRotationY();  // Rotates around up.
+
+    // Rotate the menu button towards camera. Because no longer right below
+    // user's feet.
+    mainMenuAnchorToggle.rotation.x = 0.4 * Math.PI;
 
     Vars.scene.registerBeforeRender(() => {
         mainMenuAnchorToggle.position.copyFrom(VRPoints.groundPointBelowCamera);  // Prob
@@ -318,7 +328,7 @@ function showOnlyButtonsOfLevel(breadcrumbs: string[]): void {
     const subMenuItemNames = Object.keys(subMenu);
 
     // Set some names aside as "special".
-    const redBtns = ["Close Menu ×"];
+    const redBtns = ["Close Menu ×", "Exit VR ×"];
     const yellowBtns = ["Back ⇦"];
     const specialBtns = redBtns.concat(yellowBtns);
 

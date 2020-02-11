@@ -14,6 +14,8 @@ import * as Vars from "../Vars/Vars";
 import * as Lecturer from "../WebRTC/Lecturer";
 import * as Optimizations from "./Optimizations";
 import * as UrlVars from "../Vars/UrlVars";
+import * as Arrow from "../Navigation/Arrow";
+
 // import * as Fullscreen from "../Navigation/Fullscreen";
 
 declare var BABYLON: any;
@@ -119,10 +121,13 @@ function vrSetupBeforeBabylonFileLoaded(): void {
  */
 function babylonScene(callBackFunc: any): void {
     LoadingScreens.babylonJSLoadingMsg("Loading the main scene...");
-
+    // Start loading the main scene.
     BABYLON.SceneLoader.LoadAssetContainer(Vars.sceneName, "scene.babylon", Vars.scene, (container: any) => {
         LoadingScreens.startFakeLoading(90);
         Vars.scene.executeWhenReady(() => {
+            // Start loading the floor arrow.
+            Arrow.loadArrow();
+
             // Now load scene_info.json too.
             jQuery.getJSON(Vars.sceneName + "scene_info.json", (data: any) => {
                 // Save variables from scene_info.json so they can be accessed

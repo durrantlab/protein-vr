@@ -22,11 +22,12 @@ export function setup(): Promise<any> {
     beforeLoading();
 
     // Load from a pdb file via 3Dmoljs.
-    Menu3D.setup();  // This populates Menu3D.menuInf.
+    if (Vars.vrVars.menuActive) {
+        Menu3D.setup();  // This populates Menu3D.menuInf.
+    }
+
     return ThreeDMol.setup().then(() => {  // This needs Menu3D.menuInf.
-        if (Vars.vrVars.menuActive) {
-            Menu2D.setup();
-        }
+        // Menu2D.setup();
 
         // Update the shadows.
         Optimizations.updateEnvironmentShadows();

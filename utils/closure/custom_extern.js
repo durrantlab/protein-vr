@@ -102,8 +102,12 @@ jQuery.ajax = function(a,b) {};
 jQuery.hide = function() {};
 jQuery.unbind = function(a) {};
 jQuery.css = function(a,b) {};
+jQuery.addClass = function(a) {};
+jQuery.removeClass = function(a) {};
 jQuery.fadeIn  = function(a) {};
 jQuery.fadeOut  = function(a) {};
+jQuery.one  = function(a, b) {};
+jQuery.off  = function(a) {};
 
 function _(astr) {};
 function __(astr) {};
@@ -164,6 +168,7 @@ BABYLON.SceneLoader = function() {};
 BABYLON.SceneLoader.LoadAssetContainerAsync = function(a,b,c) {};
 BABYLON.SceneLoader.Load = function(a,b,c,d,e) {};
 BABYLON.SceneLoader.LoadAssetContainer = function(a, b, c, d, e) {};
+BABYLON.SceneLoader.ImportMeshAsync = function(a, b, c, d) {};
 BABYLON.MeshBuilder;
 BABYLON.MeshBuilder.CreateBox = function(a, b, c) {};
 
@@ -324,6 +329,7 @@ BABYLON.Mesh.scaling.x = 0;
 BABYLON.Mesh.scaling.y = 0;
 BABYLON.Mesh.scaling.z = 0;
 BABYLON.Mesh.position = function() {};
+BABYLON.Mesh.lookAt = function(a) {};
 BABYLON.Mesh.position.x = 0;
 BABYLON.Mesh.position.y = 0;
 BABYLON.Mesh.position.z = 0;
