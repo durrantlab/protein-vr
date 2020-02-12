@@ -19,6 +19,7 @@ CHANGES
 * A small arrow at the player's feet now points in the direction of the
   protein, to help the user avoid getting lost in the 3D scene.
 * Added an "Exit VR" item to the menu.
+* Added a how-to-use video to the help system.
 
 1.0.2
 -----
