@@ -3,37 +3,36 @@
 // full details. Copyright 2019 Jacob D. Durrant.
 
 import * as Optimizations from "../Scene/Optimizations";
-import * as Menu3D from "../UI/Menu3D/Menu3D";
-import * as Menu2D from "../UI/Menu2D";
 import * as Vars from "../Vars/Vars";
 import * as ThreeDMol from "./3DMol/ThreeDMol";
 import * as MolShadows from "./MolShadows";
 import * as Pickables from "../Navigation/Pickables";
 import * as LoadAndSetup from "../Scene/LoadAndSetup";
+import * as PromiseStore from "../PromiseStore";
 
 declare var jQuery: any;
 declare var BABYLON: any;
 
 /**
  * Load in the molecules.
- * @returns A promise that is fulfilled when the molecule is loaded.
  */
-export function setup(): Promise<any> {
-    beforeLoading();
+export function runLoadMolecule(): void {
+    PromiseStore.setPromise(
+        // You need menus because you will add to them.
+        "LoadMolecule", ["LoadBabylonScene", "SetupMenus"],
+        (resolve) => {
+            beforeLoading();  // sets up molecular shadows
 
-    // Load from a pdb file via 3Dmoljs.
-    if (Vars.vrVars.menuActive) {
-        Menu3D.setup();  // This populates Menu3D.menuInf.
-    }
+            return ThreeDMol.setup().then(() => {  // This needs Menu3D.menuInf.
+                afterLoading();
 
-    return ThreeDMol.setup().then(() => {  // This needs Menu3D.menuInf.
-        // Menu2D.setup();
+                // Update the shadows.
+                Optimizations.updateEnvironmentShadows();
 
-        // Update the shadows.
-        Optimizations.updateEnvironmentShadows();
-
-        return Promise.resolve();
-    });
+                resolve();
+            });
+        }
+    )
 }
 
 /**
@@ -77,7 +76,7 @@ export function afterLoading(): void {
     }
 
     // Finish up all scene preparations.
-    LoadAndSetup.loadingAssetsDone();
+    // LoadAndSetup.loadingAssetsDone();
 }
 
 /**

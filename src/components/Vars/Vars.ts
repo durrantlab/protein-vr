@@ -8,6 +8,9 @@
 
 import * as Navigation from "../Navigation/Navigation";
 import * as UrlVars from "./UrlVars";
+import * as PromiseStore from "../PromiseStore";
+import * as VRCamera from "../Cameras/VRCamera";
+// import WebXRPolyfill from 'webxr-polyfill';
 
 declare var BABYLON: any;
 
@@ -22,7 +25,7 @@ export interface IVRSetup {
     menuActive?: boolean;
 }
 
-export const VERSION = "1.0.3";
+export const VERSION = "1.0.4";
 
 export let canvas: any;
 export let engine: any;
@@ -78,7 +81,7 @@ export const VR_CONTROLLER_TRIGGER_DELAY_TIME = 500;  // time to wait between tr
 export const VR_CONTROLLER_PAD_ROTATION_DELAY_TIME = 750;  // time to wait between triggers.
 
 /** @const {number} */
-export const VR_CONTROLLER_PAD_RATIO_OF_MIDDLE_FOR_CAMERA_RESET = 0.1;
+export const VR_CONTROLLER_PAD_RATIO_OF_MIDDLE_FOR_CAMERA_RESET = 0.5;
 
 /** @const {number} */
 export const MAX_TELEPORT_DIST = 15;
@@ -153,43 +156,131 @@ export function setCameraHeight(height: number): void {
  * variable.
  * @param  {Object<string,*>} initParams The initial parameters.
  */
-export function setupVR(initParams: IVRSetup): void {
-    // Save the parameter to params (module-level variable).
-    vrVars = initParams;
+export function runInitVR(initParams: IVRSetup): void {
+    PromiseStore.setPromise(
+        "InitVR", [],
+        (resolve) => {
+            // Save the parameter to params (module-level variable).
+            vrVars = initParams;
 
-    // If running in Student mode, do not set up VR camera... But good to
-    // define vrVars first (above) so you can hide the nav sphere elsewhere.
-    if (UrlVars.checkWebrtcInUrl()) {
-        return;
-    }
+            // If running in Student mode, do not set up VR camera... But good to
+            // define vrVars first (above) so you can hide the nav sphere elsewhere.
+            if (UrlVars.checkIfWebRTCInUrl()) {
+                resolve();
+                return;
+            }
 
-    // Create the vr helper. See http://doc.babylonjs.com/how_to/webvr_helper
-    const params = {
-        // "createDeviceOrientationCamera": false,  // This makes phone ignore motion sensor. No good.
-        "createDeviceOrientationCamera": true,
-        "useMultiview": false
-    };
+            // Create the xr helper.
+            const params = {
+                // "createDeviceOrientationCamera": false,  // This makes phone ignore motion sensor. No good.
+                // "createDeviceOrientationCamera": true,
+                // "useMultiview": false,
 
-    // TODO: No multiview for now because causes errors on latest FireFox.
-    // Good to revist this in the future as WebVR progresses.
-    // if (scene.getEngine().getCaps().multiview) {
-        // Much faster according to
-        // https://doc.babylonjs.com/how_to/multiview, but not supported in
-        // all browsers.
-        // params["useMultiview"] = true;
-    // }
-    vrHelper = scene.createDefaultVRExperience(params);
+                "disableTeleportation": true,  // because using your own system.
+                "ignoreNativeCameraTransformation": false,
+                "createDefaultXRExperienceAsync": {
+                    "canvasElement": canvas,
+                    "canvasOptions": {
+                        "framebufferScaleFactor": 1,  // https://github.com/immersive-web/webxr/issues/349
+                        "antialias": true
+                    }
+                }
+            };
 
-    // Hide the vrHelper icon initially.
-    const babylonVRiconbtn = document.getElementById("babylonVRiconbtn");
-    if (babylonVRiconbtn !== null) {
-        babylonVRiconbtn.style.opacity = "0.0";  // Non IE;
-        babylonVRiconbtn.style.filter = "alpha(opacity=0)";  // IE;
-    }
+            // TODO: No multiview for now because causes errors on latest FireFox.
+            // Good to revist this in the future as WebVR progresses.
+            // if (scene.getEngine().getCaps().multiview) {
+                // Much faster according to
+                // https://doc.babylonjs.com/how_to/multiview, but not supported in
+                // all browsers.
+                // params["useMultiview"] = true;
+            // }
+            // vrHelper = scene.createDefaultVRExperience(params);
 
-    // For debugging....
-    // window["vrHelper"] = vrHelper;
+            // WebXR shiv now loaded in index.html.
+            // const polyfill = new WebXRPolyfill();
 
-    // Whether the menu system is active. True by default.
-    vrVars.menuActive = true;
+            // Use a local copy of part of the repo at
+            // https://github.com/immersive-web/webxr-input-profiles to
+            // load controller profiles.
+            BABYLON.WebXRMotionControllerManager.BaseRepositoryUrl = "js/";
+
+            window["engine"] = engine;
+            scene.createDefaultXRExperienceAsync(params).then((vrHelp: any) => {
+                // Check if supports immersive vr. See
+                // https://forum.babylonjs.com/t/webxr-on-oculus-quest/4949/6
+
+                vrHelper = vrHelp;
+
+                // Make sure WebXR state is sent to not in xr. Strange that
+                // this is necessary. On most systems it works without it, but
+                // on Oculus Go it sometimes doesn't.
+                // VRCamera.exitVRAndFS();
+
+                // For debugging...
+                window["vrHelper"] = vrHelper;
+
+                vrHelper.baseExperience.sessionManager.onXRSessionInit.add(() => {
+                    // console.log("onXRSessionInit");
+
+                    if (window["webXRPolyfill"]["nativeWebXR"] === false) {
+                        // The WebXR polyfill is low resolution. I think it's a
+                        // bug. It initially resizes the canvas to higher
+                        // resolution, but then it makes it smaller again (100%)
+                        // and messes up the resolution. Native WebXR doesn't seem
+                        // to have the same problem. So if the polyfill is being
+                        // used, let increase the hardware scaling level to
+                        // compensate.
+
+                        // The problem is that I can't get the renderTarget
+                        // framebuffer dimensions until I enter VR. But if
+                        // I've already entered VR, setting
+                        // setHardwareScalingLevel messes the canvas up. There
+                        // is so good solution here. So I'm going to shoot for
+                        // 1440 ( x 2) by 1600 (a high-end set). See
+                        // https://en.wikipedia.org/wiki/Comparison_of_virtual_reality_headsets
+                        // Unfortunately, this is almost certainly too high a
+                        // resolution for some headsets, which is likely to
+                        // affect performance. Anyway, WebXR should be
+                        // supported everywhere soon enough.
+
+                        const targetFrameBufferWidth = 1440 * 2;  // Wish I could use vrHelper.renderTarget.xrLayer.framebufferWidth here.
+                        const targetFrameBufferHeight = 1600;  // Wish I could use vrHelper.renderTarget.xrLayer.framebufferHeight here.
+
+                        let scale1 = window.innerWidth / targetFrameBufferWidth;
+                        let scale2 = window.innerHeight / targetFrameBufferHeight;
+
+                        let scale = Math.min(scale1, scale2);
+
+                        if (scale < 1.0) {
+                            // Only scale if it would be upscaling.
+                            engine.setHardwareScalingLevel(scale);  // works here too.
+                        }
+
+                        console.log("Using WebXR polyfill.");
+                    }
+                });
+
+                // Prioritize the local classes (but use online if controller
+                // not found).
+                // BABYLON.WebXRMotionControllerManager.PrioritizeOnlineRepository = false;
+
+                // Hide the vrHelper icon initially.
+                const babylonVRiconbtn = document.getElementById("babylonVRiconbtn");
+                if (babylonVRiconbtn !== null) {
+                    babylonVRiconbtn.style.opacity = "0.0";  // Non IE;
+                    babylonVRiconbtn.style.filter = "alpha(opacity=0)";  // IE;
+                }
+
+                // For debugging....
+                // window["vrHelper"] = vrHelper;
+
+                // Whether the menu system is active. True by default.
+                vrVars.menuActive = true;
+
+                resolve();
+                return Promise.resolve();
+            });
+        }
+    );
 }

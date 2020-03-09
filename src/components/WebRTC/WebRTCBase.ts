@@ -115,7 +115,11 @@ export function webRTCErrorMsg(details = ""): void {
         msg += "</p>";
     }
 
-    OpenPopup.openModal("Leader Error", msg, false);
+    OpenPopup.openModal({
+        title: "Leader Error",
+        content: msg,
+        isUrl: false
+    });
 }
 
 /**

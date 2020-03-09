@@ -88,7 +88,7 @@ export function buildStylesSubMenu(): any {
  * @returns void
  */
 export function updatePastStylesInMenu(menuInf: any): void {
-    if (UrlVars.checkWebrtcInUrl()) {
+    if (UrlVars.checkIfWebRTCInUrl()) {
         // Leader mode. So no need to update menu (it doesn't exist).
         return;
     }

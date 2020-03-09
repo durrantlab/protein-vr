@@ -2,6 +2,7 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
+// This controls 2D buttons on main screen.
 
 // Sets up tweaks to the UI.
 
@@ -60,7 +61,10 @@ function addRunModeButtons(): void {
             clickFunc: () => {
                 // Give them some time to admire nanokid... :)
                 window["PVR_warning"] = true;
-                OpenPopup.openModal("Load Molecule", "pages/load.html");
+                OpenPopup.openModal({
+                    title: "Load Molecule",
+                    content: "pages/load.html"
+                });
             }
         },
         {
@@ -136,7 +140,14 @@ function addRunModeButtons(): void {
             title: "Help",
             id: "help-button",
             showInFollowerMode: false,
-            clickFunc: () => { OpenPopup.openModal("Help: ProteinVR " + Vars.VERSION, "pages/help.html", true, true); }
+            clickFunc: () => {
+                OpenPopup.openModal({
+                    title: "Help: ProteinVR " + Vars.VERSION,
+                    content: "pages/help.html",
+                    isUrl: true,
+                    hasCloseBtn: true
+                });
+            }
         },
         {
             svg: `<svg version="1.2" baseProfile="tiny" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -177,7 +188,7 @@ function addRunModeButtons(): void {
     let html = "";
     let curBottom = 60;
     for (const btn of btns.reverse()) {
-        if ((UrlVars.webrtc === undefined) || (btn.showInFollowerMode === true)) {
+        if ((!UrlVars.checkIfWebRTCInUrl()) || (btn.showInFollowerMode === true)) {
             html += `
                 <button
                     title="${btn.title}"
@@ -199,8 +210,25 @@ function addRunModeButtons(): void {
         }
     }
 
-    // Add to DOM.
-    jQuery("body").append(html);
+    // Add to DOM. You need to wrap this in a div that can be transformed.
+    let babylonVRicon = jQuery(".babylonVRicon");
+    let buttonWrapperHTML = '<div id="btnsWrapper"></div>';
+    if (babylonVRicon.length !== 0) {
+        babylonVRicon.closest("div").wrap(buttonWrapperHTML);
+    } else {
+        jQuery("body").append(buttonWrapperHTML);
+    }
+    let btnsWrapper = jQuery("#btnsWrapper");
+    btnsWrapper.css("height", curBottom.toString() + "px");
+    jQuery(btnsWrapper).append(html);
+
+    // On resize, reposition the 2D buttons if the screen height is too small.
+    window.addEventListener("resize", () => {
+        // Resize the buttons if the screen isn't height enough (e.g.,
+        // phones).
+        reposition2DButtons(btnsWrapper, curBottom);
+    });
+    reposition2DButtons(btnsWrapper, curBottom);
 
     // Make buttons clickable
     for (const btn of btns) {
@@ -218,16 +246,34 @@ function addRunModeButtons(): void {
 }
 
 /**
+ * Resizes the 2D buttons on the main screen if the height is too small (e.g.,
+ * on phones).
+ * @param  {any} btnsWrapper   A jquery object, the wrapper around the
+ *                             buttons.
+ * @param  {number} curBottom  The height of the buttons together.
+ * @returns void
+ */
+function reposition2DButtons(btnsWrapper: any, curBottom: number): void {
+    let scale = 1.0;
+    if (window.innerHeight < curBottom) {
+        scale = window.innerHeight / curBottom;
+    }
+    btnsWrapper.css(
+        "transform",
+        "scale(" + scale.toString() + ")"
+    )
+}
+
+/**
  * A function to activate debug mode.
  * @returns void
  */
 function debugMode(): void {
-    Vars.scene.debugLayer.show();
-    setTimeout(() => {
+    Vars.scene.debugLayer.show().then(() => {
         document.getElementById("inspector-host").style.zIndex = "15";
         document.getElementById("scene-explorer-host").style.zIndex = "15";
-    }, 500);
+    });
 }
 
 // For debugging...
-// window["debugMode"] = debugMode;
+window["debugMode"] = debugMode;

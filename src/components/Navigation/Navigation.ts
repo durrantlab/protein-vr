@@ -15,6 +15,9 @@ import * as Points from "./Points";
 import * as UrlVars from "../Vars/UrlVars";
 import * as Menu3D from "../UI/Menu3D/Menu3D";
 import * as OpenPopup from "../UI/OpenPopup/OpenPopup";
+import * as Arrow from "../Navigation/Arrow";
+import * as PromiseStore from "../PromiseStore";
+import * as VRCamera from "../Cameras/VRCamera";
 
 declare var BABYLON: any;
 declare var jQuery: any;
@@ -32,37 +35,62 @@ let currentlyTeleporting = false;
  * Setup the navigation system.
  * @returns void
  */
-export function setup(): void {
-    // Allways collide with a floor mesh.
-    Vars.vrVars.groundMesh = Vars.scene.getMeshByID("ground");
-    if (Vars.vrVars.groundMesh === null) { alert("No mesh named ground"); }
-    Vars.vrVars.groundMesh.checkCollisions = true;
+export function runSetupNavigation(): void {
+    PromiseStore.setPromise(
+        "SetupNavigation", ["LoadBabylonScene"],
+        (resolve) => {
+            if (UrlVars.checkIfWebRTCInUrl()) {
+                // Initially, no VR.
+                Vars.vrVars.navMode = Navigation.NavMode.NoVR;
 
-    // The ground should generally be hidden. There's a chance it could be
-    // turned into glass too. See Mols.
-    Vars.vrVars.groundMesh.visibility = 0;
+                // Also, make sure ground is not visible.
+                const groundMesh = Vars.scene.getMeshByID("ground");
+                groundMesh.visibility = 0;
 
-    Optimizations.optimizeMeshPicking(Vars.vrVars.groundMesh);
-    Pickables.makeMeshMouseClickable({
-        callBack: actOnStareTrigger,
-        mesh: Vars.vrVars.groundMesh,
-    });
+                // Also hide navigation sphere.
+                Vars.vrVars.navTargetMesh.isVisible = false;
 
-    // Initially, no VR.
-    Vars.vrVars.navMode = Navigation.NavMode.NoVR;
+                resolve();
+                return;
+            }
 
-    // Setup triggers.
-    setupTriggers();
+            // Start loading the floor arrow.
+            Arrow.loadArrow();
 
-    // Keep track up critical points in the scene (like stare points).
-    Points.setup();
+            // Allways collide with a floor mesh.
+            Vars.vrVars.groundMesh = Vars.scene.getMeshByID("ground");
+            if (Vars.vrVars.groundMesh === null) { alert("No mesh named ground"); }
+            Vars.vrVars.groundMesh.checkCollisions = true;
 
-    // Create a div to intercept clicks if needed. Add clear div over canvas.
-    setupCaptureMouseClicksOutsideBabylon();
+            // The ground should generally be hidden. There's a chance it could be
+            // turned into glass too. See Mols.
+            Vars.vrVars.groundMesh.visibility = 0;
 
-    // Constantly monitor the position of the camera. If it's no longer over
-    // the floor, move it back to its previous position.
-    keepCameraOverFloor();
+            Optimizations.optimizeMeshPicking(Vars.vrVars.groundMesh);
+            Pickables.makeMeshMouseClickable({
+                callBack: actOnStareTrigger,
+                mesh: Vars.vrVars.groundMesh,
+            });
+
+            // Initially, no VR.
+            Vars.vrVars.navMode = Navigation.NavMode.NoVR;
+
+            // Setup triggers.
+            setupTriggers();
+
+            // Keep track up critical points in the scene (like stare points).
+            Points.setup();
+
+            // Create a div to intercept clicks if needed. Add clear div over canvas.
+            setupCaptureMouseClicksOutsideBabylon();
+
+            // Constantly monitor the position of the camera. If it's no longer over
+            // the floor, move it back to its previous position.
+            keepCameraOverFloor();
+
+            resolve();
+        }
+    )
 }
 
 /** @type {*} */
@@ -102,14 +130,17 @@ function keepCameraOverFloor(): void {
 function setupTriggers(): void {
     // Space always triggers
     const body = jQuery("body");
-    body.keypress((e: any) => {
+    body.keydown((e: any) => {
         if (OpenPopup.modalCurrentlyOpen === false) {
-            if (e.charCode === 32) {
+            let charCode = (typeof e.which == "undefined") ? e.keyCode : e.which;
+            if (charCode === 32) {
                 // Space bar
                 actOnStareTrigger();
-            } else if (e.charCode === 109) {
+            } else if (charCode === 77) { // 109?
                 // M (open 3d menu).
                 Menu3D.openMainMenuFloorButton.toggled();
+            } else if (charCode === 27) {
+                VRCamera.exitVRAndFS();
             }
         }
     });
@@ -124,7 +155,7 @@ let lastTrigger = 0;
  * @returns void
  */
 export function actOnStareTrigger(): void {
-    if (UrlVars.webrtc !== undefined) {
+    if (UrlVars.checkIfWebRTCInUrl()) {
         // If in leader mode, don't ever trigger.
         return;
     }
@@ -174,7 +205,8 @@ function teleport(newLoc: any = undefined, callBack: any = undefined): void {
     }
 
     // Hide the bigger nav mesh. It will appear again elsewhere.
-    Vars.vrHelper.gazeTrackerMesh.isVisible = false;
+    // JDDJDD Vars.vrHelper.gazeTrackerMesh.isVisible = false;
+    Vars.vrVars.navTargetMesh.isVisible = false;
 
     // Animate the transition to the new location.
     /** @const {*} */
@@ -219,7 +251,8 @@ function teleport(newLoc: any = undefined, callBack: any = undefined): void {
     Vars.scene.beginAnimation(activeCamera, 0, Vars.TRANSPORT_DURATION, false, 1, () => {
         // Animation finished callback.
         currentlyTeleporting = false;
-        Vars.vrHelper.gazeTrackerMesh.isVisible = true;
+        // Vars.vrHelper.gazeTrackerMesh.isVisible = true;
+        Vars.vrVars.navTargetMesh.isVisible = true;
 
         // Erase animation
         activeCamera.animations = [];
@@ -310,9 +343,13 @@ function setupCaptureMouseClicksOutsideBabylon(): void {
         actOnStareTrigger();
     });
 
-    Vars.scene.registerBeforeRender(() => {
-        checkCaptureMouseClicksOutsideBabylon();
-    });
+    // Check periodically to see if a device orientation sensor is every
+    // picked up. If so, make the window clickable.
+
+    setInterval(checkCaptureMouseClicksOutsideBabylon, 500);
+
+    // ();
+    // Vars.scene.registerBeforeRender(() => {});
 }
 
 /**
@@ -322,6 +359,14 @@ function setupCaptureMouseClicksOutsideBabylon(): void {
  * @returns void
  */
 function checkCaptureMouseClicksOutsideBabylon(): void {
+    if (currentlyCapturingMouseClicks === true) {
+        // Once you've detected a device orientation sensor, never "undetect"
+        // it. This makes it so the mouse teleports, rather than rotating via
+        // drag and drop. Because the rotation is now handled by the device
+        // orientations sensor.
+        return;
+    }
+
     const deviceOrientation = Vars.scene.activeCamera.inputs.attached.deviceOrientation;
     let deviceBeingOriented;
 
@@ -338,6 +383,7 @@ function checkCaptureMouseClicksOutsideBabylon(): void {
     if (deviceBeingOriented && !currentlyCapturingMouseClicks) {
         currentlyCapturingMouseClicks = true;
         captureMouseClicksDiv.show();
+        console.log("Device orientation sensor detected...");
     } else if (!deviceBeingOriented && currentlyCapturingMouseClicks) {
         currentlyCapturingMouseClicks = false;
         captureMouseClicksDiv.hide();

@@ -6,70 +6,26 @@ import * as LoadAndSetup from "./components/Scene/LoadAndSetup";
 import 'bootstrap';
 import * as UrlVars from "./components/Vars/UrlVars";
 import * as Vars from "./components/Vars/Vars";
-
-declare var ga;
+import * as ServiceWorker from "./components/System/ServiceWorker";
+import * as GoogleAnalytics from "./components/System/GoogleAnalytics";
+import * as DeviceOrientation from "./components/System/DeviceOrientation";
 
 // Report version
 console.log("ProteinVR " + Vars.VERSION);
 document.title = "ProteinVR " + Vars.VERSION;
 
-// Get server workers (for progressive web app). Makes for better experience,
-// especially on iOS. See
-// https://webpack.js.org/guides/progressive-web-application/
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register(
-            'service-worker.js',
-            {scope: './'}
-        ).then(registration => {
-            console.log('SW registered: ', registration);
-        }).catch(registrationError => {
-            console.log('SW registration failed: ', registrationError);
-        });
-    });
-}
+// Setup service worker
+ServiceWorker.setupServiceWorker();
 
+// Get environment name (why needed here?)
 UrlVars.readEnvironmentNameParam();
 
+// It is unfortunately necessary to explicitly request device orientation on
+// iOS13.
+DeviceOrientation.requestDeviceOrientation();
+
+// Begin loading
 LoadAndSetup.load();
 
-// If the url has "durrantlab" in it, contact google analytics. Logging all
-// usage would be ideal for grant reporting, but some users may wish to run
-// versions of proteinvr on their own servers specifically to maintain privacy
-// (e.g., in case of proprietary data). Calls to google analytics in such
-// scenarios could be alarming, even though I'm only recording basic
-// demographics anyway.
-if (window.location.href.indexOf("durrantlab") !== -1) {
-    setTimeout(() => {
-        // Just to make sure it isn't blocking...
-        (function(i, s, o, g, r, a, m) {
-            i['GoogleAnalyticsObject'] = r;
-            i[r] = i[r] || function() {
-                (i[r].q = i[r].q || []).push(arguments)
-            }, i[r].l = 1 * new Date().getTime();
-            a = s.createElement(o);
-            m = s.getElementsByTagName(o)[0];
-            a.async = 1;
-            a.src = g;
-            m.parentNode.insertBefore(a, m)
-        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-        ga('create', 'UA-144382730-1', {
-            'name': 'proteinvr'
-        });
-
-        // Remove anything after "?" (to avoid identifying what users are
-        // specifically looking at).
-        let eventLabel = window.location.href;
-        if (eventLabel.indexOf("?") !== -1) {
-            eventLabel = eventLabel.split("?")[0] + "?PARAMS_REMOVED"
-        }
-
-        // UA-144382730-1 reports to pcaviz account.
-        ga('proteinvr.send', {
-            "hitType": 'event',
-            "eventCategory": 'proteinvr',
-            "eventAction": 'pageview',
-            "eventLabel": eventLabel
-        });
-    }, 0)
-}
+// Let google analytics know if running from durrantlab server.
+GoogleAnalytics.setupGoogleAnalyticsIfDurrantLab();

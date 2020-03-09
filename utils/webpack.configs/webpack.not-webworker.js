@@ -63,7 +63,22 @@ module.exports = merge(common, {
                     urlPattern: /\./,
                     handler: "NetworkFirst" // First check the network. If that fails, use cache...
                 }
-            ]
+            ],
+            exclude: [
+                /js\/profiles\//,  // So controller models will always be loaded remotely.
+                /\.md$/,
+                /environs\/(?!day)/,  // leave only one scene
+                /favicon\.ico/,
+                /icon-[^5].*?\.png/,  // only keep one icon
+                /peer\.min\.js/,  // No need to cache this. Because if you don't have an internet connection, it won't work anyway.
+                /leader\.html/,
+                /\.map$/,
+                /\.manifest$/,
+                /\.mp3$/,
+                /pages\/imgs\//,  // non essential (help iamges)
+                /glyphicons-halflings-regular.(?!woff)$/,
+
+            ],
         })
     ],
     module: {

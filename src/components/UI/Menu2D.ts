@@ -6,7 +6,15 @@ import * as Menu3D from "./Menu3D/Menu3D";
 let funcs = {};
 
 export function open(): void {
-    OpenPopup.openModal("Menu", `<div class="accrd" id="accordion-menu2d"></div>`, false, true, false, false, true).then(() => {
+    OpenPopup.openModal({
+        title: "Menu",
+        content: `<div class="accrd" id="accordion-menu2d"></div>`,
+        isUrl: false,
+        hasCloseBtn: true,
+        isUnClosable: false,
+        showBackdrop: false,
+        isSkinny: true
+    }).then(() => {
         populate2DSubMenu("#accordion-menu2d", Menu3D.menuInf, [], 0);
     });
 }

@@ -1,5 +1,7 @@
 # Must be run from the main directory.
 
+# exit  # Don't do this. For debugging.
+
 # When using closure compiler, it creates empty files that aren't needed.
 # Tricky because you need to make sure the service worker doesn't try to load
 # them either.
@@ -70,6 +72,7 @@ find dist -name "*.log" -exec rm '{}' \;
 find dist -name "src.txt" -exec rm '{}' \;
 find dist -name "old" -exec rm -r '{}' \;
 find dist -name "tmp" -exec rm -r '{}' \;
+find dist -name "*.sh" -exec rm -r '{}' \;
 
 # Remove files from precache-manifest*js file that do not exist.
 cd dist

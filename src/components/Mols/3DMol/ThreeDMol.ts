@@ -54,7 +54,7 @@ function after3DMolJsLoaded(resolveFunc: Function): void {
             // Update URL with location
             UrlVars.setURL();
 
-            if (!UrlVars.checkWebrtcInUrl()) {
+            if (!UrlVars.checkIfWebRTCInUrl()) {
                 // It's not leader mode, set setup menu.
 
                 // Get additional selection information about the loaded
@@ -69,14 +69,14 @@ function after3DMolJsLoaded(resolveFunc: Function): void {
             UrlVars.startLoadingStyles();
 
             // Continue...
-            Load.afterLoading();
+            // Load.afterLoading();
 
             // If it's nanokid, open a popup to let them specify a url or
             // pdbid.
-            if ((modelUrl === "nanokid.sdf") && (UrlVars.checkWebrtcInUrl() === false)){
+            if ((modelUrl === "nanokid.sdf") && (UrlVars.checkIfWebRTCInUrl() === false)){
                 setTimeout(() => {
                     // Give them some time to admire nanokid... :)
-                    OpenPopup.openModal("Load Molecule", "pages/load.html");
+                    OpenPopup.openModal({title: "Load Molecule", content: "pages/load.html"});
                 }, 3000);
             }
 

@@ -97,11 +97,14 @@ jQuery.prototype.getScript = function(a, b) {};
 jQuery.append = function(a) {};
 jQuery.remove = function() {};
 jQuery.keypress = function(a) {};
+jQuery.keydown = function(a) {};
 jQuery.getJSON = function(a, b) {};
 jQuery.ajax = function(a,b) {};
 jQuery.hide = function() {};
 jQuery.unbind = function(a) {};
 jQuery.css = function(a,b) {};
+jQuery.closest = function(a) {};
+jQuery.wrap = function(a) {};
 jQuery.addClass = function(a) {};
 jQuery.removeClass = function(a) {};
 jQuery.fadeIn  = function(a) {};
@@ -216,6 +219,7 @@ BABYLON.Material.diffuseColor;
 BABYLON.Material.specularColor;
 BABYLON.Material.emissiveTexture;
 BABYLON.Material.diffuseTexture;
+BABYLON.Material.albedoTexture;
 BABYLON.Material.emissiveColor;
 BABYLON.Material.activeLight;
 BABYLON.Material.alpha;
@@ -316,6 +320,7 @@ BABYLON.Mesh.createOrUpdateSubmeshesOctree = function(a,b) {};
 BABYLON.Mesh.ActionManager = function() {};
 BABYLON.Mesh.material = function() {};
 BABYLON.Mesh.freezeWorldMatrix = function() {};
+BABYLON.Mesh.getChildren = function() {};
 BABYLON.Mesh.receiveShadows;
 BABYLON.Mesh.id;
 BABYLON.Mesh.hasVertexAlpha;
@@ -357,6 +362,7 @@ BABYLON.Mesh.refreshBoundingInfo = function() {};
 BABYLON.Mesh.animations;
 BABYLON.Mesh.getWorldMatrix = function() {};
 BABYLON.Mesh.infiniteDistance;
+BABYLON.mesh.renderingGroupId;
 
 BABYLON.Matrix;
 BABYLON.Matrix.Translation = function(a) {};
@@ -415,6 +421,7 @@ BABYLON.Engine.prototype.displayLoadingUI = function() {};
 BABYLON.Engine.prototype.hideLoadingUI = function() {};
 BABYLON.Engine.prototype.loadingUIText;
 BABYLON.Engine.prototype.getFps = function() {};
+BABYLON.Engine.prototype.setHardwareScalingLevel = function(a) {};
 
 var require = function(a) {};
 
@@ -467,6 +474,10 @@ BABYLON.Scene.prototype.lights = function() {};
 BABYLON.Scene.prototype.lights.name = function() {};
 BABYLON.Scene.prototype.lights.dispose = function() {};
 BABYLON.Scene.prototype.lights.autoUpdateExtends;
+
+BABYLON.scene.prototype.onPointerObservable;
+BABYLON.scene.prototype.onPointerObservable.add = function(a) {};
+
 BABYLON.Scene.prototype.meshes = function() {};
 BABYLON.Scene.prototype.getMeshByName = function(a) {};
 BABYLON.Scene.prototype.getMeshByID = function(a) {};
@@ -477,8 +488,10 @@ BABYLON.Scene.prototype.pickWithRay.hit;
 BABYLON.Scene.prototype.pickWithRay.distance;
 BABYLON.Scene.prototype.pickWithRay.pickedPoint;
 BABYLON.Scene.prototype.pickWithRay.pickedMesh;
-BABYLON.Scene.prototype.createDefaultVRExperience = function() {};
 BABYLON.Scene.prototype.render = function() {};
+
+BABYLON.Scene.prototype.createDefaultXRExperienceAsync = function(a) {};
+BABYLON.Scene.prototype.createDefaultVRExperience = function() {};
 BABYLON.Scene.prototype.createDefaultVRExperience.rightControllerGazeTrackerMesh;
 BABYLON.Scene.prototype.createDefaultVRExperience.leftControllerGazeTrackerMesh;
 BABYLON.Scene.prototype.createDefaultVRExperience.gazeTrackerMesh;
@@ -539,8 +552,78 @@ BABYLON.Scene.addAllToScene = function() {};
 BABYLON.Scene.getAnimationRatio = function() {};
 BABYLON.Scene.cameras;
 
+BABYLON.PointerEventTypes;
+BABYLON.PointerEventTypes.POINTERDOWN;
+BABYLON.PointerEventTypes.POINTERUP;
+BABYLON.PointerEventTypes.POINTERMOVE;
+BABYLON.PointerEventTypes.POINTERWHEEL;
+BABYLON.PointerEventTypes.POINTERPICK;
+BABYLON.PointerEventTypes.POINTERTAP;
+BABYLON.PointerEventTypes.POINTERDOUBLETAP;
+
 BABYLON.Database.IDBStorageEnabled;
 BABYLON.Database;
+
+BABYLON.WebXRDefaultExperience;
+BABYLON.WebXRDefaultExperience.input;
+BABYLON.WebXRDefaultExperience.input.motionController;
+BABYLON.WebXRDefaultExperience.input.motionController.handness;
+BABYLON.WebXRDefaultExperience.input.onControllerAddedObservable;
+BABYLON.WebXRDefaultExperience.input.onControllerAddedObservable.add = function(a) {};
+BABYLON.WebXRDefaultExperience.onMotionControllerInitObservable;
+BABYLON.WebXRDefaultExperience.onMotionControllerInitObservable.add = function(a) {};
+BABYLON.WebXRDefaultExperience.onMeshLoadedObservable;
+BABYLON.WebXRDefaultExperience.onMeshLoadedObservable.add = function(a) {};
+BABYLON.WebXRDefaultExperience.input.getWorldPointerRayToRef = function(a) {};
+BABYLON.WebXRDefaultExperience.baseExperience;
+BABYLON.WebXRDefaultExperience.baseExperience.camera;
+BABYLON.WebXRDefaultExperience.baseExperience.camera.updateUpVectorFromRotation;
+BABYLON.WebXRDefaultExperience.baseExperience.camera.setTransformationFromNonVRCamera = function(a, b) {};
+BABYLON.WebXRDefaultExperience.baseExperience.camera.rotationQuaternion;
+BABYLON.WebXRDefaultExperience.baseExperience.camera.rotationQuaternion.multiplyInPlace = function(a) {};
+BABYLON.WebXRDefaultExperience.baseExperience.exitXRAsync = function() {};
+BABYLON.WebXRDefaultExperience.baseExperience.onStateChangedObservable;
+BABYLON.WebXRDefaultExperience.baseExperience.onStateChangedObservable.add = function(a) {};
+BABYLON.WebXRDefaultExperience.baseExperience.sessionManager;
+BABYLON.WebXRDefaultExperience.baseExperience.sessionManager.session;
+BABYLON.WebXRDefaultExperience.baseExperience.sessionManager.session.onselect = function(a) {};
+BABYLON.WebXRDefaultExperience.baseExperience.sessionManager.onXRSessionInit;
+BABYLON.WebXRDefaultExperience.baseExperience.sessionManager.onXRSessionInit.addOnce = function(a) {};
+BABYLON.WebXRDefaultExperience.renderTarget;
+BABYLON.WebXRDefaultExperience.renderTarget.xrLayer;
+BABYLON.WebXRDefaultExperience.renderTarget.xrLayer.framebufferHeight;
+BABYLON.WebXRDefaultExperience.renderTarget.xrLayer.framebufferWidth;
+BABYLON.WebXRDefaultExperience.renderTarget.canvasContext;
+BABYLON.WebXRDefaultExperience.renderTarget.canvasContext.canvas;
+BABYLON.WebXRDefaultExperience.renderTarget.canvasContext.canvas.width;
+BABYLON.WebXRDefaultExperience.renderTarget.canvasContext.canvas.height;
+BABYLON.WebXRDefaultExperience.inputSource;
+BABYLON.WebXRDefaultExperience.targetRayMode;
+
+BABYLON.WebXRMotionControllerManager;
+BABYLON.WebXRMotionControllerManager.PrioritizeOnlineRepository;
+BABYLON.WebXRMotionControllerManager.BaseRepositoryUrl;
+
+BABYLON.WebXRState;
+BABYLON.WebXRState.ENTERING_XR;
+BABYLON.WebXRState.EXITING_XR;
+BABYLON.WebXRState.IN_XR;
+BABYLON.WebXRState.NOT_IN_XR;
+
+BABYLON.WebXRControllerComponent.getMainComponent = function() {};
+BABYLON.WebXRControllerComponent.onButtonStateChangedObservable;
+BABYLON.WebXRControllerComponent.onButtonStateChangedObservable.add = function(a) {};
+BABYLON.WebXRControllerComponent.onAxisValueChangedObservable;
+BABYLON.WebXRControllerComponent.onAxisValueChangedObservable.add = function(a) {};
+BABYLON.WebXRControllerComponent.TOUCHPAD;
+BABYLON.WebXRControllerComponent.changes;
+BABYLON.WebXRControllerComponent.changes.pressed;
+BABYLON.WebXRControllerComponent.getComponent = function(a) {};
+BABYLON.WebXRControllerComponent.getComponentIds = function() {};
+BABYLON.WebXRControllerComponent.axes;
+BABYLON.WebXRControllerComponent.axes.x;
+BABYLON.WebXRControllerComponent.axes.y;
+BABYLON.WebXRControllerComponent.handness;
 
 /**
  * @constructor
@@ -614,7 +697,7 @@ BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE = function() {};
 BABYLON.Animation.prototype.setKeys = function(a) {};
 BABYLON.Animation.ANIMATIONTYPE_FLOAT;
 BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE;
-
+BABYLON.Animation.ANIMATIONTYPE_COLOR3;
 
 /**
  * @constructor

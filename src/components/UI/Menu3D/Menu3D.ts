@@ -69,6 +69,9 @@ export function setup(data?: any): void {
         // window["gui3DMenuManager"] = gui3DMenuManager;
     }
 
+    // Simplify the menu (collapsing excessive parts).
+    reduceSingleItemSubMenus();
+
     setupMainMenu();
 
     // Only required to setup once.
@@ -84,9 +87,6 @@ export function setup(data?: any): void {
             { loop: false, autoplay: false, spatialSound: true, volume: 0.1 },
         );
     }
-
-    // Simplify the menu (collapsing excessive parts).
-    reduceSingleItemSubMenus();
 }
 
 /**
@@ -96,7 +96,7 @@ export function setup(data?: any): void {
 function setupMainMenu(): void {
     // Here would also be a good place to add additional buttons such as voice
     // dictation. See setupAllSubMenuNavButtons for how this was done
-    // previously.
+    // previously. Currently adds back and close buttons.
     setupAllSubMenuNavButtons();
 
     commonMenuAnchor = new BABYLON.TransformNode(""); // this can be a mesh, too
@@ -279,6 +279,9 @@ function setupMainMenuToggleButton(): void {
     // user's feet.
     mainMenuAnchorToggle.rotation.x = 0.4 * Math.PI;
 
+    // var mySphere = BABYLON.MeshBuilder.CreateSphere("mySphere", {diameter: 0.5, diameterX: 0.5}, Vars.scene);
+    // mySphere.position = mainMenuAnchorToggle.position;
+
     Vars.scene.registerBeforeRender(() => {
         mainMenuAnchorToggle.position.copyFrom(VRPoints.groundPointBelowCamera);  // Prob
         mainMenuAnchorToggle.position.y = mainMenuAnchorToggle.position.y + 0.1;     // No prob
@@ -408,50 +411,36 @@ function reduceSingleItemSubMenus(): void {
     const recurse = (subMenu: any, breadcrumbs: string[]): void => {
         let keys = Object.keys(subMenu);
 
-        // There should be three items in a one-item submenu, including back
-        // and close.
-        if (keys.length === 3) {
-            const keysToKeep = keys.filter((k: string) => {
-                if (k === "Close Menu ×") {
-                    return false;
-                } else if (k === "Back ⇦") {
-                    return false;
-                }
+        if (keys.length === 1) {  // Not 3 because back and close not added yet.
+            // Only one item remains. That's the one to collpase.
+            const keyToKeep = keys[0];
 
-                return true;
-            });
-            if (keysToKeep.length === 1) {
-                // Only one item remains. That's the one to collpase.
-                const keyToKeep = keysToKeep[0];
+            // Get the name of the new key (one up with keyToKeep added to
+            // end).
+            const lastKey = breadcrumbs[breadcrumbs.length - 1];
+            const newKey = lastKey + ": " + keyToKeep;
 
-                // Get the name of the new key (one up with keyToKeep added to
-                // end).
-                const lastKey = breadcrumbs[breadcrumbs.length - 1];
-                const newKey = lastKey + ": " + keyToKeep;
+            // Redefine the breadcrumbs
+            breadcrumbs = breadcrumbs.slice(0, breadcrumbs.length - 1).concat([newKey]);
 
-                // Redefine the breadcrumbs
-                breadcrumbs = breadcrumbs.slice(0, breadcrumbs.length - 1).concat([newKey]);
-
-                // Go through the menu keys to get to the submenu above this
-                // one.
-                subMenu = menuInf;
-                const breadcrumbsButLast = breadcrumbs.slice(0, breadcrumbs.length - 1);
-                const breadcrumbsButLastLen = breadcrumbsButLast.length;
-                for (let i = 0; i < breadcrumbsButLastLen; i++) {
-                    const breadcrumb = breadcrumbsButLast[i];
-                    subMenu = subMenu[breadcrumb];
-                }
-
-                // Rename if submenu.
-                subMenu[newKey] = subMenu[lastKey][keyToKeep];
-                delete subMenu[lastKey];
-
-                // Go into new submenu
-                subMenu = subMenu[newKey];
-
-                // Update keys
-                keys = Object.keys(subMenu);
+            // Go through the menu keys to get to the submenu above this one.
+            subMenu = menuInf;
+            const breadcrumbsButLast = breadcrumbs.slice(0, breadcrumbs.length - 1);
+            const breadcrumbsButLastLen = breadcrumbsButLast.length;
+            for (let i = 0; i < breadcrumbsButLastLen; i++) {
+                const breadcrumb = breadcrumbsButLast[i];
+                subMenu = subMenu[breadcrumb];
             }
+
+            // Rename if submenu.
+            subMenu[newKey] = subMenu[lastKey][keyToKeep];
+            delete subMenu[lastKey];
+
+            // Go into new submenu
+            subMenu = subMenu[newKey];
+
+            // Update keys
+            keys = Object.keys(subMenu);
         }
 
         const keysLen = keys.length;

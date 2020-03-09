@@ -36,3 +36,5 @@ scene.log
 update_node_etc.sh
 TODO.md
 *.old
+from_playground
+fetch_js_from_playground.sh

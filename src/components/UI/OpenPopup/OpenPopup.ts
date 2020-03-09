@@ -21,9 +21,33 @@ let showBackdrop = true;
 let resolveFunc;
 let skinnyModal = false;
 
+interface IOpenModal {
+    title: string;
+    content: string;
+    isUrl?: boolean;
+    hasCloseBtn?: boolean;
+    isUnClosable?: boolean;
+    showBackdrop?: boolean;
+    isSkinny?: boolean;
+    btnText?: string;
+    onCloseCallback?: any;
+}
+
+function setMissingToDefaults(params: IOpenModal): IOpenModal {
+    params.isUrl = params.isUrl === undefined ? true : params.isUrl;
+    params.hasCloseBtn = params.hasCloseBtn === undefined ? undefined : params.hasCloseBtn;
+    params.isUnClosable = params.isUnClosable === undefined ? false : params.isUnClosable;
+    params.showBackdrop = params.showBackdrop === undefined ? true : params.showBackdrop;
+    params.isSkinny = params.isSkinny === undefined ? false : params.isSkinny;
+    params.onCloseCallback = params.onCloseCallback === undefined ? undefined : params.onCloseCallback;
+    params.btnText = params.btnText === undefined ? "Close" : params.btnText;
+
+    return params;
+}
+
 /**
  * Opens a modal.
- * @param  {string}  title       The tittle.
+ * @param  {string}  title       The title.
  * @param  {string}  val         The URL. A message otherwise.
  * @param  {boolean} isUrl       Whether val is a url.
  * @param  {boolean} closeBtn    Whether to include a close button. Defaults
@@ -35,9 +59,12 @@ let skinnyModal = false;
  * @param  {boolean} skinny      Whether the modal should be skinny.
  * @returns A promise that is fulfilled when the modal is shown.
  */
-export function openModal(title: string, val: string, isUrl = true, closeBtn?: boolean, unClosable = false, backdrop = true, skinny = false): Promise<any> {
-    showBackdrop = backdrop;
-    skinnyModal = skinny;
+// export function openModal(title: string, val: string, isUrl = true, closeBtn?: boolean, unClosable = false, backdrop = true, skinny = false): Promise<any> {
+export function openModal(params: IOpenModal): Promise<any> {
+    params = setMissingToDefaults(params);
+
+    showBackdrop = params.showBackdrop;
+    skinnyModal = params.isSkinny;
 
     // Load the css if needed.
     return new Promise((resolve, reject) => {
@@ -72,7 +99,7 @@ export function openModal(title: string, val: string, isUrl = true, closeBtn?: b
 
                         <!-- Modal footer -->
                         <div id="modal-footer" class="modal-footer">
-                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary modal-close-btn" data-dismiss="modal">${params.btnText}</button>
                         </div>
                     </div>
                 </div>
@@ -86,9 +113,9 @@ export function openModal(title: string, val: string, isUrl = true, closeBtn?: b
             // </div> -->
 
             // Add the javascript
-            openUrlModalContinue(title, val, isUrl, closeBtn, unClosable);
+            openUrlModalContinue(params);
         } else {
-            openUrlModalContinue(title, val, isUrl, closeBtn, unClosable);
+            openUrlModalContinue(params);
         }
     });
 }
@@ -104,7 +131,7 @@ export function openModal(title: string, val: string, isUrl = true, closeBtn?: b
  *                                ends the program.
  * @returns void
  */
-function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeBtn: boolean, unClosable: boolean): void {
+function openUrlModalContinue(params: IOpenModal): void {
     if (msgModal === undefined) {
         // This is run the first time. Like an init.
         msgModal = jQuery("#msgModal");
@@ -152,12 +179,12 @@ function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeB
     // Clear it.
     msgContainer.html("");
 
-    myTitle.html(title);
+    myTitle.html(params.title);
 
-    if (isUrl === true) {
+    if (params.isUrl === true) {
         // msgContainer.hide();
         // myIFrame.attr("src", val);
-        if (closeBtn === undefined) {
+        if (params.hasCloseBtn === undefined) {
             footer.hide();
         }
 
@@ -175,13 +202,13 @@ function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeB
                     // script.onload = () => {
                     //     //do stuff with the script
                     // };
-                    script.src = val.replace(".html", ".html.js");
+                    script.src = params.content.replace(".html", ".html.js");
 
                     document.head.appendChild(script);
                 }, 0)
             }
         };
-        xhttp.open("GET", val, true);
+        xhttp.open("GET", params.content, true);
         xhttp.send();
 
         // jQuery.get(val, (html: string) => {
@@ -207,20 +234,20 @@ function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeB
         // }, 1000);
 
         msgContainer.css("text-align", "center");
-        msgContainer.html(val);
-        if (closeBtn === undefined) {
+        msgContainer.html(params.content);
+        if (params.hasCloseBtn === undefined) {
             footer.show();
         }
     }
 
-    if (closeBtn === true) {
+    if (params.hasCloseBtn === true) {
         footer.show();
-    } else if (closeBtn === false) {
+    } else if (params.hasCloseBtn === false) {
         footer.hide();
     }
 
     let options = {};
-    if (unClosable === true) {
+    if (params.isUnClosable === true) {
         jQuery("#modal-close-button").hide();
         msgModal.on('shown.bs.modal', function (e) {
             jQuery(".modal-backdrop.show").css("opacity", 1);
@@ -233,6 +260,16 @@ function openUrlModalContinue(title: string, val: string, isUrl: boolean, closeB
     }
 
     msgModal.modal(options);
+
+    // If a callback function is specified, attach that to the button. Note
+    // that you should only use callback function if isUrl == false;
+    if (params.onCloseCallback !== undefined) {
+        let modalCloseBtn = jQuery(".modal-close-btn");
+        modalCloseBtn.unbind("click");
+        modalCloseBtn.click(() => {
+            params.onCloseCallback();
+        });
+    }
 
     // Need to redefine backdropDOM every time (because it gets removed, I
     // think).

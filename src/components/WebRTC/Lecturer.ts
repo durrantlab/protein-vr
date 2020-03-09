@@ -101,9 +101,12 @@ export function startBroadcast(): void {
 
     lect.idReady.then((id: string) => {
         window["PVR_webRTCID"] = id;
-        OpenPopup.openModal(
-            "Leader", "pages/leader.html", true, true
-        );
+        OpenPopup.openModal({
+            title: "Leader",
+            content: "pages/leader.html",
+            isUrl: true,
+            hasCloseBtn: true
+        });
     });
 
     // Periodically send the information about the representations.

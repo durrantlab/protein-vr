@@ -142,7 +142,13 @@ export function loadPDBURL(url: string, callBack: any): void {
             let msg = "<p>Could not load molecule: " + url + "</p>";
             msg += "<p><pre>" + err + "</pre></p>";
             msg += '<p>(<a href="' + window.location.href.split("?")[0] + '">Click to restart...</a>)</p>';
-            OpenPopup.openModal("Error Loading Molecule", msg, false, false, true);
+            OpenPopup.openModal({
+                title: "Error Loading Molecule",
+                content: msg,
+                isUrl: false,
+                hasCloseBtn: false,
+                isUnClosable: true
+            });
         },
     });
 }
@@ -249,8 +255,16 @@ export function render(updateData: boolean, repName: string, callBack: any = () 
  */
 function loadVRMLFrom3DMol(callBack: any): void {
     // Make the VRML string from that model.
-    /** @type {string} */
-    vrmlStr = viewer.exportVRML();
+
+    // TODO: Below is a horrible idea for debugging! But I'm getting an error
+    // with the WebXR polyfill that I can't debug (3rd party library).
+
+    try {
+        /** @type {string} */
+        vrmlStr = viewer.exportVRML();
+    } catch(e) {
+        console.log("Error that you should try to debug!", e);
+    }
     callBack();
 }
 
@@ -325,12 +339,12 @@ function loadValsFromVRML(repName: string, callBack: any): void {
         });
     } else {
         // Sorry! No Web Worker support..
-        OpenPopup.openModal(
-            "Browser Error",
-            `Your browser does not support web workers. Please use a more
+        OpenPopup.openModal({
+            title: "Browser Error",
+            content: `Your browser does not support web workers. Please use a more
             modern browser when running ProteinVR.`,
-            false
-        );
+            isUrl: false
+        });
         throw new Error("Browser does not support web workers.");
 
         // Comment below if you ever want to try to make it work without web

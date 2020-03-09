@@ -10,6 +10,9 @@ import * as CommonCamera from "../Cameras/CommonCamera";
 import * as Optimizations from "../Scene/Optimizations";
 import * as Vars from "../Vars/Vars";
 import * as Navigation from "./Navigation";
+import * as PromiseStore from "../PromiseStore";
+import * as UrlVars from "../Vars/UrlVars";
+import { runSetupVRListeners } from "../Cameras/VRCamera";
 
 declare var BABYLON: any;
 
@@ -40,8 +43,21 @@ export let curPickedMesh: any;
  * Sets up the pickables.
  * @returns void
  */
-export function setup(): void {
-    pickableMeshes.push(Vars.vrVars.groundMesh);
+export function runSetupPickables(): void {
+    PromiseStore.setPromise(
+        "SetupPickables", ["LoadBabylonScene"],
+        (resolve) => {
+            if (UrlVars.checkIfWebRTCInUrl()) {
+                // Follower mode. No need to setup pickables.
+                resolve();
+                return;
+            }
+
+            pickableMeshes.push(Vars.vrVars.groundMesh);
+
+            resolve();
+        }
+    )
 }
 
 /**
@@ -98,15 +114,16 @@ export function checkIfMeshPickable(mesh: any): boolean {
  * @returns number The category.
  */
 export function getCategoryOfCurMesh(): PickableCategory {
+    // console.log(curPickedMesh, curPickedMesh.name, "NEED NAMES HERE THHROUGHOUT?");
     if (curPickedMesh === undefined) {
         return PickableCategory.None;
-    } else if (curPickedMesh === Vars.vrVars.groundMesh) {
+    } else if (curPickedMesh.name === Vars.vrVars.groundMesh.name) {
         return PickableCategory.Ground;
     } else if (pickableButtons.indexOf(curPickedMesh) !== -1) {
         return PickableCategory.Button;
     } else if (pickableMolecules.indexOf(curPickedMesh) !== -1) {
         return PickableCategory.Molecule;
-    } else if (curPickedMesh === padNavSphereAroundCamera) {
+    } else if (curPickedMesh.name === padNavSphereAroundCamera.name) {
         return PickableCategory.padNavSphereAroundCamera;
     } else {
         return PickableCategory.None;
@@ -161,6 +178,11 @@ export function makeMeshMouseClickable(params: IMakeMeshClickableParams): void {
  * @returns void
  */
 export function makePadNavigationSphereAroundCamera(): void {
+    if (Vars.scene.meshes.map(m => m.name).indexOf("padNavSphereAroundCamera") !== -1) {
+        // Already loaded (could be two controllers).
+        return;
+    }
+
     padNavSphereAroundCamera = BABYLON.Mesh.CreateSphere(
         "padNavSphereAroundCamera",
         4, Vars.MAX_TELEPORT_DIST - 1.0, Vars.scene,

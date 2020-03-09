@@ -1,6 +1,19 @@
 CHANGES
 =======
 
+1.0.4
+-----
+
+* Upgrades BabylonJS engine from 4.1.0-alpha.19 to v4.1.0.
+* Fixed minor menu bug.
+* Switched from WebVR to WebXR (using WebXR polyfill for browsers that don't
+  support WebXR yet).
+* PROMISE BASED SYSTEM.
+* FIX: input improve Gamepad support in protein VR changes
+* Buttons resize on narrow-height devices.
+* Blinking cursor
+* Splash screen on mobile top request access to device orientation access (necessary for latest iOS)
+
 1.0.3
 -----
 

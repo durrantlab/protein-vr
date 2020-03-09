@@ -1,6 +1,6 @@
 {
     "name": "protein-vr",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "",
     "private": true,
     "scripts": {
@@ -42,6 +42,7 @@
         "3dmol": "^1.4.0",
         "bootstrap": "^4.3.1",
         "expose-loader": "^0.7.5",
-        "popper.js": "^1.15.0"
+        "popper.js": "^1.15.0",
+        "webxr-polyfill": "^2.0.1"
     }
 }

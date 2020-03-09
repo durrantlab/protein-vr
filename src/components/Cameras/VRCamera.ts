@@ -12,47 +12,70 @@ import * as Vars from "../Vars/Vars";
 import * as VRControllers from "./VRControllers";
 import * as UrlVars from "../Vars/UrlVars";
 import * as Menu3D from "../UI/Menu3D/Menu3D";
+import * as PromiseStore from "../PromiseStore";
+import * as Points from "../Navigation/Points";
+import * as NonVRCamera from "./NonVRCamera";
 
 declare var BABYLON: any;
 
 let lastTimeJSRunningChecked: number;
 
 /**
- * Sets up the VR camera.
+ * Sets up the VR camera (listens for enter/exit, controllers added, etc.).
  * @returns void
  */
-export function setup(): void {
-    if (UrlVars.checkWebrtcInUrl()) {
-        // Never do VR in webrtc mode.
-        return;
-    }
+export function runSetupVRListeners(): void {
+    // debugger;
+    // setTimeout(() => {
+    //     PromiseStore.debug();
+    // }, 5000);
 
-    // Setup different trigger VR functions (changes state, etc.)
-    setupEnterAndExitVRCallbacks();
-    VRControllers.setup();
+    PromiseStore.setPromise(
+        "SetupVRListeners", ["InitVR"],
+        (resolve) => {
+            // debugger;
+            if (UrlVars.checkIfWebRTCInUrl()) {
+                // Never do VR in webrtc mode.
+                resolve();
+                return;
+            }
 
-    // When you gain or loose focus, always exit VR mode. Doing this for
-    // iphone pwa, which otherwise can't exit VR mode.
-    // jQuery(window).focus(() => { exitVRAndFS(); });
-    // jQuery(window).blur(() => { exitVRAndFS(); });
-    // jQuery("body").focus(() => { exitVRAndFS(); });
-    // jQuery("body").blur(() => { exitVRAndFS(); });
-    // document.addEventListener("visibilitychange", () => { exitVRAndFS(); }, false);
+            if (Vars.vrHelper.baseExperience === undefined) {
+                // Apparently there is no WebXR.
+                resolve();
+                return;
+            }
 
-    // Surprizingly, none of the above are triggering on ios pwa! Let's try an
-    // additional approach...
-    setInterval(() => {
-        const now = new Date().getTime();
-        if (lastTimeJSRunningChecked === undefined) {
-            lastTimeJSRunningChecked = now;
+            // Setup different trigger VR functions (changes state, etc.)
+            setupEnterAndExitVRCallbacks();
+            VRControllers.setup();
+
+            // When you gain or loose focus, always exit VR mode. Doing this for
+            // iphone pwa, which otherwise can't exit VR mode.
+            // jQuery(window).focus(() => { exitVRAndFS(); });
+            // jQuery(window).blur(() => { exitVRAndFS(); });
+            // jQuery("body").focus(() => { exitVRAndFS(); });
+            // jQuery("body").blur(() => { exitVRAndFS(); });
+            // document.addEventListener("visibilitychange", () => { exitVRAndFS(); }, false);
+
+            // Surprizingly, none of the above are triggering on ios pwa! Let's try an
+            // additional approach...
+            setInterval(() => {
+                const now = new Date().getTime();
+                if (lastTimeJSRunningChecked === undefined) {
+                    lastTimeJSRunningChecked = now;
+                }
+                const deltaTime = now - lastTimeJSRunningChecked;
+                if (deltaTime > 2000) {
+                    // Javascript must have stopped recently.
+                    exitVRAndFS();
+                }
+                lastTimeJSRunningChecked = now;
+            }, 1000);
+
+            resolve();
         }
-        const deltaTime = now - lastTimeJSRunningChecked;
-        if (deltaTime > 2000) {
-            // Javascript must have stopped recently.
-            exitVRAndFS();
-        }
-        lastTimeJSRunningChecked = now;
-    }, 1000);
+    )
 }
 
 /**
@@ -64,13 +87,11 @@ export function exitVRAndFS(): void {
         return;
     }
 
-    // I wondered if the if statements below prevented ios pwa from working.
-    // Could be wrong, but doesn't hurt to omit them. Leave them commented in
-    // case you need them in the future.
-
-    // if (Vars.vrHelper.isInVRMode) {
-        Vars.vrHelper.exitVR();
-    // }
+    if (Vars.vrHelper.baseExperience.state === BABYLON.WebXRState.IN_XR) {
+        // Be sure you only exit if you're in XR. Otherwise it will cause
+        // problems (Oculus Go).
+        Vars.vrHelper.baseExperience.exitXRAsync();
+    }
 
     // if (Vars.vrHelper._fullscreenVRpresenting) {
     Vars.scene.getEngine().exitFullscreen();
@@ -83,111 +104,106 @@ export function exitVRAndFS(): void {
  * @returns void
  */
 function setupEnterAndExitVRCallbacks(): void {
-    Vars.vrHelper.onEnteringVRObservable.add((a: any, b: any) => {
-        // When you enter VR. Not sure what a and b are. Both are objects.
+    // UrlVars.enableAutoUpdateUrl(false);  // For debugging
+    Vars.vrHelper.baseExperience.onStateChangedObservable.add((state) => {
+        switch (state) {
+            case BABYLON.WebXRState.ENTERING_XR:
+                // Prevent url update while waiting for user to authorize xr.
+                // console.log("ENTERING_XR");
+                UrlVars.enableAutoUpdateUrl(false);
+                break;
 
-        // Update navMode
-        Vars.vrVars.navMode = Navigation.NavMode.VRNoControllers;
+            case BABYLON.WebXRState.IN_XR:
+                // XR is initialized and already submitted one frame
+                // console.log("IN_XR");
+                UrlVars.enableAutoUpdateUrl(true);
 
-        // Setup teleportation. If uncommented, this is the one that comes
-        // with BABYLON.js.
-        // setupCannedVRTeleportation();
+                // Below doesn't work, but just setting the position does.
+                // Vars.vrHelper.baseExperience.camera.setTransformationFromNonVRCamera(
+                //     NonVRCamera.nonVRCamera, true
+                // );
+                Vars.vrHelper.baseExperience.camera.position = NonVRCamera.nonVRCamera.position.clone();
 
-        setupGazeTracker();
+                // Resize the engine to get it working in VR headset.
+                Vars.engine.resize();
 
-        // Reset selected mesh.
-        Pickables.setCurPickedMesh(undefined);
+                // case BABYLON.WebXRState.ENTERING_XR:
+                // // xr is being initialized, enter XR request was made
+                // console.log("Entering VR", state);
 
-        // You need to recalculate the shadows. I've found you get back
-        // shadows in VR otherwise.
-        Optimizations.updateEnvironmentShadows();
+                // Update navMode
+                Vars.vrVars.navMode = Navigation.NavMode.VRNoControllers;
 
-        // Hide the 2D buttons.
-        jQuery(".ui-button").hide();
-        jQuery(".babylonVRicon").hide();
+                // Update the object used to position the nav mesh. Now VR
+                // camera.
+                Points.useGazeForNavMeshPos();
 
-        // Start trying to initialive the controllers (in case they weren't
-        // initalized already).
-        VRControllers.startCheckingForControlers();
+                // Setup teleportation. If uncommented, this is the one that comes
+                // with BABYLON.js.
+                // setupCannedVRTeleportation();
 
-        // Update menu, too, so there's an exit VR button.
-        Menu3D.menuInf["Exit VR ×"] = () => { exitVRAndFS(); }
+                // Reset selected mesh.
+                Pickables.setCurPickedMesh(undefined);
 
-        window["vrHelper"] = Vars.vrHelper;
+                // You need to recalculate the shadows. I've found you get back
+                // shadows in VR otherwise.
+                Optimizations.updateEnvironmentShadows();
+
+                // Hide the 2D buttons.
+                jQuery(".ui-button").hide();
+                // jQuery(".babylonVRicon").hide();  // Keep this one visible to exit.
+
+                // Start trying to initialive the controllers (in case they weren't
+                // initalized already).
+                // VRControllers.startCheckingForControlers();
+
+                // Update menu, too, so there's an exit VR button.
+                Menu3D.menuInf["Exit VR ×"] = () => { exitVRAndFS(); }
+
+                // Active camera needs to be XR camera..
+                // console.log(Vars.scene.activeCamera);
+                break;
+
+            case BABYLON.WebXRState.EXITING_XR:
+                // console.log("EXITING_XR");
+                UrlVars.enableAutoUpdateUrl(true);
+                // xr exit request was made. not yet done.
+                // console.log("Exiting VR", state);
+                break;
+
+            case BABYLON.WebXRState.NOT_IN_XR:
+                // console.log("NOT_IN_XR");
+                UrlVars.enableAutoUpdateUrl(true);
+                // console.log("Not in VR", state);
+
+                // Resize the engine to get it working in VR headset.
+                Vars.engine.resize();
+
+                // Update navMode
+                Vars.vrVars.navMode = Navigation.NavMode.NoVR;
+
+                // Reset selected mesh.
+                Pickables.setCurPickedMesh(undefined);
+
+                // Let's recalculate the shadows here again too, just to be on the
+                // safe side.
+                Optimizations.updateEnvironmentShadows();
+
+                // Update the object used to position the nav mesh. Now back
+                // to non-VR camera.
+                Points.useGazeForNavMeshPos();
+
+                // Show the 2D buttons.
+                jQuery(".ui-button").show();
+                jQuery(".babylonVRicon").show();
+
+                // Update menu, too, so there's an exit VR button.
+                delete Menu3D.menuInf["Exit VR ×"];
+                // console.log(Menu3D.menuInf);
+                break;
+
+            // case BABYLON.WebXRState_NOT_IN_XR:
+            //     // self explanatory - either our or not yet in XR
+        }
     });
-
-    Vars.vrHelper.onExitingVRObservable.add(() => {
-        // Update navMode
-        Vars.vrVars.navMode = Navigation.NavMode.NoVR;
-
-        // Reset selected mesh.
-        Pickables.setCurPickedMesh(undefined);
-
-        // Let's recalculate the shadows here again too, just to be on the
-        // safe side.
-        Optimizations.updateEnvironmentShadows();
-
-        // Show the 2D buttons.
-        jQuery(".ui-button").show();
-        jQuery(".babylonVRicon").show();
-
-        // Update menu, too, so there's an exit VR button.
-        delete Menu3D.menuInf["Exit VR ×"];
-        console.log(Menu3D.menuInf);
-    });
-}
-
-/**
- * A placeholder mesh. Not technically empty, but pretty close.
- * @returns {*} The custom mesh (almost an empty).
- */
-function makeEmptyMesh(): any {
-    /** @const {*} */
-    const customMesh = new BABYLON.Mesh("vrNavTargetMesh", Vars.scene);
-
-    /** @const {Array<number>} */
-    const positions = [0, 0, 0];
-
-    /** @const {Array<number>} */
-    const indices = [0];
-
-    /** @const {*} */
-    const vertexData = new BABYLON.VertexData();
-
-    vertexData.positions = positions;
-    vertexData.indices = indices;
-    vertexData.applyToMesh(customMesh);
-    customMesh.isVisible = false;
-
-    return customMesh;
-}
-
-/**
- * Sets up the VR gaze tracking mesh.
- * @returns void
- */
-export function setupGazeTracker(): void {
-
-    /**
-     * @param {*}
-     * @returns boolean
-     */
-    Vars.vrHelper.raySelectionPredicate = (mesh: any): boolean => {
-        // if (!mesh.isVisible) {
-        //     return false;
-        // }
-        return Pickables.checkIfMeshPickable(mesh);
-    };
-
-    // Make an invisible mesh that will be positioned at location of gaze.
-    Vars.vrHelper.gazeTrackerMesh = makeEmptyMesh();
-    Vars.vrHelper.updateGazeTrackerScale = false;  // Babylon 3.3 preview.
-    Vars.vrHelper.displayGaze = true;  // Does need to be true. Otherwise, position not updated.
-    Vars.vrHelper.enableGazeEvenWhenNoPointerLock = true;
-    // console.log(Vars.vrHelper);
-
-    Vars.vrHelper.enableInteractions();
-
-    // For debugging...
-    // window.vrHelper = Vars.vrHelper;
 }

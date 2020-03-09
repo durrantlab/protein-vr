@@ -18,6 +18,17 @@ const stylesQueue: any[] = [];
 export let webrtc: any = undefined;
 export let shadows = false;
 let urlParams: any;
+let autoUpdateUrlEnabled = true;
+
+/**
+ * Whether to periodically update the URL with information re. the scene and
+ * camera position.
+ * @param  {boolean} val  True if the url should be updated. False otherwise.
+ * @returns void
+ */
+export function enableAutoUpdateUrl(val: boolean): void {
+    autoUpdateUrlEnabled = val;
+}
 
 /**
  * Get all the url parameters from a url string.
@@ -74,6 +85,10 @@ function round(x: number): string {
  * @returns void
  */
 export function setURL(): void {
+    if (autoUpdateUrlEnabled === false) {
+        return;
+    }
+
     let params = [];
 
     // Get the rotations.
@@ -135,7 +150,9 @@ export function setURL(): void {
 
     params.push("sh=" + shadows.toString());
 
-    // Update URL
+    // Update URL. Note that if you change the url while waiting for the user
+    // to authorize VR, it will throw an error. So make sure that's not what's
+    // going on.
     window.history.pushState(
         {
             // "html": response.html,
@@ -312,7 +329,7 @@ export function startLoadingStyles(): void {
  * Checks if "f=" in url (webrtc). This works even if UrlVars hasn't been set yet.
  * @returns boolean
  */
-export function checkWebrtcInUrl(): boolean {
+export function checkIfWebRTCInUrl(): boolean {
     return window.location.href.indexOf("f=") !== -1;
 }
 

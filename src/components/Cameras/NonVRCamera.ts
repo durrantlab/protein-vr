@@ -10,7 +10,7 @@ import * as Vars from "../Vars/Vars";
 declare var BABYLON: any;
 
 /** @type {*} */
-let nonVRCamera: any;
+export let nonVRCamera: any;
 
 const lastCameraPosAboveGroundMesh: any = new BABYLON.Vector3(0, 0, 0);
 

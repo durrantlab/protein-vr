@@ -19,6 +19,8 @@ export let groundPointBelowCamera = new BABYLON.Vector3(0, 0, 0);
 export let groundPointBelowStarePt = new BABYLON.Vector3(0, 0, 0);
 export let curStarePt = new BABYLON.Vector3(0, 0, 0);
 
+// setInterval(() => { console.log(groundPointBelowCamera);}, 500);
+
 /**
  * Sets the curStarePt variable externally.
  * @param {*} pt
@@ -28,20 +30,36 @@ export function setCurStarePt(pt: any): void {
     curStarePt.copyFrom(pt);
 }
 
+// Read position and rotation from this to position teleportation sphere.
+let rayFuncToCalcNavMeshPos;
+
+export function setRayFuncToCalcNavMeshPos(func: Function): void {
+    rayFuncToCalcNavMeshPos = func;
+}
+
+export function useGazeForNavMeshPos(): void {
+    setRayFuncToCalcNavMeshPos(() => {
+        return Vars.scene.activeCamera.getForwardRay();
+    });
+}
+
 /**
  * Sets up the key points detection. Stare point, point below the camera, etc.
  * @returns void
  */
 export function setup(): void {
-    // Hide menu button if clsoer than this
+    // Hide menu button if closer than this.
     const CLOSE_TO_GROUND_DIST = Vars.BUTTON_SPHERE_RADIUS * 1.5;
+
+    // Initially, move the nav sphere to where starting.
+    useGazeForNavMeshPos();
 
     // Constantly update the stare point info. Also, position the tracking
     // mesh.
     Vars.scene.registerBeforeRender(() => {
         // Get the stare point. Here because it should be updated with every
         // frame.
-        setStarePointInfo();
+        setPickPointAndObjInScene();
         cancelStareIfFarAway();
         Vars.vrVars.navTargetMesh.position.copyFrom(curStarePt);
 
@@ -66,6 +84,7 @@ export function setup(): void {
             } else {
                 Menu3D.openMainMenuFloorButton.button.isVisible = true;
                 Menu3D.openMainMenuFloorButton.containingMesh.isVisible = true;
+                window["btn"] = Menu3D.openMainMenuFloorButton;  // For debugging
             }
         }
 
@@ -73,57 +92,6 @@ export function setup(): void {
         pickedGroundPt = groundPointPickingInfo(curStarePt).pickedPoint;
         if (pickedGroundPt) { groundPointBelowStarePt = pickedGroundPt; }
     });
-}
-
-/**
- * Gets the point where the user is looking (or pointing with controllers).
- * @returns void
- */
-export function setStarePointInfo(): void {
-    // This function runs with ever turn of the render loop. Set's information
-    // about what you're looking/pointing at. Info saved to curStarePt
-    /** @type {*} */
-    let ray: any;
-
-    if (Vars.vrVars.navMode === Navigation.NavMode.NoVR) {
-        // No VR yet. So it's outside the realm of the VRHelper. Calculate
-        // it using the looking direction.
-
-        // Get a ray extending out in the direction of the stare.
-        ray = Vars.scene.activeCamera.getForwardRay();
-    } else if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
-               (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
-
-
-        // Find the valid gazetracker mesh.
-        /** @type {*} */
-        let gazeTrackerMesh;
-        if (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers) {
-            gazeTrackerMesh = Vars.vrHelper.rightControllerGazeTrackerMesh;
-            if (!gazeTrackerMesh) { gazeTrackerMesh = Vars.vrHelper.leftControllerGazeTrackerMesh; }
-        } else if (Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) {
-            gazeTrackerMesh = Vars.vrHelper.gazeTrackerMesh;
-        }
-        if (!gazeTrackerMesh) {
-            console.log("error!");
-            return;
-        }
-
-        if (!gazeTrackerMesh.isVisible) {
-            setCurStarePt(pointWayOffScreen);
-        } else {
-            setCurStarePt(gazeTrackerMesh.absolutePosition);
-        }
-
-        // Construct a ray from the camera to the stare obj
-        /** @type {*} */
-        const camPos = CommonCamera.getCameraPosition();
-        ray = new BABYLON.Ray(camPos, curStarePt.subtract(camPos));
-    } else {
-        console.log("Unexpected error.");
-    }
-
-    setPickPointAndObjInScene(ray);
 }
 
 /**
@@ -148,11 +116,13 @@ function cancelStareIfFarAway(): void {
 
 /**
  * Sets the pick point and object currently looking at.
- * @param  {*}       ray	          The looking ray.
- * @param  {boolean} [updatePos=true] Whether to update the position.
+x * @param  {boolean} [updatePos=true] Whether to update the position.
  * @returns void
  */
-function setPickPointAndObjInScene(ray: any, updatePos = true): void {
+export function setPickPointAndObjInScene(updatePos = true): void {
+    // The looking ray.
+    let ray = rayFuncToCalcNavMeshPos();
+
     // Determines where the specified ray intersects a pickable object.
     /** @const {*} */
     const pickingInfo = Vars.scene.pickWithRay(ray, (mesh: any) => {

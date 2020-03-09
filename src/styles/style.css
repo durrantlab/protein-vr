@@ -74,11 +74,20 @@ body {
 #babylonVRiconbtn,
 .ui-button {
   z-index: 4;
+  transition: transform 0.125s ease-out;
+}
+
+.ui-button:hover {
+    transform: scale(1.05);
 }
 
 #babylonjsLoadingDiv {
   z-index: 3;
   background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.babylonVRicon {
+    position: fixed;
 }
 
 /* Full screen, make sure no cursor. */
@@ -159,4 +168,14 @@ div.btn {
 /* No selecting text */
 * {
     user-select: none;
+}
+
+/* The button wrapper (to resize the 2D buttons on the front screen. */
+#btnsWrapper {
+    transform-origin: bottom right;
+    position: absolute;
+    z-index: 3 !important;
+    right: 0;
+    bottom: 0;
+    width: 85px;
 }
