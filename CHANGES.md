@@ -4,15 +4,20 @@ CHANGES
 1.0.4
 -----
 
-* Upgrades BabylonJS engine from 4.1.0-alpha.19 to v4.1.0.
-* Fixed minor menu bug.
-* Switched from WebVR to WebXR (using WebXR polyfill for browsers that don't
+* Upgraded the BabylonJS engine from 4.1.0-alpha.19 to v4.1.0.
+* Switched from WebVR to WebXR (using a WebXR polyfill for browsers that don't
   support WebXR yet).
-* PROMISE BASED SYSTEM.
-* FIX: input improve Gamepad support in protein VR changes
-* Buttons resize on narrow-height devices.
-* Blinking cursor
-* Splash screen on mobile top request access to device orientation access (necessary for latest iOS)
+* Improved Gamepad/VR-controller support.
+* The teleportation sphere now blinks so that it is easily visible in both
+  light and dark environments.
+* 2D buttons automatically resize on narrow-height devices (e.g., phones).
+* On systems that require the user to explicitly authorize access to the
+  device orientation sensors (e.g., iPhones), a splash screen now appears in
+  order to request access.
+* Fixed a minor menu bug.
+* Internally, ProteinVR now often uses Promises instead of callback functions.
+  This change makes the codebase more maintainable and will make it easier to
+  implement a plugin system (planned for the future).
 
 1.0.3
 -----
