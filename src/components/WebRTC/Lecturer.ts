@@ -2,7 +2,6 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 // Functions for leader mode, that the leader (lecturer) uses.
 
 import * as CommonCamera from "../Cameras/CommonCamera";
@@ -158,7 +157,7 @@ export function sendToggleRepCommand(filters: any[], repName: string, colorSchem
 
 /**
  * Sends the data to the student so they can run Rotations.axisRotation.
- * @param  {string} axis The axis to rotate about.
+ * @param  {string} axis  The axis to rotate about.
  * @returns void
  */
 export function sendUpdateMolRotCommand(axis: string): void {
@@ -167,13 +166,13 @@ export function sendUpdateMolRotCommand(axis: string): void {
         "val": axis
     });
 }
-
+/**
+ * Send the data to the student re. undoing any rotations.
+ * @returns void
+ */
 export function sendUndoRotCommand(): void {
     lect.sendData({
         "type": "molUndoRot",
         "val": undefined
     });
 }
-
-// For debugging...
-// window["startBroadcast"] = startBroadcast;

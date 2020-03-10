@@ -12,8 +12,6 @@ let bootstrapLoaded = false;
 let msgModal: any;
 let myTitle: any;
 let modalDialog: any;
-// let myIFrame: any;
-// let iFrameContainer: any;
 let msgContainer: any;
 let footer: any;
 export let modalCurrentlyOpen: boolean = false;
@@ -33,6 +31,11 @@ interface IOpenModal {
     onCloseCallback?: any;
 }
 
+/**
+ * Set values of open-modal parameters that are not specified elsewhere.
+ * @param  {IOpenModal} params  The parameters.
+ * @returns IOpenModal  The parameters, with the missing values filled in.
+ */
 function setMissingToDefaults(params: IOpenModal): IOpenModal {
     params.isUrl = params.isUrl === undefined ? true : params.isUrl;
     params.hasCloseBtn = params.hasCloseBtn === undefined ? undefined : params.hasCloseBtn;
@@ -46,20 +49,10 @@ function setMissingToDefaults(params: IOpenModal): IOpenModal {
 }
 
 /**
- * Opens a modal.
- * @param  {string}  title       The title.
- * @param  {string}  val         The URL. A message otherwise.
- * @param  {boolean} isUrl       Whether val is a url.
- * @param  {boolean} closeBtn    Whether to include a close button. Defaults
- *                               to false if isUrl, true otherwise.
- * @param  {boolean} unClosable  If true, modal cannot be closed. Effectively
- *                               ends the program.
- * @param  {boolean} backdrop    Whether to show the backdrop. Defaults to
- *                               true.
- * @param  {boolean} skinny      Whether the modal should be skinny.
- * @returns A promise that is fulfilled when the modal is shown.
+ * Opens the modal.
+ * @param  {IOpenModal} params  The parameters required to open this modal.
+ * @returns Promise  A promise that is fulfilled when done.
  */
-// export function openModal(title: string, val: string, isUrl = true, closeBtn?: boolean, unClosable = false, backdrop = true, skinny = false): Promise<any> {
 export function openModal(params: IOpenModal): Promise<any> {
     params = setMissingToDefaults(params);
 
@@ -122,13 +115,7 @@ export function openModal(params: IOpenModal): Promise<any> {
 
 /**
  * A follow-up function for opening the url modal.
- * @param  {string}   title       The title.
- * @param  {string}   val         The URL if isUrl. A message otherwise.
- * @param  {boolean}  isUrl       Whether val is a url.
- * @param  {boolean}  closeBtn    Whether to include a close button. Defaults
- *                                to false if isUrl, true otherwise.
- * @param  {boolean}  unClosable  If true, modal cannot be closed. Effectively
- *                                ends the program.
+ * @param  {IOpenModal} params  The parameters required to open this modal.
  * @returns void
  */
 function openUrlModalContinue(params: IOpenModal): void {
@@ -200,7 +187,7 @@ function openUrlModalContinue(params: IOpenModal): void {
                     // Now that the html is loaded, load the remote js too.
                     const script = document.createElement('script');
                     // script.onload = () => {
-                    //     //do stuff with the script
+                    //     // do stuff with the script
                     // };
                     script.src = params.content.replace(".html", ".html.js");
 
@@ -288,6 +275,3 @@ function openUrlModalContinue(params: IOpenModal): void {
         modalDialog.removeClass("skinny-modal");
     }
 }
-
-// For debugging...
-// window["openModal"] = openModal;

@@ -2,7 +2,6 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 // Functions for leader mode, that the follower (student) uses.
 
 import * as CommonCamera from "../Cameras/CommonCamera";

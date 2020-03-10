@@ -2,7 +2,6 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 // Functions that are common to the main classes of Lecturer.ts and
 // Student.ts.
 
@@ -94,6 +93,10 @@ export class WebRTCBase {
         });
     }
 
+    /**
+     * Generate a random string.
+     * @returns string  The string.
+     */
     private randomNumStr(): string {
         return Math.random().toString().replace(/\./g, "").replace(/0/g, "").slice(0, 3);
     }

@@ -2,7 +2,6 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 // This module sets up the VR camera.
 
 import * as Navigation from "../Navigation/Navigation";
@@ -33,7 +32,6 @@ export function runSetupVRListeners(): void {
     PromiseStore.setPromise(
         "SetupVRListeners", ["InitVR"],
         (resolve) => {
-            // debugger;
             if (UrlVars.checkIfWebRTCInUrl()) {
                 // Never do VR in webrtc mode.
                 resolve();
@@ -104,7 +102,6 @@ export function exitVRAndFS(): void {
  * @returns void
  */
 function setupEnterAndExitVRCallbacks(): void {
-    // UrlVars.enableAutoUpdateUrl(false);  // For debugging
     Vars.vrHelper.baseExperience.onStateChangedObservable.add((state) => {
         switch (state) {
             case BABYLON.WebXRState.ENTERING_XR:
@@ -112,7 +109,6 @@ function setupEnterAndExitVRCallbacks(): void {
                 // console.log("ENTERING_XR");
                 UrlVars.enableAutoUpdateUrl(false);
                 break;
-
             case BABYLON.WebXRState.IN_XR:
                 // XR is initialized and already submitted one frame
                 // console.log("IN_XR");
@@ -126,10 +122,6 @@ function setupEnterAndExitVRCallbacks(): void {
 
                 // Resize the engine to get it working in VR headset.
                 Vars.engine.resize();
-
-                // case BABYLON.WebXRState.ENTERING_XR:
-                // // xr is being initialized, enter XR request was made
-                // console.log("Entering VR", state);
 
                 // Update navMode
                 Vars.vrVars.navMode = Navigation.NavMode.VRNoControllers;
@@ -153,28 +145,20 @@ function setupEnterAndExitVRCallbacks(): void {
                 jQuery(".ui-button").hide();
                 // jQuery(".babylonVRicon").hide();  // Keep this one visible to exit.
 
-                // Start trying to initialive the controllers (in case they weren't
-                // initalized already).
-                // VRControllers.startCheckingForControlers();
-
                 // Update menu, too, so there's an exit VR button.
                 Menu3D.menuInf["Exit VR ×"] = () => { exitVRAndFS(); }
 
                 // Active camera needs to be XR camera..
                 // console.log(Vars.scene.activeCamera);
                 break;
-
             case BABYLON.WebXRState.EXITING_XR:
+                // xr exit request was made. not yet done.
                 // console.log("EXITING_XR");
                 UrlVars.enableAutoUpdateUrl(true);
-                // xr exit request was made. not yet done.
-                // console.log("Exiting VR", state);
                 break;
-
             case BABYLON.WebXRState.NOT_IN_XR:
                 // console.log("NOT_IN_XR");
                 UrlVars.enableAutoUpdateUrl(true);
-                // console.log("Not in VR", state);
 
                 // Resize the engine to get it working in VR headset.
                 Vars.engine.resize();
@@ -199,11 +183,7 @@ function setupEnterAndExitVRCallbacks(): void {
 
                 // Update menu, too, so there's an exit VR button.
                 delete Menu3D.menuInf["Exit VR ×"];
-                // console.log(Menu3D.menuInf);
                 break;
-
-            // case BABYLON.WebXRState_NOT_IN_XR:
-            //     // self explanatory - either our or not yet in XR
         }
     });
 }

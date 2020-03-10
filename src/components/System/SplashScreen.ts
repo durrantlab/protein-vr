@@ -1,3 +1,7 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2019 Jacob D. Durrant.
+
 // On some devices like iOS13, you'll need the user to specifically authorize
 // the device orientation sensors. We can do this through a simple "splash
 // screen".
@@ -5,6 +9,12 @@
 import * as OpenPopup from "../UI/OpenPopup/OpenPopup";
 import * as Vars from "../Vars/Vars";
 
+/**
+ * Shows a splash screen. Mostly to get the user to authorize device
+ * orientation sensor.
+ * @param  {Function} onClick  The function to run when you click the modal.
+ * @returns void
+ */
 export function showSplashScreen(onClick: any): void {
     let msg = `
     <div class="media">

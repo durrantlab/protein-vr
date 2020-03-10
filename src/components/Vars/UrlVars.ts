@@ -2,14 +2,12 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 import * as ThreeDMol from "../Mols/3DMol/ThreeDMol";
 import * as VisStyles from "../Mols/3DMol/VisStyles";
 import * as VRML from "../Mols/3DMol/VRML";
 import * as Student from "../WebRTC/Student";
 import * as Vars from "./Vars";
 import * as CommonCamera from "../Cameras/CommonCamera";
-// import * as OpenPopup from "../UI/OpenPopup/OpenPopup";
 
 declare var jQuery: any;
 declare var BABYLON: any;
@@ -74,7 +72,7 @@ function getAllUrlParams(url: string): any {
 /**
  * Round a number and represent it as a string.
  * @param  {number} x  The number.
- * @returns string The rounded string.
+ * @returns string  The rounded string.
  */
 function round(x: number): string {
     return (Math.round(100000 * x) / 100000).toString();
@@ -290,7 +288,7 @@ export function readUrlParams(): void {
 /**
  * Takes a string like All--Ligand--Stick--Element and converts it to [["All",
  * "Ligand"], "Stick", "Element"].
- * @param  {string} key The srting.
+ * @param  {string} key  The srting.
  * @returns Array<*>
  */
 export function extractRepInfoFromKey(key: string): any[] {

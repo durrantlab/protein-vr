@@ -2,7 +2,6 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 // This module includes functions to manage which meshes in the scene are
 // pickable.
 
@@ -12,7 +11,6 @@ import * as Vars from "../Vars/Vars";
 import * as Navigation from "./Navigation";
 import * as PromiseStore from "../PromiseStore";
 import * as UrlVars from "../Vars/UrlVars";
-import { runSetupVRListeners } from "../Cameras/VRCamera";
 
 declare var BABYLON: any;
 
@@ -114,7 +112,6 @@ export function checkIfMeshPickable(mesh: any): boolean {
  * @returns number The category.
  */
 export function getCategoryOfCurMesh(): PickableCategory {
-    // console.log(curPickedMesh, curPickedMesh.name, "NEED NAMES HERE THHROUGHOUT?");
     if (curPickedMesh === undefined) {
         return PickableCategory.None;
     } else if (curPickedMesh.name === Vars.vrVars.groundMesh.name) {
@@ -138,7 +135,7 @@ interface IMakeMeshClickableParams {
 
 /**
  * Make it so a given mesh can be clicked with the mouse.
- * @param  {Object<string,*>} params The parameters. See interface above.
+ * @param  {Object<string,*>} params  The parameters. See interface above.
  * @returns void
  */
 export function makeMeshMouseClickable(params: IMakeMeshClickableParams): void {
@@ -204,7 +201,4 @@ export function makePadNavigationSphereAroundCamera(): void {
 
     // It needs to be pickable
     pickableMeshes.push(padNavSphereAroundCamera);
-
-    // Pretend like it's a molecule. Teleportation will be disabled elsewhere.
-    // addPickableMolecule(padNavSphereAroundCamera);
 }

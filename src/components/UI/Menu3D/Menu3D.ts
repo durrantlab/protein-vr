@@ -2,10 +2,8 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 import * as CommonCamera from "../../Cameras/CommonCamera";
 import * as VRPoints from "../../Navigation/Points";
-import * as VRCamera from "../../Cameras/VRCamera";
 import * as Vars from "../../Vars/Vars";
 import * as Button from "./Button";
 import * as Rotations from "./Rotations";
@@ -64,9 +62,6 @@ export function setup(data?: any): void {
     if (gui3DMenuManager === undefined) {
         // Make a manager for the menu
         gui3DMenuManager = new BABYLON.GUI.GUI3DManager(Vars.scene);
-
-        // For debugging...
-        // window["gui3DMenuManager"] = gui3DMenuManager;
     }
 
     // Simplify the menu (collapsing excessive parts).
@@ -144,7 +139,7 @@ function createPanelSixteenButtons(): void {
                 level: levelInt,
                 name: "menu-visible-button-" + txt,
                 panel,
-                trueTxt: txt, //  + "\n(Show)",
+                trueTxt: txt,
                 color,
             }),
         );
@@ -162,7 +157,7 @@ function createPanelSixteenButtons(): void {
  * Applies a user-provided function to all levels of the menu. For example,
  * adds "Back" and "Close Menu" buttons to all sub menus.
  * @param  {Function(Object, Array<string>)} funcToApply  The function to
- * apply.
+ *                                                        apply.
  * @returns void
  */
 export function applyFuncToAllMenuLevels(funcToApply: any): void {
@@ -246,8 +241,7 @@ function setupMainMenuToggleButton(): void {
             }
 
             commonMenuAnchor.position.copyFrom(CommonCamera.getCameraPosition());
-            commonMenuAnchor.rotation.y = CommonCamera.getCameraRotationY(); //  + Math.PI * 0.5;
-            // camera.rotation.y + Math.PI * 0.5;s
+            commonMenuAnchor.rotation.y = CommonCamera.getCameraRotationY();
         },
         default: false,
         falseTxt: "Show Menu",
@@ -262,9 +256,6 @@ function setupMainMenuToggleButton(): void {
     openMainMenuFloorButton.button.position.z = 0.75;
     // openMainMenuFloorButton.button.rotation.x = 0.25 * Math.PI;
 
-    // For debugging...
-    // window["openMainMenuFloorButton"] = openMainMenuFloorButton;
-
     // Set up the button anchor and move/rotate it.
     const mainMenuAnchorToggle = new BABYLON.TransformNode(""); // this can be a mesh, too
     panelToggle.linkToTransformNode(mainMenuAnchorToggle);
@@ -278,9 +269,6 @@ function setupMainMenuToggleButton(): void {
     // Rotate the menu button towards camera. Because no longer right below
     // user's feet.
     mainMenuAnchorToggle.rotation.x = 0.4 * Math.PI;
-
-    // var mySphere = BABYLON.MeshBuilder.CreateSphere("mySphere", {diameter: 0.5, diameterX: 0.5}, Vars.scene);
-    // mySphere.position = mainMenuAnchorToggle.position;
 
     Vars.scene.registerBeforeRender(() => {
         mainMenuAnchorToggle.position.copyFrom(VRPoints.groundPointBelowCamera);  // Prob

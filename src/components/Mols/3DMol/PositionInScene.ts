@@ -2,7 +2,6 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 import * as Optimizations from "../../Scene/Optimizations";
 import * as Vars from "../../Vars/Vars";
 import * as VisStyles from "./VisStyles";
@@ -67,6 +66,7 @@ export function positionAll3DMolMeshInsideAnother(babylonMesh: any, otherBabylon
     let thisBoxDimens: number[];
 
     let thisMesh;  // biggest mesh
+
     /** @type {number} */
     const allVisMolMeshesLen = allVisMolMeshes.length;
     for (let i = 0; i < allVisMolMeshesLen; i++) {

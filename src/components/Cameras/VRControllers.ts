@@ -2,14 +2,11 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 import * as Navigation from "../Navigation/Navigation";
 import * as Pickables from "../Navigation/Pickables";
 import * as Points from "../Navigation/Points";
 import * as Vars from "../Vars/Vars";
 import * as CommonCamera from "./CommonCamera";
-import * as VRCamera from "./VRCamera";
-// import * as DebugMsg from "../UI/DebugMsg";
 
 declare var BABYLON: any;
 
@@ -27,8 +24,6 @@ let inputSources = {
 };
 
 let currentInputSourceType = "";
-
-// let startedCheckingForControllers = false;
 
 /**
  * Sets up the enter and exit functions when controllers load. No unload
@@ -84,25 +79,12 @@ export function setup(): void {
         // Need to set it up separately for gaze controller.
         setupGazeTrackingButtonClick();
     });
-
-    // // onControllersAttachedObservable doesn't work. I'd prefer that one...
-    // Vars.vrHelper.input.onControllerAddedObservable.add((webXRController /* WebXRController instance */ ) => {
-    //     // WAS: Vars.vrHelper.webVRCamera.onControllerMeshLoadedObservable.add((webVRController: any) => {
-    //     onControllerLoaded(webXRController);  // JDDJDD. webXRController != webVRController. Could be additional changes needed.
-    // });
-
-    // JDDJDD
-    // Vars.vrHelper.onControllerMeshLoaded.add((webVRController: any) => {
-    //     onControllerLoaded(webVRController);
-    // });
-
-    // Vars.vrHelper.webVRCamera.onControllersAttachedObservable.add((v) => {
-    //     Vars.scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
-    // });
-
-    // Doesn't appear to be a detach function...
 }
 
+/**
+ * Set up gaze tracking (e.g., for google goggles).
+ * @returns void
+ */
 export function setupGazeTrackingButtonClick(): void {
     Vars.vrHelper.input.onControllerAddedObservable.add((inputSource) => {
         Vars.vrHelper.baseExperience.sessionManager.session.onselect = (inputSource) => {
@@ -119,6 +101,11 @@ export function setupGazeTrackingButtonClick(): void {
     });
 }
 
+/**
+ * Translates handness. Mostly switches "none" to "other".
+ * @param  {string} handness  The handness.
+ * @returns string The new value.
+ */
 function getSourceType(handness: string): string {
     switch (handness) {
         case "left":
@@ -134,7 +121,7 @@ function getSourceType(handness: string): string {
  * Gets the controller components with ids that match any of the provided
  * keywords (case insensitive).
  * @param  {string[]} keywords    An array of the keywords.
- * @param  {any} webXRController  The XR controller object to examine.
+ * @param  {*} webXRController    The XR controller object to examine.
  * @returns any[]  The matching components, in an array.
  */
 function getComponents(keywords: string[], webXRController: any): any[] {
@@ -195,6 +182,10 @@ function setupMotionControllerTrigger(webXRController: any): void {
     }
 }
 
+/**
+ * Resets the values read from vr-controller pad.
+ * @returns void
+ */
 function resetPadState(): void {
     padMoveSpeedFactor = 0;
     padRotateSpeedFactor = 0;
@@ -230,6 +221,7 @@ function setupMotionPad(webXRController: any): void {
                 // If it's not a press right in the middle, then save the y
                 // value for moving foward/backward. Note that you must
                 // rescale so that
+
                 /** @type {number} */
                 padMoveSpeedFactor = values.y * 3.0;  // TODO: 3.0 chosen by trial and error. Good to make user definable param?
 
@@ -245,6 +237,7 @@ function setupMotionPad(webXRController: any): void {
                     // Also save the x for turning. But here you can make people
                     // really sick, so only trigger if on outer 4ths of pad (no
                     // accidents).
+
                     /** @type {number} */
                     padRotateSpeedFactor = component.axes.x;
 
@@ -337,24 +330,6 @@ function rotateCamera(): void {
 
     lastPadRotationTime = nowTime;
 
-    // Old rotation code that no longer works in WebXR.
-
-    // Get the camera's current rotation.
-    // const curAngles = Vars.vrHelper.webVRCamera.rotationQuaternion.toEulerAngles();
-    // const curAngles = Vars.scene.activeCamera.rotationQuaternion.toEulerAngles();
-
-    // Rotate it slightly about up axis.
-    // curAngles.y += 0.1 * padRotateSpeedFactor * Vars.PAD_MOVE_SPEED * Vars.scene.getAnimationRatio();
-    // curAngles.y = curAngles.y + Math.sign(padRotateSpeedFactor) * 0.0625 * Math.PI;
-
-    // Rotates 45 degrees for rapid reorientation.
-    // curAngles.y = curAngles.y + Math.sign(padRotateSpeedFactor) * 0.25 * Math.PI;
-    // curAngles.z = 0;  // So always horizontal when looking?
-
-    // Set camera to this new rotation.
-    // Vars.vrHelper.webVRCamera.rotationQuaternion = BABYLON.Quaternion.FromEulerVector(curAngles);
-    // Vars.scene.activeCamera.rotationQuaternion = BABYLON.Quaternion.FromEulerVector(curAngles);
-
-    // Above rotation code produced problems. This seems to work better in WebXR:
+    // Update camera rotation.
     Vars.scene.activeCamera.rotationQuaternion.multiplyInPlace(BABYLON.Quaternion.FromEulerAngles(0, Math.sign(padRotateSpeedFactor) * 0.25 * Math.PI, 0));
 }

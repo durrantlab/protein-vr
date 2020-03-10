@@ -10,7 +10,7 @@ import * as Lecturer from "../../WebRTC/Lecturer";
 
 /**
  * Builds a submenu object describing how the models and be rotated.
- * @returns Object The submenu objct.
+ * @returns Object  The submenu objct.
  */
 export function buildRotationsSubMenu(): any {
     return {

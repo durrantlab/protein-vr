@@ -20,7 +20,7 @@ export function runOptimizeScene(): void {
             // Turn on scene optimizer. Note that during loading the fps is
             // bound to drop, so let's put it on a little delay. TODO: Only
             // run this once the model and scene are loaded. NOTE: The below
-            // optimization (now commented out) cause problems on the Quest.
+            // optimization (now commented out) caused problems on the Quest.
             // So I'm going to skip it.
 
             // setTimeout(() => {
@@ -126,8 +126,8 @@ function furtherProcessKeyMeshes(): void {
                 mesh.infiniteDistance = true;
             }
 
-            // Causes skybox to go black. I think you'd need to set to 0, and
-            // all other meshes to 1.
+            // Below causes skybox to go black. I think you'd need to set to
+            // 0, and all other meshes to 1.
             // mesh.renderingGroupId = -1;
         }
     }
@@ -296,45 +296,45 @@ export function updateEnvironmentShadows(): void {
  * Prepares scene-optimizer paramters.
  * @returns * The parameters.
  */
-function sceneOptimizerParameters(): any {
-    // See https://doc.babylonjs.com/how_to/how_to_use_sceneoptimizer
-    // The goal here is to maintain a frame rate of 60. Check every two
-    // seconds. Very similar to HighDegradationAllowed
-    const result = new BABYLON.SceneOptimizerOptions(25, 2000);
+// function sceneOptimizerParameters(): any {
+//     // See https://doc.babylonjs.com/how_to/how_to_use_sceneoptimizer
+//     // The goal here is to maintain a frame rate of 60. Check every two
+//     // seconds. Very similar to HighDegradationAllowed
+//     const result = new BABYLON.SceneOptimizerOptions(25, 2000);
 
-    let priority = 0;
-    result.optimizations.push(new BABYLON.ShadowsOptimization(priority));
-    // The below won't make a difference for my scenes anyway...
-    // result.optimizations.push(new BABYLON.MergeMeshesOptimization(priority));
-    result.optimizations.push(new BABYLON.LensFlaresOptimization(priority));
-    result.optimizations.push(new BABYLON.PostProcessesOptimization(priority));
-    result.optimizations.push(new BABYLON.ParticlesOptimization(priority));
-    result.optimizations.push(new ReportOptimizationChange(priority));
+//     let priority = 0;
+//     result.optimizations.push(new BABYLON.ShadowsOptimization(priority));
+//     // The below won't make a difference for my scenes anyway...
+//     // result.optimizations.push(new BABYLON.MergeMeshesOptimization(priority));
+//     result.optimizations.push(new BABYLON.LensFlaresOptimization(priority));
+//     result.optimizations.push(new BABYLON.PostProcessesOptimization(priority));
+//     result.optimizations.push(new BABYLON.ParticlesOptimization(priority));
+//     result.optimizations.push(new ReportOptimizationChange(priority));
 
-    // Next priority
-    priority++;
-    result.optimizations.push(new RemoveSurfaces(priority));  // Remove surfaces
-    result.optimizations.push(new ReportOptimizationChange(priority));
+//     // Next priority
+//     priority++;
+//     result.optimizations.push(new RemoveSurfaces(priority));  // Remove surfaces
+//     result.optimizations.push(new ReportOptimizationChange(priority));
 
-    // Next priority
-    priority++;
-    result.optimizations.push(new BABYLON.TextureOptimization(priority, 512));
-    result.optimizations.push(new ReportOptimizationChange(priority));
+//     // Next priority
+//     priority++;
+//     result.optimizations.push(new BABYLON.TextureOptimization(priority, 512));
+//     result.optimizations.push(new ReportOptimizationChange(priority));
 
-    // Next priority
-    priority++;
-    result.optimizations.push(new BABYLON.RenderTargetsOptimization(priority));
-    result.optimizations.push(new BABYLON.TextureOptimization(priority, 256));
-    result.optimizations.push(new ReportOptimizationChange(priority));
+//     // Next priority
+//     priority++;
+//     result.optimizations.push(new BABYLON.RenderTargetsOptimization(priority));
+//     result.optimizations.push(new BABYLON.TextureOptimization(priority, 256));
+//     result.optimizations.push(new ReportOptimizationChange(priority));
 
-    // Next priority
-    priority++;
-    result.optimizations.push(new BABYLON.HardwareScalingOptimization(priority, 4));
-    result.optimizations.push(new SimplifyMeshes(priority, 500));  // Simplify meshes.
-    result.optimizations.push(new ReportOptimizationChange(priority));
+//     // Next priority
+//     priority++;
+//     result.optimizations.push(new BABYLON.HardwareScalingOptimization(priority, 4));
+//     result.optimizations.push(new SimplifyMeshes(priority, 500));  // Simplify meshes.
+//     result.optimizations.push(new ReportOptimizationChange(priority));
 
-    return result;
-}
+//     return result;
+// }
 
 /**
  * Entirely remove a mesh.
@@ -348,158 +348,158 @@ export function removeMeshEntirely(mesh: any): void {
     mesh = null;
 }
 
-class ReportOptimizationChange {
-    private priority: number;
-    private apply: any;           // Leave these even though not used.
-    private getDescription: any;  // Leave these even though not used.
+// class ReportOptimizationChange {
+//     private priority: number;
+//     private apply: any;           // Leave these even though not used.
+//     private getDescription: any;  // Leave these even though not used.
 
-    /**
-     * Remove the surface mesh (it takes a lot of resources).
-     * @param  {number} priority The priority of this optimization.
-     * @returns void
-     */
-    constructor(priority: number) {
-        if (priority === undefined) {
-            priority = 0;
-        }
+//     /**
+//      * Remove the surface mesh (it takes a lot of resources).
+//      * @param  {number} priority The priority of this optimization.
+//      * @returns void
+//      */
+//     constructor(priority: number) {
+//         if (priority === undefined) {
+//             priority = 0;
+//         }
 
-        this["priority"] = priority;
-        this["apply"] = (scene: any) => {
-            console.log("Optimization priority:", this["priority"]);
-            console.log("FPS:", Vars.engine.getFps());
-            console.log("");
-            return true;
-        };
+//         this["priority"] = priority;
+//         this["apply"] = (scene: any) => {
+//             console.log("Optimization priority:", this["priority"]);
+//             console.log("FPS:", Vars.engine.getFps());
+//             console.log("");
+//             return true;
+//         };
 
-        this["getDescription"] = () => {
-            return "Reports the current priority. For debugging.";
-        };
-    }
-}
-
-// tslint:disable-next-line:max-classes-per-file
-class RemoveSurfaces {
-    private priority: number;     // Leave these even though not used.
-    private apply: any;           // Leave these even though not used.
-    private getDescription: any;  // Leave these even though not used.
-
-    /**
-     * Remove the surface mesh (it takes a lot of resources).
-     * @param  {number} priority The priority of this optimization.
-     * @returns void
-     */
-    constructor(priority: number) {
-        if (typeof priority === "undefined") {
-            priority = 0;
-        }
-
-        this["priority"] = priority;
-        this["apply"] = (scene: any) => {
-            // Delete the surface mesh. Note that it will still be visible in the
-            // main menu, but oh well.
-            const surfaces = Vars.scene.getMeshByName("surfaces.wrl");
-            removeMeshEntirely(surfaces);
-            return true;
-        };
-
-        this["getDescription"] = () => {
-            return "Removes surface representations.";
-        };
-    }
-}
+//         this["getDescription"] = () => {
+//             return "Reports the current priority. For debugging.";
+//         };
+//     }
+// }
 
 // tslint:disable-next-line:max-classes-per-file
-class SimplifyMeshes {
-    private priority: number;     // Leave these even though not used.
-    private apply: any;           // Leave these even though not used.
-    private getDescription: any;  // Leave these even though not used.
+// class RemoveSurfaces {
+//     private priority: number;     // Leave these even though not used.
+//     private apply: any;           // Leave these even though not used.
+//     private getDescription: any;  // Leave these even though not used.
 
-    /**
-     * A scene optimization to decimate the big meshes.
-     * @param  {number} priority                  The priority of this
-     *                                            optimization.
-     * @param  {number} minNumVertsThatIsProblem  The target number of vertices.
-     * @param  {number} [decimationLevel=]        The decimation level. If not
-     *                                            specified, calculated from
-     *                                            minNumVertsThatIsProblem.
-     */
-    constructor(priority: number, minNumVertsThatIsProblem: number, decimationLevel: number = undefined) {
-        if (typeof priority === "undefined") {
-            priority = 0;
-        }
+//     /**
+//      * Remove the surface mesh (it takes a lot of resources).
+//      * @param  {number} priority The priority of this optimization.
+//      * @returns void
+//      */
+//     constructor(priority: number) {
+//         if (typeof priority === "undefined") {
+//             priority = 0;
+//         }
 
-        this["priority"] = priority;
-        this["apply"] = (scene: any) => {
-            /** @type {Array<Array<number,*,number>>} */
-            const meshesToConsider = [];
-            /** @type {number} */
-            const len = Vars.scene.meshes.length;
-            for (let meshIdx = 0; meshIdx < len; meshIdx++) {
-                const mesh = Vars.scene.meshes[meshIdx];
+//         this["priority"] = priority;
+//         this["apply"] = (scene: any) => {
+//             // Delete the surface mesh. Note that it will still be visible in the
+//             // main menu, but oh well.
+//             const surfaces = Vars.scene.getMeshByName("surfaces.wrl");
+//             removeMeshEntirely(surfaces);
+//             return true;
+//         };
 
-                // If it's decimated, skip it. It will be deleted and
-                // recreated.
-                if (mesh.name.indexOf("Decimated") !== -1) { continue; }
+//         this["getDescription"] = () => {
+//             return "Removes surface representations.";
+//         };
+//     }
+// }
 
-                // Get the number of vertexes.
-                /** @type {number} */
-                const numVertexes = getNumVertices(mesh);
-                if (numVertexes === null) { continue; }  // Something like __root__
-                if (numVertexes < minNumVertsThatIsProblem) { continue; }
+// tslint:disable-next-line:max-classes-per-file
+// class SimplifyMeshes {
+//     private priority: number;     // Leave these even though not used.
+//     private apply: any;           // Leave these even though not used.
+//     private getDescription: any;  // Leave these even though not used.
 
-                meshesToConsider.push([
-                    numVertexes, mesh,
-                    (decimationLevel === undefined) ? 1. - minNumVertsThatIsProblem / numVertexes : decimationLevel,
-                ]);
+//     /**
+//      * A scene optimization to decimate the big meshes.
+//      * @param  {number} priority                  The priority of this
+//      *                                            optimization.
+//      * @param  {number} minNumVertsThatIsProblem  The target number of vertices.
+//      * @param  {number} [decimationLevel=]        The decimation level. If not
+//      *                                            specified, calculated from
+//      *                                            minNumVertsThatIsProblem.
+//      */
+//     constructor(priority: number, minNumVertsThatIsProblem: number, decimationLevel: number = undefined) {
+//         if (typeof priority === "undefined") {
+//             priority = 0;
+//         }
 
-                // Simplify the mesh. See
-                // https://doc.babylonjs.com/how_to/in-browser_mesh_simplification
-                // You used to be able to simplify a mesh without LOD.
-                // Apparently you can't now?
+//         this["priority"] = priority;
+//         this["apply"] = (scene: any) => {
+//             /** @type {Array<Array<number,*,number>>} */
+//             const meshesToConsider = [];
+//             /** @type {number} */
+//             const len = Vars.scene.meshes.length;
+//             for (let meshIdx = 0; meshIdx < len; meshIdx++) {
+//                 const mesh = Vars.scene.meshes[meshIdx];
 
-                // let decimator = new BABYLON.QuadraticErrorSimplification(mesh);
-                // simplify({
-                //     "decimationIterations": 100,
-                //     "aggressiveness": 7,
-                //     // "syncIterations": ?  // Just keep default. Not sure what this is.
-                // }, () => { return; });
-            }
+//                 // If it's decimated, skip it. It will be deleted and
+//                 // recreated.
+//                 if (mesh.name.indexOf("Decimated") !== -1) { continue; }
 
-            // Order the meshes from the one with most vertices to the one with
-            // least (prioritize bad ones).
-            meshesToConsider.sort((a, b) => b[0] - a[0]);
+//                 // Get the number of vertexes.
+//                 /** @type {number} */
+//                 const numVertexes = getNumVertices(mesh);
+//                 if (numVertexes === null) { continue; }  // Something like __root__
+//                 if (numVertexes < minNumVertsThatIsProblem) { continue; }
 
-            // Simplify those meshes.
-            const meshesToConsiderLen = meshesToConsider.length;
-            for (let i = 0; i < meshesToConsiderLen; i++) {
-                /** @type {Array<number,*,number>} */
-                const meshToConsider = meshesToConsider[i];
-                const mesh = meshToConsider[1];
+//                 meshesToConsider.push([
+//                     numVertexes, mesh,
+//                     (decimationLevel === undefined) ? 1. - minNumVertsThatIsProblem / numVertexes : decimationLevel,
+//                 ]);
 
-                /** @type {number} */
-                const decimationLvel = meshToConsider[2];
+//                 // Simplify the mesh. See
+//                 // https://doc.babylonjs.com/how_to/in-browser_mesh_simplification
+//                 // You used to be able to simplify a mesh without LOD.
+//                 // Apparently you can't now?
 
-                // Remove the existing LODs if they exist.
-                while (mesh.getLODLevels().length > 0) {
-                    const firstLODMesh = mesh.getLODLevels()[0]["mesh"];
-                    mesh.removeLODLevel(firstLODMesh);
-                    removeMeshEntirely(firstLODMesh);
-                }
+//                 // let decimator = new BABYLON.QuadraticErrorSimplification(mesh);
+//                 // simplify({
+//                 //     "decimationIterations": 100,
+//                 //     "aggressiveness": 7,
+//                 //     // "syncIterations": ?  // Just keep default. Not sure what this is.
+//                 // }, () => { return; });
+//             }
 
-                // https://doc.babylonjs.com/api/classes/babylon.mesh#simplify
-                mesh.simplify([{"quality": decimationLvel, "distance": 0.001}],
-                    false, BABYLON.SimplificationType.QUADRATIC, () => {
-                        // let simpMesh = mesh.getLODLevels()[0]["mesh"];
-                        // removeMeshEntirely(mesh);
-                    },
-                );
-            }
+//             // Order the meshes from the one with most vertices to the one with
+//             // least (prioritize bad ones).
+//             meshesToConsider.sort((a, b) => b[0] - a[0]);
 
-            return true;
-        };
+//             // Simplify those meshes.
+//             const meshesToConsiderLen = meshesToConsider.length;
+//             for (let i = 0; i < meshesToConsiderLen; i++) {
+//                 /** @type {Array<number,*,number>} */
+//                 const meshToConsider = meshesToConsider[i];
+//                 const mesh = meshToConsider[1];
 
-        this["getDescription"] = () => {
-            return "Simplifies the geometry of complex objects in the scene.";
-        };
-    }
-}
+//                 /** @type {number} */
+//                 const decimationLvel = meshToConsider[2];
+
+//                 // Remove the existing LODs if they exist.
+//                 while (mesh.getLODLevels().length > 0) {
+//                     const firstLODMesh = mesh.getLODLevels()[0]["mesh"];
+//                     mesh.removeLODLevel(firstLODMesh);
+//                     removeMeshEntirely(firstLODMesh);
+//                 }
+
+//                 // https://doc.babylonjs.com/api/classes/babylon.mesh#simplify
+//                 mesh.simplify([{"quality": decimationLvel, "distance": 0.001}],
+//                     false, BABYLON.SimplificationType.QUADRATIC, () => {
+//                         // let simpMesh = mesh.getLODLevels()[0]["mesh"];
+//                         // removeMeshEntirely(mesh);
+//                     },
+//                 );
+//             }
+
+//             return true;
+//         };
+
+//         this["getDescription"] = () => {
+//             return "Simplifies the geometry of complex objects in the scene.";
+//         };
+//     }
+// }

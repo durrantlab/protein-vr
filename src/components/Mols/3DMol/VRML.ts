@@ -2,7 +2,6 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 // An module to manage VRML data obtained from 3Dmol.js. Assumes the 3Dmol.js
 // javascript file is already loaded.
 
@@ -60,7 +59,7 @@ export function setup(callBack: any): void {
     element = jQuery("#mol-container");
     config = { backgroundColor: "white" };
     viewer = $3Dmol.createViewer( element, config );
-    window["viewer"] = viewer;  // For debugging.
+    // window["viewer"] = viewer;  // For debugging.
 
     callBack();
 }
@@ -434,7 +433,6 @@ export function importIntoBabylonScene(): any {
         // Merge all these meshes.
         // https://doc.babylonjs.com/how_to/how_to_merge_meshes
         babylonMesh = BABYLON.Mesh.MergeMeshes(meshes, true, true);  // dispose of source and allow 32 bit integers.
-        // babylonMesh = meshes[0];
         babylonMesh.name = "MeshFrom3DMol" + Math.random().toString();
         babylonMesh.id = babylonMesh.name;
 

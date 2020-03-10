@@ -2,13 +2,11 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 // This module has functions for storing various important points in the
 // scene. Note that the camera location is in CommonCamera, not here.
 
 import * as CommonCamera from "../Cameras/CommonCamera";
 import * as Vars from "../Vars/Vars";
-import * as Navigation from "./Navigation";
 import * as Pickables from "./Pickables";
 import * as Menu3D from "../UI/Menu3D/Menu3D";
 
@@ -18,8 +16,6 @@ export let pointWayOffScreen = new BABYLON.Vector3(-1000, 1000, 1000);
 export let groundPointBelowCamera = new BABYLON.Vector3(0, 0, 0);
 export let groundPointBelowStarePt = new BABYLON.Vector3(0, 0, 0);
 export let curStarePt = new BABYLON.Vector3(0, 0, 0);
-
-// setInterval(() => { console.log(groundPointBelowCamera);}, 500);
 
 /**
  * Sets the curStarePt variable externally.
@@ -116,7 +112,7 @@ function cancelStareIfFarAway(): void {
 
 /**
  * Sets the pick point and object currently looking at.
-x * @param  {boolean} [updatePos=true] Whether to update the position.
+ * @param  {boolean} [updatePos=true]  Whether to update the position.
  * @returns void
  */
 export function setPickPointAndObjInScene(updatePos = true): void {

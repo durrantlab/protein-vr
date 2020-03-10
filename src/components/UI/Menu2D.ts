@@ -5,6 +5,10 @@ import * as Menu3D from "./Menu3D/Menu3D";
 
 let funcs = {};
 
+/**
+ * Opens the 2D menu.
+ * @returns void
+ */
 export function open(): void {
     OpenPopup.openModal({
         title: "Menu",
@@ -19,6 +23,14 @@ export function open(): void {
     });
 }
 
+/**
+ * Populate a submenu with its various opens/items.
+ * @param  {string}   parentSelectr  The DOM selector of the parent menu.
+ * @param  {*}        subMenu        The data itself describing the submenu.
+ * @param  {string[]} breadcrumbs    A list of the keys to get to this point
+ *                                   in the menu.
+ * @param  {number=0} depth          The depth of this submenu.
+ */
 function populate2DSubMenu(parentSelectr: string, subMenu: any, breadcrumbs: string[], depth: number = 0) {
     let parentDOM = jQuery(parentSelectr);
     let html = "";
@@ -37,11 +49,9 @@ function populate2DSubMenu(parentSelectr: string, subMenu: any, breadcrumbs: str
 
         const subMenuItems = subMenu[title];
         let id = accordionId + (accordionId === "" ? "" : "-") + slugify(title);
-        // let id = id + slugify(title);
         let btnId = "btn-" + id;
         let collapseId = "collapse-" + id;
         let fontsize = 150 - depth * 10;
-        let color = 255 - depth * 15;
         // let bgColor = `background-color: rgb(${color}, ${color}, ${color});`;
         // let fgColor = `color: rgb(${255 - color}, ${255 - color}, ${255 - color});`;
         let bgColor = `background-color: ${getPastel(depth)};`
@@ -107,7 +117,6 @@ function populate2DSubMenu(parentSelectr: string, subMenu: any, breadcrumbs: str
                 curSubMenu = curSubMenu[path[i]];
             }
 
-            // let collapseID = This.closest(".card").find(".collapse").attr("id");
             let collapseID = "#collapse-" + slugPath.join("-");
             populate2DSubMenu(collapseID + " .card-body", curSubMenu, path, depth);
 

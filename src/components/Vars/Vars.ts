@@ -2,14 +2,12 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 // A place to put variables that need to be accessed from multiple places.
 // This module is a place to store "global" variables.
 
 import * as Navigation from "../Navigation/Navigation";
 import * as UrlVars from "./UrlVars";
 import * as PromiseStore from "../PromiseStore";
-import * as VRCamera from "../Cameras/VRCamera";
 // import WebXRPolyfill from 'webxr-polyfill';
 
 declare var BABYLON: any;
@@ -172,6 +170,7 @@ export function runInitVR(initParams: IVRSetup): void {
 
             // Create the xr helper.
             const params = {
+                // Previous when using WebVR:
                 // "createDeviceOrientationCamera": false,  // This makes phone ignore motion sensor. No good.
                 // "createDeviceOrientationCamera": true,
                 // "useMultiview": false,
@@ -195,7 +194,6 @@ export function runInitVR(initParams: IVRSetup): void {
                 // all browsers.
                 // params["useMultiview"] = true;
             // }
-            // vrHelper = scene.createDefaultVRExperience(params);
 
             // WebXR shiv now loaded in index.html.
             // const polyfill = new WebXRPolyfill();
@@ -211,11 +209,6 @@ export function runInitVR(initParams: IVRSetup): void {
                 // https://forum.babylonjs.com/t/webxr-on-oculus-quest/4949/6
 
                 vrHelper = vrHelp;
-
-                // Make sure WebXR state is sent to not in xr. Strange that
-                // this is necessary. On most systems it works without it, but
-                // on Oculus Go it sometimes doesn't.
-                // VRCamera.exitVRAndFS();
 
                 // For debugging...
                 window["vrHelper"] = vrHelper;

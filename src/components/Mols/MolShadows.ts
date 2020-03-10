@@ -2,12 +2,10 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 // Functions to handle molecule shadows.
 
 import * as Vars from "../Vars/Vars";
 import * as UrlVars from "../Vars/UrlVars";
-// import * as Optimizations from "../Scene/Optimizations";
 
 declare var BABYLON: any;
 
@@ -28,7 +26,6 @@ export function setupShadowGenerator(): void {
 
     // Set up the shadow generator.
     // Below gives error on iphone sometimes... And Oculus Go browser.
-    // if (!Vars.IOS) {
     if (UrlVars.checkShadowInUrl()) {
         shadowGenerator = new BABYLON.ShadowGenerator(4096, light);
 
@@ -43,7 +40,6 @@ export function setupShadowGenerator(): void {
             shadowGenerator.blurKernel = shadowInf.blur;  // Degree of bluriness.
             // shadowGenerator.blurScale = 15;
             // shadowGenerator.blurBoxOffset = 15;
-            // console.log(shadowInf);
 
             shadowGenerator.setDarkness(shadowInf.darkness);
 
@@ -55,14 +51,6 @@ export function setupShadowGenerator(): void {
             // Old parameters not used:
             // shadowGenerator.usePoissonSampling = true;  // Good but slow.
         }
-
-        // setTimeout(() => {
-        //     Optimizations.updateEnvironmentShadows();
-        // }, 1000)
-
-        // Will make debugging easier.
-        // window.shadowGenerator = shadowGenerator;
-
     } else {
         // console.log("iOS, so not generating shadows... causes an error... See https://forum.babylonjs.com/t/issues-between-shadowgenerator-and-ios-osx/795");
     }

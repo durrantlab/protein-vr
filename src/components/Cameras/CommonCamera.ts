@@ -59,7 +59,6 @@ export function setCameraPosition(pt: any): void {
     } else if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
                (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
         // Not ever tested... not sure it works...
-        // const activeCam = Vars.vrHelper.webVRCamera;
         const activeCam = Vars.scene.activeCamera;
 
         // A VR camera. Need to account for the fact that the eye might not be
@@ -162,8 +161,6 @@ export function getVecFromEyeToCamera(): any {
 
     // Note that some VR cameras don't track position, only orientation.
     // Google cardboard is an example.
-    // debugger;
-    // const activeCam = Vars.vrHelper.webVRCamera;
     const activeCam = Vars.scene.activeCamera;
     let deltaVec;
     if (activeCam.leftCamera) {

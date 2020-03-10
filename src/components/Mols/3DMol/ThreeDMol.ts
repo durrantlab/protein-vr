@@ -2,7 +2,6 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 // Functions from loading molecules directly from a 3Dmol.js instance. See
 // VRML.ts for additional functions related to the mesh itself.
 
@@ -10,7 +9,6 @@ import * as Menu3D from "../../UI/Menu3D/Menu3D";
 import * as Styles from "../../UI/Menu3D/Styles";
 import * as OpenPopup from "../../UI/OpenPopup/OpenPopup";
 import * as UrlVars from "../../Vars/UrlVars";
-import * as Load from "../Load";
 import * as VRML from "./VRML";
 
 // Unfortunately, closure compiler breaks this. So hard code.
@@ -67,9 +65,6 @@ function after3DMolJsLoaded(resolveFunc: Function): void {
 
             // Now that the PDB is loaded, you can start loading styles.
             UrlVars.startLoadingStyles();
-
-            // Continue...
-            // Load.afterLoading();
 
             // If it's nanokid, open a popup to let them specify a url or
             // pdbid.

@@ -2,10 +2,6 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
-// import { groundPointBelowCamera } from "../../Navigation/Points";
-// import * as VRML from "./VRML";
-
 const ctx: Worker = self as any;
 
 declare var WorkerGlobalScope: any;
@@ -249,7 +245,7 @@ function strToColors(str: string): any {
 /**
  * Converts coordIndex in string format to list of numbers. Similar to
  * strToCoors(), but for indexes.
- * @param  {string} str The indexes in string format.
+ * @param  {string} str  The indexes in string format.
  * @returns * The list (actually a Uint32Array... not sure how to type this.)
  */
 function strToTris(str: string): any {

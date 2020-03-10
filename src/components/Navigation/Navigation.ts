@@ -172,7 +172,6 @@ export function actOnStareTrigger(): void {
     switch (Pickables.getCategoryOfCurMesh()) {
         case Pickables.PickableCategory.Ground:
             // It's the ground, so teleport there.
-            // console.log("teleport");
             teleport();
             break;
         case Pickables.PickableCategory.Molecule:
@@ -205,7 +204,6 @@ function teleport(newLoc: any = undefined, callBack: any = undefined): void {
     }
 
     // Hide the bigger nav mesh. It will appear again elsewhere.
-    // JDDJDD Vars.vrHelper.gazeTrackerMesh.isVisible = false;
     Vars.vrVars.navTargetMesh.isVisible = false;
 
     // Animate the transition to the new location.
@@ -251,7 +249,6 @@ function teleport(newLoc: any = undefined, callBack: any = undefined): void {
     Vars.scene.beginAnimation(activeCamera, 0, Vars.TRANSPORT_DURATION, false, 1, () => {
         // Animation finished callback.
         currentlyTeleporting = false;
-        // Vars.vrHelper.gazeTrackerMesh.isVisible = true;
         Vars.vrVars.navTargetMesh.isVisible = true;
 
         // Erase animation
@@ -345,11 +342,7 @@ function setupCaptureMouseClicksOutsideBabylon(): void {
 
     // Check periodically to see if a device orientation sensor is every
     // picked up. If so, make the window clickable.
-
     setInterval(checkCaptureMouseClicksOutsideBabylon, 500);
-
-    // ();
-    // Vars.scene.registerBeforeRender(() => {});
 }
 
 /**
@@ -389,10 +382,8 @@ function checkCaptureMouseClicksOutsideBabylon(): void {
         captureMouseClicksDiv.hide();
     } else {
         // console.log("confused");
-        // console.log(deviceBeingOriented);
-        // console.log(currentlyCapturingMouseClicks);
     }
 }
 
-// NOTE THAT THE TRACKPAD-CONTROLED FORWARD MOVEMENTS AND ROTATIONS USED IN VR
+// NOTE THAT THE TRACKPAD-CONTROLED FORWARD MOVEMENTS AND ROTATIONS USED IN XR
 // MODE ARE LOCATED IN VRControllers.ts.

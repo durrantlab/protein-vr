@@ -7,14 +7,13 @@ import * as Vars from "../Vars/Vars";
 import * as ThreeDMol from "./3DMol/ThreeDMol";
 import * as MolShadows from "./MolShadows";
 import * as Pickables from "../Navigation/Pickables";
-import * as LoadAndSetup from "../Scene/LoadAndSetup";
 import * as PromiseStore from "../PromiseStore";
 
-declare var jQuery: any;
 declare var BABYLON: any;
 
 /**
  * Load in the molecules.
+ * @returns void
  */
 export function runLoadMolecule(): void {
     PromiseStore.setPromise(
@@ -74,9 +73,6 @@ export function afterLoading(): void {
             console.log("Warning: Vars.vrVars.groundMesh not defined.");
         }
     }
-
-    // Finish up all scene preparations.
-    // LoadAndSetup.loadingAssetsDone();
 }
 
 /**

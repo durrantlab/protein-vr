@@ -178,7 +178,6 @@ function addRunModeButtons(): void {
             showInFollowerMode: true,
             clickFunc: () => {
                 Vars.engine.switchFullscreen(true);
-                // jQuery(document).css("cursor")
                 jQuery("#renderCanvas").focus();  // So keypress will work.
             }
         }
@@ -274,6 +273,3 @@ function debugMode(): void {
         document.getElementById("scene-explorer-host").style.zIndex = "15";
     });
 }
-
-// For debugging...
-window["debugMode"] = debugMode;

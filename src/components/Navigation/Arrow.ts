@@ -1,14 +1,11 @@
 import * as Vars from "../Vars/Vars";
-// import * as CommonCamera from "../Cameras/CommonCamera";
 import * as Points from "../Navigation/Points";
 
 declare var BABYLON;
 
-// let arrowMesh: any;
-
 export function loadArrow() {
     BABYLON.SceneLoader.ImportMeshAsync(null, "environs/arrow/", "arrow.babylon", Vars.scene).then(function (data) {
-        // do something with the meshes and skeletons
+        // Do something with the meshes and skeletons
         // particleSystems are always null for glTF assets
         let arrowMesh = data.meshes[0];
         arrowMesh.scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
@@ -41,10 +38,3 @@ export function loadArrow() {
         });
     });
 }
-
-// export function updateArrowPosition() {
-//     // let pos = CommonCamera.getCameraPosition();
-//     // pos.y = 0;
-//     // arrowMesh.position = pos;
-
-// }

@@ -1,3 +1,7 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2019 Jacob D. Durrant.
+
 // A place to store promises.
 
 // After a certain amount of time, if a given promise hasn't been fulfilled,
@@ -28,7 +32,18 @@ const enum PromiseState {
     IGNORE = 3
 }
 
-export function setPromise(name: string, dependencies: string[], promiseFunc: Function, ignoreIfNeverFulfilled = false): void {
+/**
+ * Defines a promise.
+ * @param  {string}         name                    The name (label) of the
+ *                                                  promise.
+ * @param  {string[]}       dependencies            The names of dependencies
+ *                                                  that must be fulfilled
+ *                                                  before this promise runs.
+ * @param  {Function}       promiseFunc             The function to run with
+ *                                                  this promise.
+ * @returns void
+ */
+export function setPromise(name: string, dependencies: string[], promiseFunc: Function): void {
     if (promises[name] === undefined) {
         throw new Error("Promise not registered: " + name);
     }
@@ -50,6 +65,11 @@ export function setPromise(name: string, dependencies: string[], promiseFunc: Fu
     });
 }
 
+/**
+ * Wait for promises to be fulfilled.
+ * @param  {string[]} names  The names of the promises that must be fulfilled.
+ * @returns Promise
+ */
 export function waitFor(names: string[]): Promise<any> {
     let promisesToResolve = names.map(m => promises[m]);
 
@@ -60,6 +80,10 @@ export function waitFor(names: string[]): Promise<any> {
     return Promise.all(promisesToResolve);
 }
 
+/**
+ * Shows which promises have been fulfilled. Good for debugging.
+ * @returns void
+ */
 export function debug(): void {
     const name = Object.keys(promises);
     const nameLen = name.length;
@@ -88,25 +112,25 @@ export function directlyFulfillPromise(promiseName: string): void {
 }
 
 // Below is for debugging. Comment out in production code.
-setTimeout(() => {
-    const names = Object.keys(promises);
-    const namesLen = names.length;
-    for (let i = 0; i < namesLen; i++) {
-        const name = names[i];
-        const promiseState = promiseStates[name];
-        let msg: string;
-        switch(promiseState) {
-            case undefined:
-                msg = "Promise never set: " + name + ".";
-                // throw new Error("Promise never set: " + name + ".");
-                console.log(msg);
-            case PromiseState.PENDING:
-                // Comment out below when not in production. Very slow
-                // connections could legitimately take a while to fulfill all
-                // promises.
-                msg = "Promise should be fulfilled by now: " + name;
-                // throw new Error(msg);
-                console.log(msg);
-        }
-    }
-}, PROMISE_TIMEOUT_MILLISECONDS);
+// setTimeout(() => {
+//     const names = Object.keys(promises);
+//     const namesLen = names.length;
+//     for (let i = 0; i < namesLen; i++) {
+//         const name = names[i];
+//         const promiseState = promiseStates[name];
+//         let msg: string;
+//         switch(promiseState) {
+//             case undefined:
+//                 msg = "Promise never set: " + name + ".";
+//                 // throw new Error("Promise never set: " + name + ".");
+//                 console.log(msg);
+//             case PromiseState.PENDING:
+//                 // Comment out below when not in production. Very slow
+//                 // connections could legitimately take a while to fulfill all
+//                 // promises.
+//                 msg = "Promise should be fulfilled by now: " + name;
+//                 // throw new Error(msg);
+//                 console.log(msg);
+//         }
+//     }
+// }, PROMISE_TIMEOUT_MILLISECONDS);

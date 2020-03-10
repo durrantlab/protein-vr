@@ -2,7 +2,6 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2019 Jacob D. Durrant.
 
-
 import * as CamerasSetup from "../Cameras/Setup";
 import * as VRCamera from "../Cameras/VRCamera";
 import * as MolsLoad from "../Mols/Load";
@@ -13,9 +12,6 @@ import * as Optimizations from "./Optimizations";
 import * as PromiseStore from "../PromiseStore";
 import * as Pickables from "../Navigation/Pickables";
 import * as Menus from "../UI/Menus";
-import * as UrlVars from "../Vars/UrlVars";
-
-// import * as Fullscreen from "../Navigation/Fullscreen";
 
 declare var BABYLON: any;
 
@@ -59,20 +55,6 @@ export function load(): void {
 
             runFinalizeScene();
 
-
-            // PromiseStore.waitFor(["LoadBabylonScene"]).then(() => {
-                // There should be only one camera at this point, because the VR
-                // stuff is in the callback. Make that that one camera is the
-                // active one.
-                // Vars.scene.activeCamera =  Vars.scene.cameras[0];
-
-                // Attach camera to canvas inputs
-                // Vars.scene.activeCamera.attachControl(Vars.canvas);
-
-                // Setup full-screen functions.
-                // Fullscreen.setup();
-            // });
-
             // Watch for browser/canvas resize events
             window.addEventListener("resize", () => {
                 Vars.engine.resize();
@@ -114,6 +96,12 @@ function vrSetupBeforeLoadingBabylonFile(): void {
     // window.Vars = Vars;
 }
 
+/**
+ * Sets up the 3D teleportation cursor. Currently just blinks, but scaling
+ * animation also commented out.
+ * @param  {*} navMeshMat  The BABYLONJS mesh.
+ * @returns void
+ */
 function animateCursor(navMeshMat: any): void {
     let black = new BABYLON.Color3(0.2, 0.2, 0.2);
     let white = new BABYLON.Color3(0.8, 0.8, 0.8);
@@ -158,7 +146,6 @@ function animateCursor(navMeshMat: any): void {
     // navMeshToUse.animations.push(navMeshAnim5);
     // Vars.scene.beginAnimation(navMeshToUse, 0, numSteps, true);
 }
-
 
 /**
  * Load the scene from the .babylon file.
