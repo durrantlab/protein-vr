@@ -248,7 +248,6 @@ export function runInitVR(initParams: IVRSetup): void {
                         let scale = Math.min(scale1, scale2);
 
                         if ((scale < 1.0) && UrlVars.checkHardwardScalingInUrl()) {
-                            console.log("upscaling");
                             // Only scale if it would be upscaling.
                             engine.setHardwareScalingLevel(scale);
                         }
