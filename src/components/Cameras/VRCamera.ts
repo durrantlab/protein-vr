@@ -19,6 +19,8 @@ declare var BABYLON: any;
 
 let lastTimeJSRunningChecked: number;
 
+// Note that the xrHelper is initialized in Vars.ts.
+
 /**
  * Sets up the VR camera (listens for enter/exit, controllers added, etc.).
  * @returns void

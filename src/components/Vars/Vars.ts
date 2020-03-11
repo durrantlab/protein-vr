@@ -217,13 +217,13 @@ export function runInitVR(initParams: IVRSetup): void {
                     // console.log("onXRSessionInit");
 
                     if (window["webXRPolyfill"]["nativeWebXR"] === false) {
-                        // The WebXR polyfill is low resolution. I think it's a
-                        // bug. It initially resizes the canvas to higher
-                        // resolution, but then it makes it smaller again (100%)
-                        // and messes up the resolution. Native WebXR doesn't seem
-                        // to have the same problem. So if the polyfill is being
-                        // used, let increase the hardware scaling level to
-                        // compensate.
+                        // The WebXR polyfill is low resolution. I think it's
+                        // a bug. It initially resizes the canvas to higher
+                        // resolution, but then it makes it smaller again
+                        // (100%) and messes up the resolution. Native WebXR
+                        // doesn't seem to have the same problem. So if the
+                        // polyfill is being used, let's increase the hardware
+                        // scaling level to compensate.
 
                         // The problem is that I can't get the renderTarget
                         // framebuffer dimensions until I enter VR. But if
@@ -234,8 +234,10 @@ export function runInitVR(initParams: IVRSetup): void {
                         // https://en.wikipedia.org/wiki/Comparison_of_virtual_reality_headsets
                         // Unfortunately, this is almost certainly too high a
                         // resolution for some headsets, which is likely to
-                        // affect performance. Anyway, WebXR should be
-                        // supported everywhere soon enough.
+                        // affect performance. Also seems to cause some
+                        // problems if the resolution has different dimensions
+                        // (e.g., Oculus Rift vs. HTC Vive). Anyway, WebXR
+                        // should be supported everywhere soon enough.
 
                         const targetFrameBufferWidth = 1440 * 2;  // Wish I could use vrHelper.renderTarget.xrLayer.framebufferWidth here.
                         const targetFrameBufferHeight = 1600;  // Wish I could use vrHelper.renderTarget.xrLayer.framebufferHeight here.
@@ -245,9 +247,10 @@ export function runInitVR(initParams: IVRSetup): void {
 
                         let scale = Math.min(scale1, scale2);
 
-                        if (scale < 1.0) {
+                        if ((scale < 1.0) && UrlVars.checkHardwardScalingInUrl()) {
+                            console.log("upscaling");
                             // Only scale if it would be upscaling.
-                            engine.setHardwareScalingLevel(scale);  // works here too.
+                            engine.setHardwareScalingLevel(scale);
                         }
 
                         console.log("Using WebXR polyfill.");

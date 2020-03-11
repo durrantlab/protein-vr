@@ -15,6 +15,7 @@ declare var BABYLON: any;
 const stylesQueue: any[] = [];
 export let webrtc: any = undefined;
 export let shadows = false;
+export let hardwardScaling = true;
 let urlParams: any;
 let autoUpdateUrlEnabled = true;
 
@@ -145,8 +146,10 @@ export function setURL(): void {
     params.push("e=" + Vars.sceneName);
 
     if (shadows === undefined) { shadows = false; }
-
     params.push("sh=" + shadows.toString());
+
+    if (hardwardScaling === undefined) { hardwardScaling = true; }  // true is default
+    params.push("hs=" + hardwardScaling.toString());
 
     // Update URL. Note that if you change the url while waiting for the user
     // to authorize VR, it will throw an error. So make sure that's not what's
@@ -281,6 +284,8 @@ export function readUrlParams(): void {
     // Determine if shadows or not.
     shadows = urlParams["sh"];
 
+    hardwardScaling = urlParams["hs"];
+
     // Start updating the URL periodically. Because of camera changes.
     autoUpdateUrl();
 }
@@ -338,6 +343,15 @@ export function checkIfWebRTCInUrl(): boolean {
  */
 export function checkShadowInUrl(): boolean {
     return window.location.href.indexOf("sh=t") !== -1;
+}
+
+/**
+ * Checks if "hs=" in url (hardware scaling). This works even if UrlVars
+ * hasn't been set yet.
+ * @returns boolean
+ */
+export function checkHardwardScalingInUrl(): boolean {
+    return window.location.href.indexOf("hs=t") !== -1;
 }
 
 /**

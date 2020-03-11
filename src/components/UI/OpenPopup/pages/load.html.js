@@ -5,11 +5,14 @@
 
 (function(context) {
     // Determine whether warning should be displayed. Do this fast.
-    var warning = document.getElementById("will-erase");
-    if (window["PVR_warning"] === true) {
-        warning.style.display = "inline-block";
-    } else {
-        warning.style.display = "none";
+    var warnings = document.getElementsByClassName("will-erase");
+    for (var i = 0; i < warnings.length; i++) {
+        var warning = warnings[i];
+        if (window["PVR_warning"] === true) {
+            warning.style.display = "inline-block";
+        } else {
+            warning.style.display = "none";
+        }
     }
     delete window["PVR_warning"];
 
@@ -67,6 +70,7 @@
         // Get jquery objects for the form elements.
         var urlOrPDB = document.getElementById("urlOrPDB");
         var shadowsObj = document.getElementById("molecular-shadows");
+        var hardwareScalingObj = document.getElementById("set-hardware-scaling-level");
         var submitButton = document.getElementById("submit");
 
         // Set the values of those form elements if they are in local
@@ -78,6 +82,20 @@
             shadowsObj.checked = localStorage.getItem("shadows") === "true";
         }
 
+        if (localStorage.getItem("hardwareScaling") !== null) {
+            hardwareScalingObj.checked = localStorage.getItem("hardwareScaling") === "true";
+        } else {
+            hardwareScalingObj.checked = true;  // default
+        }
+
+        if (window["webXRPolyfill"]["nativeWebXR"] !== true) {
+            var divs = document.getElementsByClassName("enhance-resolution-container");
+            for (var i = 0; i < warnings.length; i++) {
+                var div = divs[i];
+                div.style.display = "inline-block";
+            }
+        }
+
         urlOrPDB.focus();
 
         submitButton.onclick = () => {
@@ -85,7 +103,8 @@
             var url = urlOrPDB.value
             var environmentSelectOption = environmentSelect.options[environmentSelect.selectedIndex]; // .find("option:selected");
             var environ = environmentSelectOption.value;
-            var shadows = shadowsObj.checked; // is(':checked');
+            var shadows = shadowsObj.checked;
+            var hardwareScaling = hardwareScalingObj.checked;
 
             // Save them so they are the same when you reload. Decided
             // not to save url for security reasons (could be
@@ -93,10 +112,11 @@
             // localStorage.setItem('url', url);
             localStorage.setItem('environ', environ);
             localStorage.setItem('shadows', shadows);
+            localStorage.setItem('hardwareScaling', hardwareScaling);
 
             // Constricut the redirect url and redirect.
             let curUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-            let newUrl = curUrl + "?s=" + url + "&e=" + environ + "&sh=" + shadows.toString();
+            let newUrl = curUrl + "?s=" + url + "&e=" + environ + "&sh=" + shadows.toString() + "&hs=" + hardwareScaling.toString();
             window.location.href = newUrl;
         };
 
