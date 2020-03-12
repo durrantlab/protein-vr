@@ -90,7 +90,7 @@
 
         if (window["webXRPolyfill"]["nativeWebXR"] !== true) {
             var divs = document.getElementsByClassName("enhance-resolution-container");
-            for (var i = 0; i < warnings.length; i++) {
+            for (var i = 0; i < divs.length; i++) {
                 var div = divs[i];
                 div.style.display = "inline-block";
             }

@@ -45,18 +45,17 @@
     </div> -->
     <hr class="mt-3 mb-4" style="border-top:0;" />
     <h5>Graphics Settings</h5>
-    <div class="alert alert-warning">
-        Molecular shadows can slow navigation and may crash some mobile
-        browsers.
-    </div>
-    <div class="alert alert-warning enhance-resolution-container" style="display:none;">
+    <!-- <div class="alert alert-warning enhance-resolution-container" style="display:none;">
         Your browser does not support WebXR. ProteinVR will try to use the
         older WebVR API instead.
-    </div>
+    </div> -->
     <div class="row">
         <div class="col-md-12">
             <div class="form-check">
-                <!-- <label for="shadows"></label> -->
+                <label for="shadows">
+                    Molecular shadows can slow navigation and may crash some
+                    mobile browsers.
+                </label>
                 <div id="shadows">
                     <input style="margin-left: 0;" type="checkbox" class="form-check-input" id="molecular-shadows">
                     <label style="padding-left: 1.5rem;" class="form-check-label" for="molecular-shadows">Allow Molecules to Cast Subtle Shadows</label>
@@ -69,8 +68,11 @@
         <div class="col-md-12">
             <div class="form-check">
                 <label for="enhance-resolution">
-                    Enhanced VR resolution can cause problems on some headsets
-                    (e.g., graphics in only one eye).
+                    <!-- can cause problems on some headsets.--><!-- (e.g.,
+                    graphics in only one eye, left-eye field of view impinges
+                    on right, etc.).--> Try disabling enhanced VR resolution
+                    if ProteinVR sends incongruous images to each eye in VR mode.
+                    <!-- VR breaks on your device. -->
                 </label>
                 <div id="enhance-resolution">
                     <input style="margin-left: 0;" type="checkbox" class="form-check-input" id="set-hardware-scaling-level">
