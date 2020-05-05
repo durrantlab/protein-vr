@@ -138,17 +138,52 @@ export function loadPDBURL(url: string, callBack: any): void {
          * @param  {string}  err
          */
         "error": (hdr: any, status: any, err: any) => {
-            let msg = "<p>Could not load molecule: " + url + "</p>";
-            msg += "<p><pre>" + err + "</pre></p>";
-            msg += '<p>(<a href="' + window.location.href.split("?")[0] + '">Click to restart...</a>)</p>';
-            OpenPopup.openModal({
-                title: "Error Loading Molecule",
-                content: msg,
-                isUrl: false,
-                hasCloseBtn: false,
-                isUnClosable: true
-            });
+            showLoadMoleculeError(hdr, status, err, url);
         },
+    });
+}
+
+/**
+ * If there's an error...
+ * @param  {*}       hdr
+ * @param  {*}       status
+ * @param  {string}  err
+ * @param  {string}  url  The url.
+ */
+function showLoadMoleculeError(hdr: any, status: any, err: any, url: string) {
+    let msg = "<p>Could not load molecule from URL: " + url + "</p>";
+
+    if (status !== -9999) {
+        if (url.substr(0, 4) !== "http") {
+            // If it doesn't start with http, and 404 error, good to explain
+            // that.
+            if ((err.substr(err.lengh - 1, 1) !== ".") && (err !== "")) {
+                err += ".";
+            }
+            err += " The molecule URL must start with \"http://\" or \"https://\".";
+        } else if (err === "") {
+            // The browser doesn't report some errors. Let's try to make some
+            // guesses. Check if it's because trying to load http over https.
+            let protocol = window.location.protocol;
+            if (url.substr(0, protocol.length) !== protocol) {
+                err = "Protocols don't match. The ProteinVR URL starts with \"" + protocol +
+                      "//\", but the molecule URL starts with \"" +
+                      url.split(":")[0] + "://\".";
+            } else {
+                // Some other unspecified error that can't be caught.
+                err ='Unidentifiable network error. It might be a <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank">CORS issue</a> or a dropped internet connection. If you\'re a developer, check the console.';
+            }
+        }
+    }
+
+    msg += "<p><pre>" + err + "</pre></p>";
+    msg += '<p>(<a href="' + window.location.href.split("?")[0] + '">Click to restart...</a>)</p>';
+    OpenPopup.openModal({
+        title: "Error Loading Molecule",
+        content: msg,
+        isUrl: false,
+        hasCloseBtn: false,
+        isUnClosable: true
     });
 }
 
@@ -223,27 +258,36 @@ export function render(updateData: boolean, repName: string, callBack: any = () 
 
     if (updateData) {
         // Load the data.
-        loadVRMLFrom3DMol(() => {
-            loadValsFromVRML(repName, () => {
-                // Could modify coordinates before importing into babylon
-                // scene, so comment out below. Changed my mind the kinds of
-                // manipulations above should be performed on the mesh.
-                // Babylon is going to have better functions for this than I
-                // can come up with.
-                const newMesh = importIntoBabylonScene();
+        loadVRMLFrom3DMol(
+            () => {
+                loadValsFromVRML(
+                    repName,
+                    () => {
+                        // Could modify coordinates before importing into
+                        // babylon scene, so comment out below. Changed my
+                        // mind the kinds of manipulations above should be
+                        // performed on the mesh. Babylon is going to have
+                        // better functions for this than I can come up with.
+                        const newMesh = importIntoBabylonScene();
 
-                if (newMesh !== undefined) {
-                    // It's undefined if, for example, trying to do cartoon on
-                    // ligand.
-                    PositionInScene.positionAll3DMolMeshInsideAnother(newMesh, Vars.scene.getMeshByName("protein_box"));
-                }
+                        if (newMesh !== undefined) {
+                            // It's undefined if, for example, trying to do
+                            // cartoon on ligand.
+                            PositionInScene.positionAll3DMolMeshInsideAnother(newMesh, Vars.scene.getMeshByName("protein_box"));
+                        }
 
-                callBack(newMesh);  // Cloned so it won't change with new rep in future.
+                        callBack(newMesh);  // Cloned so it won't change with new rep in future.
 
-                // Clean up.
-                modelData = [];
-            });
-        });
+                        // Clean up.
+                        modelData = [];
+                    }
+                );
+            },
+            (e) => {
+                // -9999 avoids showing other errors.
+                showLoadMoleculeError(null, -9999, "Is the molecule file properly formatted?", "");
+            }
+        );
     }
 }
 
@@ -252,7 +296,7 @@ export function render(updateData: boolean, repName: string, callBack: any = () 
  * @param  {Function=}  callBack    The callback function.
  * @returns void
  */
-function loadVRMLFrom3DMol(callBack: any): void {
+function loadVRMLFrom3DMol(callBack: any, callBackErr: any): void {
     // Make the VRML string from that model.
 
     // TODO: Below is a horrible idea for debugging! But I'm getting an error
@@ -262,9 +306,15 @@ function loadVRMLFrom3DMol(callBack: any): void {
         /** @type {string} */
         vrmlStr = viewer.exportVRML();
     } catch(e) {
-        console.log("Error that you should try to debug!", e);
+        // console.log("Error that you should try to debug!", e);
+        callBackErr(e);
     }
-    callBack();
+
+    try {
+        callBack();
+    } catch(e) {
+        callBackErr(e);
+    }
 }
 
 /**

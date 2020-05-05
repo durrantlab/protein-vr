@@ -16,7 +16,7 @@ const stylesQueue: any[] = [];
 export let webrtc: any = undefined;
 export let shadows = false;
 export let hardwardScaling = true;
-let urlParams: any;
+let urlParams: Map<string, any> = new Map();  // To preserve order.
 let autoUpdateUrlEnabled = true;
 
 /**
@@ -34,7 +34,7 @@ export function enableAutoUpdateUrl(val: boolean): void {
  * @param  {string} url  The url srtring.
  * @returns Object<string,*> The parameters.
  */
-function getAllUrlParams(url: string): any {
+function getAllUrlParams(url: string): Map<string, any> {
     // Adapted from
     // https://www.sitepoint.com/get-url-parameters-with-javascript/
 
@@ -42,7 +42,7 @@ function getAllUrlParams(url: string): any {
     let queryString = url ? url.split("?")[1] : window.location.search.slice(1);
 
     // we'll store the parameters here
-    const obj = {};
+    const obj = new Map();  // Using map to preserve order.
 
     // if query string exists
     if (queryString) {
@@ -63,7 +63,7 @@ function getAllUrlParams(url: string): any {
             const paramName = keyValPair[0];
             const paramValue = (keyValPair[1] === undefined) ? true : keyValPair[1];
 
-            obj[paramName] = paramValue;
+            obj.set(paramName, paramValue);
         }
     }
 
@@ -174,7 +174,7 @@ export function readEnvironmentNameParam(): void {
     urlParams = getAllUrlParams(window.location.href);
 
     // Get the environment.
-    const environ = urlParams["e"];
+    const environ = urlParams.get("e");
     if (environ !== undefined) {
         Vars.setSceneName(environ);
     }
@@ -188,7 +188,7 @@ export function readEnvironmentNameParam(): void {
  */
 export function readUrlParams(): void {
     // Before anything, check if this is a webrtc session.
-    webrtc = urlParams["f"];
+    webrtc = urlParams.get("f");
     if (webrtc !== undefined) {
         Student.startFollowing(webrtc);
 
@@ -222,13 +222,13 @@ export function readUrlParams(): void {
 
     // Update the mesh rotations
     /** @type {number} */
-    let rx = urlParams["rx"];
+    let rx = urlParams.get("rx");
 
     /** @type {number} */
-    let ry = urlParams["ry"];
+    let ry = urlParams.get("ry");
 
     /** @type {number} */
-    let rz = urlParams["rz"];
+    let rz = urlParams.get("rz");
 
     rx = (rx === undefined) ? 0 : +rx;
     ry = (ry === undefined) ? 0 : +ry;
@@ -237,7 +237,7 @@ export function readUrlParams(): void {
 
     // Set the protein model if it's present.
     /** @type {string} */
-    let src = urlParams["s"];
+    let src = urlParams.get("s");
     if ((src !== undefined) && (src !== "")) {
         if ((src.length === 4) && (src.indexOf(".") === -1)) {
             // Assume it's a pdb id
@@ -247,13 +247,9 @@ export function readUrlParams(): void {
     }
 
     // Setup the styles as well.
-    /** @type {Array<string>} */
-    const keys = Object.keys(urlParams);
-    const len = keys.length;
-    for (let i = 0; i < len; i++) {
-        const key = keys[i];
+    for (let [key, value] of urlParams) {
         if (key.slice(0, 2) === "st") {
-            const repInfo = extractRepInfoFromKey(urlParams[key]);
+            const repInfo = extractRepInfoFromKey(value);
             stylesQueue.push(repInfo);
         }
     }
@@ -266,25 +262,25 @@ export function readUrlParams(): void {
     }
 
     // Position the camera
-    const cx = urlParams["cx"];
-    const cy = urlParams["cy"];
-    const cz = urlParams["cz"];
+    const cx = urlParams.get("cx");
+    const cy = urlParams.get("cy");
+    const cz = urlParams.get("cz");
     if ((cx !== undefined) && (cy !== undefined) && (cz !== undefined)) {
         CommonCamera.setCameraPosition(new BABYLON.Vector3(+cx, +cy, +cz));
     }
 
-    const crx = urlParams["crx"];
-    const cry = urlParams["cry"];
-    const crz = urlParams["crz"];
-    const crw = urlParams["crw"];
+    const crx = urlParams.get("crx");
+    const cry = urlParams.get("cry");
+    const crz = urlParams.get("crz");
+    const crw = urlParams.get("crw");
     if ((crx !== undefined) && (cry !== undefined) && (crz !== undefined) && (crw !== undefined)) {
         CommonCamera.setCameraRotationQuaternion(new BABYLON.Quaternion(+crx, +cry, +crz, +crw));
     }
 
     // Determine if shadows or not.
-    shadows = urlParams["sh"];
+    shadows = urlParams.get("sh");
 
-    hardwardScaling = urlParams["hs"];
+    hardwardScaling = urlParams.get("hs");
 
     // Start updating the URL periodically. Because of camera changes.
     autoUpdateUrl();
@@ -320,7 +316,8 @@ export function extractRepInfoFromKey(key: string): any[] {
 export function startLoadingStyles(): void {
     if (stylesQueue.length > 0) {
         // There are some styles to still run.
-        const style = stylesQueue.pop();
+        // const style = stylesQueue.pop();
+        const style = stylesQueue.shift();
         VisStyles.toggleRep(style[0], style[1], style[2], () => {
             // Try to get the next style.
             startLoadingStyles();
