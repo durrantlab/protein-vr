@@ -11,6 +11,7 @@ import * as Vars from "../Vars/Vars";
 import * as Lecturer from "../WebRTC/Lecturer";
 import * as UrlVars from "../Vars/UrlVars";
 import * as Menu2D from "./Menu2D";
+import * as LoadSave from "./OpenPopup/LoadSave";
 
 declare var jQuery: any;
 
@@ -61,10 +62,11 @@ function addRunModeButtons(): void {
             clickFunc: () => {
                 // Give them some time to admire nanokid... :)
                 window["PVR_warning"] = true;
-                OpenPopup.openModal({
-                    title: "Load Molecule",
-                    content: "pages/load.html"
-                });
+                LoadSave.open();
+                // OpenPopup.openModal({
+                //     title: "Load Molecule",
+                //     content: "pages/load.html"
+                // });
             }
         },
         {

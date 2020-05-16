@@ -29,6 +29,7 @@ interface IOpenModal {
     isSkinny?: boolean;
     btnText?: string;
     onCloseCallback?: any;
+    onReadyCallBack?: any
 }
 
 /**
@@ -43,6 +44,7 @@ function setMissingToDefaults(params: IOpenModal): IOpenModal {
     params.showBackdrop = params.showBackdrop === undefined ? true : params.showBackdrop;
     params.isSkinny = params.isSkinny === undefined ? false : params.isSkinny;
     params.onCloseCallback = params.onCloseCallback === undefined ? undefined : params.onCloseCallback;
+    params.onReadyCallBack = params.onReadyCallBack === undefined ? undefined : params.onReadyCallBack;
     params.btnText = params.btnText === undefined ? "Close" : params.btnText;
 
     return params;
@@ -220,7 +222,9 @@ function openUrlModalContinue(params: IOpenModal): void {
         //     }
         // }, 1000);
 
-        msgContainer.css("text-align", "center");
+        // msgContainer.css("text-align", "center");
+        msgContainer.css("text-align", "initial");
+
         msgContainer.html(params.content);
         if (params.hasCloseBtn === undefined) {
             footer.show();
@@ -273,5 +277,12 @@ function openUrlModalContinue(params: IOpenModal): void {
         modalDialog.addClass("skinny-modal");
     } else {
         modalDialog.removeClass("skinny-modal");
+    }
+
+    // If a onReadyCallBack is specified...
+    if (params.onReadyCallBack !== undefined) {
+        msgModal.on('shown.bs.modal', function (e) {
+            params.onReadyCallBack();
+        });
     }
 }
