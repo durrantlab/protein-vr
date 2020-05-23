@@ -10,6 +10,7 @@ import * as ServiceWorker from "./components/System/ServiceWorker";
 import * as GoogleAnalytics from "./components/System/GoogleAnalytics";
 import * as DeviceOrientation from "./components/System/DeviceOrientation";
 import * as Plugins from "./components/Plugins/Plugins";
+import * as VueApp from "./components/UI/VueApp";
 
 // Report version
 console.log("ProteinVR " + Vars.VERSION);
@@ -33,3 +34,14 @@ LoadAndSetup.load();
 
 // Let google analytics know if running from durrantlab server.
 GoogleAnalytics.setupGoogleAnalyticsIfDurrantLab();
+
+/**
+ * A function to activate debug mode.
+ * @returns void
+ */
+function debugMode(): void {
+    Vars.scene.debugLayer.show().then(() => {
+        document.getElementById("inspector-host").style.zIndex = "15";
+        document.getElementById("scene-explorer-host").style.zIndex = "15";
+    });
+}

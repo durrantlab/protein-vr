@@ -2,11 +2,14 @@ const webpack = require("webpack");
 const merge = require("webpack-merge");
 const common = require("./webpack.common.js");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+// const HtmlWebpackIncludeAssetsPlugin = require("html-webpack-include-assets-plugin");
 var HtmlWebpackExcludeAssetsPlugin = require("html-webpack-exclude-assets-plugin");
 var CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
 const WorkboxPlugin = require("workbox-webpack-plugin"); // for PWA
 // const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
+
 
 module.exports = merge(common, {
     entry: {
@@ -14,8 +17,10 @@ module.exports = merge(common, {
     },
     plugins: [
         // new CleanWebpackPlugin(),
+        // new HtmlWebpackPlugin({}),
+        // new HtmlWebpackIncludeAssetsPlugin({
         new HtmlWebpackPlugin({
-            // title: 'Test Title',
+                // title: 'Test Title',
             template: path.join(__dirname, "../../src/index.html"),
             // favicon: ???
             minify: true,
@@ -79,7 +84,8 @@ module.exports = merge(common, {
                 /glyphicons-halflings-regular.(?!woff)$/,
 
             ],
-        })
+        }),
+        new VueLoaderPlugin()
     ],
     module: {
         rules: [
@@ -99,6 +105,10 @@ module.exports = merge(common, {
                 ]
             },
             { test: /\.(png|jpg|hdr|mp3|sdf)$/, loader: "file-loader" },
+            {
+                test: /\.vue$/,
+                loader: 'vue-loader'
+            }
             // {
             //     test: require.resolve("jquery"),
             //     use: [

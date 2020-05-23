@@ -5,7 +5,8 @@
 import * as PromiseStore from "../PromiseStore";
 import * as Vars from "../Vars/Vars";
 import * as Menu3D from "./Menu3D/Menu3D";
-import * as UI2D from "./UI2D";
+// import * as UI2D from "./UI2D/UI2D";
+import * as VueApp from "./VueApp";
 
 /**
  * Sets up pthe menus.
@@ -24,7 +25,9 @@ export function runSetupMenus(): void {
 
             // Sets up nav selection buttons in DOM... including the 2D menu
             // that mirrors the 3D menu.
-            UI2D.setup();
+            // UI2D.setup();
+            VueApp.setup();
+
 
             resolve();
         }

@@ -8,6 +8,14 @@ Vue.set = function(a, b, c) {};
 Vue.nextTick = function(a) {};
 Vue.$slots = function(a) {};
 Vue.use = function(a) {};
+Vue.$createElement;
+Vue._self;
+Vue._self._c;
+Vue._self._s;
+Vue._self._v;
+Vue._self._l;
+
+var render;
 
 function Vuex() {};
 

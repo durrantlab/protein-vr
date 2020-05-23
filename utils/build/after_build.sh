@@ -1,3 +1,5 @@
+exit
+
 # Must be run from the main directory.
 
 # exit  # Don't do this. For debugging.
