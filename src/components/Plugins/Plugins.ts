@@ -1,4 +1,5 @@
 import * as LoadSavePDBUurl from "./LoadSave/PDBUrl";
+import * as LoadSaveSceneFile from "./LoadSave/SceneFile";
 
 // An object where loaded plugins are stored.
 export let loadedPlugins: any = {};
@@ -10,6 +11,7 @@ export let loadedPlugins: any = {};
 export function loadAll(): void {
     let plugins = [];
     plugins.push(LoadSavePDBUurl.PDBUrl);
+    plugins.push(LoadSaveSceneFile.SceneFile);
 
     const pluginsLen = plugins.length;
     for (let i = 0; i < pluginsLen; i++) {

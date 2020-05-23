@@ -17,7 +17,7 @@ export function requestDeviceOrientation(): void {
         (resolve) => {
             // See
             // https://medium.com/flawless-app-stories/how-to-request-device-motion-and-orientation-permission-in-ios-13-74fc9d6cd140
-            if (typeof DeviceMotionEvent["requestPermission"] === "function") {
+            if ((typeof DeviceMotionEvent !== "undefined") && (typeof DeviceMotionEvent["requestPermission"] === "function")) {
                 SplashScreen.showSplashScreen(() => {
                     // iOS 13+.
                     DeviceOrientationEvent["requestPermission"]()

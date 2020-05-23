@@ -4,11 +4,13 @@ CHANGES
 WIP
 ---
 
+* Upgraded to Bootstrap v4.3.1.
 * When reloading a saved ProteinVR URL, the molecular representations are now
   loaded in the same, original order (in modern browsers).
 * Added proper citation (PLoS Comp Bio).
 * Improved error handling (e.g., warns when trying to load HTTP content over
   HTTPS).
+* Created plugin architecture for loading/saving scenes internally.
 
 1.0.4
 -----

@@ -2,6 +2,7 @@ const webpack = require("webpack");
 const merge = require("webpack-merge");
 const common = require("./webpack.common.js");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+// const HtmlWebpackIncludeAssetsPlugin = require("html-webpack-include-assets-plugin");
 var HtmlWebpackExcludeAssetsPlugin = require("html-webpack-exclude-assets-plugin");
 var CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
@@ -14,8 +15,10 @@ module.exports = merge(common, {
     },
     plugins: [
         // new CleanWebpackPlugin(),
+        // new HtmlWebpackPlugin({}),
+        // new HtmlWebpackIncludeAssetsPlugin({
         new HtmlWebpackPlugin({
-            // title: 'Test Title',
+                // title: 'Test Title',
             template: path.join(__dirname, "../../src/index.html"),
             // favicon: ???
             minify: true,
