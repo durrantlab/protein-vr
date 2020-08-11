@@ -1,0 +1,52 @@
+I'd reocmmend redoing this  whole thing. From breadcrumbs, read Menu3D.inf directly and  retrieve data needed to display whole tree (and all siblings of one selected).
+
+<div class="card">
+    <div :id="btnId"
+        class="btn btn-sm menu2d-btn"
+        data-toggle="collapse"
+        :data-target="'#' + collapseId"
+        aria-expanded="false"
+        :aria-controls="collapseId"
+        :style="css"
+        :data-clickpath='JSON.stringify(this.newBreadCrumbs)'
+        :data-depth='depth + 1'
+        :title="title"
+        @click.stop='addSubMenuData()'>
+        {{breadcrumbs}}{{title}}
+    </div>
+    <div v-if="typeof subMenuItems === 'object'">
+        <!-- class="collapse" -->
+        <div :id="collapseId"
+            :aria-labelledby="id"
+            :data-parent="'#accordion-' + accordionId"
+        >
+            <div class="card-body pad10" :style="bgColor">
+                <!-- :subMenuItems="subMenuItems[title]" -->
+                <menu-2d-group
+                    :breadcrumbs="newBreadCrumbs"
+                    :depth="depth + 1"
+                    :title="title"
+                >
+                </menu-2d-group>
+            </div>
+        </div>
+    </div>
+
+    <!-- switch (typeof subMenuItems) {
+        case "object":
+            // If you're here, subMenuItems contains actual submenu
+            // items. It should be it's own accordion.
+            html += `
+                <div id="${collapseId}" class="collapse" aria-labelledby="${id}" data-parent="#accordion-${accordionId}">
+                    <div class="card-body pad10" style="${bgColor}">
+                    </div>
+                </div>`; // card collapse
+            break;
+        default:
+            // If you get here, subMenuItems is a function that should be
+            // run on click.
+            funcs[btnId] = subMenuItems;
+            break;
+    } -->
+
+</div>

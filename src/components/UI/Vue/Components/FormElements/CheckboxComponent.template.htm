@@ -1,0 +1,20 @@
+<div v-if="!hidden" :class="'row ' + id + '-container'">
+    <div class="col-md-12">
+        <div class="form-check">
+            <label for="id + '-label'">
+                {{helpMsg}}
+            </label>
+            <div id="id + '-label'">
+                <input
+                    style="margin-left: 0;"
+                    type="checkbox"
+                    class="form-check-input"
+                    :id="id"
+                    v-model="isChecked"
+                >
+                <label style="padding-left: 1.5rem;" class="form-check-label" :for="id">{{label}}</label>
+                <p style="height:5px;">&nbsp;</p>
+            </div>
+        </div>
+    </div>
+</div>

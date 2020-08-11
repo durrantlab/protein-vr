@@ -14,7 +14,7 @@ import * as Pickables from "./Pickables";
 import * as Points from "./Points";
 import * as UrlVars from "../Vars/UrlVars";
 import * as Menu3D from "../UI/Menu3D/Menu3D";
-import * as OpenPopup from "../UI/OpenPopup/OpenPopup";
+import * as ModalComponent from "../UI/Vue/Components/OpenPopup/ModalComponent";
 import * as Arrow from "../Navigation/Arrow";
 import * as PromiseStore from "../PromiseStore";
 import * as VRCamera from "../Cameras/VRCamera";
@@ -131,7 +131,7 @@ function setupTriggers(): void {
     // Space always triggers
     const body = jQuery("body");
     body.keydown((e: any) => {
-        if (OpenPopup.modalCurrentlyOpen === false) {
+        if (ModalComponent.modalCurrentlyOpen === false) {
             let charCode = (typeof e.which == "undefined") ? e.keyCode : e.which;
             if (charCode === 32) {
                 // Space bar

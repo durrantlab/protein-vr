@@ -1,0 +1,10 @@
+<li class="nav-item">
+    <a
+        :class="'nav-link' + (activeClass ? ' active' : '')"
+        :id="pluginSlug + '-tab'"
+        data-toggle="tab" :href="'#' + pluginSlug"
+        role="tab" :aria-controls="pluginSlug"
+        aria-selected="true">
+        <slot></slot>
+    </a>
+</li>

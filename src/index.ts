@@ -3,14 +3,15 @@
 // full details. Copyright 2019 Jacob D. Durrant.
 
 import * as LoadAndSetup from "./components/Scene/LoadAndSetup";
-import 'bootstrap';
+// import 'bootstrap';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+
 import * as UrlVars from "./components/Vars/UrlVars";
 import * as Vars from "./components/Vars/Vars";
 import * as ServiceWorker from "./components/System/ServiceWorker";
 import * as GoogleAnalytics from "./components/System/GoogleAnalytics";
 import * as DeviceOrientation from "./components/System/DeviceOrientation";
 import * as Plugins from "./components/Plugins/Plugins";
-import * as VueApp from "./components/UI/VueApp";
 
 // Report version
 console.log("ProteinVR " + Vars.VERSION);

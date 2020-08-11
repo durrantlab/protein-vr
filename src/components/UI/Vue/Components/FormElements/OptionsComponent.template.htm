@@ -1,0 +1,9 @@
+<span>
+    <!-- {{options}} -->
+    <select v-model="selectedVal" class="form-control" :id="id">
+        <option v-for="option in options" v-bind:value="option.value" :key="option.value">
+            <!-- :key="option.value" :selected="option.selected"> -->
+            {{option.description}}
+        </option>
+    </select>
+</span>

@@ -1,0 +1,25 @@
+<div>
+    <h5>Graphics Settings</h5>
+    <form-checkbox
+        :id="'molecular-shadows-' + pluginSlug"
+        label="Allow Molecules to Cast Subtle Shadows"
+        helpMsg="Molecular sshadows can slow navigation and may crash some mobile browsers."
+        :hidden="false"
+        :checked="$store.state.shadowsHardwareScaling.useShadows"
+        @change="onChangeShadows"
+    >
+    </form-checkbox>
+    <form-checkbox
+        :id="'set-hardware-scaling-level-' + pluginSlug"
+        label="Enhance Resolution in VR Mode (Recommended)"
+        helpMsg="Try disabling enhanced VR resolution if ProteinVR sends incongruous images to each eye in VR mode."
+        :hidden="hideHrdScle"
+        :checked="$store.state.shadowsHardwareScaling.useHardwareScaling"
+        @change="onChangeHardwareScaling"
+    >
+    </form-checkbox>
+    <!-- can cause problems on some headsets.--><!-- (e.g.,
+        graphics in only one eye, left-eye field of view impinges
+        on right, etc.).-->
+        <!-- VR breaks on your device. -->
+</div>

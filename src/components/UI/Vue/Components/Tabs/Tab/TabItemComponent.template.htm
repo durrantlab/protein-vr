@@ -1,0 +1,6 @@
+<div
+    :class="'tab-pane fade' + (activeClass ? 'show active' : '')"
+    :id="pluginSlug" role="tabpanel"
+    :aria-labelledby="pluginSlug + '-tab'">
+    <slot></slot>
+</div>

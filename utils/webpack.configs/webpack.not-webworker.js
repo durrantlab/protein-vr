@@ -8,7 +8,7 @@ var CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
 const WorkboxPlugin = require("workbox-webpack-plugin"); // for PWA
 // const {CleanWebpackPlugin} = require('clean-webpack-plugin');
-const VueLoaderPlugin = require('vue-loader/lib/plugin')
+// const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 
 module.exports = merge(common, {
@@ -34,13 +34,13 @@ module.exports = merge(common, {
             "window.jQuery": "jquery",
             $3Dmol: "3dmol",
             "window.$3Dmol": "3dmol",
-            // bootstrap: "bootstrap",
-            // "window.bootstrap": "bootstrap"
+            bootstrap: "bootstrap",
+            "window.bootstrap": "bootstrap"
         }),
         new CopyWebpackPlugin([
             { from: "src/babylon_scenes", to: "environs" },
             { from: "src/js", to: "js" },
-            { from: "src/components/UI/OpenPopup/pages", to: "pages" },
+            { from: "src/components/UI/Vue/Components/OpenPopup/pages", to: "pages" },
             {
                 from: "src/components/Mols/3DMol/nanokid.sdf",
                 to: "nanokid.sdf"
@@ -85,7 +85,7 @@ module.exports = merge(common, {
 
             ],
         }),
-        new VueLoaderPlugin()
+        // new VueLoaderPlugin()
     ],
     module: {
         rules: [
@@ -105,10 +105,11 @@ module.exports = merge(common, {
                 ]
             },
             { test: /\.(png|jpg|hdr|mp3|sdf)$/, loader: "file-loader" },
-            {
-                test: /\.vue$/,
-                loader: 'vue-loader'
-            }
+            { test: /\.htm$/i, loader: 'html-loader' },
+            // {
+            //     test: /\.vue$/,
+            //     loader: 'vue-loader'
+            // }
             // {
             //     test: require.resolve("jquery"),
             //     use: [

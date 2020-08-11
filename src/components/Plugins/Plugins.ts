@@ -1,8 +1,7 @@
-import * as LoadSavePDBUurl from "./LoadSave/PDBUrl";
-import * as LoadSaveSceneFile from "./LoadSave/SceneFile";
+import * as LoadSaveAll from "./LoadSave/LoadAll";
 
 // An object where loaded plugins are stored.
-export let loadedPlugins: any = {};
+export let registeredPlugins: any = {};
 
 /**
  * Loads all plugins. If you add a new plugin, you must load it from here.
@@ -10,19 +9,23 @@ export let loadedPlugins: any = {};
  */
 export function loadAll(): void {
     let plugins = [];
-    plugins.push(LoadSavePDBUurl.PDBUrl);
-    plugins.push(LoadSaveSceneFile.SceneFile);
+    plugins.push(...LoadSaveAll.getPlugins());
 
     const pluginsLen = plugins.length;
     for (let i = 0; i < pluginsLen; i++) {
-        const plugin = new plugins[i]();
-        if (loadedPlugins[plugin._type] === undefined) {
-            loadedPlugins[plugin._type] = [];
+        const plugin = plugins[i];
+        if (registeredPlugins[plugin._type] === undefined) {
+            registeredPlugins[plugin._type] = [];
         }
-        loadedPlugins[plugin._type].push(plugin);
+        registeredPlugins[plugin._type].push(plugin);
     }
 }
 
+/**
+ * Get all the registered plugins of a given type.
+ * @param  {string} type  The name of the type.
+ * @returns any[]  The list of registered plugins.
+ */
 export function getPluginsOfType(type: string): any[] {
-    return loadedPlugins[type];
+    return registeredPlugins[type];
 }

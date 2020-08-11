@@ -6,7 +6,8 @@
 // the device orientation sensors. We can do this through a simple "splash
 // screen".
 
-import * as OpenPopup from "../UI/OpenPopup/OpenPopup";
+// import * as OpenPopup from "../UI/OpenPopup/OpenPopup";
+import * as SimpleModalComponent from "../UI/Vue/Components/OpenPopup/SimpleModalComponent";
 import * as Vars from "../Vars/Vars";
 
 /**
@@ -25,13 +26,23 @@ export function showSplashScreen(onClick: any): void {
             <p>Please authorize access to your device's orientation sensors to continue.</p>
         </div>
     </div>`;
-    OpenPopup.openModal({
+    // OpenPopup.openModal({
+    //     title: "Welcome",
+    //     content: msg,
+    //     // isUrl: false,  // TODO: JDD. Delete after confirm work.
+    //     btnText: "Authorize",
+    //     onCloseCallback: () => {
+    //         onClick();
+    //     }
+    // });
+    SimpleModalComponent.openSimpleModal({
         title: "Welcome",
         content: msg,
-        isUrl: false,
+        // hasCloseBtn: true,
+        // showBackdrop: true,
+        // unclosable: false,
         btnText: "Authorize",
-        onCloseCallback: () => {
-            onClick();
-        }
+    }, false, () => {
+        alert("hi");
     });
 }

@@ -7,10 +7,10 @@
 
 import * as Menu3D from "../../UI/Menu3D/Menu3D";
 import * as Styles from "../../UI/Menu3D/Styles";
-// import * as OpenPopup from "../../UI/OpenPopup/OpenPopup";
 import * as UrlVars from "../../Vars/UrlVars";
 import * as VRML from "./VRML";
-import * as LoadSave from "../../UI/OpenPopup/LoadSave";
+import * as LoadAll from "../../Plugins/LoadSave/LoadAll";
+
 
 // Unfortunately, closure compiler breaks this. So hard code.
 // import * as NanoKidFile from "./nanokid.sdf"
@@ -72,8 +72,7 @@ function after3DMolJsLoaded(resolveFunc: Function): void {
             if ((modelUrl === "nanokid.sdf") && (UrlVars.checkIfWebRTCInUrl() === false)){
                 setTimeout(() => {
                     // Give them some time to admire nanokid... :)
-                    LoadSave.open();
-                    // OpenPopup.openModal({title: "Load Molecule", content: "pages/load.html"});
+                    LoadAll.openLoadSaveModal();
                 }, 3000);
             }
 

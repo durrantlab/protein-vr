@@ -1,0 +1,11 @@
+<span>
+    <label :for="id"><slot></slot></label>
+    <input
+        :type="type"
+        class="form-control"
+        :id="id"
+        :placeholder="placeholder"
+        v-model="valueGetSet"
+        @keypress="onKeyPress"
+    />
+</span>

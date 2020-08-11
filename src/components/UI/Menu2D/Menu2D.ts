@@ -1,7 +1,9 @@
-import * as OpenPopup from "./OpenPopup/OpenPopup";
-import * as Menu3D from "./Menu3D/Menu3D";
+import * as OpenPopup from "../Vue/Components/OpenPopup/OpenPopup";
+import * as Menu3D from "../Menu3D/Menu3D";
 
 // After the 3D menu has been created, also make a 2D menu system.
+
+debugger;  // To prove this isn't being used anymore.
 
 let funcs = {};
 
@@ -13,11 +15,11 @@ export function open(): void {
     OpenPopup.openModal({
         title: "Menu",
         content: `<div class="accrd" id="accordion-menu2d"></div>`,
-        isUrl: false,
+        // isUrl: false,  // TODO: JDD. Delete after confirm work.
         hasCloseBtn: true,
-        isUnClosable: false,
+        unclosable: false,
         showBackdrop: false,
-        isSkinny: true
+        skinny: true
     }).then(() => {
         populate2DSubMenu("#accordion-menu2d", Menu3D.menuInf, [], 0);
     });
@@ -92,7 +94,10 @@ function populate2DSubMenu(parentSelectr: string, subMenu: any, breadcrumbs: str
 
     parentDOM.html(html);
 
+    debugger;
+
     parentDOM.find(".menu2d-btn").click(function (e) {
+        debugger;
         let This = jQuery(this);
         let id = This.attr("id");
 

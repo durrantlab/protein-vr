@@ -1,0 +1,15 @@
+<modal
+    id="simple-modal"
+    :title="$store.state.simpleModal.title"
+    :hasCloseBtn="$store.state.simpleModal.hasCloseBtn"
+    :unclosable="$store.state.simpleModal.unclosable"
+    :showBackdrop="$store.state.simpleModal.showBackdrop"
+    :skinny="$store.state.simpleModal.skinny"
+    :btnText="$store.state.simpleModal.btnText"
+    @onReady="onReady"
+    @onClose="onClose"
+    :open="$store.state.simpleModal.showModal"
+>
+
+    <span v-html="$store.state.simpleModal.content"></span>
+</modal>

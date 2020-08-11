@@ -1,27 +1,16 @@
-<template>
-    <div id="btnsWrapper" :style="btnsWrapperStyle">
-        Moosedog
-        <front-button
-            v-for="item in runModeButtons"
-            :key="item.id"
-            :title="item.title"
-            :id ="item.id"
-            :curBottom = "item.curBottom"
-            :svg = "item.svg"
-            @click.native="item.clickFunc"
-        ></front-button>
-    </div>
-</template>
-
-<script lang="ts">
-console.log("MOODOG");
-import FrontButton from "./FrontButton.vue";
-import * as LoadSave from "../OpenPopup/LoadSave";
-import * as Menu2D from "../Menu2D";
-import * as OpenPopup from "../OpenPopup/OpenPopup";
+// import FrontButton from "./FrontButton.vue";
+import * as LoadAll from "../../Plugins/LoadSave/LoadAll";
+// import * as Menu2D from "../Menu2D/Menu2D";
+// import * as OpenPopup from "../OpenPopup/OpenPopup";
+import * as SimpleModalComponent from "../Vue/Components/OpenPopup/SimpleModalComponent";
 import * as Vars from "../../Vars/Vars";
 import * as Lecturer from "../../WebRTC/Lecturer";
 import * as UrlVars from "../../Vars/UrlVars";
+import {VueComponentParent} from "../Vue/VueComponentParent";
+import {store} from "../../UI/Vue/VueX/VueXStore";
+
+// @ts-ignore
+import templateHtml from "./FrontVueComponent.template.htm";
 
 interface I2DButton {
     svg: string;
@@ -32,16 +21,12 @@ interface I2DButton {
     showInFollowerMode: boolean;
 }
 
-export default {
-    "data"() {
-        return {
-            curBottomStart: 60,
-            vertSeparationDist: 55,
-            justResized: true
-        };
-    },
-    "components": {"FrontButton": FrontButton},
-    "computed": {
+export class FrontVueComponent extends VueComponentParent {
+    public tag = "front";
+    public methods = {};
+    public vueXStore;
+
+    public computed = {
         "btnsWrapperStyle"(): string {
             if (this.justResized === false) {
                 return;
@@ -95,8 +80,12 @@ export default {
                     "showInFollowerMode": false,
                     "clickFunc": () => {
                         // Give them some time to admire nanokid... :)
-                        window["PVR_warning"] = true;
-                        LoadSave.open();
+                        store.commit("setVar", {
+                            moduleName: "replaceWarning",
+                            varName: "showWarning",
+                            val: true
+                        });
+                        LoadAll.openLoadSaveModal();
                     },
                     "curBottom": undefined
                 },
@@ -159,7 +148,12 @@ export default {
                     "id": "menu-button",
                     "showInFollowerMode": false,
                     "clickFunc": () => {
-                        Menu2D.open();
+                        // Menu2D.open();
+                        store.commit("setVar", {
+                            moduleName: "menu2d",
+                            varName: "showMenu2DModal",
+                            val: true
+                        });
                     },
                     "curBottom": undefined
                 },
@@ -175,12 +169,20 @@ export default {
                     "id": "help-button",
                     "showInFollowerMode": false,
                     "clickFunc": () => {
-                        OpenPopup.openModal({
+                        // debugger;
+                        // OpenPopup.openModal({
+                        //     title: ,
+                        //     content: ,
+                        //     // isUrl: true,
+                        //     hasCloseBtn: true
+                        // });
+                        SimpleModalComponent.openSimpleModal({
                             title: "Help: ProteinVR " + Vars.VERSION,
                             content: "pages/help.html",
-                            isUrl: true,
-                            hasCloseBtn: true
-                        });
+                            hasCloseBtn: true,
+                            showBackdrop: true,
+                            unclosable: false
+                        }, true);
                     },
                     "curBottom": undefined
                 },
@@ -236,10 +238,24 @@ export default {
             }
 
             return btns;
-        },
-    },
-    "methods": {},
-    "mounted"(): void {
+        }
+    };
+
+    public props = {};
+
+    public watch = {};
+
+    public template = templateHtml;
+
+    public data = function(): any {
+        return {
+            curBottomStart: 60,
+            vertSeparationDist: 55,
+            justResized: true
+        };
+    }
+
+    public mounted = function(): void {
         // On resize, reposition the 2D buttons if the screen height is too small.
         window.addEventListener("resize", () => {
             // Resize the buttons if the screen isn't height enough (e.g.,
@@ -267,6 +283,5 @@ export default {
                 }
             }
         });
-    }
-};
-</script>
+    };
+}

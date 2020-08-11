@@ -9,12 +9,20 @@ import * as UrlVars from "../../Vars/UrlVars";
 import * as Vars from "../../Vars/Vars";
 import * as Load from "../Load";
 import * as PositionInScene from "./PositionInScene";
-import * as OpenPopup from "../../UI/OpenPopup/OpenPopup";
+import * as SimpleModalComponent from "../../UI/Vue/Components/OpenPopup/SimpleModalComponent"
 
 declare var $3Dmol;
 
 declare var BABYLON: any;
 declare var jQuery: any;
+
+// Uncomment this to debug Worker.
+// var Worker = class DebugWorker {
+//     public onmessage: any;
+//     public postMessage;
+//     static debugWorker = true;
+//     constructor(s: string) {}
+// };
 
 export interface IVRMLModel {
     coors: any;  // Float32Array
@@ -153,7 +161,11 @@ export function loadPDBURL(url: string, callBack: any): void {
 function showLoadMoleculeError(hdr: any, status: any, err: any, url: string) {
     let msg = "<p>Could not load molecule from URL: " + url + "</p>";
 
-    if (status !== -9999) {
+    // @ts-ignore
+    if ((typeof(Worker) === "undefined") || (Worker.debugWorker === true)) {
+        err = "Your browser does not support web workers. Please use a more " +
+              "modern browser when running ProteinVR.";
+    } else if (status !== -9999) {
         if (url.substr(0, 4) !== "http") {
             // If it doesn't start with http, and 404 error, good to explain
             // that.
@@ -178,13 +190,13 @@ function showLoadMoleculeError(hdr: any, status: any, err: any, url: string) {
 
     msg += "<p><pre>" + err + "</pre></p>";
     msg += '<p>(<a href="' + window.location.href.split("?")[0] + '">Click to restart...</a>)</p>';
-    OpenPopup.openModal({
+
+    SimpleModalComponent.openSimpleModal({
         title: "Error Loading Molecule",
         content: msg,
-        isUrl: false,
         hasCloseBtn: false,
-        isUnClosable: true
-    });
+        unclosable: true
+    }, false);
 }
 
 /**
@@ -388,12 +400,14 @@ function loadValsFromVRML(repName: string, callBack: any): void {
         });
     } else {
         // Sorry! No Web Worker support..
-        OpenPopup.openModal({
+        SimpleModalComponent.openSimpleModal({
             title: "Browser Error",
             content: `Your browser does not support web workers. Please use a more
-            modern browser when running ProteinVR.`,
-            isUrl: false
-        });
+                      modern browser when running ProteinVR.`,
+            hasCloseBtn: false,
+            unclosable: true
+        }, false);
+
         throw new Error("Browser does not support web workers.");
 
         // Comment below if you ever want to try to make it work without web
