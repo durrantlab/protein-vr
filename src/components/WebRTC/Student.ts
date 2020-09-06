@@ -8,7 +8,7 @@ import * as CommonCamera from "../Cameras/CommonCamera";
 import * as WebRTCBase from "./WebRTCBase";
 import * as Vars from "../Vars/Vars";
 import * as VisStyles from "../Mols/3DMol/VisStyles";
-import * as Rotations from "../UI/Menu3D/Rotations";
+import * as Rotations from "../UI/Menus/Menu3D/Rotations";
 
 declare var BABYLON: any;
 

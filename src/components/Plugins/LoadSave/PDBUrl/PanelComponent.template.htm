@@ -1,5 +1,6 @@
 <panel>
-    <h5>Load PDB File</h5>
+    <h5>Load Remote PDB or SDF File</h5>
+    <replace-warning></replace-warning>
     <form-input-wrapper>
         <form-input
             id="urlOrPDB"
@@ -7,7 +8,7 @@
             type="text"
             :value="$store.state.pdbUrlPanel.urlOrPDB"
             @change="onChangePDBUrl"
-            @keypress="onKeypress"
+            @enter="onEnter"
         >
             Enter a PDB ID (e.g., <a class="link-sim" href="#" @click.prevent="setUrl('1XDN')" data-href="1XDN">1XDN</a>)
             or PDB-/SDF-file URL (e.g., <a class="link-sim" href="#" @click.prevent="setUrl('https://files.rcsb.org/view/1XDN.pdb')">https://files.rcsb.org/.../1XDN.pdb</a>,
@@ -16,22 +17,7 @@
         <!-- <p class="help-block"></p> -->
     </form-input-wrapper>
 
-    <form-input-wrapper>
-        <!-- <label for="environments">Environment</label> -->
-        <label for="environments">
-            Select an environment to give context to your molecule. <!-- Or
-            <a href="#" onclick="loadMoreModels();">load complex environments</a>
-            from durrantlab.com. --> <!-- Now loading automatically. -->
-        </label>
-        <form-options
-            id="environments"
-            :options="environOptions"
-            :selected="$store.state.pdbUrlPanel.environment"
-            @change="changeEnvironment"
-        >
-        </form-options>
-        <!-- <p class="help-block"></p> -->
-    </form-input-wrapper>
+    <select-environment></select-environment>
 
     <!-- <div class="row">
         <div class="col-md-12">

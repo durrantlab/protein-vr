@@ -3,7 +3,11 @@ import * as Points from "../Navigation/Points";
 
 declare var BABYLON;
 
-export function loadArrow() {
+/**
+ * Load the 3D arrow that points towards the protein.
+ * @returns void
+ */
+export function loadArrow(): void {
     BABYLON.SceneLoader.ImportMeshAsync(null, "environs/arrow/", "arrow.babylon", Vars.scene).then(function (data) {
         // Do something with the meshes and skeletons
         // particleSystems are always null for glTF assets

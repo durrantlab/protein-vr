@@ -5,7 +5,8 @@
 // Functions that are common to the main classes of Lecturer.ts and
 // Student.ts.
 
-import * as OpenPopup from "../UI/Vue/Components/OpenPopup/OpenPopup";
+// import * as OpenPopup from "../UI/Vue/Components/OpenPopup/OpenPopup";
+import * as SimpleModalComponent from "../UI/Vue/Components/OpenPopup/SimpleModalComponent";
 
 declare var Peer: any;
 
@@ -118,11 +119,19 @@ export function webRTCErrorMsg(details = ""): void {
         msg += "</p>";
     }
 
-    OpenPopup.openModal({
+    // OpenPopup.openModal({
+    //     title: "Leader Error",
+    //     content: msg,
+    //     // isUrl: false
+    // });
+
+    SimpleModalComponent.openSimpleModal({
         title: "Leader Error",
         content: msg,
-        // isUrl: false
-    });
+        hasCloseBtn: true,
+        showBackdrop: true,
+        unclosable: false
+    }, false);
 }
 
 /**

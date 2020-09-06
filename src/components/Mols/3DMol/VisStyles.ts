@@ -5,8 +5,8 @@
 // Functions to create a protein visualization using 3DMol.js
 
 import * as Optimizations from "../../Scene/Optimizations";
-import * as Menu3D from "../../UI/Menu3D/Menu3D";
-import * as Styles from "../../UI/Menu3D/Styles";
+import * as Menu3D from "../../UI/Menus/Menu3D/Menu3D";
+import * as Styles from "../../UI/Menus/Menu3D/Styles";
 import * as UrlVars from "../../Vars/UrlVars";
 import * as Vars from "../../Vars/Vars";
 import * as PositionInScene from "./PositionInScene";

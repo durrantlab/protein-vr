@@ -3,7 +3,7 @@
     <form-checkbox
         :id="'molecular-shadows-' + pluginSlug"
         label="Allow Molecules to Cast Subtle Shadows"
-        helpMsg="Molecular sshadows can slow navigation and may crash some mobile browsers."
+        helpMsg="Molecular shadows can slow navigation and may crash some mobile browsers."
         :hidden="false"
         :checked="$store.state.shadowsHardwareScaling.useShadows"
         @change="onChangeShadows"

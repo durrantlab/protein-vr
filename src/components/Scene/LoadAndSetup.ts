@@ -11,7 +11,7 @@ import * as Vars from "../Vars/Vars";
 import * as Optimizations from "./Optimizations";
 import * as PromiseStore from "../PromiseStore";
 import * as Pickables from "../Navigation/Pickables";
-import * as Menus from "../UI/Menus";
+import * as Menus from "../UI/Menus/Menus";
 
 declare var BABYLON: any;
 

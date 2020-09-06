@@ -1,22 +1,41 @@
-import {VueComponentParent} from "../../VueComponentParent";
-import {store} from "../../VueX/VueXStore";
+import {VueComponentParent} from "../VueComponentParent";
+import {store} from "../../../../Vars/VueX/VueXStore";
 
 // @ts-ignore
-import templateHtml from "./InputComponent.template.htm";
+import {templateHtml} from "./InputComponent.template.htm.ts";
 
 export class FormInputComponent extends VueComponentParent {
     public tag = "form-input";
     public methods = {
+        /**
+         * Runs when the key is pressed.
+         * @param  {KeyboardEvent} e  The key information.
+         * @returns void
+         */
         "onKeyPress"(e: KeyboardEvent): void {
             this.$emit("keypress", e);
-        }
+
+            if (e.charCode === 13) {
+                this.$emit("enter");
+            }
+        },
     };
 
     public computed = {
         "valueGetSet": {
+            /**
+             * Gets the valueGetSet variable.
+             * @returns boolean  The value.
+             */
             get: function(): boolean {
                 return this["value"];
             },
+
+            /**
+             * Sets the valueGetSet variable.
+             * @param  {boolean} val  The new value.
+             * @returns void
+             */
             set: function(val: boolean): void {
                 this.$emit('change', val);
             }
@@ -37,9 +56,16 @@ export class FormInputComponent extends VueComponentParent {
 
     public vueXStore;
 
+    /**
+     * Returns the data associated with this component.
+     * @returns * The data object.
+     */
     public data = function(): any {
         return {};
     }
 
+    /**
+     * Function that runs when Vue component loaded.
+     */
     public mounted = function(): void {}
 }

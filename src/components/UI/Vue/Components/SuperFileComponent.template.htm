@@ -1,11 +1,32 @@
 <form-input-wrapper>
     <label :id="name + '-label'" :for="name + '-container'">{{label}}</label>
-    <div :id="name + '-container'" class="input-group mb-3">
-        <input type="text" :id="name + '-text-input'" :placeholder="placeholder" class="form-control" aria-label=""><!-- aria-describedby="basic-addon2" -->
+    <div
+        :id="name + '-container'"
+        class="input-group mb-3"
+        style="cursor:pointer !important;"
+    >
+        <input
+            type="text" :id="name + '-text-input'"
+            :placeholder="placeholder" :value="filename"
+            style="cursor:pointer !important;"
+            class="form-control" aria-label=""
+            @keypress="openFileInput"
+            @keydown="openFileInput"
+            @click="openFileInput"
+            readonly><!-- aria-describedby="basic-addon2" -->
         <div class="input-group-append">
-            <span class="input-group-text" style="margin:0; padding:0; border:0; width:110px;">
-                <button class="btn btn-primary" style="position:absolute; width:110px;">Select File</button>
-                <input type="file" :id="name + '-file-input'" style="z-index:100; opacity:0;">
+            <span class="input-group-text" style="margin:0; padding:0; border:0; width:110px; cursor:pointer !important;">
+                <button
+                    :ref="name + '-file-input-button'"
+                    class="btn btn-primary"
+                    style="position:absolute; width:110px; cursor:pointer !important;"
+                >Select File</button>
+                <input
+                    type="file" :id="name + '-file-input'"
+                    style="z-index:100; opacity:0; cursor:pointer !important;"
+                    :ref="name + '-file-input'"
+                    :accept="accept"
+                >
             </span>
         </div>
     </div>

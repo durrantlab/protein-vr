@@ -57,7 +57,14 @@ body {
   position: absolute;
   z-index: 2 !important;
   left: 0;
+  cursor: grab !important;
 }
+
+#renderCanvas:focus {
+    /* Make sure never any blue outline around canvas */
+    outline:0;
+}
+
 
 #container #capture-clicks {
   position: absolute;
@@ -178,4 +185,38 @@ div.btn {
     right: 0;
     bottom: 0;
     width: 85px;
+}
+
+.menu2d-btn {
+    width:100%;
+}
+
+.accordion-panel {
+    transition: max-height 5s ease;
+    max-height:6000px;
+
+    /* transition: min-height 1s ease; */
+    /* min-height:0; */
+
+    /* height:300px; */
+    overflow: hidden;
+}
+
+.accordion-panel.collapsed {
+    max-height:0;
+    /* min-height:600px; */
+}
+
+.emoji {
+    display: inline;
+    margin-left: 5px;
+    font-size: 12px;
+    position: relative;
+    bottom: 1px;
+}
+
+/* Fix tab widths. No good bootstrap4 class seems to get it just right. */
+.px-tab-pvr {
+    padding-left: 10px;
+    padding-right: 10px;
 }

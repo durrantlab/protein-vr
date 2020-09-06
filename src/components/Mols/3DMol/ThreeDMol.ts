@@ -5,12 +5,12 @@
 // Functions from loading molecules directly from a 3Dmol.js instance. See
 // VRML.ts for additional functions related to the mesh itself.
 
-import * as Menu3D from "../../UI/Menu3D/Menu3D";
-import * as Styles from "../../UI/Menu3D/Styles";
+import * as Menu3D from "../../UI/Menus/Menu3D/Menu3D";
+import * as Styles from "../../UI/Menus/Menu3D/Styles";
 import * as UrlVars from "../../Vars/UrlVars";
 import * as VRML from "./VRML";
 import * as LoadAll from "../../Plugins/LoadSave/LoadAll";
-
+import * as VueXStore from "../../Vars/VueX/VueXStore";
 
 // Unfortunately, closure compiler breaks this. So hard code.
 // import * as NanoKidFile from "./nanokid.sdf"
@@ -26,7 +26,9 @@ export let modelUrl = "nanokid.sdf";  // NanoKidFile;
  * @param  {string} url The new value.
  * @returns void
  */
-export function setModelUrl(url: string): void { modelUrl = url; }
+export function setModelUrl(url: string): void {
+    modelUrl = decodeURIComponent(url);
+}
 
 /**
  * Load in the extra molecule meshes.
@@ -48,37 +50,88 @@ function after3DMolJsLoaded(resolveFunc: Function): void {
     VRML.setup(() => {
         UrlVars.readUrlParams();
 
-        // let pdbUri = "https://files.rcsb.org/view/1XDN.pdb";
-        VRML.loadPDBURL(modelUrl, (mdl3DMol: any) => {
-            // Update URL with location
-            UrlVars.setURL();
+        if (modelUrl === "LOCALFILE") {
+            // Actually loading from a local file, currently in localstorage.
+            let data = sessionStorage.getItem("fileContent");
+            let type = sessionStorage.getItem("fileType");
+            sessionStorage.removeItem("fileContent");
+            sessionStorage.removeItem("fileType");
 
-            if (!UrlVars.checkIfWebRTCInUrl()) {
-                // It's not leader mode, set setup menu.
-
-                // Get additional selection information about the loaded
-                // molecule. Like residue name.
-                getAdditionalSels(mdl3DMol);
-
-                // Now that the pdb is loaded, you need to update the menu.
-                Styles.updateModelSpecificSelectionsInMenu(Menu3D.menuInf);
+            if ((data === null) || (data === undefined) ||
+                (type === null) || (type === undefined))
+            {
+                window.location.href = window.location.protocol + "//" + window.location.host + window.location.pathname;
             }
 
-            // Now that the PDB is loaded, you can start loading styles.
-            UrlVars.startLoadingStyles();
+            // Store these values in the VueX store, before parsing. That way,
+            // if you make modifications and resave the file, you'll have
+            // access to the original data. This isn't necessary if you
+            // specify a remote url, because you can just get the data from
+            // the remote source.
+            VueXStore.storeOutsideVue.commit("setVar", {
+                moduleName: "proteinvrLoadScenePanel",
+                varName: "fileContent",
+                val: data
+            });
+            VueXStore.storeOutsideVue.commit("setVar", {
+                moduleName: "proteinvrLoadScenePanel",
+                varName: "fileType",
+                val: type
+            });
 
-            // If it's nanokid, open a popup to let them specify a url or
-            // pdbid.
-            if ((modelUrl === "nanokid.sdf") && (UrlVars.checkIfWebRTCInUrl() === false)){
-                setTimeout(() => {
-                    // Give them some time to admire nanokid... :)
-                    LoadAll.openLoadSaveModal();
-                }, 3000);
-            }
+            VRML.loadPDBData(data, type, (mdl3DMol: any) => {
+                continueAfterModelLoaded(mdl3DMol, resolveFunc);
+            });
+        } else {
+            // Loading some sort of remote url.
+            // let pdbUri = "https://files.rcsb.org/view/1XDN.pdb";
+            VRML.loadPDBURL(modelUrl, (mdl3DMol: any) => {
+                continueAfterModelLoaded(mdl3DMol, resolveFunc);
+            });
+        }
 
-            resolveFunc();
-        });
+        // Make doubly sure deleted from sessionStorage.
+        sessionStorage.removeItem("fileContent");
+        sessionStorage.removeItem("fileType");
+
     });
+}
+
+/**
+ * Function that runs once the model is loaded.
+ * @param  {*}         mdl3DMol     The 3Dmol molecule object.
+ * @param  {Function}  resolveFunc  The resolve function to run when you're
+ *                                  done processing things.
+ * @returns void
+ */
+function continueAfterModelLoaded(mdl3DMol: any, resolveFunc: Function): void {
+    // Update URL with location
+    UrlVars.setURL();
+
+    if (!UrlVars.checkIfWebRTCInUrl()) {
+        // It's not leader mode, set setup menu.
+
+        // Get additional selection information about the loaded
+        // molecule. Like residue name.
+        getAdditionalSels(mdl3DMol);
+
+        // Now that the pdb is loaded, you need to update the menu.
+        Styles.updateModelSpecificSelectionsInMenu(Menu3D.menuInf);
+    }
+
+    // Now that the PDB is loaded, you can start loading styles.
+    UrlVars.startLoadingStyles();
+
+    // If it's nanokid, open a popup to let them specify a url or
+    // pdbid.
+    if ((modelUrl === "nanokid.sdf") && (UrlVars.checkIfWebRTCInUrl() === false)){
+        setTimeout(() => {
+            // Give them some time to admire nanokid... :)
+            LoadAll.openLoadSaveModal();
+        }, 3000);
+    }
+
+    resolveFunc();
 }
 
 /**

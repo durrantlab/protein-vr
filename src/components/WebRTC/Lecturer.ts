@@ -5,8 +5,9 @@
 // Functions for leader mode, that the leader (lecturer) uses.
 
 import * as CommonCamera from "../Cameras/CommonCamera";
-import * as OpenPopup from "../UI/Vue/Components/OpenPopup/OpenPopup";
+// import * as OpenPopup from "../UI/Vue/Components/OpenPopup/OpenPopup";
 import * as WebRTCBase from "./WebRTCBase";
+import * as SimpleModalComponent from "../UI/Vue/Components/OpenPopup/SimpleModalComponent";
 
 export let isLecturerBroadcasting = false;
 
@@ -100,12 +101,19 @@ export function startBroadcast(): void {
 
     lect.idReady.then((id: string) => {
         window["PVR_webRTCID"] = id;
-        OpenPopup.openModal({
+        // OpenPopup.openModal({
+        //     title: "Leader",
+        //     content: "pages/leader.html",
+        //     // isUrl: true,
+        //     hasCloseBtn: true
+        // });
+        SimpleModalComponent.openSimpleModal({
             title: "Leader",
             content: "pages/leader.html",
-            // isUrl: true,
-            hasCloseBtn: true
-        });
+            hasCloseBtn: true,
+            showBackdrop: true,
+            unclosable: false
+        }, true);
     });
 
     // Periodically send the information about the representations.

@@ -1,8 +1,8 @@
-import {VueComponentParent} from "../../VueComponentParent";
-import {store} from "../../VueX/VueXStore";
+import {VueComponentParent} from "../VueComponentParent";
+import {store} from "../../../../Vars/VueX/VueXStore";
 
 // @ts-ignore
-import templateHtml from "./OptionsComponent.template.htm";
+import {templateHtml} from "./OptionsComponent.template.htm.ts";
 
 export class FormOptionsComponent extends VueComponentParent {
     public tag = "form-options";
@@ -10,9 +10,19 @@ export class FormOptionsComponent extends VueComponentParent {
 
     public computed = {
         "selectedVal": {
+            /**
+             * Gets the selectedVal.
+             * @returns string The value.
+             */
             get: function(): string {
                 return this["selected"];
             },
+
+            /**
+             * Sets the selectedVal.
+             * @param  {string} val The value to set.
+             * @returns void
+             */
             set: function(val: string): void {
                 // alert(val);
                 // prob here
@@ -39,12 +49,17 @@ export class FormOptionsComponent extends VueComponentParent {
 
     public vueXStore;
 
+    /**
+     * Returns the data associated with this component.
+     * @returns * The data object.
+     */
     public data = function(): any {
-        return {
-            // "selectedVal": "",
-        };
+        return {};
     }
 
+    /**
+     * Function that runs when Vue component loaded.
+     */
     public mounted = function(): void {
         // Go through data and find first one that's selected.
         // for (let val of this["options"]) {

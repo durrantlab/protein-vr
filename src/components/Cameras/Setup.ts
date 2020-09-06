@@ -22,6 +22,9 @@ export function runSetupCamera(): void {
             // file. Should be the only one without the string VR in it.
             // Vars.scene.activeCamera = Vars.scene.cameras.filter((c: any) => c.name.indexOf("VR") === -1)[0];
 
+            // For debugging
+            // window["scene"] = Vars.scene;
+
             // You need to make the camera from the babylon file active. First, get
             // the babylon camera. It's the one that doesn't have "VR" in its name,
             // because VR cameras are added programatically.

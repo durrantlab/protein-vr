@@ -6,6 +6,7 @@ function Vue(s) {};
 Vue.component = function(a,b) {};
 Vue.set = function(a, b, c) {};
 Vue.nextTick = function(a) {};
+Vue.$emit = function(a,b) {};
 Vue.$slots = function(a) {};
 Vue.use = function(a) {};
 Vue.$createElement;
@@ -27,7 +28,11 @@ Vuex.Store = function(a) {};
 Vuex.Store.commit = function() {};
 Vuex.Store.dispatch = function() {};
 Vue.$store = function() {};
+Vue.$refs = function() {};
+Vuex.Store.state;
+Vuex.Store.registerModule = function(a,b) {};
 
+var addEventListener = function(a,b) {};
 function $3Dmol() {};
 $3Dmol.SurfaceType = function() {};
 $3Dmol.SurfaceType.MS = function() {};
@@ -792,3 +797,10 @@ var Peer = function(a,b) {};
 
 
 var ga = function(a,b,c) {};
+
+var sessionStorage;
+sessionStorage.getItem = function(a) {};
+sessionStorage.removeItem = function(a) {};
+sessionStorage.setItem = function(a, b) {};
+
+var templateHtml;

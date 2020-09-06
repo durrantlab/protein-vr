@@ -1,0 +1,15 @@
+<modal
+    id="menu-2d"
+    title="Menu"
+    :hasCloseBtn="false"
+    :unclosable="false"
+    :showBackdrop="false"
+    :skinny="true"
+    btnText="Close"
+    @onReady="onReady"
+    @onClose="onClose"
+    :open="$store.state.menu2dModal.showMenu2DModal"
+>
+
+    <menu-2d-display title=""></menu-2d-display>
+</modal>

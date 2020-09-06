@@ -10,7 +10,7 @@ import * as Optimizations from "../Scene/Optimizations";
 import * as Vars from "../Vars/Vars";
 import * as VRControllers from "./VRControllers";
 import * as UrlVars from "../Vars/UrlVars";
-import * as Menu3D from "../UI/Menu3D/Menu3D";
+import * as Menu3D from "../UI/Menus/Menu3D/Menu3D";
 import * as PromiseStore from "../PromiseStore";
 import * as Points from "../Navigation/Points";
 import * as NonVRCamera from "./NonVRCamera";

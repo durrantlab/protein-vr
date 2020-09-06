@@ -1,0 +1,16 @@
+<form-input-wrapper>
+    <!-- <label for="environments">Environment</label> -->
+    <label for="environments">
+        Select an environment to give context to your molecule. <!-- Or
+        <a href="#" onclick="loadMoreModels();">load complex environments</a>
+        from durrantlab.com. --> <!-- Now loading automatically. -->
+    </label>
+    <form-options
+        id="environments"
+        :options="$store.state.selectEnvironment.environOptions"
+        :selected="$store.state.selectEnvironment.environment"
+        @change="changeEnvironment"
+    >
+    </form-options>
+    <!-- <p class="help-block"></p> -->
+</form-input-wrapper>

@@ -1,7 +1,7 @@
-import {VueComponentParent} from "../../VueComponentParent";
+import {VueComponentParent} from "../VueComponentParent";
 
 // @ts-ignore
-import templateHtml from "./ButtonComponent.template.htm";
+import {templateHtml} from "./ButtonComponent.template.htm.ts";
 
 export class FormButtonComponent extends VueComponentParent {
     public tag = "form-button";
@@ -14,6 +14,9 @@ export class FormButtonComponent extends VueComponentParent {
         "cls": {
             "default": "primary"
         },
+        "disabled": {
+            "default": false
+        }
     };
 
     public watch = {};
@@ -22,9 +25,16 @@ export class FormButtonComponent extends VueComponentParent {
 
     public vueXStore;
 
+    /**
+     * Returns the data associated with this component.
+     * @returns * The data object.
+     */
     public data = function(): any {
         return {};
     }
 
+    /**
+     * Function that runs when Vue component loaded.
+     */
     public mounted = function(): void {}
 }

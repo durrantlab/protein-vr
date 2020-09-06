@@ -1,8 +1,8 @@
-import {VueComponentParent} from "../../VueComponentParent";
-import {store} from "../../VueX/VueXStore";
+import {VueComponentParent} from "../VueComponentParent";
+import {store} from "../../../../Vars/VueX/VueXStore";
 
 // @ts-ignore
-import templateHtml from "./CheckboxComponent.template.htm";
+import {templateHtml} from "./CheckboxComponent.template.htm.ts";
 import { positionAll3DMolMeshInsideAnother } from "../../../../Mols/3DMol/PositionInScene";
 
 export class FormCheckboxComponent extends VueComponentParent {
@@ -11,9 +11,19 @@ export class FormCheckboxComponent extends VueComponentParent {
 
     public computed = {
         "isChecked": {
+            /**
+             * Gets the isChecked value.
+             * @returns boolean  The value.
+             */
             get: function(): boolean {
                 return this["checked"];
             },
+
+            /**
+             * Sets the isChecked value.
+             * @param  {boolean} val  The new value.
+             * @returns void
+             */
             set: function(val: boolean): void {
                 this.$emit('change', val);
             }
@@ -34,9 +44,16 @@ export class FormCheckboxComponent extends VueComponentParent {
 
     public vueXStore;
 
+    /**
+     * Returns the data associated with this component.
+     * @returns * The data object.
+     */
     public data = function(): any {
         return {};
     }
 
+    /**
+     * Function that runs when Vue component loaded.
+     */
     public mounted = function(): void {}
 }

@@ -1,0 +1,27 @@
+<modal
+    id="load-save-modal"
+    title="Load and Save"
+    :hasCloseBtn="false"
+    :unclosable="false"
+    :showBackdrop="true"
+    :skinny="false"
+    btnText="Close"
+    @onReady="onReady"
+    @onClose="onClose"
+    :open="$store.state.loadSaveModal.showLoadSaveModal"
+>
+
+    <!-- @onClose="onClose()"
+    @onReady="onReady()" -->
+
+    <replace-warning></replace-warning>
+
+    <tabs-container name="loadSaveTabs">
+        <tabs-header name="loadSaveTabs">
+            {{HEADERS}}
+        </tabs-header>
+        <tabs name="loadSaveTabs">
+            {{CONTENTS}}
+        </tabs>
+    </tabs-container>
+</modal>

@@ -1,0 +1,11 @@
+<span>
+    <label :for="id"><slot></slot></label>
+    <textarea
+        :id="id"
+        class="form-control"
+        rows="5"
+        :placeholder="placeholder"
+        v-model="valueGetSet"
+        @keypress="onKeyPress"
+    ></textarea>
+</span>

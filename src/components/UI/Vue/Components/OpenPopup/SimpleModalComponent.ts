@@ -1,11 +1,11 @@
-import {VueComponentParent} from "../../../Vue/VueComponentParent";
-import {store} from "../../../Vue/VueX/VueXStore";
+import {VueComponentParent} from "../VueComponentParent";
+import {store} from "../../../../Vars/VueX/VueXStore";
 
 // import {getPluginsOfType} from "../../Plugins";
 // import * as LoadSavePlugin from "../../../Plugins/LoadSave/Parent";
 
 // @ts-ignore
-import templateHtml from "./SimpleModalComponent.template.htm";
+import {templateHtml} from "./SimpleModalComponent.template.htm.ts";
 
 export interface ISimpleModal {
     title: string;
@@ -23,9 +23,18 @@ export interface ISimpleModal {
 export class SimpleModalComponent extends VueComponentParent {
     public tag = "simple-modal";
     public methods = {
+        /**
+         * Runs once the modal has opened.
+         * @returns void
+         */
         "onReady"(): void {
 
         },
+
+        /**
+         * Runs once the modal has closed.
+         * @returns void
+         */
         "onClose"(): void {
             if (this.$store.state["simpleModal"]["onCloseCallback"] !== null) {
                 this.$store.state["simpleModal"]["onCloseCallback"]();
@@ -67,10 +76,19 @@ export class SimpleModalComponent extends VueComponentParent {
         mutations: {}
     }
 
-    public data = function(): any {
+    public data =
+
+    /**
+     * Returns the data associated with this component.
+     * @returns * The data object.
+     */
+    function(): any {
         return {};
     }
 
+    /**
+     * Function that runs when Vue component loaded.
+     */
     public mounted = function(): void {};
 }
 
@@ -92,6 +110,15 @@ function setMissingToDefaults(params: ISimpleModal): ISimpleModal {
     return params;
 }
 
+/**
+ * Opens a simple modal.
+ * @param  {*}        params                  The modal parameters. Of type
+ *                                            ISimpleModal.
+ * @param  {boolean}  [interpretAsUrl=false]  Whether the modal is a url
+ *                                            (iframe).
+ * @param  {Function} [onCloseCallback=null]  The function to call when this
+ *                                            simple modal is closed.
+ */
 export function openSimpleModal(params: ISimpleModal, interpretAsUrl: boolean = false, onCloseCallback: Function = null) {
     params = setMissingToDefaults(params);
 

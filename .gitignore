@@ -38,3 +38,4 @@ TODO.md
 *.old
 from_playground
 fetch_js_from_playground.sh
+*.template.htm.ts

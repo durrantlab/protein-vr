@@ -1,11 +1,25 @@
-import {VueComponentParent} from "../VueComponentParent";
+import {VueComponentParent} from "./VueComponentParent";
 
 // @ts-ignore
-import templateHtml from "./SuperFileComponent.template.htm";
+import {templateHtml} from "./SuperFileComponent.template.htm.ts";
 
 export class SuperFileComponent extends VueComponentParent {
     public tag = "super-file";
-    public methods = {};
+    public methods = {
+        /**
+         * Opens the open-file dialogue.
+         * @param  {*} e  Click event.
+         * @returns boolean  Always false.
+         */
+        "openFileInput"(e: any): boolean {
+            let fileInput = this.$refs[this["name"] + "-file-input"];
+            fileInput.click();
+
+            // Cancel the click.
+            e.preventDefault();
+            return false;
+        }
+    };
 
     public computed = {};
 
@@ -13,6 +27,7 @@ export class SuperFileComponent extends VueComponentParent {
         "name": {"required": true},
         "label": {"required": true},
         "placeholder": {"required": true},
+        "accept": {"default": undefined}
     };
 
     public watch = {};
@@ -21,9 +36,35 @@ export class SuperFileComponent extends VueComponentParent {
 
     public vueXStore;
 
+    /**
+     * Returns the data associated with this component.
+     * @returns * The data object.
+     */
     public data = function(): any {
-        return {};
+        return {
+            "filename": ""
+        };
     }
 
-    public mounted = function(): void {}
+    /**
+     * Function that runs when Vue component loaded.
+     */
+    public mounted = function(): void {
+        let fileInput = this.$refs[this["name"] + "-file-input"];
+        // debugger;
+        // let fileInput = document.getElementById(this["name"] + "-file-input");
+        fileInput.addEventListener("change", (e) => {
+            // because the way it's setup, there is only one file.
+            let fileName = fileInput["files"][0].name;
+            this["filename"] = fileName;
+
+            let input = e.target;
+            let reader = new FileReader();
+            reader.onloadend = (file) => {
+                let txt = reader.result;
+                this["$emit"]("fileLoaded", txt);
+            };
+            reader.readAsText(input["files"][0]);
+        });
+    }
 }

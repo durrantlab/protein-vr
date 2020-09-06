@@ -5,13 +5,13 @@
 // import * as Vars from "../../Vars/Vars";
 // import * as Lecturer from "../../WebRTC/Lecturer";
 // import * as UrlVars from "../../Vars/UrlVars";
-import {VueComponentParent} from "../../VueComponentParent";
+import {VueComponentParent} from "../VueComponentParent";
 // import * as OpenPopup from "../../OpenPopup/OpenPopup";
 
 import 'bootstrap';  // Note that this is important.
 
 // @ts-ignore
-import templateHtml from "./ModalComponent.template.htm";
+import {templateHtml} from "./ModalComponent.template.htm.ts";
 
 export var modalCurrentlyOpen = false;
 
@@ -20,10 +20,18 @@ export class ModalComponent extends VueComponentParent {
     public methods = {};
 
     public computed = {
+        /**
+         * Determines whether modal should be skinny.
+         * @returns string  The appropriate class.
+         */
         "skinnyClass"(): string {
             return this["skinny"] ? "skinny-modal" : "";
         },
 
+        /**
+         * Determines whether to stylize the modal per isUrl.
+         * @returns string  The appropriate css style.
+         */
         "msgContainerStyles"(): string {
             return this["isUrl"] ? "" : "text-align: initial;";
         }
@@ -46,7 +54,11 @@ export class ModalComponent extends VueComponentParent {
     };
 
     public watch = {
-        "open": function(val) {
+        /**
+         * Whether to open or close the modal.
+         * @param  {boolean} val  true to open, false to close.
+         */
+        "open": function(val: boolean) {
             if (val === true) {
                 // Deal with unclosable modals.
                 if (this["unclosable"] === true) {
@@ -116,6 +128,10 @@ export class ModalComponent extends VueComponentParent {
         }
     }
 
+    /**
+     * Returns the data associated with this component.
+     * @returns * The data object.
+     */
     public data = function(): any {
         return {
             modalOptions: {},
@@ -123,6 +139,9 @@ export class ModalComponent extends VueComponentParent {
         };
     }
 
+    /**
+     * Function that runs when Vue component loaded.
+     */
     public mounted = function(): void {
         this.modalObj = jQuery("#" + this["id"]);
 

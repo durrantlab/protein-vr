@@ -33,7 +33,8 @@ export interface IVRMLModel {
 /** @type {Array<Object<string,*>>} */
 let modelData: IVRMLModel[] = [];
 
-export let molRotation: any = new BABYLON.Vector3(0, 0, 0);
+// export let molRotation: any = new BABYLON.Vector3(0, 0, 0);
+export let molRotationQuat: any = undefined;
 
 export let viewer: any;
 let element: any;
@@ -67,7 +68,7 @@ export function setup(callBack: any): void {
     element = jQuery("#mol-container");
     config = { backgroundColor: "white" };
     viewer = $3Dmol.createViewer( element, config );
-    // window["viewer"] = viewer;  // For debugging.
+    window["viewer"] = viewer;  // For debugging.
 
     callBack();
 }
@@ -110,7 +111,7 @@ export function resetAll(): void {
 }
 
 /**
- * Load a file into the 3dmol object.
+ * Load a remove file into the 3dmol object.
  * @param  {string}   url       The url.
  * @param  {Function} callBack  A callback function. The 3DMoljs molecule
  *                              object is the parameter.
@@ -134,9 +135,7 @@ export function loadPDBURL(url: string, callBack: any): void {
                 molTxtType = "sdf";
             }
 
-            const mdl = viewer.addModel(data, molTxtType, {"keepH": true});
-
-            callBack(mdl);
+            loadPDBData(molTxt, molTxtType, callBack);
         },
 
         /**
@@ -152,13 +151,27 @@ export function loadPDBURL(url: string, callBack: any): void {
 }
 
 /**
+ * Load data into 3dmol.
+ * @param  {string}   data      The data (contents). PDB or SDF formatted
+ *                              text.
+ * @param  {string}   type      The type of data. "pdb" or "sdf".
+ * @param  {Function} callBack  A callback function. The 3DMoljs molecule
+ *                              object is the parameter.
+ * @returns void
+ */
+export function loadPDBData(data: string, type: string, callBack: any): void {
+    const mdl = viewer.addModel(data, type, {"keepH": true});
+    callBack(mdl);
+}
+
+/**
  * If there's an error...
  * @param  {*}       hdr
  * @param  {*}       status
  * @param  {string}  err
  * @param  {string}  url  The url.
  */
-function showLoadMoleculeError(hdr: any, status: any, err: any, url: string) {
+export function showLoadMoleculeError(hdr: any, status: any, err: any, url: string) {
     let msg = "<p>Could not load molecule from URL: " + url + "</p>";
 
     // @ts-ignore
@@ -514,7 +527,32 @@ export function importIntoBabylonScene(): any {
  * @returns void
  */
 export function updateMolRotation(axis: string, amount: number): void {
-    molRotation[axis] += amount;
+    // Note that molRotation is Vector3 (x, y, z).
+    // molRotation[axis] += amount;  // Doesn't work as expected.
+
+    // What you really need to do is convert the euler angles into
+    // quaternions, rotate that about a world axis, and then convert back to
+    // Euler angles. Why convert back? Because the URL stores euler angles,
+    // and it's good to keep it that way for backwards compatibility and
+    // because it's only three values.
+    // let rotQuat = BABYLON.Quaternion.RotationYawPitchRoll(
+    //     molRotation["y"], molRotation["x"], molRotation["z"]
+    // );
+
+    let rotAxis = new BABYLON.Vector3(
+        axis == "x" ? 1 : 0,
+        axis == "y" ? 1 : 0,
+        axis == "z" ? 1 : 0
+    );
+
+    let rotationMatrix = new BABYLON.Quaternion();
+    BABYLON.Quaternion.RotationAxisToRef(rotAxis, amount, rotationMatrix); // R
+    // rotQuat.multiplyToRef(rotationMatrix, rotQuat);
+    molRotationQuat.multiplyToRef(rotationMatrix, molRotationQuat);
+
+    // See https://github.com/BabylonJS/Babylon.js/blob/master/src/Meshes/transformNode.ts#L863
+
+    // molRotation = rotQuat.toEulerAngles();
 
     // Update URL too.
     UrlVars.setURL();

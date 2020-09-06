@@ -1,0 +1,19 @@
+<panel>
+    <h5>Save ProteinVR Scene File</h5>
+    <form-input-wrapper>
+        <form-input
+            id="pvr-scene-file-name"
+            placeholder="ProteinVR scene file"
+            type="text"
+            :value="pvrSceneFileName"
+            @change="onChange"
+            @enter="onEnter"
+        >
+            Enter the name of the file (ending in ".pvr").
+        </form-input>
+        <!-- <p class="help-block"></p> -->
+    </form-input-wrapper>
+    <form-button :disabled="btnDisabled" @click.native="startSave" id="save-proteinvr-scene">
+        {{btnTxt}}
+    </form-button>
+</panel>

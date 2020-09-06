@@ -61,7 +61,7 @@ function getAllUrlParams(url: string): Map<string, any> {
 
             // set parameter name and value (use 'true' if empty)
             const paramName = keyValPair[0];
-            const paramValue = (keyValPair[1] === undefined) ? true : keyValPair[1];
+            const paramValue = (keyValPair[1] === undefined) ? true : decodeURIComponent(keyValPair[1]);
 
             obj.set(paramName, paramValue);
         }

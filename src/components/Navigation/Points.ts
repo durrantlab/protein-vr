@@ -8,7 +8,7 @@
 import * as CommonCamera from "../Cameras/CommonCamera";
 import * as Vars from "../Vars/Vars";
 import * as Pickables from "./Pickables";
-import * as Menu3D from "../UI/Menu3D/Menu3D";
+import * as Menu3D from "../UI/Menus/Menu3D/Menu3D";
 
 declare var BABYLON: any;
 
@@ -29,10 +29,20 @@ export function setCurStarePt(pt: any): void {
 // Read position and rotation from this to position teleportation sphere.
 let rayFuncToCalcNavMeshPos;
 
+/**
+ * Sets the global variable rayFuncToCalcNavMeshPos.
+ * @param  {Function} func  The new value (function).
+ * @returns void
+ */
 export function setRayFuncToCalcNavMeshPos(func: Function): void {
     rayFuncToCalcNavMeshPos = func;
 }
 
+/**
+ * Sets the rayFuncToCalcNavMeshPos function. Works with
+ * setRayFuncToCalcNavMeshPos.
+ * @returns void
+ */
 export function useGazeForNavMeshPos(): void {
     setRayFuncToCalcNavMeshPos(() => {
         return Vars.scene.activeCamera.getForwardRay();

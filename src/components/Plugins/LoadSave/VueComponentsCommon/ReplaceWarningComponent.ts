@@ -1,7 +1,7 @@
-import {VueComponentParent} from "../../../UI/Vue/VueComponentParent";
+import {VueComponentParent} from "../../../UI/Vue/Components/VueComponentParent";
 
 // @ts-ignore
-import templateHtml from "./ReplaceWarningComponent.template.htm";
+import {templateHtml} from "./ReplaceWarningComponent.template.htm.ts";
 
 declare var jQuery;
 
@@ -11,9 +11,19 @@ export class ReplaceWarningComponent extends VueComponentParent {
 
     public computed = {
         "showWarning": {
+            /**
+             * Gets the showWarning variable.
+             * @returns boolean  The value.
+             */
             get: function(): boolean {
                 return this.$store.state["replaceWarning"]["showWarning"];
             },
+
+            /**
+             * Sets the showWarning variable.
+             * @param  {boolean} val  The new value.
+             * @returns void
+             */
             set: function(val: boolean): void {
                 this.$store.commit("setVar", {
                     moduleName: "replaceWarning",
@@ -39,9 +49,16 @@ export class ReplaceWarningComponent extends VueComponentParent {
         }
     }
 
+    /**
+     * Returns the data associated with this component.
+     * @returns * The data object.
+     */
     public data = function(): any {
         return {};
     }
 
+    /**
+     * Function that runs when Vue component loaded.
+     */
     public mounted = function(): void {};
 }

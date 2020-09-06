@@ -16,10 +16,19 @@ let width = 0;
 let alreadySetup = false;
 let plane;
 
+/**
+ * Sets the msg global variable.
+ * @param  {string} m  The new value.
+ * @returns void
+ */
 export function setMsg(m: string): void {
     msg = m;
 }
 
+/**
+ * Sets up the debugging msg.
+ * @returns void
+ */
 export function setup(): void {
     if (alreadySetup === true) {
         return;
@@ -48,7 +57,11 @@ export function setup(): void {
     updateText();
 }
 
-function updateText() {
+/**
+ * Updates the message text, using the value in msg.
+ * @returns void
+ */
+function updateText(): void {
     dynamicTexture.update(true);
     dynamicTexture.getContext().clearRect(0, 0, dynamicTexture.getSize().width, dynamicTexture.getSize().height);
     dynamicTexture.drawText(msg, 256 - width / 2, 52, font, "lightblue", "");

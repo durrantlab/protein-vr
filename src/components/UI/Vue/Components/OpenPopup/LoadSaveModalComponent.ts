@@ -1,13 +1,17 @@
-import {VueComponentParent} from "../../../Vue/VueComponentParent";
+import {VueComponentParent} from "../VueComponentParent";
 import {getPluginsOfType} from "../../../../Plugins/Plugins";
-import * as LoadSavePlugin from "../../../../Plugins/LoadSave/Parent";
+import * as LoadSavePlugin from "../../../../Plugins/LoadSave/LoadSaveParent";
 
 // @ts-ignore
-import templateHtml from "./LoadSaveModalComponent.template.htm";
+import {templateHtml} from "./LoadSaveModalComponent.template.htm.ts";
 
 export class LoadSaveModalComponent extends VueComponentParent {
     public tag = "load-save-modal";
     public methods = {
+        /**
+         * Runs once the modal has opened.
+         * @returns void
+         */
         "onReady"(): void {
             // Now that it's open, trigger all the onUserInterfaceDone
             // functions from the plugins.
@@ -18,6 +22,11 @@ export class LoadSaveModalComponent extends VueComponentParent {
                 plugins[i].onUserInterfaceDone();
             }
         },
+
+        /**
+         * Runs once the modal has closed.
+         * @returns void
+         */
         "onClose"(): void {
             // You need to update the store now that it's closed. There must
             // be a more elegant way of doing this...
@@ -46,7 +55,11 @@ export class LoadSaveModalComponent extends VueComponentParent {
 
     public watch = {};
 
-    private makeTemplate = function(): any {
+    /**
+     * Makes the template for the associated tab.
+     * @returns string  The template html.
+     */
+    private makeTemplate = function(): string {
         let plugins = getPluginsOfType("loadSave");
 
         let headers = "";
@@ -70,9 +83,16 @@ export class LoadSaveModalComponent extends VueComponentParent {
         mutations: {}
     }
 
+    /**
+     * Returns the data associated with this component.
+     * @returns * The data object.
+     */
     public data = function(): any {
         return {};
     }
 
+    /**
+     * Function that runs when Vue component loaded.
+     */
     public mounted = function(): void {};
 }

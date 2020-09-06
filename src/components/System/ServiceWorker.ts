@@ -1,3 +1,7 @@
+/**
+ * Sets up the service worker.
+ * @returns void
+ */
 export function setupServiceWorker(): void {
     // Get server workers (for progressive web app). Makes for better experience,
     // especially on iOS. See

@@ -1,0 +1,22 @@
+<panel>
+    <h5>Load PDB or SDF from Text</h5>
+    <replace-warning></replace-warning>
+
+    <form-input-wrapper>
+        <text-area
+            id="pdbOrSdfText"
+            placeholder="Contents of a PDB or SDF file"
+            :value="fileContents"
+            @change="onChangeText"
+        >
+            Type or copy-and-paste the contents of a PDB or SDF file into the text area below.
+        </text-area>
+    </form-input-wrapper>
+
+    <select-environment></select-environment>
+    <shadows-hardware-scaling></shadows-hardware-scaling>
+
+    <form-button @click.native="startLoad" id="load-pdb-sdf-text">
+        Load PDB/SDF File
+    </form-button>
+</panel>

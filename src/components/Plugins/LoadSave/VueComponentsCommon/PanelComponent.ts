@@ -1,7 +1,7 @@
-import {VueComponentParent} from "../../../UI/Vue/VueComponentParent";
+import {VueComponentParent} from "../../../UI/Vue/Components/VueComponentParent";
 
 // @ts-ignore
-import templateHtml from "./PanelComponent.template.htm";
+import {templateHtml} from "./PanelComponent.template.htm.ts";
 
 declare var jQuery;
 
@@ -30,9 +30,16 @@ export class PanelComponent extends VueComponentParent {
 
     public vueXStore;
 
+    /**
+     * Returns the data associated with this component.
+     * @returns * The data object.
+     */
     public data = function(): any {
         return {};
     }
 
+    /**
+     * Function that runs when Vue component loaded.
+     */
     public mounted = function(): void {};
 }

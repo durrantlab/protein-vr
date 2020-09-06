@@ -6,6 +6,10 @@
 
 declare var ga;
 
+/**
+ * Sets up google analytics if running from durrant-lab servers.
+ * @returns void
+ */
 export function setupGoogleAnalyticsIfDurrantLab(): void {
     // If the url has "durrantlab" in it, contact google analytics. Logging all
     // usage would be ideal for grant reporting, but some users may wish to run

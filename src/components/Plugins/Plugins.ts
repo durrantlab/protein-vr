@@ -1,4 +1,7 @@
 import * as LoadSaveAll from "./LoadSave/LoadAll";
+// import { getPluginsOfType } from "./Plugins";
+
+declare var Vue;
 
 // An object where loaded plugins are stored.
 export let registeredPlugins: any = {};
@@ -14,10 +17,10 @@ export function loadAll(): void {
     const pluginsLen = plugins.length;
     for (let i = 0; i < pluginsLen; i++) {
         const plugin = plugins[i];
-        if (registeredPlugins[plugin._type] === undefined) {
-            registeredPlugins[plugin._type] = [];
+        if (registeredPlugins[plugin.type] === undefined) {
+            registeredPlugins[plugin.type] = [];
         }
-        registeredPlugins[plugin._type].push(plugin);
+        registeredPlugins[plugin.type].push(plugin);
     }
 }
 

@@ -1,14 +1,7 @@
-// // import FrontButton from "./FrontButton.vue";
-// import * as LoadSave from "./LoadSave";
-// import * as Menu2D from "../Menu2D";
-// import * as OpenPopup from "./OpenPopup";
-// import * as Vars from "../../Vars/Vars";
-// import * as Lecturer from "../../WebRTC/Lecturer";
-// import * as UrlVars from "../../Vars/UrlVars";
-import {VueComponentParent} from "../../../VueComponentParent";
+import {VueComponentParent} from "../../VueComponentParent";
 
 // @ts-ignore
-import templateHtml from "./TabsHeaderItemComponent.template.htm";
+import {templateHtml} from "./TabsHeaderItemComponent.template.htm.ts";
 
 export class TabsHeaderItemComponent extends VueComponentParent {
     public tag = "tabs-header-item";
@@ -32,10 +25,16 @@ export class TabsHeaderItemComponent extends VueComponentParent {
 
     public vueXStore;
 
+    /**
+     * Returns the data associated with this component.
+     * @returns * The data object.
+     */
     public data = function(): any {
         return {};
     }
 
-    public mounted = function(): void {
-    }
+    /**
+     * Function that runs when Vue component loaded.
+     */
+    public mounted = function(): void {}
 }

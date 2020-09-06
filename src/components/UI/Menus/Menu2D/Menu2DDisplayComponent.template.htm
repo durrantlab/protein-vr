@@ -1,0 +1,41 @@
+<div :id="'accordion-' + accordionId">
+    <div
+        v-for="(menuItem, itemTitle, itemIndex) in menuData()"
+        class="card" :key="itemTitle" :title="itemTitle"
+    >
+        <!-- The header. Also what is clicked to open a submenu. -->
+        <div :id="btnId(itemTitle)"
+            class="btn btn-sm menu2d-btn"
+            data-toggle="collapse"
+            :data-target="'#' + collapseId(itemTitle)"
+            aria-expanded="false"
+            :aria-controls="collapseId(itemTitle)"
+            :style="css"
+            :title="itemTitle"
+            @click.stop="menuItemClick(breadcrumbs.concat(itemTitle), menuItem, itemTitle, itemIndex)"
+        >
+            <span :style="typeof menuItem === 'object' ? 'font-weight:bold; text-decoration:underline;' : ''">{{funcItemIndexClicked === itemIndex ? "(Updating view...)" : itemTitle}}</span>
+        </div>
+
+        <!-- Accordion body -->
+        <div
+            :id="collapseId(itemTitle)"
+            :aria-labelledby="id(itemTitle)"
+            :data-parent="'#accordion-' + accordionId"
+        >
+            <!-- If it's submenu data... -->
+            <div :style="heightStyle(menuItem, itemTitle)" :ref="collapseId(itemTitle) + '-accordion-panel'" :class="'accordion-panel ' + (typeof menuItem !== 'object' ? 'collapsed' : '')">
+                <div
+                    v-if="typeof menuItem === 'object'"
+                    class="card-body pad10" :style="bgColor"
+                >
+                    <menu-2d-display
+                        :depth="depth + 1"
+                        :title="itemTitle"
+                        :breadcrumbs="breadcrumbs.concat(itemTitle)"
+                    ></menu-2d-display>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
