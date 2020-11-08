@@ -40,4 +40,7 @@ from_playground
 fetch_js_from_playground.sh
 proteinvr_web_app.zip
 dist
+dist/*
+dist/**/*
 **/*.template.htm.ts
+
