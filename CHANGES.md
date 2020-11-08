@@ -25,6 +25,7 @@ CHANGES
   page](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/-/releases) for
   the compiled files.
 * Minor updates to the `README.md` file.
+* Development branch renamed to `main`.
 
 1.0.4
 -----
