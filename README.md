@@ -31,7 +31,7 @@ page](http://git.durrantlab.com/jdurrant/protein-vr/-/releases).
 ### Loading Screen ###
 
 ![Figure
-1](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/-/blob/1.0.4/src/components/UI/OpenPopup/pages/imgs/environment.jpg
+1](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/-/raw/1.0.4/src/components/UI/OpenPopup/pages/imgs/environment.jpg
 "Figure 1")
 
 _Figure 1: An illustration of a ProteinVR scene with the default NanoKid
@@ -80,7 +80,7 @@ Existing" allows users to remove previously specified representations/colors
 (Figure 2G).
 
 ![Figure
-2](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/-/blob/1.0.4/src/components/UI/OpenPopup/pages/imgs/3d_buttons.png
+2](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/-/raw/1.0.4/src/components/UI/OpenPopup/pages/imgs/3d_buttons.png
 "Figure 2")
 
 _Figure 2: A schematic of the menu buttons available from within the 3D
@@ -143,7 +143,7 @@ right without having to rotate the head (e.g., to reset the view), users can
 press the left and right side of the trackpad, respectively.
 
 ![Figure
-3](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/-/blob/1.0.4/src/components/UI/OpenPopup/pages/imgs/controller.png
+3](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/-/raw/1.0.4/src/components/UI/OpenPopup/pages/imgs/controller.png
 "Figure 3")
 
 _Figure 3: An illustration of the VR-controller buttons that enable navigation
