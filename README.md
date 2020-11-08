@@ -16,21 +16,22 @@ This code repository is designed to help developers.
 
 ## Repository Contents ##
 
-* `dist/`: The production (distribution) files. If you wish to run ProteinVR
-  on your own web server, these are the only files you need. For convenience,
-  the `proteinvr_web_app.zip` contains the contents of the `dist/` directory.
 * `src/`: The ProteinVR source files. You cannot use these files directly.
   They must be compiled.
 * `utils/`, `package.json`, `package-lock.json`, `tsconfig.json`: Files used
   to compile the contents of the `src/` directory to the `dist/` directory.
 * `CHANGES.md`, `CONTRIBUTORS.md`, `README.md`: Documentation files.
 
+If you wish to run ProteinVR on your own web server, simply download the
+latest `proteinvr_web_app.zip` file from the [Releases
+page](http://git.durrantlab.com/jdurrant/protein-vr/-/releases).
+
 ## Description of Use ##
 
 ### Loading Screen ###
 
 ![Figure
-1](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/raw/master/src/components/UI/OpenPopup/pages/imgs/environment.jpg
+1](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/-/blob/1.0.4/src/components/UI/OpenPopup/pages/imgs/environment.jpg
 "Figure 1")
 
 _Figure 1: An illustration of a ProteinVR scene with the default NanoKid
@@ -79,7 +80,7 @@ Existing" allows users to remove previously specified representations/colors
 (Figure 2G).
 
 ![Figure
-2](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/raw/master/src/components/UI/OpenPopup/pages/imgs/3d_buttons.png
+2](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/-/blob/1.0.4/src/components/UI/OpenPopup/pages/imgs/3d_buttons.png
 "Figure 2")
 
 _Figure 2: A schematic of the menu buttons available from within the 3D
@@ -95,8 +96,8 @@ atoms/components._
 ProteinVR makes it easy to save molecular scenes with custom visualizations
 such as these. Every time a molecular representation is loaded, rotated, or
 otherwise altered, ProteinVR updates the browser URL to track the change.
-Copying the URL at any point into a new browser tab–even on a different
-device–recreates the exact same ProteinVR scene.
+Copying the URL at any point into a new browser tab--even on a different
+device--recreates the exact same ProteinVR scene.
 
 ## Display Modes ##
 
@@ -142,7 +143,7 @@ right without having to rotate the head (e.g., to reset the view), users can
 press the left and right side of the trackpad, respectively.
 
 ![Figure
-3](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/raw/master/src/components/UI/OpenPopup/pages/imgs/controller.png
+3](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/-/blob/1.0.4/src/components/UI/OpenPopup/pages/imgs/controller.png
 "Figure 3")
 
 _Figure 3: An illustration of the VR-controller buttons that enable navigation
@@ -247,10 +248,11 @@ ProteinVR web app at [http://durrantlab.com/pvr/](http://durrantlab.com/pvr/).
 If you wish to instead run ProteinVR on your own UNIX-like computer (LINUX,
 macOS, etc.), follow these instructions:
 
-1. Download the `proteinvr_web_app.zip` file
+1. Download the latest `proteinvr_web_app.zip` file from the [Releases
+   page](http://git.durrantlab.com/jdurrant/protein-vr/-/releases)
 2. Uncompress the file: `unzip proteinvr_web_app.zip`
 3. Change to the new `proteinvr/` directory: `cd proteinvr`
-4. Start a local server. Python provides one out of the box: `python -m
+4. Start a local server. Python2 provides one out of the box: `python -m
    SimpleHTTPServer 8000`
 5. Access the server from your web-browser: `http://localhost:8000/` or
    perhaps `http://0.0.0.0:8000/`
@@ -261,9 +263,11 @@ similar.
 ## Compiling ProteinVR ##
 
 The vast majority of users will not need to compile ProteinVR on their own.
-Simply use the already compiled files in `dist/` or `proteinvr_web_app.zip`.
-If you need to make modifications to the source code, these instructions
-should help with re-compiling on UNIX-like systems:
+Simply use the already compiled files in the `proteinvr_web_app.zip` file,
+available through the [Releases
+page](http://git.durrantlab.com/jdurrant/protein-vr/-/releases). If you need
+to make modifications to the source code, these instructions should help with
+re-compiling on UNIX-like systems:
 
 1. Clone or download the git repository: `git clone http://git.durrantlab.com/jdurrant/protein-vr.git`
 2. Change into the new `protein-vr` directory: `cd protein-vr`

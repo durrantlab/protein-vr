@@ -24,6 +24,7 @@ CHANGES
   `proteinvr_web_app.zip` file will no longer be included. See the [Releases
   page](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/-/releases) for
   the compiled files.
+* Minor updates to the `README.md` file.
 
 1.0.4
 -----
