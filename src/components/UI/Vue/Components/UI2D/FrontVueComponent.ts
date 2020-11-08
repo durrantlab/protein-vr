@@ -275,25 +275,64 @@ export class FrontVueComponent extends VueComponentParent {
             this.justResized = true;
         });
 
-        jQuery(document).ready(() => {
-            const babylonVRiconbtns = document.getElementsByClassName("babylonVRicon");
+        jQuery(() => {
+            let msToWaitForReady = 10000;
 
-            if (babylonVRiconbtns.length > 0) {
-                let babylonVRiconbtn = babylonVRiconbtns[0];
+            // Start checking if babylonVRiconbtn exists.
+            let babylonVRIconBtnPromise = new Promise((resolve, reject) => {
+                let startTime = new Date().getTime();
+                let interId = setInterval(() => {
+                    // After 10 seconds give up looking.
+                    if (new Date().getTime() - startTime > msToWaitForReady) {
+                        clearInterval(interId);
+                        reject();
+                    }
 
-                // Need to move babylonVRiconbtn into #btnsWrapper, which should be
-                // rendered by now.
-                document.getElementById("btnsWrapper").appendChild(babylonVRiconbtn);
+                    // Check if button exists.
+                    const babylonVRIconBtns = document.getElementsByClassName("babylonVRicon");
+                    if (babylonVRIconBtns.length > 0) {
+                        clearInterval(interId);
+                        resolve(babylonVRIconBtns[0]);
+                    }
+                }, 500);
+            });
+
+            // Start checking if btnsWrapper exists.
+            let btnsWrapperPromise = new Promise((resolve, reject) => {
+                let startTime = new Date().getTime();
+                let interId = setInterval(() => {
+                    // After 10 seconds give up looking.
+                    if (new Date().getTime() - startTime > msToWaitForReady) {
+                        clearInterval(interId);
+                        reject();
+                    }
+
+                    // Need to move babylonVRiconbtn into #btnsWrapper, which
+                    // should be rendered by now.
+                    let btnsWrapper = document.getElementById("btnsWrapper");
+                    if (btnsWrapper) {
+                        clearInterval(interId);
+                        resolve(btnsWrapper);
+                    }
+                }, 500);
+            });
+
+            Promise.all([babylonVRIconBtnPromise, btnsWrapperPromise]).then((vals: any[]) => {
+                let babylonVRIconBtn = vals[0];
+                let btnsWrapper = vals[1];
+                btnsWrapper.appendChild(babylonVRIconBtn);
 
                 // Also make VR button visible.
-                if (babylonVRiconbtn !== null) {
+                if (babylonVRIconBtn !== null) {
                     // @ts-ignore
-                    babylonVRiconbtn.style.opacity = "1.0";  // Non IE;
+                    babylonVRIconBtn.style.opacity = "1.0";  // Non IE;
 
                     // @ts-ignore
-                    babylonVRiconbtn.style.filter = "alpha(opacity=1.0)";  // IE;
+                    babylonVRIconBtn.style.filter = "alpha(opacity=1.0)";  // IE;
                 }
-            }
+            }).catch(() => {
+                console.log("Warning: Could not activate VR!");
+            });
         });
     };
 }

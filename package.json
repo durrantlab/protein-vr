@@ -1,6 +1,6 @@
 {
     "name": "protein-vr",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "",
     "private": true,
     "scripts": {
@@ -15,7 +15,7 @@
         "@types/jquery": "^3.3.38",
         "clean-webpack-plugin": "^3.0.0",
         "closure-webpack-plugin": "^2.3.0",
-        "copy-webpack-plugin": "^5.1.1",
+        "copy-webpack-plugin": "^6.1.0",
         "css-loader": "^1.0.1",
         "duplicate-package-checker-webpack-plugin": "^3.0.0",
         "file-loader": "^4.3.0",
@@ -45,8 +45,9 @@
         "file-saver": "^2.0.2",
         "jquery": "^3.5.1",
         "popper.js": "^1.16.1",
-        "vue": "^2.6.11",
+        "vue": "^2.6.12",
         "vue-router": "^3.2.0",
+        "vuex": "^3.5.1",
         "webxr-polyfill": "^2.0.3"
     }
 }

@@ -23,7 +23,7 @@ export interface IVRSetup {
     menuActive?: boolean;
 }
 
-export const VERSION = "1.0.4";
+export const VERSION = "1.0.5";
 
 export let canvas: any;
 export let engine: any;

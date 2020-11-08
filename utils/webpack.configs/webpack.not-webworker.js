@@ -37,26 +37,36 @@ module.exports = merge(common, {
             bootstrap: "bootstrap",
             "window.bootstrap": "bootstrap"
         }),
-        new CopyWebpackPlugin([
-            { from: "src/babylon_scenes", to: "environs" },
-            { from: "src/js", to: "js" },
-            { from: "src/components/UI/Vue/Components/OpenPopup/pages", to: "pages" },
-            {
-                from: "src/components/Mols/3DMol/nanokid.sdf",
-                to: "nanokid.sdf"
-            },
-            { from: "src/pwa/icon-192.png", to: "icon-192.png" },
-            { from: "src/pwa/icon-256.png", to: "icon-256.png" },
-            { from: "src/pwa/icon-512.png", to: "icon-512.png" },
-            { from: "src/pwa/icon-1024.png", to: "icon-1024.png" },
-            {
-                from: "src/pwa/manifest.webmanifest",
-                to: "manifest.webmanifest"
-            },
-            { from: "src/styles/style.css", to: "style.css" },
-            { from: "src/styles/favicon.ico", to: "favicon.ico" }
-        ]),
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: "src/babylon_scenes", to: "environs" },
+                { from: "src/js", to: "js" },
+                { from: "src/components/UI/Vue/Components/OpenPopup/pages", to: "pages" },
+                {
+                    from: "src/components/Mols/3DMol/nanokid.sdf",
+                    to: "nanokid.sdf"
+                },
+                {
+                    from: "src/components/Mols/3DMol/1xdn.pvr",
+                    to: "1xdn.pvr"
+                },
+                { from: "src/pwa/icon-192.png", to: "icon-192.png" },
+                { from: "src/pwa/icon-256.png", to: "icon-256.png" },
+                { from: "src/pwa/icon-512.png", to: "icon-512.png" },
+                { from: "src/pwa/icon-1024.png", to: "icon-1024.png" },
+                { from: "src/pwa/icon-256-maskable.png", to: "icon-256-maskable.png" },
+                {
+                    from: "src/pwa/manifest.webmanifest",
+                    to: "manifest.webmanifest"
+                },
+                { from: "src/styles/style.css", to: "style.css" },
+                { from: "src/styles/favicon.ico", to: "favicon.ico" }
+            ]
+        }),
         new WorkboxPlugin.GenerateSW({
+            // This should be the last plugin. See
+            // https://developers.google.com/web/tools/workbox/guides/codelabs/webpack.
+
             // These options encourage the ServiceWorkers to get in there fast
             // and not allow any straggling "old" SWs to hang around. See
             // https://webpack.js.org/guides/progressive-web-application/
@@ -65,14 +75,34 @@ module.exports = merge(common, {
             // swDest: 'sw.js'
             runtimeCaching: [
                 {
-                    urlPattern: /\./,
-                    handler: "NetworkFirst" // First check the network. If that fails, use cache...
-                }
+                    // urlPattern: /\./,
+                    urlPattern: './',
+                    handler: "NetworkFirst", // First check the network. If that fails, use cache...
+                    options: {
+                        cacheableResponse: {statuses: [200]}
+                    }
+                },
+                {
+                    urlPattern: './vrmlWebWorker.js',
+                    handler: "NetworkFirst", // First check the network. If that fails, use cache...
+                    options: {
+                        cacheableResponse: {statuses: [200]}
+                    }
+                },
+                // {
+                //     urlPattern: './js/profiles/profilesList.json',
+                //     handler: "NetworkFirst", // First check the network. If that fails, use cache...
+                //     options: {
+                //         cacheableResponse: {statuses: [200]}
+                //     }
+                // },
             ],
+            ignoreURLParametersMatching: [/./],
+            // include: [/index.html/],
             exclude: [
                 /js\/profiles\//,  // So controller models will always be loaded remotely.
                 /\.md$/,
-                /environs\/(?!day)/,  // leave only one scene
+                /environs\/(?!day|arrow|.+?\.json)/,  // leave only one scene (day) and json files.
                 /favicon\.ico/,
                 /icon-[^5].*?\.png/,  // only keep one icon
                 /peer\.min\.js/,  // No need to cache this. Because if you don't have an internet connection, it won't work anyway.
@@ -80,9 +110,10 @@ module.exports = merge(common, {
                 /\.map$/,
                 /\.manifest$/,
                 /\.mp3$/,
-                /pages\/imgs\//,  // non essential (help iamges)
+                /\.pvr$/,
+                /\.old$/,
+                /pages\/imgs\//,  // non essential (help images)
                 /glyphicons-halflings-regular.(?!woff)$/,
-
             ],
         }),
         // new VueLoaderPlugin()

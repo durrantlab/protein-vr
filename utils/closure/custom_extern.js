@@ -187,6 +187,10 @@ BABYLON.SceneLoader.LoadAssetContainer = function(a, b, c, d, e) {};
 BABYLON.SceneLoader.ImportMeshAsync = function(a, b, c, d) {};
 BABYLON.MeshBuilder;
 BABYLON.MeshBuilder.CreateBox = function(a, b, c) {};
+BABYLON.UtilityLayerRenderer;
+BABYLON.UtilityLayerRenderer.utilityLayerScene;
+BABYLON.Light;
+BABYLON.Light.Parse = function(a, b) {};
 
 /**
  * @constructor
@@ -380,16 +384,17 @@ BABYLON.mesh.renderingGroupId;
 BABYLON.Matrix;
 BABYLON.Matrix.Translation = function(a) {};
 
-
 /**
  * @constructor
  */
 BABYLON.HemisphericLight = function(a,b,c) {};
+BABYLON.HemisphericLight.serialize = function() {};
 
 /**
  * @constructor
  */
 BABYLON.PointLight = function(a,b,c) {};
+BABYLON.PointLight.serialize = function() {};
 
 /**
  * @constructor
@@ -750,10 +755,14 @@ BABYLON.Quaternion.FromEulerAngles = function(a, b, c) {};
 BABYLON.Quaternion.FromEulerVector = function(a) {};
 BABYLON.Quaternion.asArray = function() {};
 BABYLON.Quaternion.FromArray = function(a) {};
+BABYLON.Quaternion.RotationAxisToRef = function(a, b, c) {}
+BABYLON.Quaternion.RotationYawPitchRoll = function(a, b, c) {}
 BABYLON.Quaternion.x;
 BABYLON.Quaternion.y;
 BABYLON.Quaternion.z;
 BABYLON.Quaternion.w;
+BABYLON.Quaternion.multiplyToRef = function(a, b) {}
+BABYLON.Quaternion.clone = function() {}
 
 var annyang = function() {};
 annyang.addCommands = function(a) {};
@@ -792,6 +801,11 @@ var MSStream;
  * @constructor
  */
 var Peer = function(a,b) {};
+
+Peer.on = function(a, b) {};
+Peer.reconnect = function() {};
+Peer.id;
+Peer._lastServerId;
 
 // var webpackJsonp;
 

@@ -1,7 +1,6 @@
 import { Menu2DDisplayComponent } from "./Menu2DDisplayComponent";
 import { Menu2DModalComponent } from "./Menu2DModalComponent";
-
-declare var Vue;
+declare var Vue;  // import Vue from "vue";
 
 /**
  * Load the vue components.

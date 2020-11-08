@@ -1,29 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <!-- <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js" async></script> -->
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, user-scalable=no" />
         <meta name="description" content="ProteinVR Scene" />
         <meta name="author" content="DurrantLab" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <meta name="apple-mobile-web-app-title" content="ProteinVR" />
         <link rel="manifest" href="manifest.webmanifest" />
         <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
-        <meta name="theme-color" content="#000000" />
         <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-        <link rel="stylesheet" href="pages/css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="pages/css/style.css">
+
+        <!-- Start getting css so it will be ready when you request it later. -->
+        <link rel="preload" href="pages/css/bootstrap.min.css" as="style">
+        <link rel="preload" href="pages/css/style.css" as="style">
+        <link rel="preload" href="style.css" as="style">
+
+        <link rel="preload" href="js/vuex.min.js" as="script">
+        <link rel="preload" href="js/vue.min.js" as="script">
+
+        <!-- Let browser know you might need google to set up a PWA. -->
+        <link rel="preconnect" href="https://storage.googleapis.com">
+
         <title>ProteinVR</title>
 
         <!--[if lt IE 9]>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
         <![endif]-->
 
-        <link href="style.css" rel="stylesheet" type="text/css" />
-        <!-- <link href="pages/css/bootstrap.min.css" rel="stylesheet" type="text/css"> -->
-
         <style>
-            /* Below needs to be hear because you don't want to wait for the js to load... */
+            /* Below needs to be hear because you don't want to wait for the
+            js/css to load... */
             html,
             body {
                 overflow: hidden;
@@ -61,15 +71,17 @@
                 animation: spin 2s linear infinite;
                 width: 60px;
                 height: 60px;
+                margin-left:20px;
             }
 
             /* The vr button needs to be closer to the edge (to accomodate
-        small phones) */
+            small phones) */
             .babylonVRicon {
                 bottom: 5px !important;
                 top: unset !important;
                 right: 5px !important;
                 left: unset !important;
+                opacity: 0;  /* Start off hidden */
             }
         </style>
     </head>
@@ -97,18 +109,27 @@
         <script> var webXRPolyfill = new WebXRPolyfill(); </script>
 
         <script src="js/jsfile.1.pep.min.js"></script>
-        <script src="js/jsfile.2.babylon.js"></script>
         <!-- <script src="https://cdn.babylonjs.com/babylon.max.js"></script> -->
+        <script src="js/jsfile.2.babylon.js"></script>
         <script src="js/jsfile.3.babylonjs.loaders.min.js"></script>
         <script src="js/jsfile.4.babylonjs.materials.min.js"></script>
         <script src="js/jsfile.5.babylon.gui.min.js"></script>
         <script src="js/peer.min.js" async></script>
 
-        <script>console.log("TODO: No more CDN");</script>
+        <script src="js/vuex.min.js"></script>
+        <script src="js/vue.min.js"></script>
+
+        <link rel="stylesheet" href="pages/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="pages/css/style.css">
+        <link href="style.css" rel="stylesheet" type="text/css" />
+
+        <!-- CDN version if you ever need them. -->
+        <!-- <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js" async></script> -->
         <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> -->
         <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> -->
-        <script src="https://unpkg.com/vuex@3.4.0/dist/vuex.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.js"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+        <!-- <script src="https://unpkg.com/vuex@3.4.0/dist/vuex.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.js"></script> -->
     </body>
 </html>

@@ -4,8 +4,7 @@ import { FormInputComponent } from "./InputComponent";
 import { FormButtonComponent } from "./ButtonComponent";
 import { FormOptionsComponent } from "./OptionsComponent";
 import { TextAreaComponent } from "./TextAreaComponent";
-
-declare var Vue;
+declare var Vue;  // import Vue from "vue";
 
 /**
  * Load the vue components.

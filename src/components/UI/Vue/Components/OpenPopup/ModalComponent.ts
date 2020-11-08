@@ -15,6 +15,9 @@ import {templateHtml} from "./ModalComponent.template.htm.ts";
 
 export var modalCurrentlyOpen = false;
 
+// Keep track of all modals so you can close them all when a new one is opened.
+let allModals = [];
+
 export class ModalComponent extends VueComponentParent {
     public tag = "modal";
     public methods = {};
@@ -60,35 +63,39 @@ export class ModalComponent extends VueComponentParent {
          */
         "open": function(val: boolean) {
             if (val === true) {
-                // Deal with unclosable modals.
-                if (this["unclosable"] === true) {
-                    this.modalOptions = {"backdrop": "static", "keyboard": false};
-                    this.modalObj.on('shown.bs.modal', (e) => {
-                        jQuery(".modal-backdrop.show").css("opacity", 1);
-                    });
+                // Always close all modals before opening a new one.
+                closeAllModals().then(() => {
+                    // Deal with unclosable modals.
+                    if (this["unclosable"] === true) {
+                        this.modalOptions = {"backdrop": "static", "keyboard": false};
+                        this.modalObj.on('shown.bs.modal', (e) => {
+                            jQuery(".modal-backdrop.show").css("opacity", 1);
+                        });
 
-                    // This is unclosable. So no need to worry about restoring any
-                    // previous settings once closed.
-                }
-
-                // Deal with the backdrop too, and keep track of opens and closes.
-                this.modalObj.on('shown.bs.modal', (e) => {
-                    // Need to redefine backdropDOM every time (because it gets
-                    // removed, I think).
-                    let backdropDOM = jQuery(".modal-backdrop");
-                    if (this["showBackdrop"] === true) {
-                        backdropDOM.css("background-color", "rgb(0,0,0)");
-                    } else {
-                        backdropDOM.css("background-color", "transparent");
+                        // This is unclosable. So no need to worry about
+                        // restoring any previous settings once closed.
                     }
 
-                    // Also trigger onReady.
-                    this["$emit"]("onReady");
+                    // Deal with the backdrop too, and keep track of opens and
+                    // closes.
+                    this.modalObj.on('shown.bs.modal', (e) => {
+                        // Need to redefine backdropDOM every time (because it
+                        // gets removed, I think).
+                        let backdropDOM = jQuery(".modal-backdrop");
+                        if (this["showBackdrop"] === true) {
+                            backdropDOM.css("background-color", "rgb(0,0,0)");
+                        } else {
+                            backdropDOM.css("background-color", "transparent");
+                        }
 
-                    modalCurrentlyOpen = true;
+                        // Also trigger onReady.
+                        this["$emit"]("onReady");
+
+                        modalCurrentlyOpen = true;
+                    });
+
+                    this.modalObj["modal"](this.modalOptions);
                 });
-
-                this.modalObj["modal"](this.modalOptions);
             } else {
                 this.modalObj["modal"]("hide");
             }
@@ -145,6 +152,9 @@ export class ModalComponent extends VueComponentParent {
     public mounted = function(): void {
         this.modalObj = jQuery("#" + this["id"]);
 
+        // Keep track so you can close them all en masse in the future.
+        allModals.push(this.modalObj);
+
         // Make it draggable without jquery-ui. Inspired by
         // https://stackoverflow.com/questions/12571922/make-bootstrap-twitter-dialog-modal-draggable
         this.modalObj.find(".modal-header").on("mousedown", function(e) {
@@ -171,4 +181,30 @@ export class ModalComponent extends VueComponentParent {
             this["$emit"]("onClose");
         });
     }
+}
+
+/**
+ * Close all the modals. This runs before opening any modal, so there can only
+ * be one modal open at a time.
+ * @returns Promise  A promise that is fulfilled when they are all closed.
+ */
+export function closeAllModals(): Promise<any> {
+    const allModalsLen = allModals.length;
+    let promises = [];
+    for (let i = 0; i < allModalsLen; i++) {
+        const modal = allModals[i];
+        promises.push(
+            new Promise((resolve, reject) => {
+                modal["modal"]("hide");
+
+                // A little hackish, but I don't want ot add another
+                // 'hidden.bs.modal' listener.
+                setTimeout(() => {
+                    resolve();
+                }, 250);
+            })
+        );
+    }
+
+    return Promise.all(promises);
 }

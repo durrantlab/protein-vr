@@ -1,40 +1,48 @@
 import * as ComponentsLoadAll from "./Components/LoadAllVue";
 import * as Menu2DLoadAll from "../Menus/Menu2D/LoadAllVue";
 import { store, setStoreOutsideVue } from "../../Vars/VueX/VueXStore";
-import { loadInitialPartialMenuData } from "../Menus/Menu2D/Menu2DDisplayComponent";
+import * as PromiseStore from "../../PromiseStore";
 
-declare var Vuex;
-declare var Vue;
+declare var Vue;  // import Vue from "vue";
+declare var Vuex;  // import Vuex from "vuex";
 
 /**
  * Load the vue components.
  */
 export function load(): void {
-    ComponentsLoadAll.load();
-    Menu2DLoadAll.load();
+    PromiseStore.setPromise(
+        "SetupVue", [],
+        (resolve) => {
+            ComponentsLoadAll.load();
 
-    new Vue({
-        "el": '#vue-app',
-        // "store": Store.store,
-        "template": `
-            <div style="height:0;">
-                <front></front>
-                <load-save-modal></load-save-modal>
-                <menu-2d-modal></menu-2d-modal>
-                <simple-modal></simple-modal>
-            </div>
-        `,
-        "store": store,
+            // Registers the 2d menu view components. Not sure why this isn't
+            // loaded from ComponentsLoadAll.load()...
+            Menu2DLoadAll.load();
 
-        /**
-         * Function that runs when Vue component loaded.
-         */
-        "mounted"() {
-            setStoreOutsideVue(this.$store);
+            // Create the base Vue component.
+            new Vue({
+                "el": '#vue-app',
+                // "store": Store.store,
+                "template": `
+                <div style="height:0;">
+                    <front></front>
+                    <load-save-modal></load-save-modal>
+                    <menu-2d-modal></menu-2d-modal>
+                    <simple-modal></simple-modal>
+                    <status></status>
+                </div>
+                `,
+                "store": store,
+
+                /**
+                 * Function that runs when Vue component loaded.
+                 */
+                "mounted"() {
+                    setStoreOutsideVue(this.$store);
+                }
+            });
+
+            resolve();
         }
-    });
-
-    // Populate partial 2D data. Here because it needs to be done after new
-    // Vue above.
-    loadInitialPartialMenuData();
+    );
 }

@@ -1,6 +1,7 @@
 import {VueComponentParent} from "../VueComponentParent";
 import {getPluginsOfType} from "../../../../Plugins/Plugins";
 import * as LoadSavePlugin from "../../../../Plugins/LoadSave/LoadSaveParent";
+import * as LoadSaveUtils from "../../../../Plugins/LoadSave/LoadSaveUtils";
 
 // @ts-ignore
 import {templateHtml} from "./LoadSaveModalComponent.template.htm.ts";
@@ -17,10 +18,10 @@ export class LoadSaveModalComponent extends VueComponentParent {
             // functions from the plugins.
             let plugins: LoadSavePlugin.LoadSaveParent[] = getPluginsOfType("loadSave");
             const pluginsLen = plugins.length;
-            for (let i = 0; i < pluginsLen; i++) {
-                plugins[i]._onUserInterfaceDone();
-                plugins[i].onUserInterfaceDone();
-            }
+            // for (let i = 0; i < pluginsLen; i++) {
+                // plugins[i].shadowsHardwareScalingLocalStorageToVueX();
+            // }
+            LoadSaveUtils.shadowsHardwareScalingLocalStorageToVueX();
         },
 
         /**

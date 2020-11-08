@@ -6,7 +6,7 @@
             <!-- Modal Header -->
             <div class="modal-header">
                 <h4 class="modal-title" :id="id + '-label'">{{title}}</h4>
-                <button v-if="!unclosable" id="modal-close-button" type="button" class="close" data-dismiss="modal">&times;</button>
+                <button :id="'modal-close-button-' + id" v-if="!unclosable" type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
 
             <!-- Modal body -->
@@ -22,6 +22,7 @@
             <!-- Modal footer -->
             <div v-if="hasCloseBtn" id="modal-footer" class="modal-footer">
                 <button
+                    :id="'close-btn-' + id"
                     type="button" class="btn btn-primary modal-close-btn"
                     @click="$emit('onClose')"
                     data-dismiss="modal">{{btnText}}</button>

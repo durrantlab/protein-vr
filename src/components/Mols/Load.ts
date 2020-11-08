@@ -8,6 +8,7 @@ import * as ThreeDMol from "./3DMol/ThreeDMol";
 import * as MolShadows from "./MolShadows";
 import * as Pickables from "../Navigation/Pickables";
 import * as PromiseStore from "../PromiseStore";
+import * as StatusComponent from "../UI/Vue/Components/StatusComponent";
 
 declare var BABYLON: any;
 
@@ -27,6 +28,8 @@ export function runLoadMolecule(): void {
 
                 // Update the shadows.
                 Optimizations.updateEnvironmentShadows();
+
+                StatusComponent.setStatus("Mol Loaded");
 
                 resolve();
             });

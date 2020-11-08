@@ -1,4 +1,8 @@
-declare var Vuex;
+declare var Vue;  // import Vue from "vue";
+declare var Vuex;  // import Vuex from "vuex";
+
+// Vue.use(Vuex)
+
 // declare var jQuery;
 
 export interface IAddVueXStoreParam {

@@ -1,4 +1,5 @@
 import { IAddVueXStoreParam, addVueXStoreParam } from "../../../Vars/VueX/VueXStore";
+import { store } from "../../../Vars/VueX/VueXStore";
 
 export abstract class VueComponentParent {
     abstract tag;
@@ -29,32 +30,40 @@ export abstract class VueComponentParent {
             "mounted": This.mounted,
 
             /** Runs before vue component displayed. */
-            "beforeCreate"() {
-                if (This.vueXStore !== undefined) {
-                    if (This.tag.indexOf("-") !== -1) {
-                        let prts = This.tag.split("-");
-                        This.tag = prts[0] + prts.slice(1).map(
-                            s => s.slice(0,1).toUpperCase() + s.slice(1)
-                        ).join("");
-                    }
-                    if (!this.$store.state[This.tag]) {
-                        this.$store.registerModule(This.tag, {
-                            "namespaced": true,
-                            "state": This.vueXStore.state,
-                            "mutations": This.vueXStore.mutations
-                        });
-                    }
-                }
-            }
+            // "beforeCreate"() {
+                // if (This.vueXStore !== undefined) {
+                //     if (This.tag.indexOf("-") !== -1) {
+                //         let prts = This.tag.split("-");
+                //         This.tag = prts[0] + prts.slice(1).map(
+                //             s => s.slice(0,1).toUpperCase() + s.slice(1)
+                //         ).join("");
+                //     }
+                //     if (!this.$store.state[This.tag]) {
+                //         this.$store.registerModule(This.tag, {
+                //             "namespaced": true,
+                //             "state": This.vueXStore.state,
+                //             "mutations": This.vueXStore.mutations
+                //         });
+                //     }
+                // }
+            // }
         });
 
-        // Vue.component('button-counter', {
-        //     data: function () {
-        //         return {
-        //             count: 0
-        //         }
-        //     },
-        //     template: '<button v-on:click="count++">You clicked me {{ count }} times.</button>'
-        // });
+        if (This.vueXStore !== undefined) {
+            if (This.tag.indexOf("-") !== -1) {
+                let prts = This.tag.split("-");
+                This.tag = prts[0] + prts.slice(1).map(
+                    s => s.slice(0,1).toUpperCase() + s.slice(1)
+                ).join("");
+            }
+            if (!store.state[This.tag]) {
+                store.registerModule(This.tag, {
+                    "namespaced": true,
+                    "state": This.vueXStore.state,
+                    "mutations": This.vueXStore.mutations
+                });
+            }
+        }
+
     }
 }

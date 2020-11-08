@@ -25,7 +25,9 @@ export class SelectEnvironmentComponent extends VueComponentParent {
 
     public computed = {};
 
-    public props = {};
+    public props = {
+        "pluginSlug": {"required": true},
+    };
 
     public watch = {};
 

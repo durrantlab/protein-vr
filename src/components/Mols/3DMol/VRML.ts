@@ -34,7 +34,7 @@ export interface IVRMLModel {
 let modelData: IVRMLModel[] = [];
 
 // export let molRotation: any = new BABYLON.Vector3(0, 0, 0);
-export let molRotationQuat: any = undefined;
+export let molRotationQuat: any = new BABYLON.Quaternion(0, 0, 0, 0);
 
 export let viewer: any;
 let element: any;
@@ -196,7 +196,7 @@ export function showLoadMoleculeError(hdr: any, status: any, err: any, url: stri
                       url.split(":")[0] + "://\".";
             } else {
                 // Some other unspecified error that can't be caught.
-                err ='Unidentifiable network error. It might be a <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank">CORS issue</a> or a dropped internet connection. If you\'re a developer, check the console.';
+                err ='Unidentifiable network error. It might be a <a rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank">CORS issue</a> or a dropped internet connection. If you\'re a developer, check the console.';
             }
         }
     }
@@ -527,18 +527,6 @@ export function importIntoBabylonScene(): any {
  * @returns void
  */
 export function updateMolRotation(axis: string, amount: number): void {
-    // Note that molRotation is Vector3 (x, y, z).
-    // molRotation[axis] += amount;  // Doesn't work as expected.
-
-    // What you really need to do is convert the euler angles into
-    // quaternions, rotate that about a world axis, and then convert back to
-    // Euler angles. Why convert back? Because the URL stores euler angles,
-    // and it's good to keep it that way for backwards compatibility and
-    // because it's only three values.
-    // let rotQuat = BABYLON.Quaternion.RotationYawPitchRoll(
-    //     molRotation["y"], molRotation["x"], molRotation["z"]
-    // );
-
     let rotAxis = new BABYLON.Vector3(
         axis == "x" ? 1 : 0,
         axis == "y" ? 1 : 0,
@@ -546,13 +534,9 @@ export function updateMolRotation(axis: string, amount: number): void {
     );
 
     let rotationMatrix = new BABYLON.Quaternion();
-    BABYLON.Quaternion.RotationAxisToRef(rotAxis, amount, rotationMatrix); // R
-    // rotQuat.multiplyToRef(rotationMatrix, rotQuat);
-    molRotationQuat.multiplyToRef(rotationMatrix, molRotationQuat);
-
-    // See https://github.com/BabylonJS/Babylon.js/blob/master/src/Meshes/transformNode.ts#L863
-
-    // molRotation = rotQuat.toEulerAngles();
+    BABYLON.Quaternion.RotationAxisToRef(rotAxis, amount, rotationMatrix);
+    // molRotationQuat.multiplyToRef(rotationMatrix, molRotationQuat);  // rotate about local axes
+    rotationMatrix.multiplyToRef(molRotationQuat, molRotationQuat);  // rotate about global axes
 
     // Update URL too.
     UrlVars.setURL();
@@ -565,6 +549,19 @@ export function updateMolRotation(axis: string, amount: number): void {
  * @param  {number} z  Rotation about z axis.
  * @returns void
  */
-export function setMolRotation(x: number, y: number, z: number): void {
-    molRotation = new BABYLON.Vector3(x, y, z);
+export function setMolRotationQuatFromURLEuler(x: number, y: number, z: number): void {
+    // molRotation = new BABYLON.Vector3(x, y, z);
+    molRotationQuat = BABYLON.Quaternion.RotationYawPitchRoll(
+        y, x, z
+    );
+}
+
+/**
+ * Sets the molRotationQuat variable. Good for setting the variable outside
+ * this module.
+ * @param  {*} quat  The new quaternion.
+ * @returns void
+ */
+export function setMolRotationQuat(quat: any): void {
+    molRotationQuat = quat.clone();
 }

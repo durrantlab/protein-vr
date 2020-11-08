@@ -29,7 +29,6 @@ export class WebRTCBase {
     private createPeerObj(): void {
         // Create own peer object with connection to shared PeerJS server
         // let idToUse = "pvr" + Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2, 5);  // null and it gets picked for you.
-
         const wrds = ["act", "add", "age", "ago", "aid", "aim", "air", "all",
                     "and", "any", "arm", "art", "ask", "bag", "ban", "bar",
                     "bed", "bet", "big", "bit", "box", "bus", "but", "buy",
@@ -111,7 +110,7 @@ export class WebRTCBase {
  * @returns void
  */
 export function webRTCErrorMsg(details = ""): void {
-    let msg = "<p>ProteinVR has encountered an error while running in leader mode. ";
+    let msg = "<p>ProteinVR has encountered an error while running in leader mode. This feature may be temporarily unavailable. ";
     if (details !== "") {
         msg += " Here are the details:</p>";
         msg += "<p><pre>" + details + "</pre></p>";

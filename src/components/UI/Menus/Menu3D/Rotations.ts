@@ -66,8 +66,8 @@ export function axisRotation(axis: string): void {
  * @returns void
  */
 export function undoRotate(): void {
-    const vec = PositionInScene.lastRotationBeforeAnimation;
-    VRML.setMolRotation(vec.x, vec.y, vec.z);
+    const quat = PositionInScene.lastRotationQuatBeforeAnimation;
+    VRML.setMolRotationQuat(quat);
     PositionInScene.positionAll3DMolMeshInsideAnother(
         undefined, Vars.scene.getMeshByName("protein_box"), true
     );

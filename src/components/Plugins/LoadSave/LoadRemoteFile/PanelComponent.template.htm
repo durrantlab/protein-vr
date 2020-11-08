@@ -1,23 +1,24 @@
 <panel>
-    <h5>Load Remote PDB or SDF File</h5>
+    <h5>Load Remote PDB, SDF, or PVR (Scene) File</h5>
     <replace-warning></replace-warning>
     <form-input-wrapper>
         <form-input
             id="urlOrPDB"
             placeholder="PDB ID or URL"
             type="text"
-            :value="$store.state.pdbUrlPanel.urlOrPDB"
             @change="onChangePDBUrl"
             @enter="onEnter"
+            :value="urlOrPDB"
         >
             Enter a PDB ID (e.g., <a class="link-sim" href="#" @click.prevent="setUrl('1XDN')" data-href="1XDN">1XDN</a>)
-            or PDB-/SDF-file URL (e.g., <a class="link-sim" href="#" @click.prevent="setUrl('https://files.rcsb.org/view/1XDN.pdb')">https://files.rcsb.org/.../1XDN.pdb</a>,
-            <a class="link-sim" href="#" @click.prevent="setUrl('nanokid.sdf')">nanokid.sdf</a>).
+            or PDB-/SDF-/PVR-file URL (e.g., <a class="link-sim" rel="noopener" href="https://files.rcsb.org/view/1XDN.pdb" @click.prevent="setUrl('https://files.rcsb.org/view/1XDN.pdb')">https://files.rcsb.org/.../1XDN.pdb</a>,
+            <a class="link-sim" href="nanokid.sdf" @click.prevent="setUrl('nanokid.sdf')">nanokid.sdf</a>,
+            <a class="link-sim" href="1xdn.pvr" @click.prevent="setUrl('1xdn.pvr')">1xdn.pvr</a>).
         </form-input>
         <!-- <p class="help-block"></p> -->
     </form-input-wrapper>
 
-    <select-environment></select-environment>
+    <select-environment v-if="showEnvironmentSelector" pluginSlug="urlOrPDB"></select-environment>
 
     <!-- <div class="row">
         <div class="col-md-12">
@@ -33,9 +34,9 @@
         older WebVR API instead.
     </div> -->
 
-    <shadows-hardware-scaling></shadows-hardware-scaling>
+    <shadows-hardware-scaling pluginSlug="urlOrPDB"></shadows-hardware-scaling>
 
-    <form-button id="submit" cls="primary" @click.native="submitPDBUrl()">
+    <form-button :disabled="loadBtnDisabled" id="submit" cls="primary" @click.native="submitPDBUrl()">
         Load Molecule
     </form-button>
 </panel>

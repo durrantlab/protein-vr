@@ -1,4 +1,4 @@
-export class PluginParent {
+export abstract class PluginParent {
     // A variable that describes the type of plugin.
-    public type: string = "undefined";
+    abstract type: string = "undefined";
 }

@@ -1,7 +1,6 @@
 import { TabItemComponent } from "./TabItemComponent";
 import { TabsComponent } from "./TabsComponent";
-
-declare var Vue;
+declare var Vue;  // import Vue from "vue";
 
 /**
  * Load the vue components.

@@ -47,7 +47,8 @@ export class ShadowsHardwareScalingComponent extends VueComponentParent {
     };
 
     public props = {
-        "pluginSlug": {"default": ""},
+        // "pluginSlug": {"default": ""},
+        "pluginSlug": {"required": true},
     };
 
     public watch = {};

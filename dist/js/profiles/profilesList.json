@@ -35,6 +35,9 @@
   "htc-vive-cosmos": {
     "path": "htc-vive-cosmos/profile.json"
   },
+  "htc-vive-focus-plus": {
+    "path": "htc-vive-focus-plus/profile.json"
+  },
   "htc-vive-focus": {
     "path": "htc-vive-focus/profile.json"
   },
@@ -59,6 +62,12 @@
   },
   "oculus-touch": {
     "path": "oculus-touch/profile.json"
+  },
+  "pico-g2": {
+    "path": "pico-g2/profile.json"
+  },
+  "pico-neo2": {
+    "path": "pico-neo2/profile.json"
   },
   "samsung-gearvr": {
     "path": "samsung-gearvr/profile.json"

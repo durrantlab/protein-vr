@@ -371,7 +371,7 @@ class Speech {
     private voices = null;
 
     constructor() {
-        jQuery(document).ready(() => {
+        jQuery(() => {
             if ("speechSynthesis" in window) {
                 // First call to getVoices may be null...later an event indicates when it is loaded
                 this.voices = window.speechSynthesis.getVoices();

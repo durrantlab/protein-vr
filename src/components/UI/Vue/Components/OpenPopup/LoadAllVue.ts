@@ -1,8 +1,7 @@
 import { ModalComponent } from "./ModalComponent";
 import { SimpleModalComponent } from "./SimpleModalComponent";
 import { LoadSaveModalComponent } from "./LoadSaveModalComponent";
-
-declare var Vue;
+declare var Vue;  // import Vue from "vue";
 
 /**
  * Load the vue components.

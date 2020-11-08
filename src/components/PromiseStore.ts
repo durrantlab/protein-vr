@@ -20,7 +20,8 @@ let promises = {
     "SetupPickables": null,
     "LoadMolecule": null,
     "SetupMenus": null,
-    "FinalizeScene": null
+    "FinalizeScene": null,
+    "SetupVue": null
 };
 
 let promiseStates = {};

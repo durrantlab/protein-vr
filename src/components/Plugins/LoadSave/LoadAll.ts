@@ -1,14 +1,12 @@
-import { PDBUrl } from "./PDBUrl/PDBUrl";
-import { LoadPdbSdfFile } from "./LoadPdbSdfFile/LoadPdbSdfFile";
+import { LoadRemoteFile } from "./LoadRemoteFile/LoadRemoteFile";
+import { LoadLocalFile } from "./LoadLocalFile/LoadLocalFile";
 import { LoadPdbSdfText } from "./LoadPdbSdfText/LoadPdbSdfText";
-import { LoadSceneFile } from "./LoadSceneFile/LoadSceneFile";
 import { SaveSceneFile } from "./SaveSceneFile/SaveSceneFile";
 import { New } from "./New/New";
 import { LoadSaveParent } from "./LoadSaveParent";
 import { store } from "../../Vars/VueX/VueXStore";
 import { getLoadSaveCommonComponents } from "./VueComponentsCommon/LoadSaveCommonComponents";
-
-declare var Vue;
+declare var Vue;  // import Vue from "vue";
 
 /**
  * Returns a list of all LoadSave plugin clases
@@ -16,11 +14,10 @@ declare var Vue;
  */
 export function getPlugins(): LoadSaveParent[] {
     let plugins = [];
-    plugins.push(new PDBUrl());
-    plugins.push(new LoadPdbSdfFile());
+    plugins.push(new LoadRemoteFile());
+    plugins.push(new LoadLocalFile());
     plugins.push(new LoadPdbSdfText());
     plugins.push(new New());
-    plugins.push(new LoadSceneFile());
     plugins.push(new SaveSceneFile());
 
     loadVuePlugins(plugins);
@@ -38,10 +35,13 @@ function loadVuePlugins(plugins: any[]): void {
     // registered.
     // let loadSavePlugins = getPluginsOfType("loadSave");
     for(let plugin of plugins) {
-        let pluginVueComponentClass = plugin.vuePanelComponent();
-        new pluginVueComponentClass().load(Vue);
+        // let pluginVueComponentClass = plugin.vuePanelComponent();
+        // new pluginVueComponentClass().load(Vue);
+        plugin.load(Vue);
     }
 
+    // Also register the common comments used to support the various load/save
+    // components.
     for (let component of getLoadSaveCommonComponents()) {
         new component().load(Vue);
     }

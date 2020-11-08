@@ -38,4 +38,6 @@ TODO.md
 *.old
 from_playground
 fetch_js_from_playground.sh
-*.template.htm.ts
+proteinvr_web_app.zip
+dist
+**/*.template.htm.ts

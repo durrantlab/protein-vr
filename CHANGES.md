@@ -1,8 +1,8 @@
 CHANGES
 =======
 
-WIP
----
+1.0.5
+-----
 
 * Upgraded to Bootstrap v4.3.1.
 * When reloading a saved ProteinVR URL, the molecular representations are now
@@ -11,12 +11,19 @@ WIP
 * Improved error handling (e.g., warns when trying to load HTTP content over
   HTTPS).
 * Created plugin architecture for loading/saving scenes internally. Added many
-  new options for loading data (file upload, copy/paste, scene pvr files,
+  new options for loading data (file upload, copy/paste, scene PVR files,
   etc.).
 * Mouse cursor set to "grab" rather than "pointer" when over viewport.
-
-TODO:
-Infinite loop when in follower mode? Not sure if happens in production.
+* Molecule rotation now about global X, Y, and Z axes.
+* Added [TestCafe](https://devexpress.github.io/testcafe/) tests to help
+  ensure that future updates don't break core functionality.
+* Modernized PWA `webmanifest` file.
+* Added Innovation in Education Award acknowledgment.
+* ProteinVR now works on Chrome with HTC Vive, at least on our test system.
+* The repository is getting too big, so the `dist/` directory and
+  `proteinvr_web_app.zip` file will no longer be included. See the [Releases
+  page](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/-/releases) for
+  the compiled files.
 
 1.0.4
 -----

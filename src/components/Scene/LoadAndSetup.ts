@@ -12,6 +12,9 @@ import * as Optimizations from "./Optimizations";
 import * as PromiseStore from "../PromiseStore";
 import * as Pickables from "../Navigation/Pickables";
 import * as Menus from "../UI/Menus/Menus";
+import * as SimpleModalComponent from "../UI/Vue/Components/OpenPopup/SimpleModalComponent";
+
+// import * as Axes from "./Axes";
 
 declare var BABYLON: any;
 
@@ -21,7 +24,7 @@ declare var BABYLON: any;
  */
 export function load(): void {
     PromiseStore.setPromise(
-        "SceneLoaded", ["DeviceOrientationAuthorizedIfNeeded"],
+        "SceneLoaded", ["DeviceOrientationAuthorizedIfNeeded", "SetupVue"],
         (resolve) => {
             Vars.setup();
 
@@ -72,13 +75,13 @@ export function load(): void {
  * @returns void
  */
 function vrSetupBeforeLoadingBabylonFile(): void {
-    // You'll need a navigation mesh.
-    const navMeshToUse = BABYLON.Mesh.CreateSphere("navTargetMesh", 4, 0.1, Vars.scene);
-    const navMeshMat = new BABYLON.StandardMaterial("navTargetMeshMaterial", Vars.scene);
+    // You'll need a navigation mesh. Put it on it's own utility layer.
+    const navMeshToUse = BABYLON.Mesh.CreateSphere("navTargetMesh", 4, 0.1, Vars.scene.utilityLayerScene);
+    const navMeshMat = new BABYLON.StandardMaterial("navTargetMeshMaterial", Vars.scene.utilityLayerScene);
     navMeshMat.emissiveColor = new BABYLON.Color3(0.1, 0.1, 0.1);
     navMeshMat.diffuseColor = new BABYLON.Color3(0.8, 0.8, 0.8);
     navMeshToUse.material = navMeshMat;
-    navMeshToUse.renderingGroupId = 2;  // So always visible, in theory.
+    // navMeshToUse.renderingGroupId = 2;  // So always visible, in theory.
 
     animateCursor(navMeshMat);
 
@@ -148,61 +151,132 @@ function animateCursor(navMeshMat: any): void {
 }
 
 /**
- * Load the scene from the .babylon file.
+ * Load the scene from the .babylon file. Also manages things if the requested
+ * scene doesn't exist (e.g., if running in offline PWA mode).
  * @returns void
  */
 function runLoadBabylonScene(): void {
     PromiseStore.setPromise(
         "LoadBabylonScene", ["InitVR"],
         (resolve) => {
-            LoadingScreens.babylonJSLoadingMsg("Loading the main scene...");
-            // Start loading the main scene.
-            BABYLON.SceneLoader.LoadAssetContainer(Vars.sceneName, "scene.babylon", Vars.scene, (container: any) => {
-                LoadingScreens.startFakeLoading(90);
-                Vars.scene.executeWhenReady(() => {
-                    // Now load scene_info.json too.
-                    jQuery.getJSON(Vars.sceneName + "scene_info.json", (data: any) => {
-                        // Save variables from scene_info.json so they can be accessed
-                        // elsewhere (throughout the app).
+            let origSceneName = Vars.sceneName;
+            loadScene(resolve, () => {
+                // No need to do anything special if you succeed the first time.
+                return;
+            }, (scene: any, msg: any) => {
+                // Scene not found, possibly because you're in PWA offline
+                // mode. Default to "day", which should always be available.
+                Vars.setSceneName("environs/day/");
 
-                        // Deactivate menu if appropriate. Note that this feature is
-                        // not supported (gives an error). Perhaps in the future I
-                        // will reimplement it, so I'm leaving the vestigial code
-                        // here.
-                        if (data["menuActive"] === false) {
-                            Vars.vrVars.menuActive = false;
-                        }
-
-                        if (data["positionOnFloor"] !== undefined) {
-                            Vars.sceneInfo.positionOnFloor = data["positionOnFloor"];
-                        }
-
-                        if (data["infiniteDistanceSkyBox"] !== undefined) {
-                            Vars.sceneInfo.infiniteDistanceSkyBox = data["infiniteDistanceSkyBox"];
-                        }
-
-                        if (data["transparentGround"] !== undefined) {
-                            Vars.sceneInfo.transparentGround = data["transparentGround"];
-                        }
-
-                        container.addAllToScene();
-
-                        resolve();
-                    })
-                })
-            }, (progress: any) => {
-                if (progress["lengthComputable"]) {
-                    // Only to 90 to not give the impression that it's done loading.
-                    const percent = Math.round(90 * progress["loaded"] / progress["total"]);
-                    LoadingScreens.babylonJSLoadingMsg("Loading the main scene... " + percent.toString() + "%");
-                }
-            })
+                loadScene(resolve, () => {
+                    // If you succeeded this second time, let the user know
+                    // about the failure on first try.
+                    SimpleModalComponent.openSimpleModal({
+                        title: "Missing Scene!",
+                        content: `The scene named "${origSceneName}" doesn't exist or is unavailable (perhaps because you're offline). Using "environs/day/" instead.`,
+                        hasCloseBtn: true,
+                        showBackdrop: true,
+                        unclosable: false
+                    }, false);
+                });
+            });
         }
     );
 }
 
 /**
- * This runs when all the assets are fully loaded. Does things like start the
+ * Tries to load a given scene.
+ * @param  {Function} resolveFunc  The promise resolve function to call when
+ *                                 done.
+ * @param  {Function} onSuccess    A optional function that runs on sucessful
+ *                                 load. Runs at same time as promise resolve
+ *                                 function. Basically used to specify when
+ *                                 had to default to "day" scene because
+ *                                 specified scene is not available.
+ * @param  {Function} onError      A optional function that runs if there is
+ *                                 an error loading the scene.
+ * @returns void
+ */
+function loadScene(resolveFunc: Function, onSuccess?: Function, onError?: Function): void {
+    LoadingScreens.babylonJSLoadingMsg("Loading the main scene...");
+    // Start loading the main scene.
+    BABYLON.SceneLoader.LoadAssetContainer(Vars.sceneName, "scene.babylon", Vars.scene, (container: any) => {
+        onSceneLoaded(container, resolveFunc, onSuccess);
+    }, (progress: any) => {
+        if (progress["lengthComputable"]) {
+            // Only to 90 to not give the impression that it's done loading.
+            const percent = Math.round(90 * progress["loaded"] / progress["total"]);
+            LoadingScreens.babylonJSLoadingMsg("Loading the main scene... " + percent.toString() + "%");
+        }
+    }, (scene: any, msg: any) => {
+        if (onError !== undefined) {
+            onError(scene, msg);
+        }
+    });
+}
+
+/**
+ * Runs once the scene has successfully loaded, though molecules have not yet
+ * been loaded.
+ * @param  {any}      container    The container that was just loaded.
+ * @param  {Function} resolveFunc  The promise resolve function to call when
+ *                                 done.
+ * @param  {Function} onSuccess    A optional function that runs on sucessful
+ *                                 load. Runs at same time as promise resolve
+ *                                 function. Basically used to specify when
+ *                                 had to default to "day" scene because
+ *                                 specified scene is not available.
+ * @returns void
+ */
+function onSceneLoaded(container: any, resolveFunc: Function, onSuccess?: Function): void {
+    LoadingScreens.startFakeLoading(90);
+    Vars.scene.executeWhenReady(() => {
+        // Now load scene_info.json too.
+        jQuery.getJSON(Vars.sceneName + "scene_info.json", (data: any) => {
+            // Save variables from scene_info.json so they can be accessed
+            // elsewhere (throughout the app).
+
+            // Deactivate menu if appropriate. Note that this feature is
+            // not supported (gives an error). Perhaps in the future I
+            // will reimplement it, so I'm leaving the vestigial code
+            // here.
+            if (data["menuActive"] === false) {
+                Vars.vrVars.menuActive = false;
+            }
+
+            if (data["positionOnFloor"] !== undefined) {
+                Vars.sceneInfo.positionOnFloor = data["positionOnFloor"];
+            }
+
+            if (data["infiniteDistanceSkyBox"] !== undefined) {
+                Vars.sceneInfo.infiniteDistanceSkyBox = data["infiniteDistanceSkyBox"];
+            }
+
+            if (data["transparentGround"] !== undefined) {
+                Vars.sceneInfo.transparentGround = data["transparentGround"];
+            }
+
+            container.addAllToScene();
+
+            // Copy over lights to utility layer so navigation sphere is
+            // lit appropriately.
+            let lightsSerialized: any[] = Vars.scene.lights.map(l => l.serialize());
+            for (let i = 0; i < lightsSerialized.length; i++) {
+                BABYLON.Light.Parse(lightsSerialized[i], Vars.scene.utilityLayerScene);
+            }
+
+            resolveFunc();
+
+            if (onSuccess !== undefined) {
+                onSuccess();
+            }
+        })
+    })
+}
+
+/**
+ * This runs when all the assets are fully loaded, including moleclues. In
+ * that sense if differs from onSceneLoaded above. Does things like start the
  * render loop.
  * @returns void
  */
@@ -222,6 +296,9 @@ export function runFinalizeScene(): void {
 
             // Make sure camera can see objects that are very close.
             Vars.scene.activeCamera.minZ = 0;
+
+            // Make the axes. Here is as good a place to do it as any.
+            // Axes.showAxes();
 
             // Start the render loop. Register a render loop to repeatedly
             // render the scene

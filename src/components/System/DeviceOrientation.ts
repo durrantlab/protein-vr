@@ -6,6 +6,9 @@
 
 import * as PromiseStore from "../PromiseStore";
 import * as SplashScreen from "./SplashScreen";
+import { store, setStoreOutsideVue } from "../Vars/VueX/VueXStore";
+
+declare var Vue;
 
 /**
  * Request access to the device orientation sensor.
@@ -13,12 +16,21 @@ import * as SplashScreen from "./SplashScreen";
  */
 export function requestDeviceOrientation(): void {
     PromiseStore.setPromise(
-        "DeviceOrientationAuthorizedIfNeeded", [],
+        "DeviceOrientationAuthorizedIfNeeded", ["SetupVue"],
         (resolve) => {
             // See
             // https://medium.com/flawless-app-stories/how-to-request-device-motion-and-orientation-permission-in-ios-13-74fc9d6cd140
-            if ((typeof DeviceMotionEvent !== "undefined") && (typeof DeviceMotionEvent["requestPermission"] === "function")) {
-            // if (true) {  // For debugging.
+
+            // Note that this doesn't appear to be necessary on the latest
+            // version of iOS. But let's keep it to support other version.
+            if (
+                (
+                    (typeof DeviceMotionEvent !== "undefined") &&
+                    (typeof DeviceMotionEvent["requestPermission"] === "function")
+                ) ||
+                (window.location.href.indexOf("testdosplash") !== -1)  // For testcafe
+            ) {
+                // if (true) {  // For debugging.
                 SplashScreen.showSplashScreen(() => {
                     // iOS 13+.
                     DeviceOrientationEvent["requestPermission"]()

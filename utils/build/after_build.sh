@@ -1,5 +1,3 @@
-exit
-
 # Must be run from the main directory.
 
 # exit  # Don't do this. For debugging.
@@ -20,7 +18,8 @@ cd -
 # set this programmatically, but couldn't get it to work. Best just to modify
 # the code to prevent it.
 cd dist/
-ls vendor* | awk '{print "cat " $1 " | sed \"s/.3Dmol.notrack/true/g\"" }' | bash > t; mv t $(ls vendor*.js)
+# ls vendor* | awk '{print "cat " $1 " | sed \"s/.3Dmol.notrack/true/g\"" }' | bash > t; mv t $(ls vendor*.js)
+ls vendor* | awk '{print "cat " $1 " | sed \"s/.3Dmol.notrack/true/g\" > t; mv t " $1}'| bash
 cd -
 
 # You need to closure compile vendor..js too. Let's use js version for maximal
@@ -29,14 +28,17 @@ echo "Check for errors above. Enter to start compiling vendor js and other js fi
 # read -p "Press enter to continue"
 cd dist
 
-node ../node_modules/google-closure-compiler/cli.js $(ls vendors*.js) > t
-mv t $(ls vendors*.js)
+# node ../node_modules/google-closure-compiler/cli.js $(ls vendors*.js) > t
+# mv t $(ls vendors*.js)
+ls vendor*js | awk '{print "echo Closure compiling " $1 "; node ../node_modules/google-closure-compiler/cli.js " $1 " > " $1 ".tmp; mv " $1 ".tmp " $1}' | parallel --no-notice
 
-node ../node_modules/google-closure-compiler/cli.js $(ls runtime*.js) > t
-mv t $(ls runtime*.js)
+# node ../node_modules/google-closure-compiler/cli.js $(ls runtime*.js) > t
+# mv t $(ls runtime*.js)
+ls runtime*js | awk '{print "echo Closure compiling " $1 "; node ../node_modules/google-closure-compiler/cli.js " $1 " > " $1 ".tmp; mv " $1 ".tmp " $1}' | parallel --no-notice
 
-node ../node_modules/google-closure-compiler/cli.js $(ls precache-manifest*.js) > t
-mv t $(ls precache-manifest*.js)
+# node ../node_modules/google-closure-compiler/cli.js $(ls precache-manifest*.js) > t
+# mv t $(ls precache-manifest*.js)
+ls precache-manifest*js | awk '{print "echo Closure compiling " $1 "; node ../node_modules/google-closure-compiler/cli.js " $1 " > " $1 ".tmp; mv " $1 ".tmp " $1}' | bash
 
 node ../node_modules/google-closure-compiler/cli.js service-worker.js > t
 mv t service-worker.js
@@ -73,6 +75,7 @@ find dist -name ".DS_Store" -exec rm '{}' \;
 find dist -name "*.log" -exec rm '{}' \;
 find dist -name "src.txt" -exec rm '{}' \;
 find dist -name "old" -exec rm -r '{}' \;
+find dist -name "*.old" -exec rm -r '{}' \;
 find dist -name "tmp" -exec rm -r '{}' \;
 find dist -name "*.sh" -exec rm -r '{}' \;
 

@@ -9,14 +9,14 @@
             :value="fileContents"
             @change="onChangeText"
         >
-            Type or copy-and-paste the contents of a PDB or SDF file into the text area below.
+            Type or copy-and-paste <a class="link-sim" href="#" @click.prevent="addSdfText()">the contents</a> of a PDB or SDF file into the text area below.
         </text-area>
     </form-input-wrapper>
 
-    <select-environment></select-environment>
-    <shadows-hardware-scaling></shadows-hardware-scaling>
+    <select-environment pluginSlug="pdbOrSdfText"></select-environment>
+    <shadows-hardware-scaling pluginSlug="pdbOrSdfText"></shadows-hardware-scaling>
 
-    <form-button @click.native="startLoad" id="load-pdb-sdf-text">
+    <form-button :disabled="fileContents === ''" @click.native="startLoad" id="load-local-file-text">
         Load PDB/SDF File
     </form-button>
 </panel>

@@ -1,7 +1,6 @@
 import { TabsHeaderComponent } from "./TabsHeaderComponent";
 import { TabsHeaderItemComponent } from "./TabsHeaderItemComponent";
-
-declare var Vue;
+declare var Vue;  // import Vue from "vue";
 
 /**
  * Load the vue components.

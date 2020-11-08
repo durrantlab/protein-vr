@@ -21,9 +21,16 @@
             "src": "icon-1024.png",
             "sizes": "1024x1024",
             "type": "image/png"
+        },
+        {
+            "src": "icon-256-maskable.png",
+            "sizes": "256x256",
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ],
     "name": "ProteinVR",
     "short_name": "ProteinVR",
-    "start_url": "index.html"
+    "start_url": "./index.html",
+    "scope": "."
 }

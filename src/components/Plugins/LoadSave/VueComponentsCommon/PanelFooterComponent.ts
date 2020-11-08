@@ -1,4 +1,5 @@
 import {VueComponentParent} from "../../../UI/Vue/Components/VueComponentParent";
+import * as Vars from "../../../Vars/Vars";
 
 // @ts-ignore
 import {templateHtml} from "./PanelFooterComponent.template.htm.ts";
@@ -24,11 +25,15 @@ export class PanelFooterComponent extends VueComponentParent {
      * @returns * The data object.
      */
     public data = function(): any {
-        return {};
+        return {
+            "version": Vars.VERSION
+        };
     }
 
     /**
      * Function that runs when Vue component loaded.
      */
-    public mounted = function(): void {};
+    public mounted = function(): void {
+        this["version"] = Vars.VERSION;
+    };
 }

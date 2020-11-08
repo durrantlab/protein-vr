@@ -1,0 +1,17 @@
+<panel>
+    <h5>Load PDB, SDF, or PVR (Scene) File</h5>
+    <replace-warning></replace-warning>
+    <super-file
+        name="load-local-file"
+        label="Specify the location of the .pdb, .sdf, or .pvr (scene) file on your computer."
+        placeholder="Specify file..."
+        accept=".pdb, .sdf, .pvr"
+        @fileLoaded="fileLoaded"></super-file>
+
+    <select-environment v-if="fileType !== '.PVR'" pluginSlug="load-local-file"></select-environment>
+    <shadows-hardware-scaling pluginSlug="load-local-file"></shadows-hardware-scaling>
+
+    <form-button :disabled="fileContents === undefined" @click.native="startLoad" id="load-local-file-scene">
+        Load PDB/SDF/PVR File
+    </form-button>
+</panel>

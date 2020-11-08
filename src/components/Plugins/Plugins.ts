@@ -1,7 +1,7 @@
 import * as LoadSaveAll from "./LoadSave/LoadAll";
-// import { getPluginsOfType } from "./Plugins";
+declare var Vue;  // import Vue from "vue";
 
-declare var Vue;
+// import { getPluginsOfType } from "./Plugins";
 
 // An object where loaded plugins are stored.
 export let registeredPlugins: any = {};

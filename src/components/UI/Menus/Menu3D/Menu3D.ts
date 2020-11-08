@@ -94,7 +94,7 @@ function setupMainMenu(): void {
     // previously. Currently adds back and close buttons.
     setupAllSubMenuNavButtons();
 
-    commonMenuAnchor = new BABYLON.TransformNode(""); // this can be a mesh, too
+    commonMenuAnchor = new BABYLON.TransformNode("CommonMenuAnchor_ForPanel"); // this can be a mesh, too
 
     createPanelSixteenButtons();
 }
@@ -257,7 +257,7 @@ function setupMainMenuToggleButton(): void {
     // openMainMenuFloorButton.button.rotation.x = 0.25 * Math.PI;
 
     // Set up the button anchor and move/rotate it.
-    const mainMenuAnchorToggle = new BABYLON.TransformNode(""); // this can be a mesh, too
+    const mainMenuAnchorToggle = new BABYLON.TransformNode("MainMenuAnchorToggle_FloorButton"); // this can be a mesh, too
     panelToggle.linkToTransformNode(mainMenuAnchorToggle);
     mainMenuAnchorToggle.rotation.x = Math.PI * 0.5;
 

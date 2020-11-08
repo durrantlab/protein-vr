@@ -62,7 +62,10 @@ export class SuperFileComponent extends VueComponentParent {
             let reader = new FileReader();
             reader.onloadend = (file) => {
                 let txt = reader.result;
-                this["$emit"]("fileLoaded", txt);
+                this["$emit"]("fileLoaded", {
+                    fileName: fileName,
+                    fileContents: txt
+                });
             };
             reader.readAsText(input["files"][0]);
         });

@@ -6,11 +6,13 @@ import * as Optimizations from "../../Scene/Optimizations";
 import * as Vars from "../../Vars/Vars";
 import * as VisStyles from "./VisStyles";
 import * as VRML from "./VRML";
+import * as StatusComponent from "../../UI/Vue/Components/StatusComponent";
+// import * as Axes from "../../Scene/Axes";
 
 declare var BABYLON: any;
 
-export let lastRotationBeforeAnimation = new BABYLON.Vector3(0, 0, 0);
-let lastRotationVec: any = undefined;
+export let lastRotationQuatBeforeAnimation = new BABYLON.Quaternion(0, 0, 0, 0);
+let lastRotationQuat: any = undefined;
 const cachedDeltaYs = {};
 
 
@@ -44,9 +46,14 @@ export function positionAll3DMolMeshInsideAnother(babylonMeshJustAdded: any, oth
     // Get the bounding box of the other (containing) mesh and it's dimensions
     // (protein_box).
     const containingBox = otherContainerBabylonMesh.getBoundingInfo().boundingBox;
-    const containingBoxDimens = Object.keys(containingBox.maximumWorld).map(
-        (k) => containingBox.maximumWorld[k] - containingBox.minimumWorld[k],
-    );
+    // const containingBoxDimens = Object.keys(containingBox.maximumWorld).map(
+    //     (k) => containingBox.maximumWorld[k] - containingBox.minimumWorld[k],
+    // );
+    const containingBoxDimens = [
+        containingBox.maximumWorld["x"] - containingBox.minimumWorld["x"],
+        containingBox.maximumWorld["y"] - containingBox.minimumWorld["y"],
+        containingBox.maximumWorld["z"] - containingBox.minimumWorld["z"]
+    ]
 
     // Get information about the mesh with the maximum volume.
     const maxVolInfo = getMaxVolMeshInfo(allVisMeshes);
@@ -59,7 +66,7 @@ export function positionAll3DMolMeshInsideAnother(babylonMeshJustAdded: any, oth
 
     // Keep track of last rotation, to enable undo rotation. All the meshes
     // have the same rotation, so just pick first one.
-    lastRotationBeforeAnimation = allVisInitialInfo.meshesInfo[0].rotation.clone();
+    lastRotationQuatBeforeAnimation = allVisInitialInfo.meshesInfo[0].rotationQuaternion.clone();
 
     // Make sure all meshes are visible.
     let len = allVisMeshes.length;
@@ -77,6 +84,14 @@ export function positionAll3DMolMeshInsideAnother(babylonMeshJustAdded: any, oth
     }
 }
 
+/**
+ * Bet information about all the visible meshes.
+ * @param  {*} babylonMeshJustAdded  The mesh just added, which might not
+ *                                   otherwise show up in the list.
+ * @returns *  An object with the data. { meshes: allVisMolMeshes, meshesInfo:
+ *             allVisMolMeshesInfo }
+
+ */
 function getVisibleMolMeshesAndInfo(babylonMeshJustAdded: any): any {
     // Get the meshes from the babylon scene.
     /** @type {Array<*>} */
@@ -84,19 +99,19 @@ function getVisibleMolMeshesAndInfo(babylonMeshJustAdded: any): any {
 
     // Save all information about each of the visible meshes, for later
     // animation.
-    if (lastRotationVec === undefined) {
+    if (lastRotationQuat === undefined) {
         // Never set before, so get it from the model.
-        lastRotationVec = VRML.molRotation.clone();
+        lastRotationQuat = VRML.molRotationQuat.clone();
     }
     const allVisMolMeshesInfo = allVisMolMeshes.map((m: any) => {
         return {
             // mesh: m,
             position: m.position.clone(),
-            rotation: lastRotationVec.clone(),
+            rotationQuaternion: lastRotationQuat.clone(),
             scaling: m.scaling.clone(),
         };
     });
-    lastRotationVec = VRML.molRotation.clone();  // Update for next turn.
+    lastRotationQuat = VRML.molRotationQuat.clone();  // Update for next turn.
 
     return {
         meshes: allVisMolMeshes,
@@ -147,7 +162,7 @@ function resetMeshes(allVisMolMeshes: any[]): void {
             // note that rotations are preserved.
             allVisMolMesh.scaling = new BABYLON.Vector3(1, 1, 1);
             allVisMolMesh.position = new BABYLON.Vector3(0, 0, 0);
-            allVisMolMesh.rotation = VRML.molRotation;
+            allVisMolMesh.rotationQuaternion = VRML.molRotationQuat;
             allVisMolMesh.visibility = 0;  // Hide while rotating.
         }
     }
@@ -156,7 +171,13 @@ function resetMeshes(allVisMolMeshes: any[]): void {
     Vars.scene.render();  // Needed to get bounding box to recalculate.
 }
 
-function getMaxVolMeshInfo(allVisMeshes: any) {
+/**
+ * Get information about the mesh with the maximum volume.
+ * @param  {*} allVisMeshes  Info about all the meshes.
+ * @returns *  The information about the max-volume mesh. { box: maxVolBox,
+ *             boxDimens: maxVolBoxDimens, mesh: maxVolMesh }
+ */
+function getMaxVolMeshInfo(allVisMeshes: any[]): any {
     // Get the molecular model with the biggest volume.
     const allVisMolMeshesLen = allVisMeshes.length;
     let maxVol = 0.0;
@@ -168,9 +189,14 @@ function getMaxVolMeshInfo(allVisMeshes: any) {
 
         // Get the bounding box of this mesh.
         const maxVolBoxTmp = allVisMolMesh.getBoundingInfo().boundingBox;
-        const maxVolBoxDimensTmp = Object.keys(maxVolBoxTmp.maximumWorld).map(
-            (k) => maxVolBoxTmp.maximumWorld[k] - maxVolBoxTmp.minimumWorld[k],
-        );
+        // const maxVolBoxDimensTmp = Object.keys(maxVolBoxTmp.maximumWorld).map(
+        //     (k) => maxVolBoxTmp.maximumWorld[k] - maxVolBoxTmp.minimumWorld[k],
+        // );
+        const maxVolBoxDimensTmp = [
+            maxVolBoxTmp.maximumWorld["x"] - maxVolBoxTmp.minimumWorld["x"],
+            maxVolBoxTmp.maximumWorld["y"] - maxVolBoxTmp.minimumWorld["y"],
+            maxVolBoxTmp.maximumWorld["z"] - maxVolBoxTmp.minimumWorld["z"]
+        ]
         const volume = maxVolBoxDimensTmp[0] * maxVolBoxDimensTmp[1] * maxVolBoxDimensTmp[2];
 
         if (volume > maxVol) {
@@ -188,6 +214,14 @@ function getMaxVolMeshInfo(allVisMeshes: any) {
     }
 }
 
+/**
+ * Scale all the meshes to fit inside a box.
+ * @param  {*[]} containingBoxDimens  The dimensions of the containing box.
+ * @param  {*[]} maxVolBoxDimens      The dimensions of the object with the
+ *                                    maximum volume.
+ * @param  {*[]} visMeshes            A list of all the visible meshes.
+ * @returns void
+ */
 function scaleAllMeshesToFixInBox(containingBoxDimens: any[], maxVolBoxDimens: any[], visMeshes: any[]): void {
     const allVisMolMeshesLen = visMeshes.length;
 
@@ -209,7 +243,16 @@ function scaleAllMeshesToFixInBox(containingBoxDimens: any[], maxVolBoxDimens: a
     Vars.scene.render();  // Needed to get bounding box to recalculate.
 }
 
-function translateAllMeshes(containingBox: any, allVisMeshes: any, maxVolInfo: any): void {
+/**
+ * Move all the meshes. For example, when embedding in a lipid bilayer.
+ * @param  {*} containingBox    Info about the box that contains all the
+ *                              meshes.
+ * @param  {*[]} allVisMeshes   All the meshes.
+ * @param  {*} maxVolInfo       Information about the mesh with the largest
+ *                              volume.
+ * @returns void
+ */
+function translateAllMeshes(containingBox: any, allVisMeshes: any[], maxVolInfo: any): void {
     const allVisMolMeshesLen = allVisMeshes.length;
 
     // Translate the meshes.
@@ -248,9 +291,10 @@ function moveMolMeshesToGround(biggestMolMesh: any, containingBox: any): number 
     // Check and see if the deltaY has already been calculated.
     const PI = Math.PI;
     const key: string = biggestMolMesh.name + "-" +
-              (biggestMolMesh.rotation.x % PI).toFixed(3) + "-" +
-              (biggestMolMesh.rotation.y % PI).toFixed(3) + "-" +
-              (biggestMolMesh.rotation.z % PI).toFixed(3);
+              (biggestMolMesh.rotationQuaternion.x % PI).toFixed(3) + "-" +
+              (biggestMolMesh.rotationQuaternion.y % PI).toFixed(3) + "-" +
+              (biggestMolMesh.rotationQuaternion.z % PI).toFixed(3) + "-" +
+              (biggestMolMesh.rotationQuaternion.w % PI).toFixed(3);
     if (cachedDeltaYs[key] !== undefined) {
         return cachedDeltaYs[key];
     }
@@ -281,14 +325,21 @@ function moveMolMeshesToGround(biggestMolMesh: any, containingBox: any): number 
     return deltaY;
 }
 
-function animateRotation(allVisInitialInfo: any, allVisMeshes: any): void {
+/**
+ * Animate the meshes to their new location/rotations.
+ * @param  {*} allVisInitialInfo  Information about the mesh visibility as it
+ *                                existed before any changes.
+ * @param  {*[]} allVisMeshes     List of all visible meshes.
+ * @returns void
+ */
+function animateRotation(allVisInitialInfo: any, allVisMeshes: any[]): void {
     let len = allVisInitialInfo.meshesInfo.length;
     for (let i = 0; i < len; i++) {
         const allVisInitialInf = allVisInitialInfo.meshesInfo[i];
         const mesh = allVisMeshes[i];
         const pos = mesh.position.clone();
         const sca = mesh.scaling.clone();
-        const rot = mesh.rotation.clone();
+        const rot = mesh.rotationQuaternion.clone();
 
 
         // TODO: The way it should be:
@@ -303,16 +354,27 @@ function animateRotation(allVisInitialInfo: any, allVisMeshes: any): void {
         const scaY = makeBabylonAnim("scaY", "scaling.y", allVisInitialInf.scaling.y, sca.y);
         const scaZ = makeBabylonAnim("scaZ", "scaling.z", allVisInitialInf.scaling.z, sca.z);
 
-        const rotX = makeBabylonAnim("rotX", "rotation.x", allVisInitialInf.rotation.x, rot.x);
-        const rotY = makeBabylonAnim("rotY", "rotation.y", allVisInitialInf.rotation.y, rot.y);
-        const rotZ = makeBabylonAnim("rotZ", "rotation.z", allVisInitialInf.rotation.z, rot.z);
+        const rotX = makeBabylonAnim("rotX", "rotationQuaternion.x", allVisInitialInf.rotationQuaternion.x, rot.x);
+        const rotY = makeBabylonAnim("rotY", "rotationQuaternion.y", allVisInitialInf.rotationQuaternion.y, rot.y);
+        const rotZ = makeBabylonAnim("rotZ", "rotationQuaternion.z", allVisInitialInf.rotationQuaternion.z, rot.z);
+        const rotW = makeBabylonAnim("rotW", "rotationQuaternion.w", allVisInitialInf.rotationQuaternion.w, rot.w);
 
-        mesh.animations = [posX, posY, posZ, scaX, scaY, scaZ, rotX, rotY, rotZ];
+        mesh.animations = [posX, posY, posZ, scaX, scaY, scaZ, rotX, rotY, rotZ, rotW];
+
+        // Axes.axesMesh.setEnabled(true);
 
         const anim = Vars.scene.beginAnimation(mesh, 0, 15, false, 1, () => {
             // You need to recalculate the shadows.
             Optimizations.updateEnvironmentShadows();
+
+            StatusComponent.setStatus("Rotate done: " + allVisInitialInf.rotationQuaternion.toString());
         });
+
+        // setTimeout(() => {
+        //     // Here instead of in end animation above because I like it to
+        //     // delay a bit.
+        //     Axes.axesMesh.setEnabled(false);
+        // }, 1000);
     }
 }
 

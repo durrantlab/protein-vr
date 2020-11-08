@@ -90,21 +90,25 @@ export function setURL(): void {
 
     let params = [];
 
+    // Convert the rotation quaternion to euler angles. For simplicity and
+    // backwards compatibility.
+    let molRotation = VRML.molRotationQuat.toEulerAngles();
+
     // Get the rotations.
     /** @type {number} */
-    const x = VRML.molRotation.x;
+    const x = molRotation.x;
     if (x !== 0) {
         params.push("rx=" + round(x));
     }
 
     /** @type {number} */
-    const y = VRML.molRotation.y;
+    const y = molRotation.y;
     if (y !== 0) {
         params.push("ry=" + round(y));
     }
 
     /** @type {number} */
-    const z = VRML.molRotation.z;
+    const z = molRotation.z;
     if (z !== 0) {
         params.push("rz=" + round(z));
     }
@@ -233,7 +237,7 @@ export function readUrlParams(): void {
     rx = (rx === undefined) ? 0 : +rx;
     ry = (ry === undefined) ? 0 : +ry;
     rz = (rz === undefined) ? 0 : +rz;
-    VRML.setMolRotation(rx, ry, rz);
+    VRML.setMolRotationQuatFromURLEuler(rx, ry, rz);
 
     // Set the protein model if it's present.
     /** @type {string} */

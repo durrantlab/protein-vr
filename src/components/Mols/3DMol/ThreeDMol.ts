@@ -69,12 +69,12 @@ function after3DMolJsLoaded(resolveFunc: Function): void {
             // specify a remote url, because you can just get the data from
             // the remote source.
             VueXStore.storeOutsideVue.commit("setVar", {
-                moduleName: "proteinvrLoadScenePanel",
+                moduleName: "loadLocalFilePanel",
                 varName: "fileContent",
                 val: data
             });
             VueXStore.storeOutsideVue.commit("setVar", {
-                moduleName: "proteinvrLoadScenePanel",
+                moduleName: "loadLocalFilePanel",
                 varName: "fileType",
                 val: type
             });

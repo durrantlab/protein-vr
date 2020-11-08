@@ -12,9 +12,16 @@ import * as ServiceWorker from "./components/System/ServiceWorker";
 import * as GoogleAnalytics from "./components/System/GoogleAnalytics";
 import * as DeviceOrientation from "./components/System/DeviceOrientation";
 import * as Plugins from "./components/Plugins/Plugins";
+import * as LoadAllVue from "./components/UI/Vue/LoadAllVue";
+
+
+// @ts-ignore
+window["jq"] = jQuery;
 
 // Report version
 console.log("ProteinVR " + Vars.VERSION);
+// @ts-ignore
+console.log("Compiled on " + BUILD_TIMESTAMP);
 document.title = "ProteinVR " + Vars.VERSION;
 
 // Setup service worker
@@ -25,6 +32,10 @@ Plugins.loadAll();
 
 // Get environment name (why needed here?)
 UrlVars.readEnvironmentNameParam();
+
+// Load VueJS system. You will need it whether you throw a device-orientation
+// error or if you proceed to the full system.
+LoadAllVue.load();
 
 // It is unfortunately necessary to explicitly request device orientation on
 // iOS13.
