@@ -86,6 +86,7 @@ cd -
 
 # Also create a ZIP file of the dist directory, for convenient distribution.
 mv dist proteinvr
+rm -rf proteinvr_web_app.zip
 zip -r proteinvr_web_app.zip proteinvr
 mv proteinvr dist
 
