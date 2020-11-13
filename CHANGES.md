@@ -1,8 +1,8 @@
 CHANGES
 =======
 
-1.0.6 WIP
----------
+1.0.6
+-----
 
 * Added new debugging functionality to assist with development.
 * Updated to latest
