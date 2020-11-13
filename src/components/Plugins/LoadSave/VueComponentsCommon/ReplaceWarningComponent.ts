@@ -1,9 +1,11 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import {VueComponentParent} from "../../../UI/Vue/Components/VueComponentParent";
 
 // @ts-ignore
 import {templateHtml} from "./ReplaceWarningComponent.template.htm.ts";
-
-declare var jQuery;
 
 export class ReplaceWarningComponent extends VueComponentParent {
     public tag = "replace-warning";

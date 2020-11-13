@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2019 Jacob D. Durrant.
+// full details. Copyright 2020 Jacob D. Durrant.
 
 // This module sets up the VR camera.
 
@@ -14,6 +14,7 @@ import * as Menu3D from "../UI/Menus/Menu3D/Menu3D";
 import * as PromiseStore from "../PromiseStore";
 import * as Points from "../Navigation/Points";
 import * as NonVRCamera from "./NonVRCamera";
+import * as FrontVueComponent from "../UI/Vue/Components/UI2D/FrontVueComponent";
 
 declare var BABYLON: any;
 
@@ -150,6 +151,11 @@ function setupEnterAndExitVRCallbacks(): void {
                 // Update menu, too, so there's an exit VR button.
                 Menu3D.menuInf["Exit VR ×"] = () => { exitVRAndFS(); }
 
+                // For reasons I don't understand, the below makes things magically work in iOS...
+                let l = new BABYLON.LightGizmo()
+                l.dispose();
+                l = null;
+
                 // Active camera needs to be XR camera..
                 // console.log(Vars.scene.activeCamera);
                 break;
@@ -182,6 +188,8 @@ function setupEnterAndExitVRCallbacks(): void {
                 // Show the 2D buttons.
                 jQuery(".ui-button").show();
                 jQuery(".babylonVRicon").show();
+
+                FrontVueComponent.showVRButtonPerOrientation();
 
                 // Update menu, too, so there's an exit VR button.
                 delete Menu3D.menuInf["Exit VR ×"];

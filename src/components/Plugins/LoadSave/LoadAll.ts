@@ -1,3 +1,7 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import { LoadRemoteFile } from "./LoadRemoteFile/LoadRemoteFile";
 import { LoadLocalFile } from "./LoadLocalFile/LoadLocalFile";
 import { LoadPdbSdfText } from "./LoadPdbSdfText/LoadPdbSdfText";
@@ -6,7 +10,7 @@ import { New } from "./New/New";
 import { LoadSaveParent } from "./LoadSaveParent";
 import { store } from "../../Vars/VueX/VueXStore";
 import { getLoadSaveCommonComponents } from "./VueComponentsCommon/LoadSaveCommonComponents";
-declare var Vue;  // import Vue from "vue";
+declare var Vue;
 
 /**
  * Returns a list of all LoadSave plugin clases
@@ -57,7 +61,4 @@ export function openLoadSaveModal(): void {
         varName: "showLoadSaveModal",
         val: true
     });
-
-    // let modalObj = jQuery('#load-save-modal');
-    // modalObj["modal"]();
 }

@@ -1,7 +1,11 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import { ModalComponent } from "./ModalComponent";
 import { SimpleModalComponent } from "./SimpleModalComponent";
 import { LoadSaveModalComponent } from "./LoadSaveModalComponent";
-declare var Vue;  // import Vue from "vue";
+declare var Vue;
 
 /**
  * Load the vue components.

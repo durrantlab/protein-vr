@@ -1,6 +1,8 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import * as Parent from "../LoadSaveParent";
-// import { PanelComponent, setAssociatedPlugin } from "./PanelComponent.ts.delme";
-// import { store } from "../../../Vars/VueX/VueXStore";
 import * as LoadSaveUtils from "../LoadSaveUtils";
 
 // @ts-ignore

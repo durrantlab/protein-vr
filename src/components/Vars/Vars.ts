@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2019 Jacob D. Durrant.
+// full details. Copyright 2020 Jacob D. Durrant.
 
 // A place to put variables that need to be accessed from multiple places.
 // This module is a place to store "global" variables.
@@ -23,7 +23,7 @@ export interface IVRSetup {
     menuActive?: boolean;
 }
 
-export const VERSION = "1.0.5";
+export const VERSION = "1.0.6";
 
 export let canvas: any;
 export let engine: any;
@@ -100,6 +100,8 @@ export let vrVars: IVRSetup = {};
  */
 export function setup(): void {
     canvas = document.getElementById("renderCanvas");
+
+    // window["canvas"] = canvas;  // debugging
 
     // Generate the BABYLON 3D engine
     engine = new BABYLON.Engine(canvas, true);
@@ -242,8 +244,16 @@ export function runInitVR(initParams: IVRSetup): void {
                         const targetFrameBufferWidth = 1440 * 2;  // Wish I could use vrHelper.renderTarget.xrLayer.framebufferWidth here.
                         const targetFrameBufferHeight = 1600;  // Wish I could use vrHelper.renderTarget.xrLayer.framebufferHeight here.
 
-                        let scale1 = window.innerWidth / targetFrameBufferWidth;
-                        let scale2 = window.innerHeight / targetFrameBufferHeight;
+                        // const targetFrameBufferHeight = 1334;  // iPhone SE
+                        // const targetFrameBufferWidth = 750;
+
+                        // let scale1 = window.innerWidth / targetFrameBufferWidth;
+                        // let scale2 = window.innerHeight / targetFrameBufferHeight;
+
+                        // Using below because
+                        // https://stackoverflow.com/questions/4629969/ios-return-bad-value-for-window-innerheight-width
+                        let scale1 = window.document.documentElement.clientWidth / targetFrameBufferWidth;
+                        let scale2 = window.document.documentElement.clientHeight / targetFrameBufferHeight;
 
                         let scale = Math.min(scale1, scale2);
 

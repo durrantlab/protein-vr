@@ -1,5 +1,5 @@
 # A program for finding typescript functions with missing docstrings.
-# Run from ./utils/ directory.
+# Run from ./utils/ directory using Python2.
 
 import subprocess
 
@@ -11,10 +11,18 @@ ts_files = (
 ts_files = [t for t in ts_files if not t.endswith(".d.ts")]
 
 for ts_file in ts_files:
+    prohibited = ["/old/", "/tmp/", "/tmp2/"]
+    prohibited_pass = [(p in ts_file) for p in prohibited]
+    if True in prohibited_pass:
+        continue
+
     print("\n***** " + ts_file + " *****")
     with open(ts_file) as f:
         lines = f.readlines()
+        found_copyright = False
         for i, line in enumerate(lines):
+            if "Copyright 20" in line:
+                found_copyright = True
             line = line.strip()
             line = line.replace("{};", "{")
 
@@ -60,3 +68,5 @@ for ts_file in ts_files:
             if match:
                 if not "*/" in lines[i - 1]:
                     print(line)
+    if not found_copyright and not "template.htm.ts" in ts_file:
+        print("No copyright in " + ts_file)

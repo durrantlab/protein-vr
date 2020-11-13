@@ -1,10 +1,13 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import {VueComponentParent} from "../../../UI/Vue/Components/VueComponentParent";
 import {store} from "../../../Vars/VueX/VueXStore";
+import * as IsIOS from "../../../System/IsIOS";
 
 // @ts-ignore
 import {templateHtml} from "./ShadowsHardwareScalingComponent.template.htm.ts";
-
-declare var jQuery;
 
 export class ShadowsHardwareScalingComponent extends VueComponentParent {
     public tag = "shadows-hardware-scaling";
@@ -69,11 +72,17 @@ export class ShadowsHardwareScalingComponent extends VueComponentParent {
      * @returns * The data object.
      */
     public data = function(): any {
-        return {};
+        return {
+            "hideShadowsOption": false
+        };
     }
 
     /**
      * Function that runs when Vue component loaded.
      */
-    public mounted = function(): void {};
+    public mounted = function(): void {
+        if (IsIOS.iOS()) {
+            this["hideShadowsOption"] = true;
+        }
+    };
 }

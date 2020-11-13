@@ -1,6 +1,8 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import {VueComponentParent} from "../VueComponentParent";
-import {getPluginsOfType} from "../../../../Plugins/Plugins";
-import * as LoadSavePlugin from "../../../../Plugins/LoadSave/LoadSaveParent";
 
 // @ts-ignore
 import {templateHtml} from "./ShareLeaderModalComponent.template.htm.ts";

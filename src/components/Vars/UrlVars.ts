@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2019 Jacob D. Durrant.
+// full details. Copyright 2020 Jacob D. Durrant.
 
 import * as ThreeDMol from "../Mols/3DMol/ThreeDMol";
 import * as VisStyles from "../Mols/3DMol/VisStyles";
@@ -8,6 +8,7 @@ import * as VRML from "../Mols/3DMol/VRML";
 import * as Student from "../WebRTC/Student";
 import * as Vars from "./Vars";
 import * as CommonCamera from "../Cameras/CommonCamera";
+import * as MonitorLoadFinish from "../System/MonitorLoadFinish";
 
 declare var jQuery: any;
 declare var BABYLON: any;
@@ -343,6 +344,13 @@ export function checkIfWebRTCInUrl(): boolean {
  * @returns boolean
  */
 export function checkShadowInUrl(): boolean {
+    if (MonitorLoadFinish.status !== MonitorLoadFinish.LoadAttemptStatus.SUCCESS) {
+        // If it failed to load previously, could be because of a shadow
+        // problem. So report no shadow in URL.
+        console.warn("Failed to fully load on last run, so turning off shadows...");
+        return false;
+    }
+
     return window.location.href.indexOf("sh=t") !== -1;
 }
 

@@ -4,7 +4,7 @@
         :id="'molecular-shadows-' + pluginSlug"
         label="Allow Molecules to Cast Subtle Shadows"
         helpMsg="Molecular shadows can slow navigation and may crash some mobile browsers."
-        :hidden="false"
+        :hidden="hideShadowsOption"
         :checked="$store.state.shadowsHardwareScaling.useShadows"
         @change="onChangeShadows"
     >

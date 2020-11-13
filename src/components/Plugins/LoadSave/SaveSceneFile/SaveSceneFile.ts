@@ -1,5 +1,8 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import * as Parent from "../LoadSaveParent";
-// import { PanelComponent, setAssociatedPlugin } from "./PanelComponent";
 import * as VRML from "../../../Mols/3DMol/VRML";
 import { store } from "../../../Vars/VueX/VueXStore";
 import * as SimpleModalComponent from "../../../UI/Vue/Components/OpenPopup/SimpleModalComponent";

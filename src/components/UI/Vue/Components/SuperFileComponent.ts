@@ -1,3 +1,7 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import {VueComponentParent} from "./VueComponentParent";
 
 // @ts-ignore
@@ -51,8 +55,6 @@ export class SuperFileComponent extends VueComponentParent {
      */
     public mounted = function(): void {
         let fileInput = this.$refs[this["name"] + "-file-input"];
-        // debugger;
-        // let fileInput = document.getElementById(this["name"] + "-file-input");
         fileInput.addEventListener("change", (e) => {
             // because the way it's setup, there is only one file.
             let fileName = fileInput["files"][0].name;

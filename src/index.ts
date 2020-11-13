@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2019 Jacob D. Durrant.
+// full details. Copyright 2020 Jacob D. Durrant.
 
 import * as LoadAndSetup from "./components/Scene/LoadAndSetup";
 // import 'bootstrap';
@@ -13,47 +13,51 @@ import * as GoogleAnalytics from "./components/System/GoogleAnalytics";
 import * as DeviceOrientation from "./components/System/DeviceOrientation";
 import * as Plugins from "./components/Plugins/Plugins";
 import * as LoadAllVue from "./components/UI/Vue/LoadAllVue";
-
+import * as Debugging from "./components/System/Debug/Debugging";
+import * as MonitorLoadFinish from "./components/System/MonitorLoadFinish";
+import * as PromiseStore from "./components/PromiseStore";
 
 // @ts-ignore
 window["jq"] = jQuery;
 
 // Report version
 console.log("ProteinVR " + Vars.VERSION);
+
 // @ts-ignore
 console.log("Compiled on " + BUILD_TIMESTAMP);
 document.title = "ProteinVR " + Vars.VERSION;
 
-// Setup service worker
-ServiceWorker.setupServiceWorker();
+// Wrapping everything in debug (include "pvr_do_debug" in url to enable).
+// Comment out appropriate block in Debugging.ts for production.
+Debugging.enableDebugging().then(() => {
+    // Mark load not yet finished. Will be unset once model loads.
+    MonitorLoadFinish.incrementLoadCounter();
 
-// Load in plugins
-Plugins.loadAll();
+    // Setup service worker
+    ServiceWorker.setupServiceWorker();
 
-// Get environment name (why needed here?)
-UrlVars.readEnvironmentNameParam();
+    // Load in plugins
+    Plugins.loadAll();
 
-// Load VueJS system. You will need it whether you throw a device-orientation
-// error or if you proceed to the full system.
-LoadAllVue.load();
+    // Get environment name (why needed here?)
+    UrlVars.readEnvironmentNameParam();
 
-// It is unfortunately necessary to explicitly request device orientation on
-// iOS13.
-DeviceOrientation.requestDeviceOrientation();
+    // Load VueJS system. You will need it whether you throw a
+    // device-orientation error or if you proceed to the full system.
+    LoadAllVue.load();
 
-// Begin loading
-LoadAndSetup.load();
+    // It is unfortunately necessary to explicitly request device orientation
+    // on iOS13.
+    DeviceOrientation.requestDeviceOrientation();
 
-// Let google analytics know if running from durrantlab server.
-GoogleAnalytics.setupGoogleAnalyticsIfDurrantLab();
+    // Begin loading
+    LoadAndSetup.load();
 
-/**
- * A function to activate debug mode.
- * @returns void
- */
-function debugMode(): void {
-    Vars.scene.debugLayer.show().then(() => {
-        document.getElementById("inspector-host").style.zIndex = "15";
-        document.getElementById("scene-explorer-host").style.zIndex = "15";
-    });
-}
+    // PromiseStore.waitFor(["LoadMolecule"]).then(() => {
+    //     alert("done");
+    //     debugger;
+    // });
+
+    // Let google analytics know if running from durrantlab server.
+    GoogleAnalytics.setupGoogleAnalyticsIfDurrantLab();
+});

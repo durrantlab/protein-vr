@@ -1,9 +1,11 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import {VueComponentParent} from "../VueComponentParent";
-import {store} from "../../../../Vars/VueX/VueXStore";
 
 // @ts-ignore
 import {templateHtml} from "./CheckboxComponent.template.htm.ts";
-import { positionAll3DMolMeshInsideAnother } from "../../../../Mols/3DMol/PositionInScene";
 
 export class FormCheckboxComponent extends VueComponentParent {
     public tag = "form-checkbox";

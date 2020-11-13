@@ -1,14 +1,11 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2019 Jacob D. Durrant.
+// full details. Copyright 2020 Jacob D. Durrant.
 
 // On iOS, you must get user's permission to use device orientation sensor.
 
 import * as PromiseStore from "../PromiseStore";
 import * as SplashScreen from "./SplashScreen";
-import { store, setStoreOutsideVue } from "../Vars/VueX/VueXStore";
-
-declare var Vue;
 
 /**
  * Request access to the device orientation sensor.
@@ -23,13 +20,12 @@ export function requestDeviceOrientation(): void {
 
             // Note that this doesn't appear to be necessary on the latest
             // version of iOS. But let's keep it to support other version.
-            if (
-                (
+            if ((
                     (typeof DeviceMotionEvent !== "undefined") &&
                     (typeof DeviceMotionEvent["requestPermission"] === "function")
                 ) ||
-                (window.location.href.indexOf("testdosplash") !== -1)  // For testcafe
-            ) {
+                (window.location.href.indexOf("testdosplash") !== -1))  // For testcafe
+            {
                 // if (true) {  // For debugging.
                 SplashScreen.showSplashScreen(() => {
                     // iOS 13+.

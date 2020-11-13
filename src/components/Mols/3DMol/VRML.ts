@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2019 Jacob D. Durrant.
+// full details. Copyright 2020 Jacob D. Durrant.
 
 // An module to manage VRML data obtained from 3Dmol.js. Assumes the 3Dmol.js
 // javascript file is already loaded.
@@ -10,6 +10,7 @@ import * as Vars from "../../Vars/Vars";
 import * as Load from "../Load";
 import * as PositionInScene from "./PositionInScene";
 import * as SimpleModalComponent from "../../UI/Vue/Components/OpenPopup/SimpleModalComponent"
+import * as MonitorLoadFinish from "../../System/MonitorLoadFinish";
 
 declare var $3Dmol;
 
@@ -516,6 +517,8 @@ export function importIntoBabylonScene(): any {
         // Work here
         Load.setupMesh(babylonMesh, 123456789);
     }
+
+    MonitorLoadFinish.loadSuccessful();
 
     return babylonMesh;
 }

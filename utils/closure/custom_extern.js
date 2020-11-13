@@ -119,6 +119,7 @@ jQuery.css = function(a,b) {};
 jQuery.closest = function(a) {};
 jQuery.wrap = function(a) {};
 jQuery.addClass = function(a) {};
+jQuery.hasClass = function(a) {};
 jQuery.removeClass = function(a) {};
 jQuery.fadeIn  = function(a) {};
 jQuery.fadeOut  = function(a) {};
@@ -196,6 +197,12 @@ BABYLON.Light.Parse = function(a, b) {};
  * @constructor
  */
 BABYLON.AssetsManager = function(a) {};
+
+/**
+ * @constructor
+ */
+BABYLON.LightGizmo = function() {};
+BABYLON.LightGizmo.dispose = function() {};
 
 BABYLON.AssetsManager.prototype.addMeshTask = function(a, b, d, c) {};
 BABYLON.AssetsManager.prototype.onProgress = function(a, b, d) {};
@@ -809,6 +816,10 @@ Peer._lastServerId;
 
 // var webpackJsonp;
 
+/**
+ * @constructor
+ */
+var VConsole = function() {};
 
 var ga = function(a,b,c) {};
 

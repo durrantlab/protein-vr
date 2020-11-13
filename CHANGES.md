@@ -1,6 +1,15 @@
 CHANGES
 =======
 
+1.0.6 WIP
+---------
+
+* Added new debugging functionality to assist with development.
+* Updated to latest
+  [webvr-polyfill](https://github.com/immersive-web/webvr-polyfill) (2.0.3).
+* Improved iOS compatibility.
+* Updated copyright notice to 2020.
+
 1.0.5
 -----
 

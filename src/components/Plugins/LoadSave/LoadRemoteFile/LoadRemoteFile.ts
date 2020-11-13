@@ -1,14 +1,14 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import * as Parent from "../LoadSaveParent";
-// import { IgnorePlugin } from "webpack";
-// import { PanelComponent, setAssociatedPlugin } from "./PanelComponent";
 import { store } from "../../../Vars/VueX/VueXStore";
 import * as SimpleModalComponent from "../../../UI/Vue/Components/OpenPopup/SimpleModalComponent";
 import * as LoadSaveUtils from "../LoadSaveUtils";
 
 // @ts-ignore
 import {templateHtml} from "./PanelComponent.template.htm.ts";
-
-// import { debug } from "../../../PromiseStore";
 
 export class LoadRemoteFile extends Parent.LoadSaveParent {
     // private urlOrPDB;

@@ -1,6 +1,9 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import {VueComponentParent} from "../../Vue/Components/VueComponentParent";
 import * as Menu3D from "../Menu3D/Menu3D";
-import {store} from "../../../Vars/VueX/VueXStore";
 
 // @ts-ignore
 import {templateHtml} from "./Menu2DModalComponent.template.htm.ts";

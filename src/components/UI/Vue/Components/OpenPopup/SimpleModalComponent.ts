@@ -1,8 +1,9 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import {VueComponentParent} from "../VueComponentParent";
 import {store} from "../../../../Vars/VueX/VueXStore";
-
-// import {getPluginsOfType} from "../../Plugins";
-// import * as LoadSavePlugin from "../../../Plugins/LoadSave/Parent";
 
 // @ts-ignore
 import {templateHtml} from "./SimpleModalComponent.template.htm.ts";
@@ -44,18 +45,7 @@ export class SimpleModalComponent extends VueComponentParent {
 
     public computed = {};
 
-    public props = {
-        // "title": {"default": ""},
-        // // "content": {"default": ""},
-        // "isUrl": {"default": false},
-        // "hasCloseBtn": {"default": false},
-        // "unclosable": {"default": false},
-        // "showBackdrop": {"default": false},
-        // "skinny": {"default": false},
-        // "btnText": {"default": ""},
-        // "onCloseCallback": {"default": undefined},
-        // "onReadyCallBack": {"default": undefined}
-    };
+    public props = {};
 
     public watch = {};
 

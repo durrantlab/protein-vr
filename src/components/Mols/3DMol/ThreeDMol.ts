@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2019 Jacob D. Durrant.
+// full details. Copyright 2020 Jacob D. Durrant.
 
 // Functions from loading molecules directly from a 3Dmol.js instance. See
 // VRML.ts for additional functions related to the mesh itself.
@@ -11,6 +11,7 @@ import * as UrlVars from "../../Vars/UrlVars";
 import * as VRML from "./VRML";
 import * as LoadAll from "../../Plugins/LoadSave/LoadAll";
 import * as VueXStore from "../../Vars/VueX/VueXStore";
+import * as ModalComponent from "../../UI/Vue/Components/OpenPopup/ModalComponent";
 
 // Unfortunately, closure compiler breaks this. So hard code.
 // import * as NanoKidFile from "./nanokid.sdf"
@@ -126,8 +127,10 @@ function continueAfterModelLoaded(mdl3DMol: any, resolveFunc: Function): void {
     // pdbid.
     if ((modelUrl === "nanokid.sdf") && (UrlVars.checkIfWebRTCInUrl() === false)){
         setTimeout(() => {
-            // Give them some time to admire nanokid... :)
-            LoadAll.openLoadSaveModal();
+            if (!ModalComponent.anyModalOpen()) {
+                // Give them some time to admire nanokid... :)
+                LoadAll.openLoadSaveModal();
+            }
         }, 3000);
     }
 

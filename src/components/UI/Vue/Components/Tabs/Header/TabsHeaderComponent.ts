@@ -1,10 +1,7 @@
-// // import FrontButton from "./FrontButton.vue";
-// import * as LoadSave from "./LoadSave";
-// import * as Menu2D from "../Menu2D";
-// import * as OpenPopup from "./OpenPopup";
-// import * as Vars from "../../Vars/Vars";
-// import * as Lecturer from "../../WebRTC/Lecturer";
-// import * as UrlVars from "../../Vars/UrlVars";
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import {VueComponentParent} from "../../VueComponentParent";
 
 // @ts-ignore

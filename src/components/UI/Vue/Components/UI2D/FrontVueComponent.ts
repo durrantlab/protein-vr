@@ -1,3 +1,7 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import * as LoadAll from "../../../../Plugins/LoadSave/LoadAll";
 import * as SimpleModalComponent from "../../../Vue/Components/OpenPopup/SimpleModalComponent";
 import * as Vars from "../../../../Vars/Vars";
@@ -5,6 +9,7 @@ import * as Lecturer from "../../../../WebRTC/Lecturer";
 import * as UrlVars from "../../../../Vars/UrlVars";
 import {VueComponentParent} from "../VueComponentParent";
 import {store} from "../../../../Vars/VueX/VueXStore";
+import * as IsIOS from "../../../../System/IsIOS";
 
 // @ts-ignore
 import {templateHtml} from "./FrontVueComponent.template.htm.ts";
@@ -208,24 +213,26 @@ export class FrontVueComponent extends VueComponentParent {
                 });
             }
 
-            btns.push({
-                "title": "Full Screen",
-                "id": "fullscreen-button",
+            if (!IsIOS.iOS()) {
+                btns.push({
+                    "title": "Full Screen",
+                    "id": "fullscreen-button",
 
-                // https://iconmonstr.com/fullscreen-thin-svg/
-                "svg": `<svg style="position:relative; left:0.5px;" width="${dimen}px" height="${dimen}px" xmlns="http://www.w3.org/2000/svg"
-                        xmlns:svg="http://www.w3.org/2000/svg" clip-rule="evenodd">
-                        <g class="layer">
-                            <path d="m47.799999,43.649999l-47.699999,0l0,-39.749999l47.699999,0l0,39.749999zm-1.9875,-37.762499l-43.724999,0l0,35.774999l43.724999,0l0,-35.774999zm-7.95,13.9125l-1.9875,0l0,-6.441487l-22.341487,22.341487l6.441487,0l0,1.9875l-9.9375,0l0,-9.9375l1.9875,0l0,6.441487l22.341487,-22.341487l-6.441487,0l0,-1.9875l9.9375,0l0,9.9375z" fill="#ffffff" id="svg_1"/>
-                        </g>
-                    </svg>`,
-                "showInFollowerMode": true,
-                "clickFunc": () => {
-                    Vars.engine.switchFullscreen(true);
-                    jQuery("#renderCanvas").focus();  // So keypress will work.
-                },
-                "curBottom": undefined
-            });
+                    // https://iconmonstr.com/fullscreen-thin-svg/
+                    "svg": `<svg style="position:relative; left:0.5px;" width="${dimen}px" height="${dimen}px" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:svg="http://www.w3.org/2000/svg" clip-rule="evenodd">
+                            <g class="layer">
+                                <path d="m47.799999,43.649999l-47.699999,0l0,-39.749999l47.699999,0l0,39.749999zm-1.9875,-37.762499l-43.724999,0l0,35.774999l43.724999,0l0,-35.774999zm-7.95,13.9125l-1.9875,0l0,-6.441487l-22.341487,22.341487l6.441487,0l0,1.9875l-9.9375,0l0,-9.9375l1.9875,0l0,6.441487l22.341487,-22.341487l-6.441487,0l0,-1.9875l9.9375,0l0,9.9375z" fill="#ffffff" id="svg_1"/>
+                            </g>
+                        </svg>`,
+                    "showInFollowerMode": true,
+                    "clickFunc": () => {
+                        Vars.engine.switchFullscreen(true);
+                        jQuery("#renderCanvas").focus();  // So keypress will work.
+                    },
+                    "curBottom": undefined
+                });
+            }
 
             // If needful, filter out the buttons should not be visible in
             // follower mode.
@@ -233,6 +240,8 @@ export class FrontVueComponent extends VueComponentParent {
                 // So you're in follower mode.
                 btns = btns.filter(b => b.showInFollowerMode);
             }
+
+            // btns = [];  // For debugging
 
             // Reverse the buttons.
             let html = "";
@@ -270,8 +279,12 @@ export class FrontVueComponent extends VueComponentParent {
     public mounted = function(): void {
         // On resize, reposition the 2D buttons if the screen height is too small.
         window.addEventListener("resize", () => {
-            // Resize the buttons if the screen isn't height enough (e.g.,
+            // Resize the buttons if the screen isn't high enough (e.g.,
             // phones).
+            this.justResized = true;
+        });
+
+        window.addEventListener("orientationchange", () => {
             this.justResized = true;
         });
 
@@ -313,6 +326,10 @@ export class FrontVueComponent extends VueComponentParent {
                     if (btnsWrapper) {
                         clearInterval(interId);
                         resolve(btnsWrapper);
+
+                        // Resize because button added, so need to resize
+                        // other buttons to make room in some cases.
+                        this.justResized = true;
                     }
                 }, 500);
             });
@@ -330,9 +347,58 @@ export class FrontVueComponent extends VueComponentParent {
                     // @ts-ignore
                     babylonVRIconBtn.style.filter = "alpha(opacity=1.0)";  // IE;
                 }
+
+                // Deal with VR button on iOS (annoying).
+                showVRButtonPerOrientation();
+                if (IsIOS.iOS()) {
+                    setInterval(() => {
+                        // On iOS keep checking periodically to make sure VR
+                        // button hidden unless in portrait mode.
+                        showVRButtonPerOrientation();
+                    }, 1000);
+
+                    if (!IsIOS.isIOSLandscape()) {
+                        SimpleModalComponent.openSimpleModal({
+                            title: "Warning",
+                            content: "VR mode is only available when the phone is in landscape orientation.",
+                            hasCloseBtn: true,
+                            unclosable: false
+                        }, false);
+                    }
+                }
             }).catch(() => {
                 console.log("Warning: Could not activate VR!");
             });
         });
     };
+}
+
+let babylonVRIconBtn;
+
+/**
+ * Hides the VR button on iOS if not in landscape mode.
+ * @returns void
+ */
+export function showVRButtonPerOrientation(): void {
+    if (babylonVRIconBtn === undefined) {
+        babylonVRIconBtn = document.getElementsByClassName("babylonVRicon")[0];
+    }
+
+    switch (IsIOS.isIOSLandscape()) {
+        case undefined:
+            // Not iOS, so always visible.
+            // @ts-ignore
+            babylonVRIconBtn?.style.display = "";
+            break;
+        case true:
+            // Landscape
+            // @ts-ignore
+            babylonVRIconBtn?.style.display = "";
+            break;
+        case false:
+            // Portrait
+            // @ts-ignore
+            babylonVRIconBtn?.style.display = "none";
+            break;
+    }
 }

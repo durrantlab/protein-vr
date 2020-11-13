@@ -1,14 +1,15 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import {VueComponentParent} from "../../Vue/Components/VueComponentParent";
 import * as Menu3D from "../Menu3D/Menu3D";
 import {store} from "../../../Vars/VueX/VueXStore";
 import * as UrlVars from "../../../Vars/UrlVars";
-declare var Vue;  // import Vue from "vue";
+declare var Vue;
 
 // @ts-ignore
 import {templateHtml} from "./Menu2DDisplayComponent.template.htm.ts";
-// import { debug } from "../../PromiseStore";
-
-// declare var jQuery;
 
 let oldMenuItem = {}  // So you can monitor changes. Should not be reactive.
 

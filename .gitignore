@@ -18,6 +18,7 @@ biotite_app/**/*.mp3
 docs
 Babylonjs.old
 tmp
+tmp2
 old
 influenza.good
 webapp-compiled

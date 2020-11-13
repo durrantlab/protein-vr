@@ -1,12 +1,8 @@
-// // import FrontButton from "./FrontButton.vue";
-// import * as LoadSave from "./LoadSave";
-// import * as Menu2D from "../Menu2D";
-// import * as OpenPopup from "./OpenPopup";
-// import * as Vars from "../../Vars/Vars";
-// import * as Lecturer from "../../WebRTC/Lecturer";
-// import * as UrlVars from "../../Vars/UrlVars";
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2020 Jacob D. Durrant.
+
 import {VueComponentParent} from "../VueComponentParent";
-// import * as OpenPopup from "../../OpenPopup/OpenPopup";
 
 import 'bootstrap';  // Note that this is important.
 
@@ -65,6 +61,9 @@ export class ModalComponent extends VueComponentParent {
             if (val === true) {
                 // Always close all modals before opening a new one.
                 closeAllModals().then(() => {
+                    // Make sure no older backdrops present.
+                    jQuery(".modal-backdrop").hide();
+
                     // Deal with unclosable modals.
                     if (this["unclosable"] === true) {
                         this.modalOptions = {"backdrop": "static", "keyboard": false};
@@ -105,34 +104,8 @@ export class ModalComponent extends VueComponentParent {
     public template = templateHtml;
 
     public vueXStore = {
-        state: {
-            // "modalTitle": "",
-            // "modalContent": "",
-            // "modalIsUrl": false,
-            // "modalHasCloseBtn": false,
-            // "modalIsUnClosable": false,
-            // "modalShowBackdrop": false,
-            // "modalIsSkinny": false,
-            // "modalBtnText": "",
-            // "modalOnCloseCallback": undefined,
-            // "modalOnReadyCallBack": undefined
-        },
-        mutations: {
-            // "openModal"(state: any, payload: OpenPopup.IOpenModal): void {
-            //     state["modalTitle"] = payload.title;
-            //     state["modalContent"] = payload.content;
-            //     state["modalIsUrl"] = payload.isUrl;
-            //     state["modalHasCloseBtn"] = payload.hasCloseBtn;
-            //     state["modalIsUnClosable"] = payload.unclosable;
-            //     state["modalShowBackdrop"] = payload.showBackdrop;
-            //     state["modalIsSkinny"] = payload.skinny;
-            //     state["modalBtnText"] = payload.btnText;
-            //     state["modalOnCloseCallback"] = payload.onCloseCallback;
-            //     state["modalOnReadyCallBack"] = payload.onReadyCallBack;
-
-            //     // jQuery('#msgModal').modal();
-            // },
-        }
+        state: {},
+        mutations: {}
     }
 
     /**
@@ -172,6 +145,13 @@ export class ModalComponent extends VueComponentParent {
             });
             draggable.closest(".modal").one("bs.modal.hide", function() {
                 jQuery("body").off("mousemove.draggable");
+
+                // Every once in a while, on iOS, the backdrop doesn't end up
+                // removed, and you can't click on the buttons. Just to be on
+                // the safe side, manually remove it after a bit.
+                setTimeout(() => {
+                    jQuery(".modal-backdrop").hide();
+                }, 100);
             });
         });
 
@@ -207,4 +187,12 @@ export function closeAllModals(): Promise<any> {
     }
 
     return Promise.all(promises);
+}
+
+/**
+ * Determines whether any modal is currently open.
+ * @returns boolean  true if one is open, false otherwise.
+ */
+export function anyModalOpen(): boolean {
+    return allModals.map(m => m.hasClass("show")).reduce((a, b) => a || b);
 }
