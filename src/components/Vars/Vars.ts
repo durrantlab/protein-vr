@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 // A place to put variables that need to be accessed from multiple places.
 // This module is a place to store "global" variables.
@@ -23,7 +23,7 @@ export interface IVRSetup {
     menuActive?: boolean;
 }
 
-export const VERSION = "1.0.6";
+export const VERSION = "1.0.7";
 
 export let canvas: any;
 export let engine: any;

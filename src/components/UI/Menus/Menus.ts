@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import * as PromiseStore from "../../PromiseStore";
 import * as Vars from "../../Vars/Vars";
@@ -33,4 +33,26 @@ export function runSetupMenus(): void {
             resolve();
         }
     )
+}
+
+export function smartSort(lst: string[]): void {
+    let t = lst[0].match(/\[([0-9]+?)\-([0-9]+?)\]/);
+    if (t === null) {
+        // Just sort alphabetically
+        lst.sort();
+    } else {
+        // It's numbers like [213-123].
+        lst.sort(function(a, b): number {
+            let aMatch = a.match(/\[([0-9]+?)\-([0-9]+?)\]/);
+            let bMatch = b.match(/\[([0-9]+?)\-([0-9]+?)\]/);
+            if ((aMatch === null) || (bMatch === null)) {
+                return 0;
+            }
+            let a2 = parseInt(aMatch[1]);
+            let b2 = parseInt(bMatch[1]);
+            if (a2 < b2) { return -1; }
+            if (a2 > b2) { return 1; }
+            return 0;
+        });
+    }
 }

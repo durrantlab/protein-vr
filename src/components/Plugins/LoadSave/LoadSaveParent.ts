@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 // All load/save plugins must inherit this one. Provides a standard interface.
 // I'm going to put a _ in front of the functions that should not be changed,
@@ -29,5 +29,10 @@ export abstract class LoadSaveParent extends VueComponentParent implements Plugi
          */
         startLoadOrSave(data: any): void {},
 
+        /**
+         * Runs when the tab header is clicked.
+         * @returns void
+         */
+        onTabHeaderClick(): void {}
     }
 }

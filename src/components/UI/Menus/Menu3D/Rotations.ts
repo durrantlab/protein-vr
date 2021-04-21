@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 
 import * as PositionInScene from "../../../Mols/3DMol/PositionInScene";
@@ -49,10 +49,18 @@ export function buildRotationsSubMenu(): any {
  * @returns void
  */
 export function axisRotation(axis: string): void {
-    const amt = 15.0 * Math.PI / 180.0;
+    let amt = 15.0 * Math.PI / 180.0;
+
+    if (axis === "REDRAW") {
+        // Just to trigger redraw (helps position labels, for example).
+        amt = 0;
+        axis = "X";
+    }
+
     VRML.updateMolRotation(axis, amt);
+    let protBox = Vars.scene.getMeshByName("protein_box");
     PositionInScene.positionAll3DMolMeshInsideAnother(
-        undefined, Vars.scene.getMeshByName("protein_box"), true
+        undefined, protBox, true
     );
 
     if (Lecturer.isLecturerBroadcasting) {
@@ -68,8 +76,9 @@ export function axisRotation(axis: string): void {
 export function undoRotate(): void {
     const quat = PositionInScene.lastRotationQuatBeforeAnimation;
     VRML.setMolRotationQuat(quat);
+    let protBox = Vars.scene.getMeshByName("protein_box");
     PositionInScene.positionAll3DMolMeshInsideAnother(
-        undefined, Vars.scene.getMeshByName("protein_box"), true
+        undefined, protBox, true
     );
 
     if (Lecturer.isLecturerBroadcasting) {

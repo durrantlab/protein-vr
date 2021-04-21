@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import * as MolShadows from "../Mols/MolShadows";
 import * as Vars from "../Vars/Vars";
@@ -123,11 +123,18 @@ function furtherProcessKeyMeshes(): void {
         } else if (mesh.name.toLowerCase().indexOf("skybox") !== -1) {
             if (Vars.sceneInfo.infiniteDistanceSkyBox) {
                 mesh.material.disableLighting = true;
-                mesh.infiniteDistance = true;
+                // mesh.infiniteDistance = true;
+
+                // TODO: Unfortunately, mesh.infiniteDistance doesn't seem to
+                // work anymore. We'll have to do it manually. Good to revisit
+                // this later.
+                Vars.scene.registerBeforeRender(() => {
+                    mesh.position = Vars.scene.activeCamera.position;
+                });
             }
 
-            // Below causes skybox to go black. I think you'd need to set to
-            // 0, and all other meshes to 1.
+            // TODO: Below causes skybox to go black. I think you'd need to
+            // set to 0, and all other meshes to 1.
             // mesh.renderingGroupId = -1;
         }
     }

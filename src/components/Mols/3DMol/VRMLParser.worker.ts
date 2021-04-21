@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 const ctx: Worker = self as any;
 
@@ -52,6 +52,7 @@ if (inWebWorker) {
             ctx.postMessage({
                 "chunk": chunkToSend,
                 "status": status,
+                "geoCenter": geoCenter
             });
         }
     };
@@ -86,17 +87,25 @@ export function loadValsFromVRML(vrmlStr: string, removeExtraPts = false): any[]
             coors = removeStrayPoints(coors);
         }
 
+        let trisIdxs = strToTris(betweenbookends("coordIndex [", "]", vrmlChunk));
+        let colors = strToColors(betweenbookends("color [", "]", vrmlChunk));
+
+        // TODO: Note that you're simplifying the mesh data on each chunck
+        // separately. Different chunks could share vertexes. So further
+        // compression is possible here, though it's complicated to implement.
+        let data = simplifyMeshData(coors, trisIdxs, colors);
+
         // Make sure string keys for closure compiler, since web worker is
         // external.
         modelData.push({
-            "colors": strToColors(betweenbookends("color [", "]", vrmlChunk)),
-            "coors": coors,
-            "trisIdxs": strToTris(betweenbookends("coordIndex [", "]", vrmlChunk)),
+            "coors": data[0],
+            "trisIdxs": data[1],
+            "colors": data[2],
         });
     }
 
     // Now that you've collected all the data, go back and translate all the
-    // vertixes so Center the coordinates at the origin. Makes it easier to
+    // vertixes, so center the coordinates at the origin. Makes it easier to
     // pivot at geometric center.
     if (geoCenter === undefined) {
         geoCenter = getGeometricCenter(modelData);
@@ -104,6 +113,7 @@ export function loadValsFromVRML(vrmlStr: string, removeExtraPts = false): any[]
     modelData = translateBeforeBabylonImport(geoCenter, modelData);
 
     if (!inWebWorker) {
+        // TODO: You should never get here. Webworkers required.
         return modelData;
     } else {
         // Now you need to chunk all the data. This is because you can only
@@ -360,4 +370,126 @@ function getGeometricCenter(modelData: any[]): any {
     zTotal = zTotal / numCoors;
 
     return new Float32Array([xTotal, yTotal, zTotal]);
+}
+
+function simplifyMeshData(coors, trisIdxs, colors) {
+    // coors is in triplets. So num points = count / 3.
+
+    // colors is in quadruplets. So num points = count / 4. one-to-one with
+    // coors.
+
+    // trisIdxs is list of indexes (triplets). The number of triangles can
+    // vary, not necessarily a function of number of coordinates.
+
+    // More points will be identified as the same if this is bigger.
+    const coorReso = 0.01;  // Angstroms
+    const colorReso = 0.01;  // always between 0 and 1
+
+    const l = coors.length / 3;
+    let x, y, z, i, coorIdx1, coorIdx2, coorIdx3, t, hsh, newIdx, r, g, b, a: number;
+    let colIdx1, colIdx2, colIdx3, colIdx4: number;
+    let oldToNewIdx = new Map();
+    let hshToNewIdx = new Map();
+    let curNewIdx = 0;
+    let newCoors = new Float32Array(coors.length);
+    let newColors = new Float32Array(colors.length);
+    let vertSeen;
+
+    // let pts = "";
+
+    // let ptsRemoved = 0;
+
+    for (i = 0; i < l; i++) {
+        coorIdx1 = 3 * i;
+        coorIdx2 = coorIdx1 + 1;
+        coorIdx3 = coorIdx1 + 2;
+
+        x = coors[coorIdx1];
+        y = coors[coorIdx2];
+        z = coors[coorIdx3];
+
+        // t = 4 * curNewIdx;
+        colIdx1 = 4 * i;
+        colIdx2 = colIdx1 + 1;
+        colIdx3 = colIdx1 + 2;
+        colIdx4 = colIdx1 + 3;
+
+        // 0 to 1
+        r = colors[colIdx1];
+        g = colors[colIdx2];
+        b = colors[colIdx3];
+        // a = colors[colIdx4];
+
+        hsh = Math.round(
+            r * 10000000000 +
+            g * 100000000 +
+            b * 1000000 +
+            x * 10000 +
+            y * 100 +
+            z
+        );
+
+        vertSeen = hshToNewIdx.has(hsh);
+        // vertSeen = false;  // for debugging. No merge by distance.
+        if (vertSeen === true) {
+            // It might have seen it, but the hash isn't unique, so additional
+            // checking needed.
+            newIdx = hshToNewIdx.get(hsh);
+
+            // Check coors match
+            coorIdx2 = 3 * newIdx;
+            vertSeen = (Math.abs(x - newCoors[coorIdx2]) < coorReso) &&
+                       (Math.abs(y - newCoors[coorIdx2 + 1]) < coorReso) &&
+                       (Math.abs(z - newCoors[coorIdx2 + 2]) < coorReso);
+
+            // If necessary, check color match too.
+            if (vertSeen === true) {
+                // If here, coordinates match. Check colors...
+                colIdx2 = 4 * newIdx;
+                vertSeen = (Math.abs(r - newColors[colIdx2]) < colorReso) &&
+                           (Math.abs(g - newColors[colIdx2 + 1]) < colorReso) &&
+                           (Math.abs(b - newColors[colIdx2 + 2]) < colorReso);
+            }
+        }
+
+        if (vertSeen) {
+            // The coordinate/color has been seen before.
+            // newIdx = hshToNewIdx.get(hsh);
+            oldToNewIdx.set(i, newIdx);
+        } else {
+            // The coordinate/color has not been seen before.
+            oldToNewIdx.set(i, curNewIdx);
+            hshToNewIdx.set(hsh, curNewIdx);
+
+            t = 3 * curNewIdx;
+            newCoors[t] = x;
+            newCoors[t + 1] = y;
+            newCoors[t + 2] = z;
+
+            // pts += x.toString() + "\t" + y.toString() + "\t" + z.toString() + "\n";
+
+            // if ((Math.abs(x - 7.368) < 0.01) &&
+            //     (Math.abs(y - 3.175) < 0.01) &&
+            //     (Math.abs(z - 0.034) < 0.01)
+            // ) {
+            //     debugger;
+            // }
+
+            t = 4 * curNewIdx;
+            newColors[t] = r;
+            newColors[t + 1] = g;
+            newColors[t + 2] = b;
+            newColors[t + 3] = 1;  // a;  // alpha always 1
+
+            curNewIdx++;
+        }
+    }
+
+    newCoors = newCoors.slice(0, 3 * curNewIdx);
+    newColors = newColors.slice(0, 4 * curNewIdx);
+    trisIdxs = trisIdxs.map(v => oldToNewIdx.get(v));
+
+    console.log("Duplicate vertices merged: " + (l - curNewIdx).toString() + " of " + l.toString());
+
+    return [newCoors, trisIdxs, newColors];
 }

@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import * as ThreeDMol from "../../../Mols/3DMol/ThreeDMol";
 import * as VisStyles from "../../../Mols/3DMol/VisStyles";
@@ -22,12 +22,12 @@ const selections = {
 };
 
 // For each of those components, specify the associated representations.
-const commonReps = ["Stick", "Sphere", "Surface"];
+const commonReps = ["Stick", "Sphere", "Surface"];  // common to all representation types.
 const representations = {
     "Ligand": commonReps,
     "Ligand Context": ["Cartoon"].concat(commonReps),
     "Nucleic": commonReps,
-    "Protein": ["Cartoon"].concat(commonReps),
+    "Protein": ["Cartoon", "Trace", "Ribbon", "Tubes"].concat(commonReps),
     "Water": commonReps,
 };
 
@@ -37,7 +37,8 @@ const colors = [
 ];
 
 const colorSchemes = [
-    "Element", "Amino Acid", "Chain", "Nucleic", "Spectrum",
+    "Element", "Amino Acid", "Chain", "Nucleic", "Spectrum", "B Factor", "Atom Index",
+    "Secondary Structure"
 ];
 
 /**

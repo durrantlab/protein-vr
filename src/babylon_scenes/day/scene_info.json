@@ -1,4 +1,5 @@
 {
     "transparentGround": false,
-    "positionOnFloor": true
+    "positionOnFloor": true,
+    "infiniteDistanceSkyBox": true
 }

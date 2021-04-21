@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 // Functions from loading molecules directly from a 3Dmol.js instance. See
 // VRML.ts for additional functions related to the mesh itself.
@@ -52,7 +52,7 @@ function after3DMolJsLoaded(resolveFunc: Function): void {
         UrlVars.readUrlParams();
 
         if (modelUrl === "LOCALFILE") {
-            // Actually loading from a local file, currently in localstorage.
+            // Actually loading from a local file, currently in sessionStorage.
             let data = sessionStorage.getItem("fileContent");
             let type = sessionStorage.getItem("fileType");
             sessionStorage.removeItem("fileContent");
@@ -80,13 +80,13 @@ function after3DMolJsLoaded(resolveFunc: Function): void {
                 val: type
             });
 
-            VRML.loadPDBData(data, type, (mdl3DMol: any) => {
+            VRML.loadMolData(data, type, (mdl3DMol: any) => {
                 continueAfterModelLoaded(mdl3DMol, resolveFunc);
             });
         } else {
             // Loading some sort of remote url.
             // let pdbUri = "https://files.rcsb.org/view/1XDN.pdb";
-            VRML.loadPDBURL(modelUrl, (mdl3DMol: any) => {
+            VRML.loadMolURL(modelUrl, (mdl3DMol: any) => {
                 continueAfterModelLoaded(mdl3DMol, resolveFunc);
             });
         }

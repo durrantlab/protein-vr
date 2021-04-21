@@ -1,8 +1,9 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import { store } from "../../Vars/VueX/VueXStore";
+import { lazyLoadJS } from '../../System/LazyLoadJS';
 
 /**
  * Makes a URL string from the input parameters.
@@ -98,6 +99,9 @@ export function getFilenameExtension(filename: string): string {
         return undefined;
     }
 
+    // If it ends in .pvr.json, pretend it ends in .pvr.
+    filename = filename.replace(/\.pvr\.json$/g, ".pvr");
+
     return filename.replace(
         /^\s+|\s+$/g, ""
     ).slice(filename.length - 4).toUpperCase();
@@ -158,4 +162,19 @@ export function shadowsHardwareScalingLocalStorageToVueX(): void {
             val: true
         });
     }
+}
+
+export function downloadBlob(blob: any, filename: string): Promise<any> {
+    return lazyLoadJS("js/FileSaver.min.js").then(() => {
+        window["saveAs"](blob, filename);
+        return Promise.resolve();
+    });
+}
+
+export function downloadTxtFile(content: string, filename: string): Promise<any> {
+    return lazyLoadJS("js/FileSaver.min.js").then(() => {
+        var blob = new Blob([content], { "type": "application/octet-stream;charset=utf-8" });
+        window["saveAs"](blob, filename);
+        return Promise.resolve();
+    });
 }

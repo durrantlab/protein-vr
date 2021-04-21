@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import * as ThreeDMol from "../Mols/3DMol/ThreeDMol";
 import * as VisStyles from "../Mols/3DMol/VisStyles";
@@ -9,6 +9,7 @@ import * as Student from "../WebRTC/Student";
 import * as Vars from "./Vars";
 import * as CommonCamera from "../Cameras/CommonCamera";
 import * as MonitorLoadFinish from "../System/MonitorLoadFinish";
+import { runURLPlugins } from "../Plugins/URLParams/LoadAll";
 
 declare var jQuery: any;
 declare var BABYLON: any;
@@ -32,10 +33,12 @@ export function enableAutoUpdateUrl(val: boolean): void {
 
 /**
  * Get all the url parameters from a url string.
- * @param  {string} url  The url srtring.
+ * @param  {string}  url                  The url srtring.
+ * @param  {boolean} stripDeviceSpecific  Whether to remove sh (shadows) and
+ *                                        hs (hardwardScaling).
  * @returns Object<string,*> The parameters.
  */
-function getAllUrlParams(url: string): Map<string, any> {
+export function getAllUrlParams(url: string, stripDeviceSpecific = false): Map<string, any> {
     // Adapted from
     // https://www.sitepoint.com/get-url-parameters-with-javascript/
 
@@ -66,6 +69,11 @@ function getAllUrlParams(url: string): Map<string, any> {
 
             obj.set(paramName, paramValue);
         }
+    }
+
+    if (stripDeviceSpecific === true) {
+        obj.delete("sh")
+        obj.delete("hs");
     }
 
     return obj;
@@ -286,6 +294,9 @@ export function readUrlParams(): void {
     shadows = urlParams.get("sh");
 
     hardwardScaling = urlParams.get("hs");
+
+    // Also loop through all the URL plugins.
+    runURLPlugins(urlParams);
 
     // Start updating the URL periodically. Because of camera changes.
     autoUpdateUrl();

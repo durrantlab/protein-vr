@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 // Functions for debugging.
 
@@ -83,3 +83,5 @@ function debugMode(): void {
         document.getElementById("scene-explorer-host").style.zIndex = "15";
     });
 }
+
+window["debugMode"] = debugMode;

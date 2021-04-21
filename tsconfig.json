@@ -2,12 +2,40 @@
     "compilerOptions": {
         "outDir": "./dist/",
         "sourceMap": true,
-        "noImplicitAny": false,
-        "module": "es6",
-        "target": "es5",
-        "jsx": "react",
+        // "module": "es6",
+        "module": "esnext",
+        // "target": "es5",
+        "target": "esnext",
+        // "jsx": "react",
+        "jsx": "preserve",
         "allowJs": true,
-        "downlevelIteration": true
+        "downlevelIteration": true,
+        "importHelpers": true,
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "baseUrl": ".",
+        // "types": ["webpack-env"],
+        // "paths": {
+        //     "@/*": ["src/*"]
+        // },
+        "lib": ["esnext", "dom", "dom.iterable", "scripthost"],
+
+        "alwaysStrict": false,
+        "noImplicitAny": false,
+        "noImplicitThis": false,
+        "strict": false,
+        "strictBindCallApply": false,
+        "strictFunctionTypes": false,
+        "strictNullChecks": false,
+        "strictPropertyInitialization": false,
+        "noStrictGenericChecks": true,
+        "skipDefaultLibCheck": true,
+        "suppressExcessPropertyErrors": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "resolveJsonModule": true
     },
     "include": [
         "./src/index.d.ts"

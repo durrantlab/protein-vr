@@ -5,7 +5,7 @@
         name="load-local-file"
         label="Specify the location of the .pdb, .sdf, or .pvr (scene) file on your computer."
         placeholder="Specify file..."
-        accept=".pdb, .sdf, .pvr"
+        accept=".pdb, .sdf, .pvr, .json"
         @fileLoaded="fileLoaded"></super-file>
 
     <select-environment v-if="fileType !== '.PVR'" pluginSlug="load-local-file"></select-environment>

@@ -1,11 +1,12 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import {VueComponentParent} from "../../Vue/Components/VueComponentParent";
 import * as Menu3D from "../Menu3D/Menu3D";
 import {store} from "../../../Vars/VueX/VueXStore";
 import * as UrlVars from "../../../Vars/UrlVars";
+import {smartSort} from "../Menus";
 declare var Vue;
 
 // @ts-ignore
@@ -149,9 +150,12 @@ export class Menu2DDisplayComponent extends VueComponentParent {
 
                     // Remove menu items that shouldn't appear in 2D version
                     // of the menu.
+                    // debugger;
                     let menuInfByRefKeys = filterProhibitedMenuItems(
                         Object.keys(menuInfByRef)
-                    ).sort();
+                    );
+
+                    smartSort(menuInfByRefKeys);
 
                     // Move data from menuInf to partialMenuData (the latter
                     // being rendered per Vuejs).

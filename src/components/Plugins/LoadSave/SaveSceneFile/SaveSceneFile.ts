@@ -1,17 +1,17 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import * as Parent from "../LoadSaveParent";
 import * as VRML from "../../../Mols/3DMol/VRML";
 import { store } from "../../../Vars/VueX/VueXStore";
 import * as SimpleModalComponent from "../../../UI/Vue/Components/OpenPopup/SimpleModalComponent";
 import * as LoadSaveUtils from "../LoadSaveUtils";
+import * as UrlVars from "../../../Vars/UrlVars";
 
 // @ts-ignore
 import {templateHtml} from "./PanelComponent.template.htm.ts";
-
-var FileSaver = require("file-saver");
+import { downloadTxtFile } from '../LoadSaveUtils';
 
 export class SaveSceneFile extends Parent.LoadSaveParent {
     public pluginTitle = "Scene<div class='emoji'>💾</div>";
@@ -25,6 +25,7 @@ export class SaveSceneFile extends Parent.LoadSaveParent {
          */
         "startSave"(): void {
             let filename = this["pvrSceneFileName"];
+            // Note that saving to .pvr.json not supported. Only loading.
             if (filename.slice(filename.length - 4) !== ".pvr") {
                 filename = filename + ".pvr";
                 this["pvrSceneFileName"] = filename;  // Update UI
@@ -57,16 +58,12 @@ export class SaveSceneFile extends Parent.LoadSaveParent {
         startLoadOrSave(pvrSceneFileName: any = undefined): void {
             LoadSaveUtils.shadowsHardwareScalingVueXToLocalStorage();
 
-            // see
-            // https://stackoverflow.com/questions/8648892/how-to-convert-url-parameters-to-a-javascript-object
-            // TODO: Shouldn't this be in UrlVars.ts? See urlParams, actually.
-            let params = location.search.substring(1);
-            let urlParamData = JSON.parse(
-                '{"' + params.replace(/&/g, '","').replace(/=/g, '":"') + '"}',
-                function (key, value) {
-                    return key === "" ? value : decodeURIComponent(value);
-                }
-            );
+            // see https://github.com/microsoft/TypeScript/issues/30933
+            let data = UrlVars.getAllUrlParams(window.location.href, true);
+            let urlParamData = {};
+            for (let k of data.keys()) {
+                urlParamData[k] = data.get(k);
+            }
 
             // Get the remote file to embed in the json.
             let url = urlParamData["s"];
@@ -147,12 +144,7 @@ export class SaveSceneFile extends Parent.LoadSaveParent {
             // s is the url. Good to remove that.
             delete urlParamData["s"];
 
-            var blob = new Blob(
-                // [window.location.href.split("?", 2)[1]],
-                [JSON.stringify(urlParamData)],
-                { type: "application/octet-stream;charset=utf-8" }
-            );
-            FileSaver["saveAs"](blob, pvrSceneFileName);
+            downloadTxtFile(JSON.stringify(urlParamData), pvrSceneFileName);
         },
 
         /**
@@ -171,6 +163,12 @@ export class SaveSceneFile extends Parent.LoadSaveParent {
         "onEnter"(): void {
             this["startSave"]();
         },
+
+        /**
+         * Runs when the tab header is clicked.
+         * @returns void
+         */
+        onTabHeaderClick(): void {}
     };
 
     public computed = {};

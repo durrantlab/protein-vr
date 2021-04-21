@@ -1,0 +1,30 @@
+<panel>
+    <h5>Export 3D Model</h5>
+    <p>Export to formats compatible with graphics programs such as <a
+    href="https://www.blender.org/" target="_blank">Blender</a>. ProteinVR
+    cannot read from these formats, so save separately to a
+    ProteinVR-compatible format if you wish to reload later.</p>
+    <form-input-wrapper>
+        <form-input
+                    id="pvr-model-file-name"
+                    placeholder="Model file name"
+                    type="text"
+                    :value="pvrModelFileName"
+                    @change="onChange"
+                    @enter="onEnter">
+            Enter the name of the 3D model (ending in .gltf, .glb, .obj, .stl,
+            or .vrml).
+        </form-input>
+
+        <!-- <p class="help-block">moose</p> -->
+    </form-input-wrapper>
+    <div v-if="formatInfo.msg !== ''"
+         v-html="formatInfo.msg"
+         class="will-erase alert alert-warning"
+         role="alert"
+         style="text-align:center;">
+    </div>
+    <form-button :disabled="overwriteBtnDisabled || btnDisabled" @click.native="startSave" id="save-proteinvr-model">
+        {{btnTxt}}
+    </form-button>
+</panel>

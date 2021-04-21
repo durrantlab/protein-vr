@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import * as Parent from "../LoadSaveParent";
 import * as LoadSaveUtils from "../LoadSaveUtils";
@@ -41,6 +41,12 @@ export class LoadPdbSdfText extends Parent.LoadSaveParent {
         "onChangeText"(txt: string): void {
             this["fileContents"] = txt;
         },
+
+        /**
+         * Runs when the tab header is clicked.
+         * @returns void
+         */
+        onTabHeaderClick(): void {},
 
         /**
          * Populate the text field with a sample SDF file.

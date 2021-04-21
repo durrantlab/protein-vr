@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import * as Parent from "../LoadSaveParent";
 import * as LoadSaveUtils from "../LoadSaveUtils";
@@ -68,14 +68,19 @@ export class LoadLocalFile extends Parent.LoadSaveParent {
          */
         startLoadOrSave(data: any): void {
             LoadSaveUtils.shadowsHardwareScalingVueXToLocalStorage();
-
             let ext = LoadSaveUtils.getFilenameExtension(data.fileName);
             if (ext === ".PVR") {
                 LoadSaveUtils.loadPvrFromFile(data.fileContents);
             } else {
                 LoadSaveUtils.loadPdbOrSdfFromFile(data.fileContents);
             }
-        }
+        },
+
+        /**
+         * Runs when the tab header is clicked.
+         * @returns void
+         */
+        onTabHeaderClick(): void {}
     };
 
     /**

@@ -1,0 +1,39 @@
+<panel>
+    <h5>QRCode</h5>
+    <span v-if="$store.state.proteinvrQrCodePanel.canUseQRCode">
+        <img
+             style="max-width: 200px; width: 100%; margin-left: auto; margin-right: auto; display: block;"
+             :src="$store.state.proteinvrQrCodePanel.imgSrc"
+             alt="QR code">
+        <form-input-wrapper>
+            <form-input
+                        id="qr-code-file-name"
+                        placeholder="QR code file"
+                        type="text"
+                        :value="qrCodeFileName"
+                        @change="onChange"
+                        @enter="onEnter">
+                Enter the name of the file (ending in ".png").
+            </form-input>
+            <!-- <p class="help-block"></p> -->
+        </form-input-wrapper>
+        <form-button :disabled="btnDisabled" @click.native="startSave" id="save-qrcode">
+            {{btnTxt}}
+        </form-button>
+    </span>
+    <span v-else>
+        <div class="container-fluid" style="padding-top:15px;">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-warning" role="alert" style="text-align:center;">
+                        Cannot save your scene as a QR code because it relies
+                        on data from your local computer. Setup your scene
+                        using only web-accessible models (loaded via the "Web"
+                        tab) to use this feature.
+                    </div>
+                    <hr class="mt-3 mb-3" style="border-top:0;" />
+                </div>
+            </div>
+        </div>
+    </span>
+</panel>

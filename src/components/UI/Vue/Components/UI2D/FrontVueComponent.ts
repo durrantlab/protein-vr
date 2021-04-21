@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import * as LoadAll from "../../../../Plugins/LoadSave/LoadAll";
 import * as SimpleModalComponent from "../../../Vue/Components/OpenPopup/SimpleModalComponent";
@@ -192,7 +192,7 @@ export class FrontVueComponent extends VueComponentParent {
             });
 
             // TODO: More sophisticated way to read from url params? Search
-            // for other relevant TODO item... Actually, chekc out urlParams.
+            // for other relevant TODO item... Actually, check out urlParams.
             if (window.location.href.indexOf("LOCALFILE") === -1) {
                 btns.push({
                     "title": "Share (Leader)",
@@ -387,18 +387,21 @@ export function showVRButtonPerOrientation(): void {
     switch (IsIOS.isIOSLandscape()) {
         case undefined:
             // Not iOS, so always visible.
-            // @ts-ignore
-            babylonVRIconBtn?.style.display = "";
+            if (babylonVRIconBtn) {
+                babylonVRIconBtn.style.display = "";
+            }
             break;
         case true:
             // Landscape
-            // @ts-ignore
-            babylonVRIconBtn?.style.display = "";
+            if (babylonVRIconBtn) {
+                babylonVRIconBtn.style.display = "";
+            }
             break;
         case false:
             // Portrait
-            // @ts-ignore
-            babylonVRIconBtn?.style.display = "none";
+            if (babylonVRIconBtn) {
+                babylonVRIconBtn.style.display = "none";
+            }
             break;
     }
 }

@@ -1,6 +1,30 @@
 CHANGES
 =======
 
+1.0.7 WIP
+---------
+
+* ProteinVR now merges duplicate vertices before loading 3Dmol.js-generated
+  molecular meshes. This should improve performance, especially on low-memory
+  devices. Loading times take somewhat longer, especially on complex
+  representations.
+* Added QRCodes to the "Load and Save" and "Leader" popups to make sharing
+  scenes easier.
+* Now possible to export ProteinVR scene as 3D models for use in third-party
+  programs such as [Blender](https://www.blender.org/) (gltf, glb, obj, stl,
+  and vrml formats supported).
+* Information about scene shadows and hardware scaling is no longer saved to
+  PVR files. These value are device specific and should be explicitly
+  specified by each individual user when appropriate.
+* Fixed a bug with leader/follow mode that previously prevented some
+  connections from completing.
+* Numeric menu items are now sorted numerically.
+* Added three new protein representations: trace, ribbon, and tubes.
+* Added three new color schemes: B factor, atom index, and secondary structure.
+* Updated the copyright notice to 2021.
+* Fixed bug that prevented the skybox from tracking with the camera at
+  "infinite distance" in some cases.
+
 1.0.6
 -----
 

@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import * as Optimizations from "../../Scene/Optimizations";
 import * as Vars from "../../Vars/Vars";
@@ -8,6 +8,7 @@ import * as VisStyles from "./VisStyles";
 import * as VRML from "./VRML";
 import * as StatusComponent from "../../UI/Vue/Components/StatusComponent";
 // import * as Axes from "../../Scene/Axes";
+import { HookTypes, runHooks } from '../../Plugins/Hooks/Hooks';
 
 declare var BABYLON: any;
 
@@ -15,6 +16,15 @@ export let lastRotationQuatBeforeAnimation = new BABYLON.Quaternion(0, 0, 0, 0);
 let lastRotationQuat: any = undefined;
 const cachedDeltaYs = {};
 
+// If you parent non-mol meshes to this transform node, using angstrom
+// coordinates, they will track the meshes as they rotate. Note that
+// everything added to this should itself be a TransformNode. Parent actual
+// meshes to that TransformNode.
+export let nonMolMeshesTransformNode;
+
+export function setupPositioning() {
+    nonMolMeshesTransformNode = new BABYLON["TransformNode"]("nonMolMeshesTransformNode");
+}
 
 /**
  * Positions a given molecular mesh within a specified box.
@@ -26,6 +36,12 @@ const cachedDeltaYs = {};
  * @returns void
  */
 export function positionAll3DMolMeshInsideAnother(babylonMeshJustAdded: any, otherContainerBabylonMesh: any, animate = false): void {
+    // Somtimes babylonMeshJustAdded is undefined by design
+    // if ((babylonMeshJustAdded === undefined) || (babylonMeshJustAdded === null)) {
+    //     // Sometimes gets passed a non-mesh.
+    //     return;
+    // }
+
     // Note that this function doesn't update the rotation. It just animates
     // to that rotation. The new rotation is stored in VRML.molRotation, and
     // it is set from the axisRotation() function.
@@ -167,6 +183,12 @@ function resetMeshes(allVisMolMeshes: any[]): void {
         }
     }
 
+    // Also position nonMolMeshesTransformNode
+    nonMolMeshesTransformNode.scaling = new BABYLON.Vector3(1, 1, 1);
+    nonMolMeshesTransformNode.position = new BABYLON.Vector3(0, 0, 0);
+    nonMolMeshesTransformNode.rotationQuaternion = VRML.molRotationQuat;
+    nonMolMeshesTransformNode.visibility = 0;  // Hide while rotating.
+
     // Render to update the meshes
     Vars.scene.render();  // Needed to get bounding box to recalculate.
 }
@@ -186,8 +208,6 @@ function getMaxVolMeshInfo(allVisMeshes: any[]): any {
     let maxVolMesh;  // To store biggest mesh.
     for (let i = 0; i < allVisMolMeshesLen; i++) {
         const allVisMolMesh = allVisMeshes[i];
-
-        // Get the bounding box of this mesh.
         const maxVolBoxTmp = allVisMolMesh.getBoundingInfo().boundingBox;
         // const maxVolBoxDimensTmp = Object.keys(maxVolBoxTmp.maximumWorld).map(
         //     (k) => maxVolBoxTmp.maximumWorld[k] - maxVolBoxTmp.minimumWorld[k],
@@ -240,6 +260,9 @@ function scaleAllMeshesToFixInBox(containingBoxDimens: any[], maxVolBoxDimens: a
         allVisMolMesh.scaling = meshScaling;
     }
 
+    // Don't forget nonMolMeshesTransformNode
+    nonMolMeshesTransformNode.scaling = meshScaling;
+
     Vars.scene.render();  // Needed to get bounding box to recalculate.
 }
 
@@ -262,6 +285,9 @@ function translateAllMeshes(containingBox: any, allVisMeshes: any[], maxVolInfo:
         allVisMolMesh.position = allVisMolMesh.position.subtract(meshTranslation);
     }
 
+    // Also nonMolMeshesTransformNode
+    nonMolMeshesTransformNode.position = nonMolMeshesTransformNode.position.subtract(meshTranslation);
+
     Vars.scene.render();  // Needed to get bounding box to recalculate.
 
     // Move the mesh up and down, too (lipid, for example).
@@ -274,6 +300,9 @@ function translateAllMeshes(containingBox: any, allVisMeshes: any[], maxVolInfo:
         const allVisMolMesh = allVisMeshes[i];
         allVisMolMesh.position.y = allVisMolMesh.position.y - deltaY;
     }
+
+    // Also nonMolMeshesTransformNode
+    nonMolMeshesTransformNode.position.y = nonMolMeshesTransformNode.position.y - deltaY;
 }
 
 /**
@@ -283,6 +312,11 @@ function translateAllMeshes(containingBox: any, allVisMeshes: any[], maxVolInfo:
  * @returns number  How much to move along the Y axis.
  */
 function moveMolMeshesToGround(biggestMolMesh: any, containingBox: any): number {
+    if ((biggestMolMesh === undefined) || (biggestMolMesh === null)) {
+        // Sometimes gets passed a non-mesh.
+        return;
+    }
+
     // The above will position the molecular mesh within the target mesh,
     // centering the two bounding boxes. That would be good for positioning
     // proteins in a bilayer, for example. Now let's move the meshes so they
@@ -334,41 +368,23 @@ function moveMolMeshesToGround(biggestMolMesh: any, containingBox: any): number 
  */
 function animateRotation(allVisInitialInfo: any, allVisMeshes: any[]): void {
     let len = allVisInitialInfo.meshesInfo.length;
+    let pos, sca, rot;
     for (let i = 0; i < len; i++) {
+        // NOTE: I believe these values are always the same for all meshes.
         const allVisInitialInf = allVisInitialInfo.meshesInfo[i];
-        const mesh = allVisMeshes[i];
-        const pos = mesh.position.clone();
-        const sca = mesh.scaling.clone();
-        const rot = mesh.rotationQuaternion.clone();
 
+        const mesh = allVisMeshes[i];
+        pos = mesh.position.clone();
+        sca = mesh.scaling.clone();
+        rot = mesh.rotationQuaternion.clone();
 
         // TODO: The way it should be:
         // scene.getMeshByName("MeshFrom3DMol0.6281022775005658").rotate(BABYLON.Axis.X, 0.1, BABYLON.Space.WORLD);
 
-        //                           name,   prop,         start_val,                    end_val
-        const posX = makeBabylonAnim("posX", "position.x", allVisInitialInf.position.x, pos.x);
-        const posY = makeBabylonAnim("posY", "position.y", allVisInitialInf.position.y, pos.y);
-        const posZ = makeBabylonAnim("posZ", "position.z", allVisInitialInf.position.z, pos.z);
-
-        const scaX = makeBabylonAnim("scaX", "scaling.x", allVisInitialInf.scaling.x, sca.x);
-        const scaY = makeBabylonAnim("scaY", "scaling.y", allVisInitialInf.scaling.y, sca.y);
-        const scaZ = makeBabylonAnim("scaZ", "scaling.z", allVisInitialInf.scaling.z, sca.z);
-
-        const rotX = makeBabylonAnim("rotX", "rotationQuaternion.x", allVisInitialInf.rotationQuaternion.x, rot.x);
-        const rotY = makeBabylonAnim("rotY", "rotationQuaternion.y", allVisInitialInf.rotationQuaternion.y, rot.y);
-        const rotZ = makeBabylonAnim("rotZ", "rotationQuaternion.z", allVisInitialInf.rotationQuaternion.z, rot.z);
-        const rotW = makeBabylonAnim("rotW", "rotationQuaternion.w", allVisInitialInf.rotationQuaternion.w, rot.w);
-
-        mesh.animations = [posX, posY, posZ, scaX, scaY, scaZ, rotX, rotY, rotZ, rotW];
-
-        // Axes.axesMesh.setEnabled(true);
-
-        const anim = Vars.scene.beginAnimation(mesh, 0, 15, false, 1, () => {
-            // You need to recalculate the shadows.
-            Optimizations.updateEnvironmentShadows();
-
-            StatusComponent.setStatus("Rotate done: " + allVisInitialInf.rotationQuaternion.toString());
-        });
+        animateRotationOnSingleMesh(
+            mesh, allVisInitialInf.position, allVisInitialInf.scaling, allVisInitialInf.rotationQuaternion,
+            pos, sca, rot
+        );
 
         // setTimeout(() => {
         //     // Here instead of in end animation above because I like it to
@@ -376,8 +392,53 @@ function animateRotation(allVisInitialInfo: any, allVisMeshes: any[]): void {
         //     Axes.axesMesh.setEnabled(false);
         // }, 1000);
     }
+
+    let allVisInitialInf = allVisInitialInfo.meshesInfo[0];
+
+    // if (nonMolMeshesTransformNode.rotationQuaternion === null) {
+    //     // Below will set rotationQuaternion if it doesn't exist.
+    //     nonMolMeshesTransformNode.rotationQuaternion = new BABYLON["Quaternion"]["Identity"]();
+    // }
+
+    animateRotationOnSingleMesh(
+        nonMolMeshesTransformNode,
+        allVisInitialInf.position, allVisInitialInf.scaling, allVisInitialInf.rotationQuaternion,
+        pos, sca, rot
+    );
+
+    runHooks(HookTypes.ON_ROTATE, {position: pos, scaling: sca, rotation: rot});
 }
 
+function animateRotationOnSingleMesh(
+    mesh: any,
+    startPos: any, startSca: any, startRot: any,
+    endPos: any, endSca: any, endRot: any
+) {
+    //                           name,   prop,         start_val,  end_val
+    const posX = makeBabylonAnim("posX", "position.x", startPos.x, endPos.x);
+    const posY = makeBabylonAnim("posY", "position.y", startPos.y, endPos.y);
+    const posZ = makeBabylonAnim("posZ", "position.z", startPos.z, endPos.z);
+
+    const scaX = makeBabylonAnim("scaX", "scaling.x", startSca.x, endSca.x);
+    const scaY = makeBabylonAnim("scaY", "scaling.y", startSca.y, endSca.y);
+    const scaZ = makeBabylonAnim("scaZ", "scaling.z", startSca.z, endSca.z);
+
+    const rotX = makeBabylonAnim("rotX", "rotationQuaternion.x", startRot.x, endRot.x);
+    const rotY = makeBabylonAnim("rotY", "rotationQuaternion.y", startRot.y, endRot.y);
+    const rotZ = makeBabylonAnim("rotZ", "rotationQuaternion.z", startRot.z, endRot.z);
+    const rotW = makeBabylonAnim("rotW", "rotationQuaternion.w", startRot.w, endRot.w);
+
+    mesh.animations = [posX, posY, posZ, scaX, scaY, scaZ];
+    mesh.animations.push(...[rotX, rotY, rotZ, rotW]);
+
+    // Axes.axesMesh.setEnabled(true);
+
+    const anim = Vars.scene.beginAnimation(mesh, 0, 15, false, 1, () => {
+        // You need to recalculate the shadows.
+        Optimizations.updateEnvironmentShadows();
+        StatusComponent.setStatus("Rotate done: " + startRot.toString());
+    });
+}
 
 /**
  * Make a babylonjs animation. I found myself doing this a lot, so figured I'd

@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 // An module to manage VRML data obtained from 3Dmol.js. Assumes the 3Dmol.js
 // javascript file is already loaded.
@@ -11,6 +11,7 @@ import * as Load from "../Load";
 import * as PositionInScene from "./PositionInScene";
 import * as SimpleModalComponent from "../../UI/Vue/Components/OpenPopup/SimpleModalComponent"
 import * as MonitorLoadFinish from "../../System/MonitorLoadFinish";
+import { runHooks, HookTypes } from "../../Plugins/Hooks/Hooks";
 
 declare var $3Dmol;
 
@@ -34,6 +35,8 @@ export interface IVRMLModel {
 /** @type {Array<Object<string,*>>} */
 let modelData: IVRMLModel[] = [];
 
+export let geoCenter: any;  // Vector3
+
 // export let molRotation: any = new BABYLON.Vector3(0, 0, 0);
 export let molRotationQuat: any = new BABYLON.Quaternion(0, 0, 0, 0);
 
@@ -44,7 +47,7 @@ let element: any;
 let config: any;
 
 /** @type {string} */
-let vrmlStr: string;
+export let vrmlStr: string;
 
 const vrmlParserWebWorker = new Worker("vrmlWebWorker.js");
 
@@ -118,7 +121,7 @@ export function resetAll(): void {
  *                              object is the parameter.
  * @returns void
  */
-export function loadPDBURL(url: string, callBack: any): void {
+export function loadMolURL(url: string, callBack: any): void {
     jQuery.ajax( url, {
 
         /**
@@ -132,11 +135,13 @@ export function loadPDBURL(url: string, callBack: any): void {
             molTxt = data;  // In case you need to restart.
             molTxtType = "pdb";
 
+            // *****
+
             if (url.slice(url.length - 3).toLowerCase() === "sdf") {
                 molTxtType = "sdf";
             }
 
-            loadPDBData(molTxt, molTxtType, callBack);
+            loadMolData(molTxt, molTxtType, callBack);
         },
 
         /**
@@ -160,7 +165,7 @@ export function loadPDBURL(url: string, callBack: any): void {
  *                              object is the parameter.
  * @returns void
  */
-export function loadPDBData(data: string, type: string, callBack: any): void {
+export function loadMolData(data: string, type: string, callBack: any): void {
     const mdl = viewer.addModel(data, type, {"keepH": true});
     callBack(mdl);
 }
@@ -294,18 +299,20 @@ export function render(updateData: boolean, repName: string, callBack: any = () 
                         // mind the kinds of manipulations above should be
                         // performed on the mesh. Babylon is going to have
                         // better functions for this than I can come up with.
-                        const newMesh = importIntoBabylonScene();
+                        importIntoBabylonScene().then((newMesh) => {
+                            if (newMesh !== undefined) {
+                                // It's undefined if, for example, trying to do
+                                // cartoon on ligand.
+                                PositionInScene.positionAll3DMolMeshInsideAnother(newMesh, Vars.scene.getMeshByName("protein_box"));
+                            }
 
-                        if (newMesh !== undefined) {
-                            // It's undefined if, for example, trying to do
-                            // cartoon on ligand.
-                            PositionInScene.positionAll3DMolMeshInsideAnother(newMesh, Vars.scene.getMeshByName("protein_box"));
-                        }
+                            callBack(newMesh);  // Cloned so it won't change with new rep in future.
 
-                        callBack(newMesh);  // Cloned so it won't change with new rep in future.
+                            // console.log("HERE")
 
-                        // Clean up.
-                        modelData = [];
+                            // Clean up.
+                            modelData = [];
+                        });
                     }
                 );
             },
@@ -363,6 +370,8 @@ function loadValsFromVRML(repName: string, callBack: any): void {
 
             /** @type {string} */
             const status = resp["status"];
+
+            geoCenter = new BABYLON.Vector3(resp["geoCenter"][0], resp["geoCenter"][1], resp["geoCenter"][2]);
 
             if (chunk !== undefined) {
                 /** @type {number} */
@@ -464,9 +473,9 @@ function typedArrayConcat(resultConstructor: any, listOfArrays: any[]): any {
 /**
  * Creates a babylonjs object from the values and adds it to the babylonjs
  * scene.
- * @returns {*} The new mesh from the 3dmoljs instance.
+ * @returns {*} The new mesh from the 3dmoljs instance (as a promise).
  */
-export function importIntoBabylonScene(): any {
+export function importIntoBabylonScene(): Promise<any> {
     // The material to add to all meshes.
     const mat = new BABYLON.StandardMaterial("Material", Vars.scene);
     mat.diffuseColor = new BABYLON.Color3(1, 1, 1);
@@ -507,6 +516,7 @@ export function importIntoBabylonScene(): any {
     }
 
     let babylonMesh;
+    let meshReadyPromise;
     if (meshes.length > 0) {
         // Merge all these meshes.
         // https://doc.babylonjs.com/how_to/how_to_merge_meshes
@@ -515,12 +525,17 @@ export function importIntoBabylonScene(): any {
         babylonMesh.id = babylonMesh.name;
 
         // Work here
-        Load.setupMesh(babylonMesh, 123456789);
+        meshReadyPromise = Load.setupMesh(babylonMesh, 123456789);
+    } else {
+        meshReadyPromise = Promise.resolve();
     }
 
-    MonitorLoadFinish.loadSuccessful();
+    return meshReadyPromise.then(() => {
+        MonitorLoadFinish.loadSuccessful();
+        return Promise.resolve(babylonMesh);
+    });
 
-    return babylonMesh;
+    // return babylonMesh;
 }
 
 /**

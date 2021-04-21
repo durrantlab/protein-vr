@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import * as CommonCamera from "../../../Cameras/CommonCamera";
 import * as VRPoints from "../../../Navigation/Points";
@@ -9,6 +9,7 @@ import * as Button from "./Button";
 import * as Rotations from "./Rotations";
 import * as Styles from "./Styles";
 import ButtonPressSoundFile from "./staple-public-domain.mp3";
+import {smartSort} from "../Menus";
 
 declare var BABYLON: any;
 
@@ -324,6 +325,9 @@ function showOnlyButtonsOfLevel(breadcrumbs: string[]): void {
     const specialBtns = redBtns.concat(yellowBtns);
 
     // Sort those names
+    // console.log(subMenuItemNames);
+    smartSort(subMenuItemNames);
+    // console.log(subMenuItemNames);
     subMenuItemNames.sort((first: string, second: string) => {
         // See
         // https://stackoverflow.com/questions/51165/how-to-sort-strings-in-javascript
@@ -334,7 +338,8 @@ function showOnlyButtonsOfLevel(breadcrumbs: string[]): void {
         } else if (!firstIsSpecial && secondIsSpecial) {
             return -1;
         } else {
-            return ("" + first).localeCompare(second);
+            // return ("" + first).localeCompare(second);
+            return 0;  // To otherwise preserve order from first sort.
         }
     });
 

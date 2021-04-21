@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 // Functions for leader mode, that the leader (lecturer) uses.
 
@@ -8,26 +8,25 @@ import * as CommonCamera from "../Cameras/CommonCamera";
 // import * as OpenPopup from "../UI/Vue/Components/OpenPopup/OpenPopup";
 import * as WebRTCBase from "./WebRTCBase";
 import * as SimpleModalComponent from "../UI/Vue/Components/OpenPopup/SimpleModalComponent";
+import * as LazyLoadJS from "../System/LazyLoadJS";
 
 export let isLecturerBroadcasting = false;
 
 let lect: any;
 
 export class Lecturer extends WebRTCBase.WebRTCBase {
-    public idReady: any = null;
-    public gotConn: any = null;
     private conns: any = [];  // The connections (there could be multiple ones
                               // because this is the lecturer).
 
     constructor() {
-        super();
-        let gotConnResolve: any;
-        this.gotConn = new Promise((resolve: any, reject: any) => {
-            gotConnResolve = resolve;
-        });
-        this.idReady = new Promise((idReadyResolve: any, reject: any) => {
-            this.setupWebRTCCallbacks(idReadyResolve, gotConnResolve);
-        });
+        // undefined because you want proteinvr to generate an id.
+        super(undefined);
+
+        this.peerOpenPromise.then(() => {
+            // So you've got an open peer. Go ahead and setup the connection
+            // and close callbacks.
+            this.setupWebRTCCallbacks();
+        })
     }
 
     /**
@@ -36,48 +35,37 @@ export class Lecturer extends WebRTCBase.WebRTCBase {
      * @returns void
      */
     public sendData(data: any): void {
+        data = JSON.stringify(data);
+
         if (WebRTCBase.DEBUG === true) {
-            console.log("Send:", data);
+            console.log("WEBRTC: Send:", data);
         }
 
         /** @type {number} */
         const connsLen = this.conns.length;
         for (let i = 0; i < connsLen; i++) {
             const conn = this.conns[i];
-            conn.send(data);
+            conn["send"](data);
         }
     }
 
     /**
      * Sets up the webrtc callback functions.
-     * @param  {Function(string)} idReadyResolve  The function to call when
-     *                                            peer.js is open.
-     * @param  {Function()}       gotConnResolve  The function to call when
-     *                                            the connection is resolved.
      * @returns void
      */
-    private setupWebRTCCallbacks(idReadyResolve: any, gotConnResolve: any): void {
-        this.peer.on("open", (id: string) => {
-            // Workaround for peer.reconnect deleting previous id
-            if (this.peer.id === null) {
-                WebRTCBase.webRTCErrorMsg("Received null id from peer open.");
-                this.peer.id = this.peerId;
-            } else {
-                this.peerId = this.peer.id;
-            }
-            idReadyResolve(this.peerId);
-
-            if (WebRTCBase.DEBUG === true) { console.log(this.peerId); }
-        });
-
+    private setupWebRTCCallbacks(): void {
         // Below only needed on lecturer. It's when a connection is received.
-        this.peer.on("connection", (c: any) => {
+        this.peer["on"]("connection", (c: any) => {
             this.conns.push(c);
-            gotConnResolve();
-            if (WebRTCBase.DEBUG === true) { console.log("Lecturer: added a connection"); }
+            // gotConnResolve();
+            if (WebRTCBase.DEBUG === true) {
+                console.log(
+                    "WEBRTC: Lecturer: added a connection"
+                );
+            }
         });
 
-        this.peer.on("close", () => {
+        this.peer["on"]("close", () => {
             /** @type {number} */
             const connsLen = this.conns.length;
             for (let i = 0; i < connsLen; i++) {
@@ -98,15 +86,22 @@ export function startBroadcast(): void {
 
     // Contact the peerjs server
     lect = new Lecturer();
+    let qrCodeReady = LazyLoadJS.lazyLoadJS("./js/qrcode.min.js");
 
-    lect.idReady.then((id: string) => {
+    Promise.all([lect.peerOpenPromise, qrCodeReady]).then((params: any) => {
+        // So window["QRCode"] now available everywhere.
+
+        let id: string = params[0];
+
         window["PVR_webRTCID"] = id;
+
         // OpenPopup.openModal({
         //     title: "Leader",
         //     content: "pages/leader.html",
         //     // isUrl: true,
         //     hasCloseBtn: true
         // });
+
         SimpleModalComponent.openSimpleModal({
             title: "Leader",
             content: "pages/leader.html",
@@ -115,6 +110,7 @@ export function startBroadcast(): void {
             unclosable: false
         }, true);
     });
+
 
     // Periodically send the information about the representations.
     setInterval(() => {

@@ -15,4 +15,11 @@
     setTimeout(() => {
         leaderURLVal.select();
     }, 0);
+
+    // Also update the QR code.
+    window["QRCode"]["toDataURL"](url, function (err, url) {
+        var leaderURLImg = document.getElementById("leaderURLQRCode");
+        leaderURLImg.src = url;
+    });
+
 })(this);

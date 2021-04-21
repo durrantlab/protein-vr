@@ -9,7 +9,7 @@ const path = require("path");
 const WorkboxPlugin = require("workbox-webpack-plugin"); // for PWA
 // const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 // const VueLoaderPlugin = require('vue-loader/lib/plugin')
-
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = merge(common, {
     entry: {
@@ -19,6 +19,10 @@ module.exports = merge(common, {
         // new CleanWebpackPlugin(),
         // new HtmlWebpackPlugin({}),
         // new HtmlWebpackIncludeAssetsPlugin({
+        // new BundleAnalyzerPlugin({
+        //     // analyzerPort: 8889
+        //     analyzerMode: "static"
+        // }),
         new HtmlWebpackPlugin({
                 // title: 'Test Title',
             template: path.join(__dirname, "../../src/index.html"),
@@ -32,6 +36,8 @@ module.exports = merge(common, {
             $: "jquery",
             jQuery: "jquery",
             "window.jQuery": "jquery",
+            // QRCode: "qrcode",
+            // "window.QRCode": "qrcode",
             $3Dmol: "3dmol",
             "window.$3Dmol": "3dmol",
             bootstrap: "bootstrap",
@@ -41,6 +47,8 @@ module.exports = merge(common, {
             patterns: [
                 { from: "src/babylon_scenes", to: "environs" },
                 { from: "src/js", to: "js" },
+                { from: "node_modules/babylonjs-serializers/babylonjs.serializers.min.js", to: "js/babylonjs.serializers.min.js"},
+                { from: "node_modules/file-saver/dist/FileSaver.min.js", to: "js/FileSaver.min.js"},
                 { from: "src/components/UI/Vue/Components/OpenPopup/pages", to: "pages" },
                 {
                     from: "src/components/Mols/3DMol/nanokid.sdf",
@@ -60,7 +68,9 @@ module.exports = merge(common, {
                     to: "manifest.webmanifest"
                 },
                 { from: "src/styles/style.css", to: "style.css" },
-                { from: "src/styles/favicon.ico", to: "favicon.ico" }
+                { from: "src/styles/favicon.ico", to: "favicon.ico" },
+                { from: "node_modules/qrcode/build/qrcode.min.js", to: "js/qrcode.min.js"},
+                { from: "src/components/Plugins/LoadSave/SaveModel/blender_mat_example.png", to: "blender_mat_example.png"}
             ]
         }),
         new WorkboxPlugin.GenerateSW({

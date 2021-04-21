@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 // Functions to create a protein visualization using 3DMol.js
 
@@ -12,6 +12,9 @@ import * as Vars from "../../Vars/Vars";
 import * as PositionInScene from "./PositionInScene";
 import * as VRML from "./VRML";
 import * as Lecturer from "../../WebRTC/Lecturer";
+import { HookTypes, runHooks } from "../../Plugins/Hooks/Hooks";
+
+declare var $3Dmol;
 
 // Where the meshes generated from 3DMol.js get stored.
 interface IStyleMesh {
@@ -82,6 +85,10 @@ const colorSchemeKeyWordTo3DMol = {
     "Spectrum": {"color": "spectrum"},
     "White": {"color": "white"},
     "Yellow": {"color": "yellow"},
+    "B Factor": {"colorscheme": {"prop": "b", "gradient": undefined, "min": undefined, "max": undefined, "mid": undefined}},
+    "Atom Index": {"colorscheme": {"prop": "serial", "gradient": undefined, "min": undefined, "max": undefined, "mid": undefined}},
+    "Secondary Structure": {"colorscheme": {"prop":'ss', "map":$3Dmol["ssColors"]['Jmol']}}
+    // "Secondary Structure": {"colorscheme": {"prop":'ss', "map":$3Dmol["ssColors"]['pyMol']}}
 };
 
 /**
@@ -157,19 +164,71 @@ export function toggleRep(filters: any[], repName: string, colorScheme: string, 
 
     // Make the new representation.
     /** @type {string} */
-    const colorSccheme = colorSchemeKeyWordTo3DMol[colorScheme];
+    const repParams = colorSchemeKeyWordTo3DMol[colorScheme];
     const sels = {"and": filters.map((i: number) => {
         // "i" can be a keyword or a selection json itself.
         return (selKeyWordTo3DMolSel[i] !== undefined) ? selKeyWordTo3DMolSel[i] : i;
     })};
 
+    // Custom tweaks to representations go here.
+    let range, gradient;
+    switch (colorScheme) {
+        case "B Factor":
+            // rescale based on b factor range.
+            // new $3Dmol["Gradient"]["Sinebow"](0,50)
+            range = $3Dmol["getPropertyRange"](
+                VRML.viewer["selectedAtoms"](), 'b'
+            );
+            // let gradient = $3Dmol["Gradient"]["RWB"](range);  // range[0], range[1]); // , 0.5 * (range[0] + range[1]))
+            gradient = "rwb" // {'gradient':'rwb','min':1,'max':-1,'mid':0}
+            // let gradient = new $3Dmol["Gradient"]["Sinebow"](range);
+            repParams["colorscheme"]["gradient"] = gradient;
+            repParams["colorscheme"]["min"] = range[0];
+            repParams["colorscheme"]["max"] = range[1];
+            repParams["colorscheme"]["mid"] = 0.5 * (range[0] + range[1]);
+            break;
+        case "Atom Index":
+            range = $3Dmol["getPropertyRange"](
+                VRML.viewer["selectedAtoms"](), 'serial'
+            );
+            // let gradient = $3Dmol["Gradient"]["RWB"](range);  // range[0], range[1]); // , 0.5 * (range[0] + range[1]))
+            gradient = "rwb" // {'gradient':'rwb','min':1,'max':-1,'mid':0}
+            // let gradient = new $3Dmol["Gradient"]["Sinebow"](range);
+            repParams["colorscheme"]["gradient"] = gradient;
+            repParams["colorscheme"]["min"] = range[0];
+            repParams["colorscheme"]["max"] = range[1];
+            repParams["colorscheme"]["mid"] = 0.5 * (range[0] + range[1]);
+            break;
+    }
+
+    switch (repName) {
+        case "Cartoon":
+            // Make this look better than default rectangle?
+            repParams["style"] = "oval";
+            // repParams["thickness"] = "0.5";  // Seems to degrade quality
+            repParams["arrows"] = true;
+            break;
+        case "Trace":
+            repName = "Cartoon";
+            repParams["style"] = "trace";
+            break;
+        case "Ribbon":
+            repName = "Cartoon";
+            repParams["ribbon"] = true;
+            break;
+        case "Tubes":
+            repName = "Cartoon";
+            repParams["tubes"] = true;
+            break;
+        }
+
     if (repName.toLowerCase() === "surface") {
-        VRML.addSurface(colorSccheme, sels, () => {
+        VRML.addSurface(repParams, sels, () => {
             toggleRepContinued(keys, repName, finalCallback);
         });
     } else {
         const rep = {};
-        rep[repName.toLowerCase()] = colorSccheme;
+        rep[repName.toLowerCase()] = repParams;
         VRML.setStyle(sels, rep);
         toggleRepContinued(keys, repName, finalCallback);
     }
@@ -225,7 +284,7 @@ function toggleRepContinued(keys: any, repName: string, finalCallback: any): voi
 }
 
 /**
- * Get keys to uniquelty describe a given representations.
+ * Get keys to uniquely describe a given representations.
  * @param  {Array<string|Object>} filters      Selections. Can be keywords or
  *                                             3dmoljs selection objects.
  * @param  {string}               repName      The name of the representation,
@@ -281,4 +340,6 @@ function visChanged(): void {
 
         // Recalculate the past-styles section of the menu.
         Styles.updatePastStylesInMenu(Menu3D.menuInf);
+
+        runHooks(HookTypes.ON_ADD_OR_REMOVE_MOL_MESH);
 }

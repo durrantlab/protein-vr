@@ -1,3 +1,5 @@
+echo "Running after_build.sh"
+
 # Must be run from the main directory.
 
 # exit  # Don't do this. For debugging.
@@ -92,3 +94,5 @@ mv proteinvr dist
 
 # Let the user know that compilation is finished. Works only on macOS.
 say "Beep"
+
+echo "Done after_build.sh"

@@ -1,11 +1,14 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import { LoadRemoteFile } from "./LoadRemoteFile/LoadRemoteFile";
 import { LoadLocalFile } from "./LoadLocalFile/LoadLocalFile";
 import { LoadPdbSdfText } from "./LoadPdbSdfText/LoadPdbSdfText";
 import { SaveSceneFile } from "./SaveSceneFile/SaveSceneFile";
+import { SaveQRCode } from "./QRCode/QRCode";
+import { SaveModel } from "./SaveModel/SaveModel";
+
 import { New } from "./New/New";
 import { LoadSaveParent } from "./LoadSaveParent";
 import { store } from "../../Vars/VueX/VueXStore";
@@ -23,6 +26,8 @@ export function getPlugins(): LoadSaveParent[] {
     plugins.push(new LoadPdbSdfText());
     plugins.push(new New());
     plugins.push(new SaveSceneFile());
+    plugins.push(new SaveQRCode());
+    plugins.push(new SaveModel());
 
     loadVuePlugins(plugins);
 
@@ -61,4 +66,11 @@ export function openLoadSaveModal(): void {
         varName: "showLoadSaveModal",
         val: true
     });
+
+    // Virtually click on tab header of selected tab. This is important for
+    // regenerating the QR code if the URL has changed, for example.
+    let currentTabPlugin = store.state["loadSaveModal"]["currentTabPlugin"];
+    if (currentTabPlugin !== undefined) {
+        currentTabPlugin.methods.onTabHeaderClick();
+    }
 }

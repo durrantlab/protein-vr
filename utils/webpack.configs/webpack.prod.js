@@ -4,7 +4,11 @@ const webworker = require('./webpack.webworker.js');
 const notWebworker = require('./webpack.not-webworker.js');
 const path = require('path');
 const ClosurePlugin = require('closure-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
 // const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+console.log("webpack.prod.js");
 
 let forProd = {
     mode: 'production',
@@ -16,7 +20,11 @@ let forProd = {
         //     chunkFilename: '[id].css',
         //     ignoreOrder: false, // Enable to remove warnings about conflicting order
         //   }),
-        new webpack.optimize.ModuleConcatenationPlugin()
+        new webpack.optimize.ModuleConcatenationPlugin(),
+        new BundleAnalyzerPlugin({
+            // analyzerPort: 8889
+            analyzerMode: "static"
+        })
     ],
     optimization: {
         // sideEffects: false,

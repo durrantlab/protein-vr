@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import * as LoadAndSetup from "./components/Scene/LoadAndSetup";
 // import 'bootstrap';
@@ -15,7 +15,8 @@ import * as Plugins from "./components/Plugins/Plugins";
 import * as LoadAllVue from "./components/UI/Vue/LoadAllVue";
 import * as Debugging from "./components/System/Debug/Debugging";
 import * as MonitorLoadFinish from "./components/System/MonitorLoadFinish";
-import * as PromiseStore from "./components/PromiseStore";
+import { setupHooks } from "./components/Plugins/Hooks/Hooks";
+// import * as PromiseStore from "./components/PromiseStore";
 
 // @ts-ignore
 window["jq"] = jQuery;
@@ -35,6 +36,8 @@ Debugging.enableDebugging().then(() => {
 
     // Setup service worker
     ServiceWorker.setupServiceWorker();
+
+    setupHooks();
 
     // Load in plugins
     Plugins.loadAll();

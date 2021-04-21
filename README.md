@@ -1,4 +1,4 @@
-# ProteinVR 1.0.6 #
+# ProteinVR 1.0.7 #
 
 ## Introduction ##
 

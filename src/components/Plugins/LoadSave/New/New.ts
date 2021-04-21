@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import * as Parent from "../LoadSaveParent";
 import * as LoadSaveUtils from "../LoadSaveUtils";
@@ -31,7 +31,13 @@ export class New extends Parent.LoadSaveParent {
         startLoadOrSave(data: any = undefined): void {
             LoadSaveUtils.shadowsHardwareScalingVueXToLocalStorage();
             window.location.href = LoadSaveUtils.makeUrl({});
-        }
+        },
+
+        /**
+         * Runs when the tab header is clicked.
+         * @returns void
+         */
+        onTabHeaderClick(): void {}
 
     };
 

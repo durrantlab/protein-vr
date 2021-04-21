@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import * as CamerasSetup from "../Cameras/Setup";
 import * as VRCamera from "../Cameras/VRCamera";
@@ -13,6 +13,7 @@ import * as PromiseStore from "../PromiseStore";
 import * as Pickables from "../Navigation/Pickables";
 import * as Menus from "../UI/Menus/Menus";
 import * as SimpleModalComponent from "../UI/Vue/Components/OpenPopup/SimpleModalComponent";
+import { setupPositioning } from "../Mols/3DMol/PositionInScene";
 
 // import * as Axes from "./Axes";
 
@@ -40,6 +41,8 @@ export function load(): void {
             runLoadBabylonScene();
 
             Optimizations.runOptimizeScene();
+
+            setupPositioning();
 
             // Setup the cameras.
             CamerasSetup.runSetupCamera();

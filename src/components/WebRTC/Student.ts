@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 // Functions for leader mode, that the follower (student) uses.
 
@@ -18,8 +18,15 @@ export class Student extends WebRTCBase.WebRTCBase {
     private dataReceivedFunc: any;
     private conn: any = null;  // The connection (just one).
 
+    /**
+     * @param  {string} id                The existing id that the Lecturer is
+     *                                    using.
+     * @param  {any}    dataReceivedFunc  The function to run when new data is
+     *                                    received.
+     */
     constructor(dataReceivedFunc: any) {
-        super();
+        // super creates a peer object and disconnected/error callbacks.
+        super(null);  // null because no assign id.
         this.dataReceivedFunc = dataReceivedFunc;
         this.setupWebRTCCallbacks();
     }
@@ -30,24 +37,29 @@ export class Student extends WebRTCBase.WebRTCBase {
      * @returns void
      */
     public joinExistingSession(id: string): void {
-        // Close old connection
-        if (this.conn) {
-            this.conn.close();
-        }
+        this.peerOpenPromise.then(() => {
+            // Only proceed if the peer is ready and open.
 
-        // Create connection to destination peer specified in the input field
-        this.conn = this.peer.connect(id, {
-            reliable: true,
-        });
+            // Close old connection
+            if (this.conn) {
+                this.conn["close"]();
+            }
 
-        this.setConnectionCallbacks();
+            // Create connection to destination peer specified in the input field
+            this.conn = this.peer["connect"](id, {
+                "reliable": true,
+            });
 
-        this.conn.on("open", () => {
-            if (WebRTCBase.DEBUG === true) { console.log("Connected to: " + this.conn.peer); }
-        });
+            this.conn["on"]("open", () => {
+                if (WebRTCBase.DEBUG === true) {
+                    console.log("WEBRTC: Connected to: " + this.conn["peer"]);
+                }
+                this.setConnectionCallbacks();
+            });
 
-        // Save peerid
-        peerId = id;
+            // Save peerid
+            peerId = id;
+        })
     }
 
     /**
@@ -55,9 +67,11 @@ export class Student extends WebRTCBase.WebRTCBase {
      * @returns void
      */
     private setupWebRTCCallbacks(): void {
-        this.peer.on("close", () => {
-            this.conn = null;
-            WebRTCBase.webRTCStandardErrorMsg();
+        this.peerOpenPromise.then(() => {
+            this.peer["on"]("close", () => {
+                this.conn = null;
+                WebRTCBase.webRTCStandardErrorMsg();
+            });
         });
     }
 
@@ -69,14 +83,15 @@ export class Student extends WebRTCBase.WebRTCBase {
     private setConnectionCallbacks(): void {
         // Handle incoming data (messages only since this is the signal
         // sender)
-        this.conn.on("data", (data: any) => {
+        this.conn["on"]("data", (data: any) => {
             if (WebRTCBase.DEBUG === true) {
-                console.log("Received:", data);
+                console.log("WEBRTC: Received:", data);
             }
+            data = JSON.parse(data);
             this.dataReceivedFunc(data);
         });
 
-        this.conn.on("close", () => {
+        this.conn["on"]("close", () => {
             WebRTCBase.webRTCErrorMsg("Leader connection closed.");
         });
     }
@@ -96,7 +111,7 @@ export function startFollowing(id: string): void {
     targetCameraRotationQuaternion = new Float32Array(CommonCamera.getCameraRotationQuaternion().asArray());
 
     const stud = new Student((data: any) => {
-        if (WebRTCBase.DEBUG === true) { console.log("stud1 got data", data); }
+        if (WebRTCBase.DEBUG === true) { console.log("WEBRTC: stud1 got data", data); }
         const type = data["type"];
         const val = data["val"];
         switch (type) {
@@ -135,6 +150,7 @@ export function startFollowing(id: string): void {
                 break;
         }
     });
+
     stud.joinExistingSession(id);
 
     // Start moving the camera in sync

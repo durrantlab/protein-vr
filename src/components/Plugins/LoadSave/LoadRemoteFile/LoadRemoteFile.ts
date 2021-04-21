@@ -1,6 +1,6 @@
 // This file is part of ProteinVR, released under the 3-Clause BSD License.
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
-// full details. Copyright 2020 Jacob D. Durrant.
+// full details. Copyright 2021 Jacob D. Durrant.
 
 import * as Parent from "../LoadSaveParent";
 import { store } from "../../../Vars/VueX/VueXStore";
@@ -47,7 +47,7 @@ export class LoadRemoteFile extends Parent.LoadSaveParent {
             let ext = LoadSaveUtils.getFilenameExtension(url);
 
             if (ext === ".PVR") {
-                // Load the remove pvr file here.
+                // Load the remote pvr file here.
                 jQuery.ajax( url, {
 
                     /**
@@ -135,6 +135,12 @@ export class LoadRemoteFile extends Parent.LoadSaveParent {
         "onEnter"(): void {
             this["submitPDBUrl"]();
         },
+
+        /**
+         * Runs when the tab header is clicked.
+         * @returns void
+         */
+        onTabHeaderClick(): void {}
     };
 
     public computed = {
