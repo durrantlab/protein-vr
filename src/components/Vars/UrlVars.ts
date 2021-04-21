@@ -21,6 +21,8 @@ export let hardwardScaling = true;
 let urlParams: Map<string, any> = new Map();  // To preserve order.
 let autoUpdateUrlEnabled = true;
 
+export var deviceSpecificParams = ["sh", "hs"];
+
 /**
  * Whether to periodically update the URL with information re. the scene and
  * camera position.
@@ -72,8 +74,12 @@ export function getAllUrlParams(url: string, stripDeviceSpecific = false): Map<s
     }
 
     if (stripDeviceSpecific === true) {
-        obj.delete("sh")
-        obj.delete("hs");
+        const deviceSpecificParamsLen = deviceSpecificParams.length;
+        for (let i = 0; i < deviceSpecificParamsLen; i++) {
+            const deviceSpecificParam = deviceSpecificParams[i];
+            obj.delete(deviceSpecificParam);
+
+        }
     }
 
     return obj;
@@ -143,6 +149,8 @@ export function setURL(): void {
         }
     }
     params = params.concat(styles);
+
+    // TODO: Handle l1, l2, l3
 
     // Also get the camera position and rotation.
     const cameraPos = CommonCamera.getCameraPosition();
@@ -266,6 +274,8 @@ export function readUrlParams(): void {
             stylesQueue.push(repInfo);
         }
     }
+
+    // TODO: Eventually, good to process l1, l2, l3 here.
 
     // If stylesQueue has nothing in it, set up a default rep.
     if (stylesQueue.length === 0) {

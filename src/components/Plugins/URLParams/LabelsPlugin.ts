@@ -1,7 +1,7 @@
 import { URLParamsParent } from "./URLParamsParent";
 import { scene } from "../../Vars/Vars";
 import { nonMolMeshesTransformNode } from '../../Mols/3DMol/PositionInScene';
-import { geoCenter } from "../../Mols/3DMol/VRML";
+import { geoCenter, showLoadMoleculeError } from "../../Mols/3DMol/VRML";
 import { registerHook, HookTypes, IRunHooksParams } from '../Hooks/Hooks';
 import { menuInf } from '../../UI/Menus/Menu3D/Menu3D';
 import { axisRotation } from "../../UI/Menus/Menu3D/Rotations";
@@ -84,7 +84,13 @@ export class LabelsPlugin extends URLParamsParent {
     }
 
     protected actOnParam(paramName: string, paramVal: any): void {
-        let params = JSON.parse(paramVal);
+        let params;
+        try {
+            params = JSON.parse(paramVal);
+        } catch(e) {
+            showLoadMoleculeError(null, -9999, "Is the molecule file properly formatted?", "");
+            return;
+        }
         let x = params["c"][0];
         let y = params["c"][1];
         let z = params["c"][2];

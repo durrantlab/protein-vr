@@ -43,41 +43,8 @@ export class LoadRemoteFile extends Parent.LoadSaveParent {
             // url for security reasons (could be proprietary).
             // localStorage.setItem('url', url);
 
-            // Construct the redirect url and redirect.
-            let ext = LoadSaveUtils.getFilenameExtension(url);
-
-            if (ext === ".PVR") {
-                // Load the remote pvr file here.
-                jQuery.ajax( url, {
-
-                    /**
-                     * When the url data is retrieved.
-                     * @param  {string} data  The remote data.
-                     * @returns void
-                     */
-                    "success": (pvrFileData: string): void => {
-                        LoadSaveUtils.loadPvrFromFile(pvrFileData);
-                    },
-
-                    /**
-                     * If there's an error...
-                     * @param  {*}       hdr
-                     * @param  {*}       status
-                     * @param  {string}  err
-                     */
-                    "error": (hdr: any, status: any, err: any) => {
-                        SimpleModalComponent.openSimpleModal({
-                            title: "Error Loading Molecule",
-                            content: "Could not load molecule from URL: " + url,
-                            hasCloseBtn: true,
-                            unclosable: false
-                        }, false);
-                    },
-                });
-            } else {
-                let params = {"s": url};
-                window.location.href = LoadSaveUtils.makeUrl(params);
-            }
+            let params = {"s": url};
+            window.location.href = LoadSaveUtils.makeUrl(params);
         },
 
         /**

@@ -206,7 +206,7 @@ export function toggleRep(filters: any[], repName: string, colorScheme: string, 
             // Make this look better than default rectangle?
             repParams["style"] = "oval";
             // repParams["thickness"] = "0.5";  // Seems to degrade quality
-            repParams["arrows"] = true;
+            // repParams["arrows"] = true;  // impacts mesh qualilty, so skip
             break;
         case "Trace":
             repName = "Cartoon";

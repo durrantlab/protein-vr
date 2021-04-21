@@ -80,7 +80,7 @@ function after3DMolJsLoaded(resolveFunc: Function): void {
                 val: type
             });
 
-            VRML.loadMolData(data, type, (mdl3DMol: any) => {
+            VRML.loadMolDataInto3DMol(data, type, (mdl3DMol: any) => {
                 continueAfterModelLoaded(mdl3DMol, resolveFunc);
             });
         } else {

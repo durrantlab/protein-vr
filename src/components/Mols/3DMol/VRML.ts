@@ -12,6 +12,7 @@ import * as PositionInScene from "./PositionInScene";
 import * as SimpleModalComponent from "../../UI/Vue/Components/OpenPopup/SimpleModalComponent"
 import * as MonitorLoadFinish from "../../System/MonitorLoadFinish";
 import { runHooks, HookTypes } from "../../Plugins/Hooks/Hooks";
+import { getFilenameExtension, makeUrl } from "../../Plugins/LoadSave/LoadSaveUtils";
 
 declare var $3Dmol;
 
@@ -135,13 +136,18 @@ export function loadMolURL(url: string, callBack: any): void {
             molTxt = data;  // In case you need to restart.
             molTxtType = "pdb";
 
-            // *****
+            let ext = getFilenameExtension(url);
 
-            if (url.slice(url.length - 3).toLowerCase() === "sdf") {
-                molTxtType = "sdf";
+            switch (ext) {
+                case ".SDF":
+                    molTxtType = "sdf";
+                    break;
+                case ".PVR":
+                    molTxtType = "pvr";
+                    break;
             }
 
-            loadMolData(molTxt, molTxtType, callBack);
+            loadMolDataInto3DMol(molTxt, molTxtType, callBack, url);
         },
 
         /**
@@ -158,16 +164,60 @@ export function loadMolURL(url: string, callBack: any): void {
 
 /**
  * Load data into 3dmol.
- * @param  {string}   data      The data (contents). PDB or SDF formatted
- *                              text.
- * @param  {string}   type      The type of data. "pdb" or "sdf".
- * @param  {Function} callBack  A callback function. The 3DMoljs molecule
- *                              object is the parameter.
+ * @param  {string}   data             The data (contents). PDB or SDF
+ *                                     formatted text.
+ * @param  {string}   type             The type of data. "pdb" or "sdf".
+ * @param  {Function} callBack         A callback function. The 3DMoljs
+ *                                     molecule object is the parameter.
+ * @param  {string}   [url=undefined]  The URL that provided the data.
  * @returns void
  */
-export function loadMolData(data: string, type: string, callBack: any): void {
+export function loadMolDataInto3DMol(data: string, type: string, callBack: any, url?: string): void {
+    // Extra processing needed here if PVR file.
+    if (type === "pvr") {
+        let jsonData = JSON.parse(data);
+        type = jsonData["scene"]["type"];
+        data = jsonData["scene"]["file"];
+        delete jsonData["scene"];
+        jsonData["s"] = url;
+
+        reloadPVRIfNeeded(jsonData);
+    }
+
     const mdl = viewer.addModel(data, type, {"keepH": true});
     callBack(mdl);
+}
+
+function reloadPVRIfNeeded(jsonData: any): void {
+    // If the existing url parameters match the ones in the pvr file, proceed
+    // to load. Otherwise, you need to reload the app with the right
+    // parameters.
+
+    let currentUrlParams = UrlVars.getAllUrlParams(window.location.href);
+
+    const jsonDataKeys = Object.keys(jsonData);
+    const jsonDataKeysLen = jsonDataKeys.length;
+    for (let i = 0; i < jsonDataKeysLen; i++) {
+        const key = jsonDataKeys[i];
+        const val = jsonData[key];
+        if (currentUrlParams.get(key) !== val) {
+            if (UrlVars.deviceSpecificParams.indexOf(key) === -1) {
+                let newUrl = makeUrl(jsonData);
+
+                // TODO: Needless redirect here sometimes when you just put in
+                // url (not loading through modal)?
+
+                // Delete loadAttempts from session storage to avoid getting
+                // an error due to the required redirect possibly performed
+                // above.
+                sessionStorage.removeItem("loadAttempts");
+                window.location.href = newUrl;
+                return;
+            }
+        }
+    }
+
+    // If you get here, you succeeded.
 }
 
 /**

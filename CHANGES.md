@@ -14,7 +14,7 @@ CHANGES
   programs such as [Blender](https://www.blender.org/) (gltf, glb, obj, stl,
   and vrml formats supported).
 * Information about scene shadows and hardware scaling is no longer saved to
-  PVR files. These value are device specific and should be explicitly
+  PVR files. These values are device specific and should be explicitly
   specified by each individual user when appropriate.
 * Fixed a bug with leader/follow mode that previously prevented some
   connections from completing.
@@ -24,6 +24,9 @@ CHANGES
 * Updated the copyright notice to 2021.
 * Fixed bug that prevented the skybox from tracking with the camera at
   "infinite distance" in some cases.
+* Improved PVR support. Now possible to include PVR file in URL.
+* ProteinVR now pauses itself when it does not have the focus, to prevent
+  excess consumption of resources when running in the background.
 
 1.0.6
 -----

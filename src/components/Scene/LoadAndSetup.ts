@@ -305,11 +305,34 @@ export function runFinalizeScene(): void {
 
             // Start the render loop. Register a render loop to repeatedly
             // render the scene
-            Vars.engine.runRenderLoop(() => {
-                Vars.scene.render();
-            });
+            setupRenderLoop();
+            runRenderLoopFun();
 
             resolve();
         }
     )
+}
+
+function runRenderLoopFun() {
+    Vars.engine.stopRenderLoop();
+
+    // Register a render loop to repeatedly render the scene
+    Vars.engine.runRenderLoop(function () {
+        Vars.scene.render();
+    });
+}
+
+function setupRenderLoop(): void {
+    function deactivate(): void {
+        console.log("Pausing...");
+        Vars.engine.stopRenderLoop();
+    }
+
+    function activate(): void {
+        console.log("Restarting...");
+        runRenderLoopFun();
+    }
+
+    window.addEventListener('blur', deactivate);
+    window.addEventListener('focus', activate);
 }
