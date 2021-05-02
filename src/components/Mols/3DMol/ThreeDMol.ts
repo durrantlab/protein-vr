@@ -86,7 +86,7 @@ function after3DMolJsLoaded(resolveFunc: Function): void {
         } else {
             // Loading some sort of remote url.
             // let pdbUri = "https://files.rcsb.org/view/1XDN.pdb";
-            VRML.loadMolURL(modelUrl, (mdl3DMol: any) => {
+            VRML.loadMolFromURL(modelUrl, (mdl3DMol: any) => {
                 continueAfterModelLoaded(mdl3DMol, resolveFunc);
             });
         }

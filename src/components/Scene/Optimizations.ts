@@ -6,8 +6,7 @@ import * as MolShadows from "../Mols/MolShadows";
 import * as Vars from "../Vars/Vars";
 import * as Pickables from "../Navigation/Pickables";
 import * as PromiseStore from "../PromiseStore";
-
-declare var BABYLON: any;
+import { Color3, RenderTargetTexture, StandardMaterial, VertexBuffer, PBRMaterial, AbstractMesh, Mesh, DirectionalLight } from '@babylonjs/core';
 
 /**
  * Setup the optimizations.
@@ -24,9 +23,9 @@ export function runOptimizeScene(): void {
             // So I'm going to skip it.
 
             // setTimeout(() => {
-            //     BABYLON.SceneOptimizer.OptimizeAsync(
+            //     SceneOptimizer.OptimizeAsync(
             //         Vars.scene,
-            //         // BABYLON.SceneOptimizerOptions.HighDegradationAllowed(),
+            //         // SceneOptimizerOptions.HighDegradationAllowed(),
             //         sceneOptimizerParameters(),
             //     );
             // }, 5000);
@@ -38,7 +37,7 @@ export function runOptimizeScene(): void {
             // Modify some meshes
             /** @type {number} */
             const len = Vars.scene.meshes.length;
-            const zeroVec = new BABYLON.Color3(0, 0, 0);
+            const zeroVec = new Color3(0, 0, 0);
             for (let idx = 0; idx < len; idx++) {
                 /** @const {*} */
                 const mesh = Vars.scene.meshes[idx];
@@ -79,30 +78,36 @@ export function runOptimizeScene(): void {
  * @returns void
  */
 function keepOnlyLightWithShadowlightSubstr(): void {
+    // NOTE: You might be tempted to do away with this to lighten the backs of
+    // molecules. Don't do it that way. Just add "keeplight" to the light name
+    // in Blender.
+
     // Delete all the lights but the first one that has the substring
-    // shadowlight or shadow_light.
+    // shadowlight or shadow_light. But keep all lights with "keeplight" in
+    // the name.
     let foundFirstShadowLight = false;
-    let indexToUse = 0;
-    while (Vars.scene.lights.length > 1) {
-        const light = Vars.scene.lights[indexToUse];
+    let lightsLeft = Vars.scene.lights.map(l => l);  // copy
+    let shadowLightName = MolShadows.getShadowCastingLight().name.toLowerCase();
+    while (lightsLeft.length > 0) {
+        const light = lightsLeft.shift()
         const lightName = light.name.toLowerCase();
-        const isShadowLight = (
-            (lightName.indexOf("shadowlight") !== -1) ||
-            (lightName.indexOf("shadow_light") !== -1)
-        );
+        const isShadowLight = lightName === shadowLightName;
 
         if (!isShadowLight) {
             // It's not a shadow light. Delete it.
-            Vars.scene.lights[indexToUse].dispose();
+            if (lightName.indexOf("keeplight") === -1) {
+                light.dispose();
+            }
         } else if (foundFirstShadowLight) {
             // You've already found a shadow light. Delete additional
             // ones.
-            Vars.scene.lights[indexToUse].dispose();
+            if (lightName.indexOf("keeplight") === -1) {
+                light.dispose();
+            }
         } else {
             // Must be the first shadow light. Don't delete, but make
             // note of it.
             foundFirstShadowLight = true;
-            indexToUse++;
         }
     }
 }
@@ -122,7 +127,7 @@ function furtherProcessKeyMeshes(): void {
             mesh.isVisible = false;
         } else if (mesh.name.toLowerCase().indexOf("skybox") !== -1) {
             if (Vars.sceneInfo.infiniteDistanceSkyBox) {
-                mesh.material.disableLighting = true;
+                (mesh.material as StandardMaterial).disableLighting = true;
                 // mesh.infiniteDistance = true;
 
                 // TODO: Unfortunately, mesh.infiniteDistance doesn't seem to
@@ -149,13 +154,14 @@ function allMaterialsShadeless(): void {
     const len = Vars.scene.meshes.length;
     for (let meshIdx = 0; meshIdx < len; meshIdx++) {
         const mesh = Vars.scene.meshes[meshIdx];
-        if (!mesh.material) { continue; }
+        let mat = mesh.material as PBRMaterial;
+        if (!mat) { continue; }
 
         // It has a material
-        if (mesh.material.emissiveTexture) {
-            mesh.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
-            mesh.material.albedoColor = new BABYLON.Color3(0, 0, 0);
-            mesh.material.ambientColor = new BABYLON.Color3(0, 0, 0);
+        if (mat.emissiveTexture) {
+            mat.emissiveColor = new Color3(1, 1, 1);
+            mat.albedoColor = new Color3(0, 0, 0);
+            mat.ambientColor = new Color3(0, 0, 0);
         }
 
         // It has submaterials.
@@ -165,9 +171,9 @@ function allMaterialsShadeless(): void {
         //     for (let matIdx = 0; matIdx < len2; matIdx++) {
         //         let mat = mesh.material.subMaterials[matIdx];
         //         if (mat.emissiveTexture) {
-        //             mat.emissiveColor = new BABYLON.Color3(1, 1, 1);
-        //             mat.albedoColor = new BABYLON.Color3(0, 0, 0);
-        //             mat.ambientColor = new BABYLON.Color3(0, 0, 0);
+        //             mat.emissiveColor = new Color3(1, 1, 1);
+        //             mat.albedoColor = new Color3(0, 0, 0);
+        //             mat.ambientColor = new Color3(0, 0, 0);
         //         }
         //     }
         // }
@@ -188,11 +194,12 @@ function optimizeMeshesAndMakeClickable(): void {
             const mesh = Vars.scene.meshes[meshIdx];
 
             // It needs to be emmisive (so always baked).
-            if ((mesh.material.emissiveTexture === undefined) ||
-                (mesh.material.emissiveTexture === null) &&
+            let mat = mesh.material as StandardMaterial;
+            if ((mat.emissiveTexture === undefined) ||
+                (mat.emissiveTexture === null) &&
                 (mesh.name !== "navTargetMesh")) {  // Don't alter navTargetMesh material!
 
-                mesh.material.emissiveTexture = mesh.material.diffuseTexture;
+                mat.emissiveTexture = mat.diffuseTexture;
 
                 // Below seems important to comment out. .clone()
                 // above and .dispose() below doesn't work. Also,
@@ -201,9 +208,9 @@ function optimizeMeshesAndMakeClickable(): void {
 
                 // mesh.material.diffuseTexture = undefined;
 
-                mesh.material.diffuseColor = new BABYLON.Color3(0, 0, 0);
-                mesh.material.specularColor = new BABYLON.Color3(0, 0, 0);
-                mesh.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
+                mat.diffuseColor = new Color3(0, 0, 0);
+                mat.specularColor = new Color3(0, 0, 0);
+                mat.emissiveColor = new Color3(0, 0, 0);
             }
 
             // TODO: Using false below to not freeze materials.
@@ -222,12 +229,12 @@ function optimizeMeshesAndMakeClickable(): void {
  * @param  {*} mesh The mesh.
  * @returns {number|null}  The number of vertices.
  */
-function getNumVertices(mesh: any): number|null {
+function getNumVertices(mesh: AbstractMesh): number|null {
     // First, get the number of vertexes.
     let numVertexes = 0;
     if (mesh !== undefined) {
         /** @type {Array<*>} */
-        const vertexData = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+        const vertexData = mesh.getVerticesData(VertexBuffer.PositionKind);
         if (vertexData === null) { return null; }  // Something like __root__
         numVertexes = vertexData.length / 3;
     } else {
@@ -241,7 +248,7 @@ function getNumVertices(mesh: any): number|null {
  * @param  {*} mesh The mesh.
  * @returns void
  */
-export function optimizeMeshPicking(mesh: any): void {
+export function optimizeMeshPicking(mesh: Mesh): void {
     // First, get the number of vertexes.
     /** @type {number} */
     const numVertexes = getNumVertices(mesh);
@@ -292,10 +299,11 @@ export function freezeMeshProps(mesh: any, freezeMaterial = true, worldMatrix = 
 export function updateEnvironmentShadows(): void {
     if (MolShadows.shadowGenerator) {
         // Update the shadows. They are frozen otherwise.
-        Vars.scene.lights[0].autoUpdateExtends = true;
-        MolShadows.shadowGenerator.getShadowMap().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
+        let light = MolShadows.getShadowCastingLight() as DirectionalLight;
+        light.autoUpdateExtends = true;
+        MolShadows.shadowGenerator.getShadowMap().refreshRate = RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
         // Vars.scene.render();
-        Vars.scene.lights[0].autoUpdateExtends = false;
+        light.autoUpdateExtends = false;
     }
 }
 
@@ -307,15 +315,15 @@ export function updateEnvironmentShadows(): void {
 //     // See https://doc.babylonjs.com/how_to/how_to_use_sceneoptimizer
 //     // The goal here is to maintain a frame rate of 60. Check every two
 //     // seconds. Very similar to HighDegradationAllowed
-//     const result = new BABYLON.SceneOptimizerOptions(25, 2000);
+//     const result = new SceneOptimizerOptions(25, 2000);
 
 //     let priority = 0;
-//     result.optimizations.push(new BABYLON.ShadowsOptimization(priority));
+//     result.optimizations.push(new ShadowsOptimization(priority));
 //     // The below won't make a difference for my scenes anyway...
-//     // result.optimizations.push(new BABYLON.MergeMeshesOptimization(priority));
-//     result.optimizations.push(new BABYLON.LensFlaresOptimization(priority));
-//     result.optimizations.push(new BABYLON.PostProcessesOptimization(priority));
-//     result.optimizations.push(new BABYLON.ParticlesOptimization(priority));
+//     // result.optimizations.push(new MergeMeshesOptimization(priority));
+//     result.optimizations.push(new LensFlaresOptimization(priority));
+//     result.optimizations.push(new PostProcessesOptimization(priority));
+//     result.optimizations.push(new ParticlesOptimization(priority));
 //     result.optimizations.push(new ReportOptimizationChange(priority));
 
 //     // Next priority
@@ -325,18 +333,18 @@ export function updateEnvironmentShadows(): void {
 
 //     // Next priority
 //     priority++;
-//     result.optimizations.push(new BABYLON.TextureOptimization(priority, 512));
+//     result.optimizations.push(new TextureOptimization(priority, 512));
 //     result.optimizations.push(new ReportOptimizationChange(priority));
 
 //     // Next priority
 //     priority++;
-//     result.optimizations.push(new BABYLON.RenderTargetsOptimization(priority));
-//     result.optimizations.push(new BABYLON.TextureOptimization(priority, 256));
+//     result.optimizations.push(new RenderTargetsOptimization(priority));
+//     result.optimizations.push(new TextureOptimization(priority, 256));
 //     result.optimizations.push(new ReportOptimizationChange(priority));
 
 //     // Next priority
 //     priority++;
-//     result.optimizations.push(new BABYLON.HardwareScalingOptimization(priority, 4));
+//     result.optimizations.push(new HardwareScalingOptimization(priority, 4));
 //     result.optimizations.push(new SimplifyMeshes(priority, 500));  // Simplify meshes.
 //     result.optimizations.push(new ReportOptimizationChange(priority));
 
@@ -464,7 +472,7 @@ export function removeMeshEntirely(mesh: any): void {
 //                 // You used to be able to simplify a mesh without LOD.
 //                 // Apparently you can't now?
 
-//                 // let decimator = new BABYLON.QuadraticErrorSimplification(mesh);
+//                 // let decimator = new QuadraticErrorSimplification(mesh);
 //                 // simplify({
 //                 //     "decimationIterations": 100,
 //                 //     "aggressiveness": 7,
@@ -488,15 +496,15 @@ export function removeMeshEntirely(mesh: any): void {
 
 //                 // Remove the existing LODs if they exist.
 //                 while (mesh.getLODLevels().length > 0) {
-//                     const firstLODMesh = mesh.getLODLevels()[0]["mesh"];
+//                     const firstLODMesh = mesh.getLODLevels()[0].mesh;
 //                     mesh.removeLODLevel(firstLODMesh);
 //                     removeMeshEntirely(firstLODMesh);
 //                 }
 
 //                 // https://doc.babylonjs.com/api/classes/babylon.mesh#simplify
 //                 mesh.simplify([{"quality": decimationLvel, "distance": 0.001}],
-//                     false, BABYLON.SimplificationType.QUADRATIC, () => {
-//                         // let simpMesh = mesh.getLODLevels()[0]["mesh"];
+//                     false, ESimplificationType.QUADRATIC, () => {
+//                         // let simpMesh = mesh.getLODLevels()[0].mesh;
 //                         // removeMeshEntirely(mesh);
 //                     },
 //                 );

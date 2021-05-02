@@ -2,7 +2,7 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2021 Jacob D. Durrant.
 
-declare var BABYLON;
+import { Color3, Mesh, Quaternion, StandardMaterial, TransformNode, Vector3 } from "@babylonjs/core";
 import * as Vars from "../Vars/Vars";
 
 // Get an empty node to serve as parent for the axes.
@@ -21,29 +21,29 @@ export var axesMesh;
  */
 function drawBarBetweenPoints(vstart: any, vend: any, color: any, isArrowHead = false, reverseArrowHead = false): void {
     // Adapted from https://www.babylonjs-playground.com/#1RWE59#12
-    let distance = BABYLON.Vector3.Distance(vstart, vend);
-    let cylinder = BABYLON.Mesh.CreateCylinder(
+    let distance = Vector3.Distance(vstart, vend);
+    let cylinder = Mesh.CreateCylinder(
         "cylinder",
         distance,
         isArrowHead ? (reverseArrowHead ? 0.0 : 0.3) : 0.1,
         isArrowHead ? (reverseArrowHead ? 0.3 : 0.0) : 0.1,
         16,
         Vars.scene,
-        true
+        // true
     );
     cylinder.position = vstart.add(vend).scale(0.5);
 
     let v1 = vend.subtract(vstart);
     v1.normalize();
 
-    let v2 = new BABYLON.Vector3(0, 1, 0);
-    let axis = BABYLON.Vector3.Cross(v1, v2);
+    let v2 = new Vector3(0, 1, 0);
+    let axis = Vector3.Cross(v1, v2);
     axis.normalize();
-    let angle = BABYLON.Vector3.Dot(v1, v2);
+    let angle = Vector3.Dot(v1, v2);
 
-    cylinder.rotationQuaternion = BABYLON.Quaternion.RotationAxis(axis, Math.PI / 2 + angle);
+    cylinder.rotationQuaternion = Quaternion.RotationAxis(axis, Math.PI / 2 + angle);
 
-    let mat = new BABYLON.StandardMaterial("mat", Vars.scene)
+    let mat = new StandardMaterial("mat", Vars.scene)
     mat.specularColor = color;
     mat.diffuseColor = color;
     cylinder.material = mat;
@@ -60,7 +60,7 @@ function drawBarBetweenPoints(vstart: any, vend: any, color: any, isArrowHead = 
  * @returns void
  */
 export function showAxes(): void {
-    axesMesh = new BABYLON.TransformNode("axes");
+    axesMesh = new TransformNode("axes");
 
     // Get the protein box for positioning
     let proteinMesh = Vars.scene.getMeshByName("protein_box");
@@ -69,9 +69,9 @@ export function showAxes(): void {
     //     (k) => containingBox.maximumWorld[k] - containingBox.minimumWorld[k],
     // );
     const containingBoxDimens = [
-        containingBox.maximumWorld["x"] - containingBox.minimumWorld["x"],
-        containingBox.maximumWorld["y"] - containingBox.minimumWorld["y"],
-        containingBox.maximumWorld["z"] - containingBox.minimumWorld["z"]
+        containingBox.maximumWorld.x - containingBox.minimumWorld.x,
+        containingBox.maximumWorld.y - containingBox.minimumWorld.y,
+        containingBox.maximumWorld.z - containingBox.minimumWorld.z
     ]
 
     let maxDim = Math.max(...containingBoxDimens);
@@ -79,22 +79,22 @@ export function showAxes(): void {
     let size = 0.5 * maxDim;
 
     drawBarBetweenPoints(
-        new BABYLON.Vector3.Zero(),
-        new BABYLON.Vector3(size, 0, 0),
-        new BABYLON.Color3(1, 0, 0),
+        Vector3.Zero(),
+        new Vector3(size, 0, 0),
+        new Color3(1, 0, 0),
     );
 
     drawBarBetweenPoints(
-        new BABYLON.Vector3.Zero(),
-        new BABYLON.Vector3(0, size, 0),
-        new BABYLON.Color3(0, 1, 0),
+        Vector3.Zero(),
+        new Vector3(0, size, 0),
+        new Color3(0, 1, 0),
         false, true
     );
 
     drawBarBetweenPoints(
-        new BABYLON.Vector3.Zero(),
-        new BABYLON.Vector3(0, 0, size),
-        new BABYLON.Color3(0, 0, 1),
+        Vector3.Zero(),
+        new Vector3(0, 0, size),
+        new Color3(0, 0, 1),
     );
 
     axesMesh.position = containingBox.centerWorld;

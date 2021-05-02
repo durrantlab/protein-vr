@@ -2,8 +2,6 @@ echo "Running after_build.sh"
 
 # Must be run from the main directory.
 
-# exit  # Don't do this. For debugging.
-
 # When using closure compiler, it creates empty files that aren't needed.
 # Tricky because you need to make sure the service worker doesn't try to load
 # them either.
@@ -20,7 +18,6 @@ cd -
 # set this programmatically, but couldn't get it to work. Best just to modify
 # the code to prevent it.
 cd dist/
-# ls vendor* | awk '{print "cat " $1 " | sed \"s/.3Dmol.notrack/true/g\"" }' | bash > t; mv t $(ls vendor*.js)
 ls vendor* | awk '{print "cat " $1 " | sed \"s/.3Dmol.notrack/true/g\" > t; mv t " $1}'| bash
 cd -
 
@@ -30,17 +27,7 @@ echo "Check for errors above. Enter to start compiling vendor js and other js fi
 # read -p "Press enter to continue"
 cd dist
 
-# node ../node_modules/google-closure-compiler/cli.js $(ls vendors*.js) > t
-# mv t $(ls vendors*.js)
-ls vendor*js | awk '{print "echo Closure compiling " $1 "; node ../node_modules/google-closure-compiler/cli.js " $1 " > " $1 ".tmp; mv " $1 ".tmp " $1}' | parallel --no-notice
-
-# node ../node_modules/google-closure-compiler/cli.js $(ls runtime*.js) > t
-# mv t $(ls runtime*.js)
-ls runtime*js | awk '{print "echo Closure compiling " $1 "; node ../node_modules/google-closure-compiler/cli.js " $1 " > " $1 ".tmp; mv " $1 ".tmp " $1}' | parallel --no-notice
-
-# node ../node_modules/google-closure-compiler/cli.js $(ls precache-manifest*.js) > t
-# mv t $(ls precache-manifest*.js)
-ls precache-manifest*js | awk '{print "echo Closure compiling " $1 "; node ../node_modules/google-closure-compiler/cli.js " $1 " > " $1 ".tmp; mv " $1 ".tmp " $1}' | bash
+ls vendor*js runtime*js precache-manifest*js | awk '{print "echo Closure compiling " $1 "; node ../node_modules/google-closure-compiler/cli.js " $1 " > " $1 ".tmp; mv " $1 ".tmp " $1}' | parallel --no-notice
 
 node ../node_modules/google-closure-compiler/cli.js service-worker.js > t
 mv t service-worker.js
@@ -84,6 +71,10 @@ find dist -name "*.sh" -exec rm -r '{}' \;
 # Remove files from precache-manifest*js file that do not exist.
 cd dist
 python ../utils/build/remove_entries_file_no_exist.py
+
+# There are some needless files that are not used. I'm not sure where they
+# come from.
+python ../utils/build/cleanup_build_files.py
 cd -
 
 # Also create a ZIP file of the dist directory, for convenient distribution.

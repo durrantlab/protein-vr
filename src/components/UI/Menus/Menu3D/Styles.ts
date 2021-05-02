@@ -33,7 +33,7 @@ const representations = {
 
 // You'll need to modify colorSchemeKeyWordTo3DMol in VisStyles.ts too.
 const colors = [
-    "White", "Red", "Blue", "Green", "Orange", "Yellow", "Purple",
+    "White", "Red", "Blue", "Green", "Orange", "Pink", "Yellow", "Purple", "Iceblue", "Lime"
 ];
 
 const colorSchemes = [

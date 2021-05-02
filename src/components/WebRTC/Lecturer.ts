@@ -22,6 +22,7 @@ export class Lecturer extends WebRTCBase.WebRTCBase {
         // undefined because you want proteinvr to generate an id.
         super(undefined);
 
+        // Set in the WebRTCBase constructor.
         this.peerOpenPromise.then(() => {
             // So you've got an open peer. Go ahead and setup the connection
             // and close callbacks.

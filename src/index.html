@@ -2,7 +2,6 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <!-- <meta name="viewport" content="width=device-width, user-scalable=no" /> -->
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 
         <meta name="description" content="ProteinVR Scene" />
@@ -22,7 +21,7 @@
         <link rel="preload" href="style.css" as="style">
 
         <link rel="preload" href="js/vuex.min.js" as="script">
-        <link rel="preload" href="js/vue.min.js" as="script">
+        <link href="js/vue.min.js" as="script">
 
         <!-- Let browser know you might need google to set up a PWA. -->
         <link rel="preconnect" href="https://storage.googleapis.com">
@@ -95,7 +94,7 @@
         </div>
 
         <div id="followerModeWarningContainer">
-            <div id="followerModeWarning">
+            <div id="followerModeWarning" style="display:none;">
                 Follower (view only) mode. Movement controlled by a remote user.
             </div>
         </div>
@@ -111,28 +110,14 @@
         <script> var webXRPolyfill = new WebXRPolyfill(); </script>
 
         <script src="js/jsfile.1.pep.min.js"></script>
-        <!-- <script src="https://cdn.babylonjs.com/babylon.max.js"></script> -->
-        <script src="js/jsfile.2.babylon.js"></script>
-        <script src="js/jsfile.3.babylonjs.loaders.min.js"></script>
-        <script src="js/jsfile.4.babylonjs.materials.min.js"></script>
-        <script src="js/jsfile.5.babylon.gui.min.js"></script>
         <script src="js/peer.min.js" async></script>
 
         <script src="js/vuex.min.js"></script>
-        <!-- <script src="js/vue.min.js"></script> -->
-        <script src="js/vue.js"></script>
+        <script src="js/vue.min.js"></script>
+        <!-- <script src="js/vue.js"></script> -->
 
         <link rel="stylesheet" href="pages/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="pages/css/style.css">
         <link href="style.css" rel="stylesheet" type="text/css" />
-
-        <!-- CDN version if you ever need them. -->
-        <!-- <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js" async></script> -->
-        <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> -->
-        <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> -->
-        <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
-        <!-- <script src="https://unpkg.com/vuex@3.4.0/dist/vuex.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.js"></script> -->
     </body>
 </html>

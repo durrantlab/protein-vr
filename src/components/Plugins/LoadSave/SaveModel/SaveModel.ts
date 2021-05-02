@@ -10,13 +10,14 @@ import * as VRML from "../../../Mols/3DMol/VRML";
 // import * as UrlVars from "../../../Vars/UrlVars";
 import * as Vars from "../../../Vars/Vars";
 
-declare var BABYLON;
-
 // @ts-ignore
 import {templateHtml} from "./PanelComponent.template.htm.ts";
 import * as StatusComponent from "../../../UI/Vue/Components/StatusComponent";
-import { lazyLoadJS } from "../../../System/LazyLoadJS";
+// import { lazyLoadJS } from "../../../System/LazyLoadJS";
 import { downloadTxtFile } from "../LoadSaveUtils";
+import { Mesh, VertexData } from "@babylonjs/core";
+import { GLTF2Export, OBJExport, STLExport } from "@babylonjs/serializers";
+// import { AbstractMesh } from "babylonjs";
 
 const exportedMeshName = "ProteinVRExport";
 let meshesToExportStartStr = "MeshFrom3DMol";
@@ -27,38 +28,38 @@ let meshesToExportStartStr = "MeshFrom3DMol";
  * @param  {any} mesh  The list of submeshes, now meshes.
  * @returns any
  */
-function deconstructMesh(mesh: any): any[] {
+function deconstructMesh(mesh: Mesh): Mesh[] {
     // adapted from see
     // https://doc.babylonjs.com/toolsAndResources/utilities/Deconstruct_Mesh
-    if (mesh["subMeshes"].length > 1) {
-        var otherVertexData = BABYLON["VertexData"]["ExtractFromMesh"](mesh, true, true);
-        var indices = otherVertexData["indices"];
-        var normals = otherVertexData["normals"];
-        var positions = otherVertexData["positions"];
-        var uvs = otherVertexData["uvs"];
-        var colors = otherVertexData["colors"];
+    if (mesh.subMeshes.length > 1) {
+        var otherVertexData = VertexData.ExtractFromMesh(mesh, true, true);
+        var indices = otherVertexData.indices;
+        var normals = otherVertexData.normals;
+        var positions = otherVertexData.positions;
+        var uvs = otherVertexData.uvs;
+        var colors = otherVertexData.colors;
 
         var newMeshArray = [];
-        for (var index = 0; index < mesh["subMeshes"].length; index++) {
-            var newVertexData = new BABYLON["VertexData"]();
+        for (var index = 0; index < mesh.subMeshes.length; index++) {
+            var newVertexData = new VertexData();
 
-            var newI = indices.slice(mesh["subMeshes"][index]["indexStart"], mesh["subMeshes"][index]["indexStart"]+mesh["subMeshes"][index]["indexCount"]);
-            var newN = normals.slice(mesh["subMeshes"][index]["verticesStart"] * 3, mesh["subMeshes"][index]["verticesStart"] * 3 + mesh["subMeshes"][index]["verticesCount"] * 3);
-            var newP = positions.slice(mesh["subMeshes"][index]["verticesStart"] * 3, mesh["subMeshes"][index]["verticesStart"] * 3 + mesh["subMeshes"][index]["verticesCount"] * 3);
-            var newU = uvs ? uvs.slice(mesh["subMeshes"][index]["verticesStart"] * 2, mesh["subMeshes"][index]["verticesStart"] * 2 + mesh["subMeshes"][index]["verticesCount"] * 2) : undefined;
-            var newC = colors ? colors.slice(mesh["subMeshes"][index]["verticesStart"] * 4, mesh["subMeshes"][index]["verticesStart"] * 4 + mesh["subMeshes"][index]["verticesCount"] * 4) : undefined;
+            var newI = indices.slice(mesh.subMeshes[index].indexStart, mesh.subMeshes[index].indexStart+mesh.subMeshes[index].indexCount);
+            var newN = normals.slice(mesh.subMeshes[index].verticesStart * 3, mesh.subMeshes[index].verticesStart * 3 + mesh.subMeshes[index].verticesCount * 3);
+            var newP = positions.slice(mesh.subMeshes[index].verticesStart * 3, mesh.subMeshes[index].verticesStart * 3 + mesh.subMeshes[index].verticesCount * 3);
+            var newU = uvs ? uvs.slice(mesh.subMeshes[index].verticesStart * 2, mesh.subMeshes[index].verticesStart * 2 + mesh.subMeshes[index].verticesCount * 2) : undefined;
+            var newC = colors ? colors.slice(mesh.subMeshes[index].verticesStart * 4, mesh.subMeshes[index].verticesStart * 4 + mesh.subMeshes[index].verticesCount * 4) : undefined;
             for (var subIndex = 0; subIndex < newI.length; subIndex++) {
-                newI[subIndex] = newI[subIndex] - mesh["subMeshes"][index]["verticesStart"];
+                newI[subIndex] = newI[subIndex] - mesh.subMeshes[index].verticesStart;
             }
-            newVertexData["indices"] = newI;
-            newVertexData["normals"] = newN;
-            newVertexData["positions"] = newP;
-            newVertexData["uvs"] = newU;
-            newVertexData["colors"] = newC;
+            newVertexData.indices = newI;
+            newVertexData.normals = newN;
+            newVertexData.positions = newP;
+            newVertexData.uvs = newU;
+            newVertexData.colors = newC;
 
-            var meshSubclass = new BABYLON["Mesh"](mesh["name"] + '-' + index, Vars.scene);
+            var meshSubclass = new Mesh(mesh.name + '-' + index, Vars.scene);
 
-            newVertexData["applyToMesh"](meshSubclass);
+            newVertexData.applyToMesh(meshSubclass);
 
             newMeshArray.push(meshSubclass);
         }
@@ -73,18 +74,18 @@ function deconstructMesh(mesh: any): any[] {
  * all that into a single regular mesh.
  * @returns any  The combined mesh.
  */
-function mergeMolMeshes(): any {
-    let molMeshes = Vars.scene["meshes"].filter(m => m["name"].slice(0, meshesToExportStartStr.length) === meshesToExportStartStr);
+function mergeMolMeshes(): Mesh {
+    let molMeshes = Vars.scene.meshes.filter(m => m.name.slice(0, meshesToExportStartStr.length) === meshesToExportStartStr);
 
     const molMeshesLen = molMeshes.length;
     let molMeshParts = [];
     for (let i = 0; i < molMeshesLen; i++) {
         const molMesh = molMeshes[i];
-        molMeshParts.push(...deconstructMesh(molMesh));
+        molMeshParts.push(...deconstructMesh(molMesh as Mesh));
     }
-    var newMolMesh = BABYLON["Mesh"]["MergeMeshes"](molMeshParts, true, true, false, false, false);
-    newMolMesh["name"] = exportedMeshName;
-    newMolMesh["id"] = exportedMeshName;
+    var newMolMesh = Mesh.MergeMeshes(molMeshParts, true, true, undefined, false, false);
+    newMolMesh.name = exportedMeshName;
+    newMolMesh.id = exportedMeshName;
     // newMolMesh.material = molMeshes[0].material;
     return newMolMesh;
 }
@@ -99,17 +100,17 @@ export class SaveModel extends Parent.LoadSaveParent {
          * Saves the molecules in GLTF format.
          * @returns void
          */
-        saveGLTF(): void {
+        saveGLTF(/* mod: any */): void {
             mergeMolMeshes();  // new mesh named exportedMeshName
-            BABYLON["GLTF2Export"]["GLTFAsync"](
+            /* mod. */ GLTF2Export.GLTFAsync(
                 Vars.scene,
-                this["pvrModelFileName"].slice(0, this["pvrModelFileName"].length - 4),
+                this["pvrModelFileName"].slice(0, this["pvrModelFileName"].length - 5),
                 this.optionsGLTFAndGLB
             ).then((gltf) => {
-                gltf["downloadFiles"]();
+                gltf.downloadFiles();
 
                 // Delete merged mesh.
-                Vars.scene["getMeshByID"](exportedMeshName)["dispose"]();
+                Vars.scene.getMeshByID(exportedMeshName).dispose();
             });
         },
 
@@ -117,17 +118,17 @@ export class SaveModel extends Parent.LoadSaveParent {
          * Saves the molecules in GLB format.
          * @returns void
          */
-         saveGLB(): void {
+         saveGLB(/* mod: any */): void {
             mergeMolMeshes();  // new mesh named exportedMeshName
-            BABYLON["GLTF2Export"]["GLBAsync"](
+            /* mod. */ GLTF2Export.GLBAsync(
                 Vars.scene,
-                this["pvrModelFileName"].slice(0, this["pvrModelFileName"].length - 3),
+                this["pvrModelFileName"].slice(0, this["pvrModelFileName"].length - 4),
                 this.optionsGLTFAndGLB
             ).then((glb) => {
-                glb["downloadFiles"]();
+                glb.downloadFiles();
 
                 // Delete merged mesh.
-                Vars.scene["getMeshByID"](exportedMeshName)["dispose"]();
+                Vars.scene.getMeshByID(exportedMeshName).dispose();
             });
         },
 
@@ -135,12 +136,12 @@ export class SaveModel extends Parent.LoadSaveParent {
          * Saves the molecules in OBJ format.
          * @returns void
          */
-         saveOBJ(): void {
-            let meshes = Vars.scene["meshes"].filter(
-                m => m["name"].slice(0, meshesToExportStartStr.length) === meshesToExportStartStr
+         saveOBJ(/* mod: any */): void {
+            let meshes = Vars.scene.meshes.filter(
+                m => m.name.slice(0, meshesToExportStartStr.length) === meshesToExportStartStr
             );
 
-            let obj = BABYLON["OBJExport"]["OBJ"](meshes, true, "", true);
+            let obj = /* mod. */ OBJExport.OBJ(meshes as Mesh[], true, "", true);
 
             downloadTxtFile(obj, this["pvrModelFileName"]);
 
@@ -154,16 +155,16 @@ export class SaveModel extends Parent.LoadSaveParent {
          * Saves the molecules in STL format.
          * @returns void
          */
-         saveSTL(): void {
+         saveSTL(/* mod: any */): void {
             // Does not include vertex colors.
-            let meshes = Vars.scene["meshes"].filter(
-                m => m["name"].slice(0, meshesToExportStartStr.length) === meshesToExportStartStr
+            let meshes = Vars.scene.meshes.filter(
+                m => m.name.slice(0, meshesToExportStartStr.length) === meshesToExportStartStr
             );
 
             // Note filename must not have stl extension.
-            BABYLON["STLExport"]["CreateSTL"](
-                meshes, true,
-                this["pvrModelFileName"].slice(0, this["pvrModelFileName"].length - 3),
+            /* mod. */ STLExport.CreateSTL(
+                meshes as Mesh[], true,
+                this["pvrModelFileName"].slice(0, this["pvrModelFileName"].length - 4),
                 undefined, undefined, false
             );
         },
@@ -193,24 +194,30 @@ export class SaveModel extends Parent.LoadSaveParent {
             //     /* webpackMode: "lazy" */
             //     "babylonjs-serializers"
 
-            lazyLoadJS("js/babylonjs.serializers.min.js")
-            .then(() => {
+            // import(
+                /* webpackChunkName: "babylonjs-serializers" */
+                /* webpackMode: "lazy" */
+                // "@babylonjs/serializers"
+            // ).then((mod) => {
+            // });
+            // lazyLoadJS("js/babylonjs.serializers.min.js")
+            // .then(() => {
                 // Good to wait a bit in case you need to update
                 // pvrModelFileName.
                 setTimeout(() => {
                     let format = That["formatInfo"]["format"];
                     switch (format) {
                         case "GLTF":
-                            That.saveGLTF();
+                            That.saveGLTF(/* mod */);
                             break;
                         case "GLB":
-                            That.saveGLB();
+                            That.saveGLB(/* mod */);
                             break;
                         case "OBJ":
-                            That.saveOBJ();
+                            That.saveOBJ(/* mod */);
                             break;
                         case "STL":
-                            That.saveSTL();
+                            That.saveSTL(/* mod */);
                             break;
                         case "VRML":
                             That.saveVRML();
@@ -227,7 +234,7 @@ export class SaveModel extends Parent.LoadSaveParent {
                         StatusComponent.setStatus("Model exported");
                     }, 1000);
                 }, 1000);
-            });
+            // });
 
         },
 
@@ -264,11 +271,20 @@ export class SaveModel extends Parent.LoadSaveParent {
     };
 
     public computed = {
+        /**
+         * Whether the button is currently disabled.
+         * @returns boolean
+         */
         "btnDisabled"(): boolean {
             return this["formatInfo"]["format"] === "";
         },
 
-        "formatInfo"(): any {
+        /**
+         * Gets information about the user-selected format (based on file
+         * extension).
+         * @returns * The information.
+         */
+        "formatInfo"(): {[key: string]: string} {
             if (this["pvrModelFileName"].indexOf(".") === -1) {
                 // No extetnsion yet.
                 return {
@@ -278,6 +294,7 @@ export class SaveModel extends Parent.LoadSaveParent {
             }
             let prts = this["pvrModelFileName"].split(".")
             let ext = prts[prts.length - 1].toUpperCase();
+            let limitedSupportVRML = "VRML support is limited. Often only a portion of the scene is exported.";
             let colorInVertMsg = 'Color information will be saved as vertex colors. In <a href="https://www.blender.org/" target="_blank">Blender</a>, use a material like this:<br /><img src="blender_mat_example.png">';
             let noColorMsg = "ProteinVR cannot include color information when exporting to this format.";
             switch (ext) {
@@ -303,7 +320,7 @@ export class SaveModel extends Parent.LoadSaveParent {
                     }
                 case "VRML":
                     return {
-                        "msg": colorInVertMsg,
+                        "msg": limitedSupportVRML + " " + colorInVertMsg,
                         "format": "VRML"
                     }
             }
@@ -329,14 +346,19 @@ export class SaveModel extends Parent.LoadSaveParent {
      * Returns the data associated with this component.
      * @returns * The data object.
      */
-    public data = function(): any {
+    public data = function(): {[key: string]: any} {
         return {
             "pvrModelFileName": "my-scene.glb",
             "btnTxt": "Save File",
             "overwriteBtnDisabled": false,
             optionsGLTFAndGLB: {
-                "shouldExportNode": function (node) {
-                    let toUse = node["name"].slice(0, exportedMeshName.length) === exportedMeshName;
+                /**
+                 * Get options to use for GLTF and GLB export.
+                 * @param  {*} node
+                 * @returns boolean
+                 */
+                "shouldExportNode": function (node): boolean {
+                    let toUse = node.name.slice(0, exportedMeshName.length) === exportedMeshName;
                     return toUse;
                 },
             }

@@ -15,8 +15,7 @@ import * as PromiseStore from "../PromiseStore";
 import * as Points from "../Navigation/Points";
 import * as NonVRCamera from "./NonVRCamera";
 import * as FrontVueComponent from "../UI/Vue/Components/UI2D/FrontVueComponent";
-
-declare var BABYLON: any;
+import { LightGizmo, WebXRState } from "@babylonjs/core";
 
 let lastTimeJSRunningChecked: number;
 
@@ -88,7 +87,7 @@ export function exitVRAndFS(): void {
         return;
     }
 
-    if (Vars.vrHelper.baseExperience.state === BABYLON.WebXRState.IN_XR) {
+    if (Vars.vrHelper.baseExperience.state === WebXRState.IN_XR) {
         // Be sure you only exit if you're in XR. Otherwise it will cause
         // problems (Oculus Go).
         Vars.vrHelper.baseExperience.exitXRAsync();
@@ -107,12 +106,12 @@ export function exitVRAndFS(): void {
 function setupEnterAndExitVRCallbacks(): void {
     Vars.vrHelper.baseExperience.onStateChangedObservable.add((state) => {
         switch (state) {
-            case BABYLON.WebXRState.ENTERING_XR:
+            case WebXRState.ENTERING_XR:
                 // Prevent url update while waiting for user to authorize xr.
                 // console.log("ENTERING_XR");
                 UrlVars.enableAutoUpdateUrl(false);
                 break;
-            case BABYLON.WebXRState.IN_XR:
+            case WebXRState.IN_XR:
                 // XR is initialized and already submitted one frame
                 // console.log("IN_XR");
                 UrlVars.enableAutoUpdateUrl(true);
@@ -152,19 +151,19 @@ function setupEnterAndExitVRCallbacks(): void {
                 Menu3D.menuInf["Exit VR ×"] = () => { exitVRAndFS(); }
 
                 // For reasons I don't understand, the below makes things magically work in iOS...
-                let l = new BABYLON.LightGizmo()
+                let l = new LightGizmo()
                 l.dispose();
                 l = null;
 
                 // Active camera needs to be XR camera..
                 // console.log(Vars.scene.activeCamera);
                 break;
-            case BABYLON.WebXRState.EXITING_XR:
+            case WebXRState.EXITING_XR:
                 // xr exit request was made. not yet done.
                 // console.log("EXITING_XR");
                 UrlVars.enableAutoUpdateUrl(true);
                 break;
-            case BABYLON.WebXRState.NOT_IN_XR:
+            case WebXRState.NOT_IN_XR:
                 // console.log("NOT_IN_XR");
                 UrlVars.enableAutoUpdateUrl(true);
 

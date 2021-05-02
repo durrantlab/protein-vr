@@ -11,8 +11,7 @@ import * as Vars from "../Vars/Vars";
 import * as Navigation from "./Navigation";
 import * as PromiseStore from "../PromiseStore";
 import * as UrlVars from "../Vars/UrlVars";
-
-declare var BABYLON: any;
+import { ActionManager, Color3, ExecuteCodeAction, Mesh, StandardMaterial } from "@babylonjs/core";
 
 const pickableMeshes: any[] = [];
 const pickableButtons: any[] = [];
@@ -151,10 +150,10 @@ export function makeMeshMouseClickable(params: IMakeMeshClickableParams): void {
         return;
     }
 
-    params.mesh.actionManager = new BABYLON.ActionManager(params.scene);
+    params.mesh.actionManager = new ActionManager(params.scene);
     params.mesh.actionManager.registerAction(
-        new BABYLON.ExecuteCodeAction(
-            BABYLON.ActionManager.OnPickTrigger,
+        new ExecuteCodeAction(
+            ActionManager.OnPickTrigger,
             () => {
                 // If it's in VR mode, there are no mouse clicks. This is
                 // important to prevent a double click with controllers.
@@ -180,15 +179,15 @@ export function makePadNavigationSphereAroundCamera(): void {
         return;
     }
 
-    padNavSphereAroundCamera = BABYLON.Mesh.CreateSphere(
+    padNavSphereAroundCamera = Mesh.CreateSphere(
         "padNavSphereAroundCamera",
         4, Vars.MAX_TELEPORT_DIST - 1.0, Vars.scene,
     );
     padNavSphereAroundCamera.flipFaces(true);
 
-    const mat = new BABYLON.StandardMaterial("padNavSphereAroundCameraMat", Vars.scene);
-    mat.diffuseColor = new BABYLON.Color3(1, 1, 1);
-    mat.specularColor = new BABYLON.Color3(0, 0, 0);
+    const mat = new StandardMaterial("padNavSphereAroundCameraMat", Vars.scene);
+    mat.diffuseColor = new Color3(1, 1, 1);
+    mat.specularColor = new Color3(0, 0, 0);
     mat.opacityTexture = null;
     padNavSphereAroundCamera.material = mat;
 

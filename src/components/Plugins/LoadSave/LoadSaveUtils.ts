@@ -164,6 +164,12 @@ export function shadowsHardwareScalingLocalStorageToVueX(): void {
     }
 }
 
+/**
+ * Starts download of a blbobl.
+ * @param  {*}      blob      The blob.
+ * @param  {string} filename  The filename.
+ * @returns Promise  Fulfilled when download starts.
+ */
 export function downloadBlob(blob: any, filename: string): Promise<any> {
     return lazyLoadJS("js/FileSaver.min.js").then(() => {
         window["saveAs"](blob, filename);
@@ -171,6 +177,12 @@ export function downloadBlob(blob: any, filename: string): Promise<any> {
     });
 }
 
+/**
+ * Downloads a file containing text.
+ * @param  {string} content   The text.
+ * @param  {string} filename  The filename to use.
+ * @returns Promise  Fulfilled when the download begins.
+ */
 export function downloadTxtFile(content: string, filename: string): Promise<any> {
     return lazyLoadJS("js/FileSaver.min.js").then(() => {
         var blob = new Blob([content], { "type": "application/octet-stream;charset=utf-8" });

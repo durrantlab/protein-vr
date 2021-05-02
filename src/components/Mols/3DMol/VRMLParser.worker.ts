@@ -94,6 +94,7 @@ export function loadValsFromVRML(vrmlStr: string, removeExtraPts = false): any[]
         // separately. Different chunks could share vertexes. So further
         // compression is possible here, though it's complicated to implement.
         let data = simplifyMeshData(coors, trisIdxs, colors);
+        // let data = [coors, trisIdxs, colors];
 
         // Make sure string keys for closure compiler, since web worker is
         // external.
@@ -146,7 +147,7 @@ export function loadValsFromVRML(vrmlStr: string, removeExtraPts = false): any[]
  * @param  {*} pts The coordinates. Float32Array.
  * @returns * Float32Array
  */
-export function removeStrayPoints(pts: any): any {
+export function removeStrayPoints(pts: Float32Array): Float32Array {
     /** @type {number} */
     const firstX = pts[0];
 
@@ -196,7 +197,7 @@ function chunk(arr: any[]): any[] {
  * @param  {string} str The coordinates in string format.
  * @returns * The list (actually a Float32Array... not sure how to type this.)
  */
-function strToCoors(str: string): any {
+function strToCoors(str: string): Float32Array {
     // Convert coordinates in string form to arrays.
     const coorStrs = str.match(numRegex);
 
@@ -227,7 +228,7 @@ function strToCoors(str: string): any {
  * @param  {string} str The colors in string format.
  * @returns * The list (actually a Float32Array... not sure how to type this.)
  */
-function strToColors(str: string): any {
+function strToColors(str: string): Float32Array {
     // Convert coordinates in string form to arrays.
     const colorStrs = str.match(numRegex);
 
@@ -258,13 +259,13 @@ function strToColors(str: string): any {
  * @param  {string} str  The indexes in string format.
  * @returns * The list (actually a Uint32Array... not sure how to type this.)
  */
-function strToTris(str: string): any {
+function strToTris(str: string): Uint32Array {
     // Convert coordinates in string form to arrays.
     const indexStrs = str.match(numRegex);
 
     if (indexStrs === null) {
         // Sometimes there are no matches, e.g., 2HU4 surface.
-        return new Float32Array(0);
+        return new Uint32Array(0);
     }
 
     const indexStrsLen = indexStrs.length;
@@ -334,7 +335,7 @@ function translateBeforeBabylonImport(delta: number[], modelData: any[]): any[] 
  *                                                            colors, etc.
  * @returns * The x, y, z of the geometric center. Float32Array.
  */
-function getGeometricCenter(modelData: any[]): any {
+function getGeometricCenter(modelData: any[]): Float32Array {
     // No coordinates... it's an empty mesh.
     if (modelData.length === 0) {
         return new Float32Array([0.0, 0.0, 0.0]);
@@ -372,7 +373,14 @@ function getGeometricCenter(modelData: any[]): any {
     return new Float32Array([xTotal, yTotal, zTotal]);
 }
 
-function simplifyMeshData(coors, trisIdxs, colors) {
+/**
+ * Simplifies meshes by merging vertexes by distance.
+ * @param  {Float32Array} coors     The coordinates (flat).
+ * @param  {Uint32Array}  trisIdxs  The indexes (flat).
+ * @param  {Float32Array} colors    The colors (flat).
+ * @returns * A list containing the merged arrays.
+ */
+function simplifyMeshData(coors: Float32Array, trisIdxs: Uint32Array, colors: Float32Array): any[] {
     // coors is in triplets. So num points = count / 3.
 
     // colors is in quadruplets. So num points = count / 4. one-to-one with

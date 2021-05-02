@@ -18,8 +18,8 @@ import * as ModalComponent from "../UI/Vue/Components/OpenPopup/ModalComponent";
 import * as Arrow from "../Navigation/Arrow";
 import * as PromiseStore from "../PromiseStore";
 import * as VRCamera from "../Cameras/VRCamera";
+import { Animation, Mesh, Vector3 } from "@babylonjs/core";
 
-declare var BABYLON: any;
 declare var jQuery: any;
 
 export const enum NavMode {
@@ -58,7 +58,7 @@ export function runSetupNavigation(): void {
             Arrow.loadArrow();
 
             // Allways collide with a floor mesh.
-            Vars.vrVars.groundMesh = Vars.scene.getMeshByID("ground");
+            Vars.vrVars.groundMesh = Vars.scene.getMeshByID("ground") as Mesh;
             if (Vars.vrVars.groundMesh === null) { alert("No mesh named ground"); }
             Vars.vrVars.groundMesh.checkCollisions = true;
 
@@ -94,7 +94,7 @@ export function runSetupNavigation(): void {
 }
 
 /** @type {*} */
-let lastCameraPt: any;
+let lastCameraPt: Vector3;
 
 /** @type {string} */
 let lastCameraName = "";
@@ -196,7 +196,7 @@ export function actOnStareTrigger(): void {
  *                                        is done.
  * @returns void
  */
-function teleport(newLoc: any = undefined, callBack: any = undefined): void {
+function teleport(newLoc: Vector3 = undefined, callBack: Function = undefined): void {
     currentlyTeleporting = true;
 
     if (callBack === undefined) {
@@ -208,10 +208,10 @@ function teleport(newLoc: any = undefined, callBack: any = undefined): void {
 
     // Animate the transition to the new location.
     /** @const {*} */
-    const animationCameraTeleportation = new BABYLON.Animation(
+    const animationCameraTeleportation = new Animation(
         "animationCameraTeleportation", "position", 90,
-        BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
-        BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+        Animation.ANIMATIONTYPE_VECTOR3,
+        Animation.ANIMATIONLOOPMODE_CONSTANT,
     );
 
     // The start location.
@@ -220,7 +220,7 @@ function teleport(newLoc: any = undefined, callBack: any = undefined): void {
     // Get the new location.
     if (newLoc === undefined) {
         // If it's not defined, use the current stare point.
-        newLoc = new BABYLON.Vector3(
+        newLoc = new Vector3(
             Points.curStarePt.x,
             Points.curStarePt.y + Vars.cameraHeight,
             Points.curStarePt.z,
@@ -368,8 +368,11 @@ function checkCaptureMouseClicksOutsideBabylon(): void {
         deviceBeingOriented = false;
     } else {
         // Check other devices (whether in browser or in cardboard, etc).
+        // @ts-ignore
         deviceBeingOriented = (deviceOrientation._alpha !== 0) ||
+        // @ts-ignore
                               (deviceOrientation._beta !== 0) ||
+        // @ts-ignore
                               (deviceOrientation._gamma !== 0);
     }
 

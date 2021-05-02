@@ -21,6 +21,10 @@ CHANGES
 * Numeric menu items are now sorted numerically.
 * Added three new protein representations: trace, ribbon, and tubes.
 * Added three new color schemes: B factor, atom index, and secondary structure.
+* Added three new colors: pink, iceblue, and lime.
+* Now possible to have more than one light in an environment, though only one
+  light can cast a shadow.
+* Added "Simple" environment.
 * Updated the copyright notice to 2021.
 * Fixed bug that prevented the skybox from tracking with the camera at
   "infinite distance" in some cases.

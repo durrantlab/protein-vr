@@ -10,9 +10,9 @@ import * as Vars from "./Vars";
 import * as CommonCamera from "../Cameras/CommonCamera";
 import * as MonitorLoadFinish from "../System/MonitorLoadFinish";
 import { runURLPlugins } from "../Plugins/URLParams/LoadAll";
+import { Quaternion, Vector3 } from "@babylonjs/core";
 
 declare var jQuery: any;
-declare var BABYLON: any;
 
 const stylesQueue: any[] = [];
 export let webrtc: any = undefined;
@@ -289,7 +289,7 @@ export function readUrlParams(): void {
     const cy = urlParams.get("cy");
     const cz = urlParams.get("cz");
     if ((cx !== undefined) && (cy !== undefined) && (cz !== undefined)) {
-        CommonCamera.setCameraPosition(new BABYLON.Vector3(+cx, +cy, +cz));
+        CommonCamera.setCameraPosition(new Vector3(+cx, +cy, +cz));
     }
 
     const crx = urlParams.get("crx");
@@ -297,7 +297,7 @@ export function readUrlParams(): void {
     const crz = urlParams.get("crz");
     const crw = urlParams.get("crw");
     if ((crx !== undefined) && (cry !== undefined) && (crz !== undefined) && (crw !== undefined)) {
-        CommonCamera.setCameraRotationQuaternion(new BABYLON.Quaternion(+crx, +cry, +crz, +crw));
+        CommonCamera.setCameraRotationQuaternion(new Quaternion(+crx, +cry, +crz, +crw));
     }
 
     // Determine if shadows or not.

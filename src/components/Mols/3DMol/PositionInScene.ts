@@ -9,25 +9,29 @@ import * as VRML from "./VRML";
 import * as StatusComponent from "../../UI/Vue/Components/StatusComponent";
 // import * as Axes from "../../Scene/Axes";
 import { HookTypes, runHooks } from '../../Plugins/Hooks/Hooks';
+import { AbstractMesh, Animation, Quaternion, TransformNode, Vector3, VertexBuffer } from "@babylonjs/core";
 
-declare var BABYLON: any;
-
-export let lastRotationQuatBeforeAnimation = new BABYLON.Quaternion(0, 0, 0, 0);
-let lastRotationQuat: any = undefined;
+export let lastRotationQuatBeforeAnimation = new Quaternion(0, 0, 0, 0);
+let lastRotationQuat: Quaternion = undefined;
 const cachedDeltaYs = {};
 
 // If you parent non-mol meshes to this transform node, using angstrom
 // coordinates, they will track the meshes as they rotate. Note that
 // everything added to this should itself be a TransformNode. Parent actual
 // meshes to that TransformNode.
-export let nonMolMeshesTransformNode;
+export let nonMolMeshesTransformNode: TransformNode;
 
-export function setupPositioning() {
-    nonMolMeshesTransformNode = new BABYLON["TransformNode"]("nonMolMeshesTransformNode");
+/**
+ * Sets up the nonMolMeshesTransformNode variable.
+ * @returns void
+ */
+export function setupPositioning(): void {
+    nonMolMeshesTransformNode = new TransformNode("nonMolMeshesTransformNode");
 }
 
 /**
- * Positions a given molecular mesh within a specified box.
+ * Positions a given molecular mesh within a specified box. The "entry point"
+ * to the mesh positioning system.
  * @param  {*}         babylonMeshJustAdded       The molecular mesh.
  * @param  {*}         otherContainerBabylonMesh  The box.
  * @param  {boolean=}  animate                    Whether to animate the mesh,
@@ -65,10 +69,11 @@ export function positionAll3DMolMeshInsideAnother(babylonMeshJustAdded: any, oth
     // const containingBoxDimens = Object.keys(containingBox.maximumWorld).map(
     //     (k) => containingBox.maximumWorld[k] - containingBox.minimumWorld[k],
     // );
+
     const containingBoxDimens = [
-        containingBox.maximumWorld["x"] - containingBox.minimumWorld["x"],
-        containingBox.maximumWorld["y"] - containingBox.minimumWorld["y"],
-        containingBox.maximumWorld["z"] - containingBox.minimumWorld["z"]
+        containingBox.maximumWorld.x - containingBox.minimumWorld.x,
+        containingBox.maximumWorld.y - containingBox.minimumWorld.y,
+        containingBox.maximumWorld.z - containingBox.minimumWorld.z
     ]
 
     // Get information about the mesh with the maximum volume.
@@ -108,7 +113,7 @@ export function positionAll3DMolMeshInsideAnother(babylonMeshJustAdded: any, oth
  *             allVisMolMeshesInfo }
 
  */
-function getVisibleMolMeshesAndInfo(babylonMeshJustAdded: any): any {
+function getVisibleMolMeshesAndInfo(babylonMeshJustAdded: AbstractMesh): any {
     // Get the meshes from the babylon scene.
     /** @type {Array<*>} */
     const allVisMolMeshes = getVisibleMolMeshes(babylonMeshJustAdded);
@@ -140,7 +145,7 @@ function getVisibleMolMeshesAndInfo(babylonMeshJustAdded: any): any {
  * @param  {*} babylonMesh  The mesh that was just added.
  * @returns Array<*>  A list of all visible meshes.
  */
-function getVisibleMolMeshes(babylonMesh: any): any[] {
+function getVisibleMolMeshes(babylonMesh: AbstractMesh): AbstractMesh[] {
     const allVisMolMeshes = [];
     const molMeshIds = Object.keys(VisStyles.styleMeshes);
     const len = molMeshIds.length;
@@ -165,7 +170,7 @@ function getVisibleMolMeshes(babylonMesh: any): any[] {
  * @param  {Object<*>} allVisMolMeshes  All the visible meshes.
  * @returns void
  */
-function resetMeshes(allVisMolMeshes: any[]): void {
+function resetMeshes(allVisMolMeshes: AbstractMesh[]): void {
     // Reset the scaling, position, and rotation of all the visible molecular
     // meshes.
     const len = allVisMolMeshes.length;
@@ -176,18 +181,18 @@ function resetMeshes(allVisMolMeshes: any[]): void {
         if (allVisMolMesh.isVisible === true) {
             // Make sure allVisMolMesh is not scaled or positioned. But
             // note that rotations are preserved.
-            allVisMolMesh.scaling = new BABYLON.Vector3(1, 1, 1);
-            allVisMolMesh.position = new BABYLON.Vector3(0, 0, 0);
+            allVisMolMesh.scaling = new Vector3(1, 1, 1);
+            allVisMolMesh.position = new Vector3(0, 0, 0);
             allVisMolMesh.rotationQuaternion = VRML.molRotationQuat;
             allVisMolMesh.visibility = 0;  // Hide while rotating.
         }
     }
 
     // Also position nonMolMeshesTransformNode
-    nonMolMeshesTransformNode.scaling = new BABYLON.Vector3(1, 1, 1);
-    nonMolMeshesTransformNode.position = new BABYLON.Vector3(0, 0, 0);
+    nonMolMeshesTransformNode.scaling = new Vector3(1, 1, 1);
+    nonMolMeshesTransformNode.position = new Vector3(0, 0, 0);
     nonMolMeshesTransformNode.rotationQuaternion = VRML.molRotationQuat;
-    nonMolMeshesTransformNode.visibility = 0;  // Hide while rotating.
+    // nonMolMeshesTransformNode.visibility = 0;  // Hide while rotating.
 
     // Render to update the meshes
     Vars.scene.render();  // Needed to get bounding box to recalculate.
@@ -199,7 +204,7 @@ function resetMeshes(allVisMolMeshes: any[]): void {
  * @returns *  The information about the max-volume mesh. { box: maxVolBox,
  *             boxDimens: maxVolBoxDimens, mesh: maxVolMesh }
  */
-function getMaxVolMeshInfo(allVisMeshes: any[]): any {
+function getMaxVolMeshInfo(allVisMeshes: AbstractMesh[]): any {
     // Get the molecular model with the biggest volume.
     const allVisMolMeshesLen = allVisMeshes.length;
     let maxVol = 0.0;
@@ -213,9 +218,9 @@ function getMaxVolMeshInfo(allVisMeshes: any[]): any {
         //     (k) => maxVolBoxTmp.maximumWorld[k] - maxVolBoxTmp.minimumWorld[k],
         // );
         const maxVolBoxDimensTmp = [
-            maxVolBoxTmp.maximumWorld["x"] - maxVolBoxTmp.minimumWorld["x"],
-            maxVolBoxTmp.maximumWorld["y"] - maxVolBoxTmp.minimumWorld["y"],
-            maxVolBoxTmp.maximumWorld["z"] - maxVolBoxTmp.minimumWorld["z"]
+            maxVolBoxTmp.maximumWorld.x - maxVolBoxTmp.minimumWorld.x,
+            maxVolBoxTmp.maximumWorld.y - maxVolBoxTmp.minimumWorld.y,
+            maxVolBoxTmp.maximumWorld.z - maxVolBoxTmp.minimumWorld.z
         ]
         const volume = maxVolBoxDimensTmp[0] * maxVolBoxDimensTmp[1] * maxVolBoxDimensTmp[2];
 
@@ -229,7 +234,7 @@ function getMaxVolMeshInfo(allVisMeshes: any[]): any {
 
     return {
         box: maxVolBox,
-        boxDimens: maxVolBoxDimens,
+        boxDimens: maxVolBoxDimens,  // ? maxVolBoxDimens : [0, 0, 0],
         mesh: maxVolMesh
     }
 }
@@ -242,7 +247,10 @@ function getMaxVolMeshInfo(allVisMeshes: any[]): any {
  * @param  {*[]} visMeshes            A list of all the visible meshes.
  * @returns void
  */
-function scaleAllMeshesToFixInBox(containingBoxDimens: any[], maxVolBoxDimens: any[], visMeshes: any[]): void {
+function scaleAllMeshesToFixInBox(
+    containingBoxDimens: any[], maxVolBoxDimens: any[],
+    visMeshes: AbstractMesh[]
+): void {
     const allVisMolMeshesLen = visMeshes.length;
 
     // Get the scales
@@ -252,7 +260,7 @@ function scaleAllMeshesToFixInBox(containingBoxDimens: any[], maxVolBoxDimens: a
 
     // Get the minimum of those scale
     const minScale = Math.min.apply(null, scales);
-    const meshScaling = new BABYLON.Vector3(minScale, minScale, minScale);
+    const meshScaling = new Vector3(minScale, minScale, minScale);
 
     // Scale the meshes.
     for (let i = 0; i < allVisMolMeshesLen; i++) {
@@ -275,7 +283,7 @@ function scaleAllMeshesToFixInBox(containingBoxDimens: any[], maxVolBoxDimens: a
  *                              volume.
  * @returns void
  */
-function translateAllMeshes(containingBox: any, allVisMeshes: any[], maxVolInfo: any): void {
+function translateAllMeshes(containingBox: any, allVisMeshes: AbstractMesh[], maxVolInfo: any): void {
     const allVisMolMeshesLen = allVisMeshes.length;
 
     // Translate the meshes.
@@ -311,7 +319,7 @@ function translateAllMeshes(containingBox: any, allVisMeshes: any[], maxVolInfo:
  * @param  {Object} containingBox  The box within which to position the mesh.
  * @returns number  How much to move along the Y axis.
  */
-function moveMolMeshesToGround(biggestMolMesh: any, containingBox: any): number {
+function moveMolMeshesToGround(biggestMolMesh: AbstractMesh, containingBox: any): number {
     if ((biggestMolMesh === undefined) || (biggestMolMesh === null)) {
         // Sometimes gets passed a non-mesh.
         return;
@@ -322,13 +330,17 @@ function moveMolMeshesToGround(biggestMolMesh: any, containingBox: any): number 
     // proteins in a bilayer, for example. Now let's move the meshes so they
     // are actually on the ground (all other meshes).
 
-    // Check and see if the deltaY has already been calculated.
+    // Check and see if the deltaY has already been calculated. Make sure this
+    // key is unique. I've run into problems in the past...
     const PI = Math.PI;
     const key: string = biggestMolMesh.name + "-" +
               (biggestMolMesh.rotationQuaternion.x % PI).toFixed(3) + "-" +
               (biggestMolMesh.rotationQuaternion.y % PI).toFixed(3) + "-" +
               (biggestMolMesh.rotationQuaternion.z % PI).toFixed(3) + "-" +
-              (biggestMolMesh.rotationQuaternion.w % PI).toFixed(3);
+              (biggestMolMesh.rotationQuaternion.w % PI).toFixed(3) + "-" +
+              biggestMolMesh.position.x.toFixed(3) + "-" +
+              biggestMolMesh.position.y.toFixed(3) + "-" +
+              biggestMolMesh.position.z.toFixed(3)
     if (cachedDeltaYs[key] !== undefined) {
         return cachedDeltaYs[key];
     }
@@ -338,14 +350,15 @@ function moveMolMeshesToGround(biggestMolMesh: any, containingBox: any): number 
     // minimum z of any vertex. Let's loop through the biggest mesh and find
     // its lowest vertex, because positioning over the ground needs to be more
     // exact.
-    const verts = biggestMolMesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+    const verts = biggestMolMesh.getVerticesData(VertexBuffer.PositionKind);
     let thisMinY = 1000000.0;
     const vertsLength = verts.length;
     const thisMeshWorldMatrix = biggestMolMesh.getWorldMatrix();
+
     const amntToSkipToGet1000Pts = Math.max(1, 3 * Math.floor(vertsLength / 3000));
     for (let i = 0; i < vertsLength; i = i + amntToSkipToGet1000Pts) {
-        let vec = new BABYLON.Vector3(verts[i], verts[i + 1], verts[i + 2]);
-        vec = BABYLON.Vector3.TransformCoordinates(vec, thisMeshWorldMatrix);
+        let vec = new Vector3(verts[i], verts[i + 1], verts[i + 2]);
+        vec = Vector3.TransformCoordinates(vec, thisMeshWorldMatrix);
         if (vec.y < thisMinY) {
             thisMinY = vec.y;
         }
@@ -353,7 +366,6 @@ function moveMolMeshesToGround(biggestMolMesh: any, containingBox: any): number 
 
     // The min z of the target box should be ok.
     const targetMinY = containingBox.minimumWorld.y;
-
     const deltaY = thisMinY - targetMinY - 0.1;
     cachedDeltaYs[key] = deltaY;
     return deltaY;
@@ -366,7 +378,7 @@ function moveMolMeshesToGround(biggestMolMesh: any, containingBox: any): number 
  * @param  {*[]} allVisMeshes     List of all visible meshes.
  * @returns void
  */
-function animateRotation(allVisInitialInfo: any, allVisMeshes: any[]): void {
+function animateRotation(allVisInitialInfo: any, allVisMeshes: AbstractMesh[]): void {
     let len = allVisInitialInfo.meshesInfo.length;
     let pos, sca, rot;
     for (let i = 0; i < len; i++) {
@@ -379,7 +391,7 @@ function animateRotation(allVisInitialInfo: any, allVisMeshes: any[]): void {
         rot = mesh.rotationQuaternion.clone();
 
         // TODO: The way it should be:
-        // scene.getMeshByName("MeshFrom3DMol0.6281022775005658").rotate(BABYLON.Axis.X, 0.1, BABYLON.Space.WORLD);
+        // scene.getMeshByName("MeshFrom3DMol0.6281022775005658").rotate(Axis.X, 0.1, Space.WORLD);
 
         animateRotationOnSingleMesh(
             mesh, allVisInitialInf.position, allVisInitialInf.scaling, allVisInitialInf.rotationQuaternion,
@@ -397,7 +409,7 @@ function animateRotation(allVisInitialInfo: any, allVisMeshes: any[]): void {
 
     // if (nonMolMeshesTransformNode.rotationQuaternion === null) {
     //     // Below will set rotationQuaternion if it doesn't exist.
-    //     nonMolMeshesTransformNode.rotationQuaternion = new BABYLON["Quaternion"]["Identity"]();
+    //     nonMolMeshesTransformNode.rotationQuaternion = new Quaternion.Identity();
     // }
 
     animateRotationOnSingleMesh(
@@ -409,11 +421,21 @@ function animateRotation(allVisInitialInfo: any, allVisMeshes: any[]): void {
     runHooks(HookTypes.ON_ROTATE, {position: pos, scaling: sca, rotation: rot});
 }
 
+/**
+ * Animates a mesh.
+ * @param  {*}  mesh      The mesh to animate.
+ * @param  {*}  startPos  The starting position of the mesh.
+ * @param  {*}  startSca  The starting scale of the mesh.
+ * @param  {*}  startRot  The starting rotation of the mesh.
+ * @param  {*}  endPos    The ending position of the mesh.
+ * @param  {*}  endSca    The ending scale of the mesh.
+ * @param  {*}  endRot    The ending rotation of the mesh.
+ */
 function animateRotationOnSingleMesh(
-    mesh: any,
-    startPos: any, startSca: any, startRot: any,
-    endPos: any, endSca: any, endRot: any
-) {
+    mesh: TransformNode,
+    startPos: Vector3, startSca: Vector3, startRot: Quaternion,
+    endPos: Vector3, endSca: Vector3, endRot: Quaternion
+): void {
     //                           name,   prop,         start_val,  end_val
     const posX = makeBabylonAnim("posX", "position.x", startPos.x, endPos.x);
     const posY = makeBabylonAnim("posY", "position.y", startPos.y, endPos.y);
@@ -449,10 +471,10 @@ function animateRotationOnSingleMesh(
  * @param  {number} endVal    The ending value.
  */
 function makeBabylonAnim(name: string, prop: string, startVal: number, endVal: number) {
-    const anim = new BABYLON.Animation(
+    const anim = new Animation(
         name, prop, 60,
-        BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-        BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE,
+        Animation.ANIMATIONTYPE_FLOAT,
+        Animation.ANIMATIONLOOPMODE_CYCLE,
     );
 
     anim.setKeys([

@@ -6,10 +6,26 @@
 
 import * as Vars from "../Vars/Vars";
 import * as UrlVars from "../Vars/UrlVars";
+import { IShadowLight, Light, ShadowGenerator } from "@babylonjs/core";
+import { ShadowOnlyMaterial } from "@babylonjs/materials";
 
-declare var BABYLON: any;
+export let shadowGenerator: ShadowGenerator;
 
-export let shadowGenerator: any;
+export function getShadowCastingLight(): Light | undefined {
+    const VarsSceneLightsLen = Vars.scene.lights.length;
+    for (let i = 0; i < VarsSceneLightsLen; i++) {
+        const light = Vars.scene.lights[i];
+        const lightName = light.name.toLowerCase();
+        const isShadowLight = (
+            (lightName.indexOf("shadowlight") !== -1) ||
+            (lightName.indexOf("shadow_light") !== -1)
+        );
+        if (isShadowLight) {
+            return light;
+        }
+    }
+    return undefined;
+}
 
 /**
  * Setup the shadow generator that casts a shadow from the molecule meshes.
@@ -17,7 +33,7 @@ export let shadowGenerator: any;
  */
 export function setupShadowGenerator(): void {
     // Get the light that will cast the shadows.
-    const light = Vars.scene.lights[0];
+    const light = getShadowCastingLight();
 
     /** @type {Object<string,number>} */
     const shadowInf = getBlurDarknessAmbientFromLightName();
@@ -27,7 +43,7 @@ export function setupShadowGenerator(): void {
     // Set up the shadow generator.
     // Below gives error on iphone sometimes... And Oculus Go browser.
     if (UrlVars.checkShadowInUrl()) {
-        shadowGenerator = new BABYLON.ShadowGenerator(4096, light);
+        shadowGenerator = new ShadowGenerator(4096, light as IShadowLight);
 
         if (true) {
             // Set above to false for debugging (sharp shadow).
@@ -58,10 +74,11 @@ export function setupShadowGenerator(): void {
 
 /**
  * Gets the blur and darkness to use on shadows and molecule lighting.
+ * @param  {*} light  The light with the info in the name.
  * @returns Object<string,number>
  */
-export function getBlurDarknessAmbientFromLightName(): any {
-    const light = Vars.scene.lights[0];
+export function getBlurDarknessAmbientFromLightName(): {[key: string]: number} {
+    const light = getShadowCastingLight();
 
     // Set some default values for the shadows.
     let blur = 64;
@@ -102,8 +119,8 @@ export function setupShadowCatchers(): void {
             mesh.name.toLowerCase().indexOf("shadow_catcher") !== -1)) {
 
             // Make the material
-            mesh.material = new BABYLON.ShadowOnlyMaterial("shadow_catch" + idx.toString(), Vars.scene);
-            mesh.material.activeLight = Vars.scene.lights[0];
+            mesh.material = new ShadowOnlyMaterial("shadow_catch" + idx.toString(), Vars.scene);
+            (mesh.material as ShadowOnlyMaterial).activeLight = getShadowCastingLight() as IShadowLight;
             // mesh.material.alpha = 0.1;
 
             // It can receive shadows.

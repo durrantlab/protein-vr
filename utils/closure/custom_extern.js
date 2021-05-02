@@ -188,10 +188,30 @@ BABYLON.SceneLoader.LoadAssetContainer = function(a, b, c, d, e) {};
 BABYLON.SceneLoader.ImportMeshAsync = function(a, b, c, d) {};
 BABYLON.MeshBuilder;
 BABYLON.MeshBuilder.CreateBox = function(a, b, c) {};
+BABYLON.MeshBuilder.CreatePlane = function(a, b, c) {};
 BABYLON.UtilityLayerRenderer;
 BABYLON.UtilityLayerRenderer.utilityLayerScene;
 BABYLON.Light;
 BABYLON.Light.Parse = function(a, b) {};
+
+BABYLON.AdvancedDynamicTexture;
+BABYLON.AdvancedDynamicTexture.CreateForMesh = function(a, b, c) {};
+BABYLON.AdvancedDynamicTexture.addControl = function() {};
+
+/**
+ * @constructor
+ */
+BABYLON.Rectangle = function() {};
+
+BABYLON.Rectangle.prototype.width;
+BABYLON.Rectangle.prototype.height;
+BABYLON.Rectangle.prototype.cornerRadius;
+BABYLON.Rectangle.prototype.color;
+BABYLON.Rectangle.prototype.thickness;
+BABYLON.Rectangle.prototype.background;
+BABYLON.Rectangle.prototype.alpha;
+BABYLON.Rectangle.prototype.linkWithMesh = function(a) {};
+BABYLON.Rectangle.prototype.addControl = function() {};
 
 /**
  * @constructor
@@ -310,6 +330,15 @@ BABYLON.GUI.TransformNode = function(a) {};
 /**
  * @constructor
  */
+BABYLON.TransformNode  = function(a) {};
+
+BABYLON.TransformNode.prototype.parent;
+BABYLON.TransformNode.prototype.setParent = function(a) {};
+BABYLON.TransformNode.prototype.position;
+
+/**
+ * @constructor
+ */
 BABYLON.GUI.StackPanel3D = function() {};
 
 BABYLON.GUI.StackPanel3D.prototype.linkToTransformNode = function(a) {};
@@ -318,6 +347,9 @@ BABYLON.GUI.StackPanel3D.prototype.linkToTransformNode = function(a) {};
  * @constructor
  */
 BABYLON.GUI.TextBlock = function() {};
+
+BABYLON.GUI.TextBlock.prototype.text;
+BABYLON.GUI.TextBlock.prototype.fontSize;
 
 /**
  * @constructor
@@ -332,11 +364,27 @@ BABYLON.GUI.HolographicButton.prototype.mesh.actionManager;
 BABYLON.GUI.HolographicButton.prototype.node.absolutePosition = function() {};
 
 
+BABYLON.GLTF2Export;
+BABYLON.GLTF2Export.GLTFAsync = function(a,b,c) {};
+BABYLON.GLTF2Export.GLBAsync = function(a,b,c) {};
+BABYLON.GLTF2Export.downloadFiles = function() {};
+
+BABYLON.OBJExport;
+BABYLON.OBJExport.OBJ = function(a,b,c,d) {};
+
+BABYLON.STLExport;
+BABYLON.STLExport.CreateSTL = function(a,b,c,d,e,f) {}
+
 /**
  * @constructor
  */
 BABYLON.Mesh = function(a,b) {};
 
+BABYLON.Mesh.subMeshes;
+BABYLON.Mesh.subMeshes.indexCount
+BABYLON.Mesh.subMeshes.indexStart
+BABYLON.Mesh.subMeshes.verticesCount
+BABYLON.Mesh.subMeshes.verticesStart
 BABYLON.Mesh.CreateSphere = function(a,b,c,d) {};
 BABYLON.Mesh.getVerticesData = function(a) {};
 BABYLON.Mesh.subdivide = function() {};
@@ -346,6 +394,8 @@ BABYLON.Mesh.material = function() {};
 BABYLON.Mesh.freezeWorldMatrix = function() {};
 BABYLON.Mesh.getChildren = function() {};
 BABYLON.Mesh.receiveShadows;
+BABYLON.Mesh.billboardMode;
+BABYLON.Mesh.BILLBOARDMODE_ALL;
 BABYLON.Mesh.id;
 BABYLON.Mesh.hasVertexAlpha;
 BABYLON.Mesh.visibility;
@@ -386,7 +436,8 @@ BABYLON.Mesh.refreshBoundingInfo = function() {};
 BABYLON.Mesh.animations;
 BABYLON.Mesh.getWorldMatrix = function() {};
 BABYLON.Mesh.infiniteDistance;
-BABYLON.mesh.renderingGroupId;
+BABYLON.Mesh.renderingGroupId;
+BABYLON.Mesh.setParent = function(a) {};
 
 BABYLON.Matrix;
 BABYLON.Matrix.Translation = function(a) {};
@@ -439,6 +490,7 @@ BABYLON.StandardMaterial = function(a,b) {};
 BABYLON.Engine = function(a,b) {};
 
 BABYLON.Engine.prototype.runRenderLoop = function(a) {};
+BABYLON.Engine.prototype.stopRenderLoop = function() {};
 BABYLON.Engine.prototype.resize = function() {};
 BABYLON.Engine.prototype.enableOfflineSupport;
 BABYLON.Engine.prototype.switchFullscreen = function(a) {};
@@ -757,6 +809,14 @@ BABYLON.VertexData.prototype.applyToMesh = function(a) {};
 BABYLON.VertexData.prototype.ComputeNormals = function(a,b,c) {};
 BABYLON.VertexData.ComputeNormals = function(a,b,c) {};
 
+BABYLON.VertexData.prototype.positions;
+BABYLON.VertexData.prototype.indices;
+BABYLON.VertexData.prototype.normals;
+BABYLON.VertexData.prototype.colors;
+BABYLON.VertexData.prototype.uvs;
+
+BABYLON.VertexData.ExtractFromMesh = function(a,b,c) {};
+
 BABYLON.Quaternion;
 BABYLON.Quaternion.FromEulerAngles = function(a, b, c) {};
 BABYLON.Quaternion.FromEulerVector = function(a) {};
@@ -829,3 +889,5 @@ sessionStorage.removeItem = function(a) {};
 sessionStorage.setItem = function(a, b) {};
 
 var templateHtml;
+
+// var createPeerObj;

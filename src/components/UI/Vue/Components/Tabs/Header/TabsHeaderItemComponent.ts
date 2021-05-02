@@ -13,6 +13,10 @@ import {templateHtml} from "./TabsHeaderItemComponent.template.htm.ts";
 export class TabsHeaderItemComponent extends VueComponentParent {
     public tag = "tabs-header-item";
     public methods = {
+        /**
+         * Runs when the tab header is clicked.
+         * @returns void
+         */
         "tabHeaderClick"(): void {
             let plugins: LoadSavePlugin.LoadSaveParent[] = getPluginsOfType("loadSave");
             const pluginName = Object.keys(plugins);

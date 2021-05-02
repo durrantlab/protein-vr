@@ -8,34 +8,33 @@
 import * as Navigation from "../Navigation/Navigation";
 import * as UrlVars from "./UrlVars";
 import * as PromiseStore from "../PromiseStore";
+import { AbstractMesh, Database, Engine, Mesh, Ray, Scene, Vector3, VRExperienceHelper, WebXRDefaultExperience, WebXRMotionControllerManager } from "@babylonjs/core";
 // import WebXRPolyfill from 'webxr-polyfill';
 
-declare var BABYLON: any;
-
 export interface IVRSetup {
-    groundMesh?: any;  // The actual mesh
-    navTargetMesh?: any;            // The mesh that appears where you're
-                                    // gazing. Always on, even during
-                                    // teleportation. This is also used to
-                                    // determine the location of the gaze. If
-                                    // not set, an empty is used for tracking.
+    groundMesh?: Mesh;             // The actual mesh
+    navTargetMesh?: AbstractMesh;  // The mesh that appears where you're
+                                   // gazing. Always on, even during
+                                   // teleportation. This is also used to
+                                   // determine the location of the gaze. If
+                                   // not set, an empty is used for tracking.
     navMode?: Navigation.NavMode;
     menuActive?: boolean;
 }
 
 export const VERSION = "1.0.7";
 
-export let canvas: any;
-export let engine: any;
-export let scene: any;
-export let vrHelper: any;
+export let canvas: HTMLCanvasElement;
+export let engine: Engine;
+export let scene: Scene;
+export let vrHelper: WebXRDefaultExperience;
 export let sceneName = "environs/day/";
 
 /**
  * Setter for sceneName variable.
  * @param  {string} val  The value to set.
  */
-export function setSceneName(val: string) { sceneName = val; }
+export function setSceneName(val: string): void { sceneName = val; }
 
 // From scene_info.json
 export let sceneInfo = {
@@ -99,20 +98,20 @@ export let vrVars: IVRSetup = {};
  * @returns void
  */
 export function setup(): void {
-    canvas = document.getElementById("renderCanvas");
+    canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
 
     // window["canvas"] = canvas;  // debugging
 
     // Generate the BABYLON 3D engine
-    engine = new BABYLON.Engine(canvas, true);
+    engine = new Engine(canvas, true);
 
     if (true) {  // true means use manifest files.
-        BABYLON.Database.IDBStorageEnabled = true;
+        Database.IDBStorageEnabled = true;
     } else {
         engine.enableOfflineSupport = false;
     }
 
-    scene = new BABYLON.Scene(engine);
+    scene = new Scene(engine);
 
     // For debugging...
     window["scene"] = scene;
@@ -128,8 +127,8 @@ export function determineCameraHeightFromActiveCamera(): void {
     if (cameraHeight === undefined) {
         // Calculate the camera height from it's position.
         /** @const {*} */
-        const ray = new BABYLON.Ray(
-            scene.activeCamera.position, new BABYLON.Vector3(0, -1, 0), 50,
+        const ray = new Ray(
+            scene.activeCamera.position, new Vector3(0, -1, 0), 50,
         );
 
         /** @const {*} */
@@ -203,10 +202,10 @@ export function runInitVR(initParams: IVRSetup): void {
             // Use a local copy of part of the repo at
             // https://github.com/immersive-web/webxr-input-profiles to
             // load controller profiles.
-            BABYLON.WebXRMotionControllerManager.BaseRepositoryUrl = "js/";
+            WebXRMotionControllerManager.BaseRepositoryUrl = "js/";
 
             window["engine"] = engine;
-            scene.createDefaultXRExperienceAsync(params).then((vrHelp: any) => {
+            scene.createDefaultXRExperienceAsync(params).then((vrHelp: WebXRDefaultExperience) => {
                 // Check if supports immersive vr. See
                 // https://forum.babylonjs.com/t/webxr-on-oculus-quest/4949/6
 
@@ -268,7 +267,7 @@ export function runInitVR(initParams: IVRSetup): void {
 
                 // Prioritize the local classes (but use online if controller
                 // not found).
-                // BABYLON.WebXRMotionControllerManager.PrioritizeOnlineRepository = false;
+                // WebXRMotionControllerManager.PrioritizeOnlineRepository = false;
 
                 // Hide the vrHelper icon initially.
                 const babylonVRiconbtn = document.getElementById("babylonVRiconbtn");

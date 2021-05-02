@@ -5,25 +5,24 @@
 
 // These functions include camera functions common to all kinds of cameras.
 
+import { UniversalCamera, Vector3, Quaternion } from '@babylonjs/core';
 import * as Navigation from "../Navigation/Navigation";
 import * as Points from "../Navigation/Points";
 import * as Vars from "../Vars/Vars";
 
-declare var BABYLON: any;
+/** @const {*} */
+const forwardVec = new Vector3(1, 0, 0);
 
 /** @const {*} */
-const forwardVec = new BABYLON.Vector3(1, 0, 0);
+const upVec = new Vector3(1, 0, 0);
 
-/** @const {*} */
-const upVec = new BABYLON.Vector3(1, 0, 0);
-
-// let activeCamPos = new BABYLON.Vector3(0, 0, 0);
+// let activeCamPos = new Vector3(0, 0, 0);
 
 /**
  * Gets the location of the camera. If VR camera, gets the left eye.
  * @returns * The camera location.
  */
-export function getCameraPosition(): any {
+export function getCameraPosition(): Vector3 {
     // If it's a VR camera, you need to make an adjustment.
 
     /** @const {*} */
@@ -51,7 +50,7 @@ export function getCameraPosition(): any {
  * @param  {*} pt The new location.
  * @returns void
  */
-export function setCameraPosition(pt: any): void {
+export function setCameraPosition(pt: Vector3): void {
     if (Vars.vrVars.navMode === Navigation.NavMode.NoVR) {
         // A regular camera. Just move it there.
         const activeCam = Vars.scene.activeCamera;
@@ -76,17 +75,17 @@ export function setCameraPosition(pt: any): void {
  * DeviceOrientation, or VR.
  * @returns * The quaternion.
  */
-export function getCameraRotationQuaternion(): any {
+export function getCameraRotationQuaternion(): Quaternion {
     if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
         (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
 
         // Cover all devices using the below... (Android, Chrome, Carboard)
         // const quat = Vars.vrHelper.webVRCamera.deviceRotationQuaternion;
         const quat = Vars.vrHelper.baseExperience.camera.rotationQuaternion;  // JDD right?
-        return (quat.x !== 0) ? quat : Vars.scene.activeCamera.rotationQuaternion;
+        return (quat.x !== 0) ? quat : (Vars.scene.activeCamera as UniversalCamera).rotationQuaternion;
     } else {
         // Regular (Universal) camera.
-        return Vars.scene.activeCamera.rotationQuaternion;
+        return (Vars.scene.activeCamera as UniversalCamera).rotationQuaternion;
     }
 }
 
@@ -97,17 +96,17 @@ export function getCameraRotationQuaternion(): any {
  * @param  {*} rotQua The rotation quaternion.
  * @returns void
  */
-export function setCameraRotationQuaternion(rotQua: any): void {
+export function setCameraRotationQuaternion(rotQua: Quaternion): void {
     if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
     (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
         console.log("PROBLEM!");
     } else {
         // Update the quaternion
-        Vars.scene.activeCamera.rotationQuaternion = rotQua.clone();
+        (Vars.scene.activeCamera as UniversalCamera).rotationQuaternion = rotQua.clone();
 
         // Update the rotation vector accordingly. See
         // http://www.html5gamedevs.com/topic/16160-retrieving-rotation-after-meshlookat/
-        Vars.scene.activeCamera.rotation = Vars.scene.activeCamera.rotationQuaternion.toEulerAngles();
+        (Vars.scene.activeCamera as UniversalCamera).rotation = (Vars.scene.activeCamera as UniversalCamera).rotationQuaternion.toEulerAngles();
     }
 }
 
@@ -115,7 +114,7 @@ export function setCameraRotationQuaternion(rotQua: any): void {
  * Gets the camera rotation.
  * @returns * The rotation.
  */
-export function getCameraRotationY(): any {
+export function getCameraRotationY(): number {
     if ((Vars.vrVars.navMode === Navigation.NavMode.VRNoControllers) ||
         (Vars.vrVars.navMode === Navigation.NavMode.VRWithControllers)) {
 
@@ -123,7 +122,7 @@ export function getCameraRotationY(): any {
         const groundPtVec = Points.groundPointBelowStarePt.subtract(Points.groundPointBelowCamera);
 
         /** @type {number} */
-        let angle = BABYLON.Vector3.GetAngleBetweenVectors(groundPtVec, forwardVec, upVec);
+        let angle = Vector3.GetAngleBetweenVectors(groundPtVec, forwardVec, upVec);
 
         if (groundPtVec.z < 0) {
             angle = -angle;
@@ -143,7 +142,7 @@ export function getCameraRotationY(): any {
     } else {
         // This is much simplier with a non-VR camera.
         const activeCam = Vars.scene.activeCamera;
-        const activeCamRot = activeCam.rotation.clone();
+        const activeCamRot = (activeCam as UniversalCamera).rotation.clone();
         return activeCamRot.y;  // + Math.PI * 0.5;
     }
 }
@@ -153,10 +152,10 @@ export function getCameraRotationY(): any {
  * camera, these can be different.
  * @returns * The vector.
  */
-export function getVecFromEyeToCamera(): any {
+export function getVecFromEyeToCamera(): Vector3 {
     if (Vars.vrVars.navMode === Navigation.NavMode.NoVR) {
         // Not in VR mode? Then there is no eye.
-        return new BABYLON.Vector3(0, 0, 0);
+        return new Vector3(0, 0, 0);
     }
 
     // Note that some VR cameras don't track position, only orientation.
@@ -167,7 +166,7 @@ export function getVecFromEyeToCamera(): any {
         const leftEyePos = activeCam.leftCamera.globalPosition;
         deltaVec = leftEyePos.subtract(activeCam.position);
     } else {
-        deltaVec = new BABYLON.Vector3(0, 0, 0);
+        deltaVec = new Vector3(0, 0, 0);
     }
 
     return deltaVec;

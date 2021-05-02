@@ -5,9 +5,8 @@
 // Functions to display messages in the VR world. To make debugging easier on
 // devices like Oculus Go.
 
+import { DynamicTexture, Mesh, StandardMaterial } from "@babylonjs/core";
 import * as Vars from "../../Vars/Vars";
-
-declare var BABYLON: any;
 
 let msg = "";
 let dynamicTexture: any;
@@ -34,7 +33,7 @@ export function setup(): void {
         return;
     }
     alreadySetup = true;
-    dynamicTexture = new BABYLON.DynamicTexture("DynamicTexture", 512, Vars.scene, true);
+    dynamicTexture = new DynamicTexture("DynamicTexture", 512, Vars.scene, true);
     dynamicTexture.hasAlpha = true;
     const name = "Menion";
     const ctx =  dynamicTexture.getContext();
@@ -45,11 +44,11 @@ export function setup(): void {
     dynamicTexture.vScale = 0.125;
     dynamicTexture.update(false);
 
-    plane = BABYLON.Mesh.CreatePlane("nameplate", 10, Vars.scene, false);
+    plane = Mesh.CreatePlane("nameplate", 10, Vars.scene, false);
     plane.rotation.x = Math.PI;
     plane.scaling.y = 0.125;
-    plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
-    const mat = new BABYLON.StandardMaterial("nameplateMat", Vars.scene);
+    plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
+    const mat = new StandardMaterial("nameplateMat", Vars.scene);
     mat.diffuseTexture = dynamicTexture;
     mat.backFaceCulling = false;
 

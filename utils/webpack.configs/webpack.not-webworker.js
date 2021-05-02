@@ -47,7 +47,7 @@ module.exports = merge(common, {
             patterns: [
                 { from: "src/babylon_scenes", to: "environs" },
                 { from: "src/js", to: "js" },
-                { from: "node_modules/babylonjs-serializers/babylonjs.serializers.min.js", to: "js/babylonjs.serializers.min.js"},
+                // { from: "node_modules/babylonjs-serializers/babylonjs.serializers.min.js", to: "js/babylonjs.serializers.min.js"},
                 { from: "node_modules/file-saver/dist/FileSaver.min.js", to: "js/FileSaver.min.js"},
                 { from: "src/components/UI/Vue/Components/OpenPopup/pages", to: "pages" },
                 {
@@ -191,11 +191,17 @@ module.exports = merge(common, {
         moduleIds: "hashed",
         splitChunks: {
             chunks: "all",
+            minSize: 100000,
+            maxSize: 500000,
+            maxAsyncRequests: 30,
+            maxInitialRequests: 30,
+            minChunks: 1,
             cacheGroups: {
                 vendor: {
                     test: /[\\/]node_modules[\\/]/,
                     name: "vendors",
-                    chunks: "all"
+                    chunks: "all",
+                    reuseExistingChunk: true,
                 }
             }
         },

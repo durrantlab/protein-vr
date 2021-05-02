@@ -23,25 +23,33 @@ interface IStyleMesh {
 }
 export let styleMeshes: {[s: string]: IStyleMesh} = {};
 
+const neutralHisVariants = ["HIS", "HID", "HIE", "HSE", "HSD"];
+const posChargeHisVariants = ["HIS", "HIP", "HSP"]
+
 const selKeyWordTo3DMolSel = {
     // See VMD output TCL files for good ideas. You may nee to look at
     // Styles.ts too.
     "All":         {},
     "Protein":     {"resn": lAndU(["ALA", "ARG", "ASP", "ASN", "ASX", "CYS",
-                                   "GLN", "GLU", "GLX", "GLY", "HIS", "HSP",
-                                   "HYP", "ILE", "LEU", "LYS", "MET", "PCA",
-                                   "PHE", "PRO", "TRP", "TYR", "VAL", "GLU",
-                                   "SER", "THR", "MSE"])},
-    "Acidic":      {"resn": lAndU(["ASP", "GLU"])},
-    "Cyclic":      {"resn": lAndU(["HIS", "PHE", "PRO", "TRP", "TYR"])},
+                                   "GLN", "GLU", "GLX", "GLY", "HYP", "ILE",
+                                   "LEU", "LYS", "MET", "PCA", "PHE", "PRO",
+                                   "TRP", "TYR", "VAL", "GLU", "SER", "THR",
+                                   "MSE"]
+                                   .concat(neutralHisVariants, posChargeHisVariants))},
+    "Acidic":      {"resn": lAndU(["ASP", "GLU"].concat(posChargeHisVariants))},
+    "Cyclic":      {"resn": lAndU(["PHE", "PRO", "TRP", "TYR"]
+                                   .concat(neutralHisVariants, posChargeHisVariants))},
     "Aliphatic":   {"resn": lAndU(["ALA", "GLY", "ILE", "LEU", "VAL"])},
-    "Aromatic":    {"resn": lAndU(["HIS", "PHE", "TRP", "TYR"])},
-    "Basic":       {"resn": lAndU(["ARG", "HIS", "LYS", "HSP"])},
-    "Charged":     {"resn": lAndU(["ASP", "GLU", "ARG", "HIS", "LYS", "HSP"])},
+    "Aromatic":    {"resn": lAndU(["PHE", "TRP", "TYR"]
+                                  .concat(neutralHisVariants, posChargeHisVariants))},
+    "Basic":       {"resn": lAndU(["ARG", "LYS"].concat(neutralHisVariants))},
+    "Charged":     {"resn": lAndU(["ASP", "GLU", "ARG", "LYS"]
+                                  .concat(posChargeHisVariants))},
     "Hydrophobic": {"resn": lAndU(["ALA", "LEU", "VAL", "ILE", "PRO", "PHE",
                                    "MET", "TRP"])},
-    "Neutral":     {"resn": lAndU(["VAL", "PHE", "GLN", "TYR", "HIS", "CYS",
-                                   "MET", "TRP", "ASX", "GLX", "PCA", "HYP"])},
+    "Neutral":     {"resn": lAndU(["VAL", "PHE", "GLN", "TYR", "CYS", "MET",
+                                   "TRP", "ASX", "GLX", "PCA", "HYP"]
+                                   .concat(neutralHisVariants))},
     "Nucleic":     {"resn": lAndU(["ADE", "A", "GUA", "G", "CYT", "C", "THY",
                                    "T", "URA", "U", "DA", "DG", "DC", "DT"])},
     "Purine":      {"resn": lAndU(["ADE", "A", "GUA", "G"])},
@@ -52,7 +60,7 @@ const selKeyWordTo3DMolSel = {
                                    "MO5", "MO6", "NA", "NAW", "OC7", "PB",
                                    "POT", "PT", "RB", "SOD", "TB", "TL", "WO4",
                                    "YB", "ZN", "ZN1", "ZN2"])},
-    "Water":     {"resn": lAndU(["WAT", "HOH", "TIP", "TIP3"])},
+    "Water":       {"resn": lAndU(["WAT", "HOH", "TIP", "TIP3"])},
 };
 
 // Add in ligand
@@ -78,8 +86,11 @@ const colorSchemeKeyWordTo3DMol = {
     "Chain": {"colorscheme": "chain"},
     "Element": {"colorscheme": "default"},
     "Green": {"color": "green"},
+    "Iceblue": {"color": "0X8080BF"},
+    "Lime": {"color": "0X80E666"},
     "Nucleic": {"colorscheme": "nucleic"},
     "Orange": {"color": "orange"},
+    "Pink": {"color": "0XFF9999"},
     "Purple": {"color": "purple"},
     "Red": {"color": "red"},
     "Spectrum": {"color": "spectrum"},
@@ -244,7 +255,7 @@ export function toggleRep(filters: any[], repName: string, colorScheme: string, 
  * @returns void
  */
 function toggleRepContinued(keys: any, repName: string, finalCallback: any): void {
-    VRML.render(true, repName, (newMesh: any) => {
+    VRML.getMeshFrom3DMol(true, repName, (newMesh: any) => {
         // Remove any other meshes that have the same category key (so could
         // be different color... that would be removed.)
         const ks = Object.keys(styleMeshes);

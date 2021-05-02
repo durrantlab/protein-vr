@@ -9,8 +9,7 @@ import * as WebRTCBase from "./WebRTCBase";
 import * as Vars from "../Vars/Vars";
 import * as VisStyles from "../Mols/3DMol/VisStyles";
 import * as Rotations from "../UI/Menus/Menu3D/Rotations";
-
-declare var BABYLON: any;
+import { Quaternion, Vector3 } from "@babylonjs/core";
 
 let peerId: string;
 
@@ -160,7 +159,7 @@ export function startFollowing(id: string): void {
             cameraLoc,
             targetCameraPosition
         );
-        const newPosAsVec = BABYLON.Vector3.FromArray(newPos);
+        const newPosAsVec = Vector3.FromArray(newPos);
         CommonCamera.setCameraPosition(newPosAsVec);
 
         const cameraRotQuat = new Float32Array(CommonCamera.getCameraRotationQuaternion().asArray());
@@ -168,7 +167,7 @@ export function startFollowing(id: string): void {
             cameraRotQuat,
             targetCameraRotationQuaternion
         );
-        const newRotAsVec = BABYLON.Quaternion.FromArray(newRot);
+        const newRotAsVec = Quaternion.FromArray(newRot);
         CommonCamera.setCameraRotationQuaternion(newRotAsVec);
     });
 }

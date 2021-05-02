@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "removeComments": false,
         "outDir": "./dist/",
         "sourceMap": true,
         // "module": "es6",
@@ -44,7 +45,7 @@
         "node_modules"
     ],
     "types": [
-        "babylonjs",
-        "babylonjs-gui"
+        // "babylonjs",
+        // "babylonjs-gui"
     ]
 }

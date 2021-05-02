@@ -2,13 +2,13 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2021 Jacob D. Durrant.
 
+import { Color3, Mesh, Vector3 } from "@babylonjs/core";
+import { HolographicButton, TextBlock } from "@babylonjs/gui";
 import * as Pickables from "../../../Navigation/Pickables";
 import * as Vars from "../../../Vars/Vars";
 import * as Menu3D from "./Menu3D";
 
-declare var BABYLON: any;
-
-const btnScale = new BABYLON.Vector3(0.75, 0.75, 0.75);
+const btnScale = new Vector3(0.75, 0.75, 0.75);
 
 interface IButtonWrapper {
     panel: any;
@@ -55,7 +55,7 @@ export class ButtonWrapper {
      */
     constructor(params: IButtonWrapper) {
         // Make the button
-        this.button = new BABYLON.GUI.HolographicButton(params.name);
+        this.button = new HolographicButton(params.name);
         params.panel.addControl(this.button);
 
         // Make the possible materials (different colors).
@@ -70,7 +70,7 @@ export class ButtonWrapper {
         this.level = params.level;
 
         // Make a text block
-        this.textBlock = new BABYLON.GUI.TextBlock();
+        this.textBlock = new TextBlock();
         this.textBlock.color = "white";
         this.textBlock.resizeToFit = true;
 
@@ -93,7 +93,7 @@ export class ButtonWrapper {
 
         // Make a mesh that surrounds the button. It actually triggers the
         // click.
-        this.containingMesh = BABYLON.Mesh.CreateSphere(
+        this.containingMesh = Mesh.CreateSphere(
             params.name + "-container-mesh", 2, Vars.BUTTON_SPHERE_RADIUS, Vars.scene,
         );
         this.containingMesh.position = this.button.node.absolutePosition;
@@ -220,12 +220,12 @@ export class ButtonWrapper {
         this.defaultMat = this.button.mesh.material;
 
         this.greenMat = this.button.mesh.material.clone();
-        this.greenMat.albedoColor = new BABYLON.Color3(0.3, 0.35 + colorDelta, 0.4);
+        this.greenMat.albedoColor = new Color3(0.3, 0.35 + colorDelta, 0.4);
 
         this.yellowMat = this.button.mesh.material.clone();
-        this.yellowMat.albedoColor = new BABYLON.Color3(0.3 + colorDelta, 0.35 + colorDelta, 0.4);
+        this.yellowMat.albedoColor = new Color3(0.3 + colorDelta, 0.35 + colorDelta, 0.4);
 
         this.redMat = this.button.mesh.material.clone();
-        this.redMat.albedoColor = new BABYLON.Color3(0.3 + colorDelta, 0.35, 0.4);
+        this.redMat.albedoColor = new Color3(0.3 + colorDelta, 0.35, 0.4);
     }
 }

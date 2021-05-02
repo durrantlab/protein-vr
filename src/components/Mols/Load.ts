@@ -10,8 +10,7 @@ import * as Pickables from "../Navigation/Pickables";
 import * as PromiseStore from "../PromiseStore";
 import * as StatusComponent from "../UI/Vue/Components/StatusComponent";
 import { ResolvePlugin } from "webpack";
-
-declare var BABYLON: any;
+import { Color3, Mesh, SimplificationType, StandardMaterial } from "@babylonjs/core";
 
 /**
  * Load in the molecules.
@@ -47,7 +46,7 @@ function beforeLoading(): void {
     MolShadows.setupShadowGenerator();
 
     // Make UVs work
-    // BABYLON.OBJFileLoader.OPTIMIZE_WITH_UV = true;
+    // OBJFileLoader.OPTIMIZE_WITH_UV = true;
 }
 
 /**
@@ -62,14 +61,14 @@ export function afterLoading(): void {
         if (Vars.vrVars.groundMesh) {
             Vars.vrVars.groundMesh.visibility = 1;
 
-            const transparentGround = new BABYLON.StandardMaterial(
+            const transparentGround = new StandardMaterial(
                 "transparentGround",
                 Vars.scene
             );
 
-            transparentGround.diffuseColor = new BABYLON.Color3(1, 1, 1);
-            transparentGround.specularColor = new BABYLON.Color3(0, 0, 0);
-            transparentGround.emissiveColor = new BABYLON.Color3(0, 0, 0);
+            transparentGround.diffuseColor = new Color3(1, 1, 1);
+            transparentGround.specularColor = new Color3(0, 0, 0);
+            transparentGround.emissiveColor = new Color3(0, 0, 0);
             transparentGround.alpha = Vars.TRANSPARENT_FLOOR_ALPHA;
 
             Vars.vrVars.groundMesh.material = transparentGround;
@@ -79,20 +78,27 @@ export function afterLoading(): void {
     }
 }
 
-function simplifyMesh(mesh: any): Promise<any> {
+/**
+ * The goal of this function was to simplify meshes to improve memory use, but
+ * I struggled to get it to work. Leaving it here in case you return to it
+ * later.
+ * @param  {*} mesh  The Mesh.
+ * @returns Promise  A promise fulfilled when the mesh is simplified.
+ */
+function simplifyMesh(mesh: Mesh): Promise<any> {
     return Promise.resolve(mesh);  // skip for now. Getting strange shadows.
 
     // TODO: Could use https://playground.babylonjs.com/#TL1IIB#53 if you
     // update to 4.2.0. Below basically uses LOD, but always showing lower
     // level (distance: 0). So the original mesh is still in memory...
     return new Promise((resolve, reject) => {
-        mesh["optimizeIndices"](() => {
-            return mesh["simplify"]([{"distance": 5, "quality": 1.0, "optimizeMesh": false}], true, BABYLON["SimplificationType"]["QUADRATIC"], () => {
+        mesh.optimizeIndices(() => {
+            return mesh.simplify([{distance: 5, quality: 1.0, optimizeMesh: false}], true, SimplificationType.QUADRATIC, () => {
                 var simplified = mesh.getLODLevelAtDistance(5);
                 console.log("Further optimization: " + (mesh.getIndices().length / 3).toString() + " => " + (simplified.getIndices().length / 3).toString());
 
-                // var simplifiedSerialized = JSON.stringify(BABYLON["SceneSerializer"]["SerializeMesh"](simplified));
-                // BABYLON.SceneLoader.ImportMesh("", "", "data:" + simplifiedSerialized, Vars.scene, function(newMeshes) {
+                // var simplifiedSerialized = JSON.stringify(SceneSerializer.SerializeMesh(simplified));
+                // SceneLoader.ImportMesh("", "", "data:" + simplifiedSerialized, Vars.scene, function(newMeshes) {
                 //     // Get rid of original mesh.
                 //     mesh.dispose();
 
@@ -101,11 +107,11 @@ function simplifyMesh(mesh: any): Promise<any> {
 
                 // Need to recalculate normals on mesh.
                 // const norms: any[] = [];
-                // let verts = simplified.getVerticesData(BABYLON["VertexBuffer"]["PositionKind"])
-                // BABYLON["VertexData"]["ComputeNormals"](
+                // let verts = simplified.getVerticesData(VertexBuffer.PositionKind)
+                // VertexDat.ComputeNormals(
                 //     verts, simplified.getIndices(), norms,
                 // );
-                // mesh.updateVerticesData(BABYLON.VertexBuffer.NormalKind, norms);
+                // mesh.updateVerticesData(VertexBuffer.NormalKind, norms);
 
                 resolve(mesh);
             });
@@ -162,7 +168,7 @@ export function setupMesh(mesh: any, uniqIntID: number): Promise<any> {
                 backgroundLum = lightingInf.ambient;
             }
 
-            mesh.material.emissiveColor = new BABYLON.Color3(
+            mesh.material.emissiveColor = new Color3(
                 backgroundLum,
                 backgroundLum,
                 backgroundLum

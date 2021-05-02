@@ -34,7 +34,11 @@ export function runSetupMenus(): void {
         }
     )
 }
-
+/**
+ * Sorts a list in a way that accounts for numbers. Sorts in place.
+ * @param  {string[]} lst  The list to be sorted.
+ * @returns void
+ */
 export function smartSort(lst: string[]): void {
     let t = lst[0].match(/\[([0-9]+?)\-([0-9]+?)\]/);
     if (t === null) {

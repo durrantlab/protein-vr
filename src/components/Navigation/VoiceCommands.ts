@@ -11,7 +11,6 @@ import * as Optimizations from "../Scene/Optimizations";
 import * as Vars from "../Vars/Vars";
 import * as Navigation from "./Navigation";
 
-declare var BABYLON: any;
 declare var jQuery: any;
 
 declare var annyang: any;
@@ -321,7 +320,7 @@ export function showOrHideModel(modelName: string, representation: string, isVis
             // console.log(mesh.name);
             // if (isVisible) {
                 // So you're making it visible.
-                // BABYLON.Animation.CreateAndStartAnimation(
+                // Animation.CreateAndStartAnimation(
                     // meshName + "fadein", mesh, "visibility", 30, 220, 0.0, 1.0,
                 // );
 

@@ -10,8 +10,8 @@ import * as Rotations from "./Rotations";
 import * as Styles from "./Styles";
 import ButtonPressSoundFile from "./staple-public-domain.mp3";
 import {smartSort} from "../Menus";
-
-declare var BABYLON: any;
+import { GUI3DManager, SpherePanel, StackPanel3D } from "@babylonjs/gui";
+import { Sound, TransformNode } from "@babylonjs/core";
 
 // An easy way to define a menu. It's a nested object. See setup();
 /** @type {Object<string,*>} */
@@ -62,7 +62,7 @@ export function setup(data?: any): void {
     // Only required to setup once.
     if (gui3DMenuManager === undefined) {
         // Make a manager for the menu
-        gui3DMenuManager = new BABYLON.GUI.GUI3DManager(Vars.scene);
+        gui3DMenuManager = new GUI3DManager(Vars.scene);
     }
 
     // Simplify the menu (collapsing excessive parts).
@@ -77,7 +77,7 @@ export function setup(data?: any): void {
 
     // Only required to setup once.
     if (clickSound === undefined) {
-        clickSound = new BABYLON.Sound(
+        clickSound = new Sound(
             "click-button", ButtonPressSoundFile,
             Vars.scene, null,
             { loop: false, autoplay: false, spatialSound: true, volume: 0.1 },
@@ -95,7 +95,7 @@ function setupMainMenu(): void {
     // previously. Currently adds back and close buttons.
     setupAllSubMenuNavButtons();
 
-    commonMenuAnchor = new BABYLON.TransformNode("CommonMenuAnchor_ForPanel"); // this can be a mesh, too
+    commonMenuAnchor = new TransformNode("CommonMenuAnchor_ForPanel"); // this can be a mesh, too
 
     createPanelSixteenButtons();
 }
@@ -106,8 +106,8 @@ function setupMainMenu(): void {
  * @returns void
  */
 function createPanelSixteenButtons(): void {
-    // let panel = new BABYLON.GUI.CylinderPanel();
-    const panel = new BABYLON.GUI.SpherePanel();
+    // let panel = new GUI.CylinderPanel();
+    const panel = new SpherePanel();
 
     panel.radius = Vars.MENU_RADIUS;
     panel.margin = Vars.MENU_MARGIN;
@@ -229,7 +229,7 @@ export function setupSubMenuNavButtons(subMenu: any, breadcrumbs: string[]): voi
 function setupMainMenuToggleButton(): void {
     // Also set up a manager at your feet. This turns the main manager on and
     // off.
-    const panelToggle = new BABYLON.GUI.StackPanel3D();
+    const panelToggle = new StackPanel3D();
     gui3DMenuManager.addControl(panelToggle);
 
     // Set up the button
@@ -258,7 +258,7 @@ function setupMainMenuToggleButton(): void {
     // openMainMenuFloorButton.button.rotation.x = 0.25 * Math.PI;
 
     // Set up the button anchor and move/rotate it.
-    const mainMenuAnchorToggle = new BABYLON.TransformNode("MainMenuAnchorToggle_FloorButton"); // this can be a mesh, too
+    const mainMenuAnchorToggle = new TransformNode("MainMenuAnchorToggle_FloorButton"); // this can be a mesh, too
     panelToggle.linkToTransformNode(mainMenuAnchorToggle);
     mainMenuAnchorToggle.rotation.x = Math.PI * 0.5;
 

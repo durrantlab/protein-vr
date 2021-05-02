@@ -180,7 +180,7 @@ export function closeAllModals(): Promise<any> {
                 // A little hackish, but I don't want ot add another
                 // 'hidden.bs.modal' listener.
                 setTimeout(() => {
-                    resolve();
+                    resolve(undefined);
                 }, 250);
             })
         );

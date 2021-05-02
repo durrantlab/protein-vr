@@ -12,7 +12,7 @@ export browser1="chrome"
 # export browser2="firefox:headless"
 export browser2="firefox"  # Must not be headless, because no WebGL in firefox headless.
 
-testcafe "${browser1}" -c 1 tmp.ts --disable-page-caching --speed 0.1
+testcafe "${browser1}" -c 1 tmp.ts --disable-page-caching # --speed 0.1
 testcafe "${browser2}" -c 1 tmp.ts --disable-page-caching
 
 #  -c 2

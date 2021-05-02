@@ -4,12 +4,11 @@
 
 // This sets up the non vr camera. Not everyone has a vr headset.
 
+import { UniversalCamera, Vector3 } from "@babylonjs/core";
 import * as Vars from "../Vars/Vars";
 
-declare var BABYLON: any;
-
 /** @type {*} */
-export let nonVRCamera: any;
+export let nonVRCamera: UniversalCamera;
 
 /**
  * Sets up the nonVR camera (not everyone has a VR headset).
@@ -25,7 +24,7 @@ export function setup(): void {
  */
 function setupNonVRCameraObj(): void {
     // The VRHelper already created a camera. Need to set it up.
-    nonVRCamera = Vars.scene.activeCamera;
+    nonVRCamera = Vars.scene.activeCamera as UniversalCamera;
 
     // Enable navigation via both WASD and the arrows keys.
     nonVRCamera.keysUp = [87, 38];
@@ -36,8 +35,8 @@ function setupNonVRCameraObj(): void {
     // Turn on gravity. Note: Turning this on causes problems, and it doesn't
     // seem to be necessary. Well, it does help with arrow/wsad navigation
     // (can't fly off).
-    // Vars.scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
-    Vars.scene.gravity = new BABYLON.Vector3(0, -0.1, 0);
+    // Vars.scene.gravity = new Vector3(0, -9.81, 0);
+    Vars.scene.gravity = new Vector3(0, -0.1, 0);
     nonVRCamera.applyGravity = true;
 
     // Enable collision detection. Note that the second paramerter is a
@@ -66,5 +65,5 @@ function setupNonVRCameraObj(): void {
  */
 export function setCameraElipsoid(): void {
     // Depends on camera height.
-    nonVRCamera.ellipsoid = new BABYLON.Vector3(1.0, 0.5 * Vars.cameraHeight, 1.0);
+    nonVRCamera.ellipsoid = new Vector3(1.0, 0.5 * Vars.cameraHeight, 1.0);
 }

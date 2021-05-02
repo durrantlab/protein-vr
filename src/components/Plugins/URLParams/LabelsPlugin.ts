@@ -1,3 +1,7 @@
+// This file is part of ProteinVR, released under the 3-Clause BSD License.
+// See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
+// full details. Copyright 2021 Jacob D. Durrant.
+
 import { URLParamsParent } from "./URLParamsParent";
 import { scene } from "../../Vars/Vars";
 import { nonMolMeshesTransformNode } from '../../Mols/3DMol/PositionInScene';
@@ -5,11 +9,17 @@ import { geoCenter, showLoadMoleculeError } from "../../Mols/3DMol/VRML";
 import { registerHook, HookTypes, IRunHooksParams } from '../Hooks/Hooks';
 import { menuInf } from '../../UI/Menus/Menu3D/Menu3D';
 import { axisRotation } from "../../UI/Menus/Menu3D/Rotations";
-declare var BABYLON;
+import { Mesh, MeshBuilder, TransformNode, Vector3 } from "@babylonjs/core";
+import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
 
 const LABEL_RATIO_HEIGHT_TO_WIDTH = 0.25;
 
 export class LabelsPlugin extends URLParamsParent {
+    /**
+     * Gets the parameters relevant to this plugin.
+     * @param  {*} allParams  All the parameters
+     * @returns *  The parameters relevant to this plugin.
+     */
     protected getRelevantParams(allParams: Map<string, any>): any[][] {
         const paramNames = allParams.keys();
         let relevantParams: any[][] = [];
@@ -24,14 +34,19 @@ export class LabelsPlugin extends URLParamsParent {
         return relevantParams;
     }
 
-    private getLabelInfo(lbl: string) {
+    /**
+     * Gets information about the label to be places, related to label size.
+     * @param  {string} lbl  The text of the label.
+     * @returns *  The information about size.
+     */
+    private getLabelInfo(lbl: string): any {
         // Figure out font size. See
         // https://doc.babylonjs.com/divingDeeper/materials/using/dynamicTexture#fit-text-into-an-area
         // Get a temporary texture to write text on.
         let height = LABEL_RATIO_HEIGHT_TO_WIDTH * 512;
         let width = 512;
 
-        let tmpTex = new BABYLON["GUI"]["AdvancedDynamicTexture"]("tmp", 512, height);
+        let tmpTex = new AdvancedDynamicTexture("tmp", 512, height, scene);
 
         let ctx = tmpTex.getContext();
 
@@ -83,6 +98,12 @@ export class LabelsPlugin extends URLParamsParent {
         return toreturn;
     }
 
+    /**
+     * Acts on the parameter. This is where the plugin action happens.
+     * @param  {string} paramName  The name of the parameter.
+     * @param  {*}      paramVal   The value of the parameter.
+     * @returns void
+     */
     protected actOnParam(paramName: string, paramVal: any): void {
         let params;
         try {
@@ -102,7 +123,7 @@ export class LabelsPlugin extends URLParamsParent {
         // let noScale = params["ns"] ? params["ns"] : false;
 
         // You need to convert between PDB coordinate system and BAYLON coordinate system.
-        let babylonVec = new BABYLON["Vector3"](z, y, x);
+        let babylonVec = new Vector3(z, y, x);
 
         let lblInfo = this.getLabelInfo(lbl);
 
@@ -110,37 +131,38 @@ export class LabelsPlugin extends URLParamsParent {
         // https://playground.babylonjs.com/#ZI9AK7#1 for inspiration.
 
         // Get the node where the plane will be located.
-        let labelNode = new BABYLON["TransformNode"]("labelNode:" + lbl);
-        labelNode["parent"] = nonMolMeshesTransformNode
-        labelNode["position"] = babylonVec;  // .add(new BABYLON["Vector3"](0.8, 1.0, -0.2));
+        let lblForObjects = lbl + "-" + Math.random().toString();
+        let labelNode = new TransformNode("labelNode:" + lblForObjects);
+        labelNode.parent = nonMolMeshesTransformNode
+        labelNode.position = babylonVec;  // .add(new Vector3(0.8, 1.0, -0.2));
 
-        // var plane = BABYLON["Mesh"]["CreatePlane"]("plane:" + lbl, 2);
-        let plane = BABYLON["MeshBuilder"]["CreatePlane"]("plane", {width: lblInfo.width / 512, height: lblInfo.height / 512}, scene);
+        // var plane = Mesh["CreatePlane"]("plane:" + lbl, 2);
+        let plane = MeshBuilder.CreatePlane("plane" + lblForObjects, {width: lblInfo.width / 512, height: lblInfo.height / 512}, scene);
 
-        plane["scaling"] = new BABYLON["Vector3"](1, 1, 1)["scale"](0.5)["scale"](s);
-        plane["billboardMode"] = BABYLON["Mesh"]["BILLBOARDMODE_ALL"];
-        plane["parent"] = labelNode;
-        let origScalingToMaintain = plane["scaling"].clone();  // Add custom property so no scaling when rotating.
+        plane.scaling = new Vector3(1, 1, 1).scale(0.5).scale(s);
+        plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
+        plane.parent = labelNode;
+        let origScalingToMaintain = plane.scaling.clone();  // Add custom property so no scaling when rotating.
 
         if (v) {
-            plane["renderingGroupId"] = 3;
+            plane.renderingGroupId = 3;
         }
 
-        // var advancedTexture = BABYLON["GUI"]["AdvancedDynamicTexture"]["CreateForMesh"](plane, 512, LABEL_RATIO_HEIGHT_TO_WIDTH * 512);
-        var advancedTexture = BABYLON["GUI"]["AdvancedDynamicTexture"]["CreateForMesh"](plane, lblInfo.width, lblInfo.height);
-        var rect1 = new BABYLON["GUI"]["Rectangle"]();
-        rect1["width"] = 1;
-        rect1["height"] = 1; //  "80px";
-        rect1["cornerRadius"] = 200;
-        rect1["color"] = "black";
-        rect1["thickness"] = 4;
-        rect1["background"] = "white";
-        rect1["alpha"] = 0.8;
-        advancedTexture["addControl"](rect1);
-        rect1["linkWithMesh"](labelNode);
+        // var advancedTexture = GUI["AdvancedDynamicTexture"]["CreateForMesh"](plane, 512, LABEL_RATIO_HEIGHT_TO_WIDTH * 512);
+        var advancedTexture = AdvancedDynamicTexture.CreateForMesh(plane, lblInfo.width, lblInfo.height);
+        var rect1 = new Rectangle();
+        rect1.width = 1;
+        rect1.height = 1; //  "80px";
+        rect1.cornerRadius = 200;
+        rect1.color = "black";
+        rect1.thickness = 4;
+        rect1.background = "white";
+        rect1.alpha = 0.8;
+        advancedTexture.addControl(rect1);
+        rect1.linkWithMesh(labelNode);
 
-        var label = new BABYLON["GUI"]["TextBlock"]();
-        label["text"] = lbl;
+        var label = new TextBlock();
+        label.text = lbl;
 
         // // Figure out font size. See
         // // https://doc.babylonjs.com/divingDeeper/materials/using/dynamicTexture#fit-text-into-an-area
@@ -151,21 +173,21 @@ export class LabelsPlugin extends URLParamsParent {
         // var textWidth = ctx.measureText(lbl).width;
         // var ratio2 = textWidth/size;
         // var font_size = Math.floor(325 / ratio2);
-        label["fontSize"] = lblInfo.fontSize;  // 74 is biggest one that looks good
+        label.fontSize = lblInfo.fontSize;  // 74 is biggest one that looks good
 
-        rect1["addControl"](label);
+        rect1.addControl(label);
 
         // Adjust for new center of geometry every time a new mesh is loaded.
 
         registerHook(HookTypes.ON_ADD_OR_REMOVE_MOL_MESH, () => {
             // Adjust node to compensate for new geo center.
-            labelNode["position"] = babylonVec.subtract(geoCenter);
+            labelNode.position = babylonVec.subtract(geoCenter);
             axisRotation("REDRAW");
         });
 
         // Adjust zoom every time rotates so that it doesn't change.
         registerHook(HookTypes.ON_ROTATE, (params: IRunHooksParams) => {
-            plane.scaling = new BABYLON.Vector3(
+            plane.scaling = new Vector3(
                 origScalingToMaintain.x / params.scaling.x,
                 origScalingToMaintain.y / params.scaling.y,
                 origScalingToMaintain.z / params.scaling.z

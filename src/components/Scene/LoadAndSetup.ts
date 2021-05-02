@@ -14,10 +14,9 @@ import * as Pickables from "../Navigation/Pickables";
 import * as Menus from "../UI/Menus/Menus";
 import * as SimpleModalComponent from "../UI/Vue/Components/OpenPopup/SimpleModalComponent";
 import { setupPositioning } from "../Mols/3DMol/PositionInScene";
+import { Color3, ISceneLoaderProgressEvent, Light, Mesh, SceneLoader, StandardMaterial } from "@babylonjs/core";
 
 // import * as Axes from "./Axes";
-
-declare var BABYLON: any;
 
 /**
  * Load the scene, setup the VR, etc.
@@ -79,10 +78,12 @@ export function load(): void {
  */
 function vrSetupBeforeLoadingBabylonFile(): void {
     // You'll need a navigation mesh. Put it on it's own utility layer.
-    const navMeshToUse = BABYLON.Mesh.CreateSphere("navTargetMesh", 4, 0.1, Vars.scene.utilityLayerScene);
-    const navMeshMat = new BABYLON.StandardMaterial("navTargetMeshMaterial", Vars.scene.utilityLayerScene);
-    navMeshMat.emissiveColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-    navMeshMat.diffuseColor = new BABYLON.Color3(0.8, 0.8, 0.8);
+    // @ts-ignore
+    const navMeshToUse = Mesh.CreateSphere("navTargetMesh", 4, 0.1, Vars.scene.utilityLayerScene);
+    // @ts-ignore
+    const navMeshMat = new StandardMaterial("navTargetMeshMaterial", Vars.scene.utilityLayerScene);
+    navMeshMat.emissiveColor = new Color3(0.1, 0.1, 0.1);
+    navMeshMat.diffuseColor = new Color3(0.8, 0.8, 0.8);
     navMeshToUse.material = navMeshMat;
     // navMeshToUse.renderingGroupId = 2;  // So always visible, in theory.
 
@@ -108,9 +109,9 @@ function vrSetupBeforeLoadingBabylonFile(): void {
  * @param  {*} navMeshMat  The BABYLONJS mesh.
  * @returns void
  */
-function animateCursor(navMeshMat: any): void {
-    let black = new BABYLON.Color3(0.2, 0.2, 0.2);
-    let white = new BABYLON.Color3(0.8, 0.8, 0.8);
+function animateCursor(navMeshMat: StandardMaterial): void {
+    let black = new Color3(0.2, 0.2, 0.2);
+    let white = new Color3(0.8, 0.8, 0.8);
     setInterval(() => {
         if (navMeshMat.diffuseColor.r === 0.2) {
             navMeshMat.diffuseColor = white;
@@ -123,11 +124,11 @@ function animateCursor(navMeshMat: any): void {
     // regardless of background.
     // let numSteps = 5;
     // let updateAnimFrameFreq = 5;
-    // var navMeshAnim1 = new BABYLON.Animation("navMeshAnim1", "scaling.x", updateAnimFrameFreq, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
-    // var navMeshAnim2 = new BABYLON.Animation("navMeshAnim2", "scaling.y", updateAnimFrameFreq, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
-    // var navMeshAnim3 = new BABYLON.Animation("navMeshAnim3", "scaling.z", updateAnimFrameFreq, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
-    // var navMeshAnim4 = new BABYLON.Animation("navMeshAnim4", "material.emissiveColor", updateAnimFrameFreq, BABYLON.Animation.ANIMATIONTYPE_COLOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
-    // var navMeshAnim5 = new BABYLON.Animation("navMeshAnim5", "material.diffuseColor", updateAnimFrameFreq, BABYLON.Animation.ANIMATIONTYPE_COLOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+    // var navMeshAnim1 = new Animation("navMeshAnim1", "scaling.x", updateAnimFrameFreq, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+    // var navMeshAnim2 = new Animation("navMeshAnim2", "scaling.y", updateAnimFrameFreq, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+    // var navMeshAnim3 = new Animation("navMeshAnim3", "scaling.z", updateAnimFrameFreq, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
+    // var navMeshAnim4 = new Animation("navMeshAnim4", "material.emissiveColor", updateAnimFrameFreq, Animation.ANIMATIONTYPE_COLOR3, Animation.ANIMATIONLOOPMODE_CYCLE);
+    // var navMeshAnim5 = new Animation("navMeshAnim5", "material.diffuseColor", updateAnimFrameFreq, Animation.ANIMATIONTYPE_COLOR3, Animation.ANIMATIONLOOPMODE_CYCLE);
 
     // var keys = [];
     // keys.push({frame: 0, value: 0.5});
@@ -138,9 +139,9 @@ function animateCursor(navMeshMat: any): void {
     // navMeshAnim3.setKeys(keys);
 
     // var keys2 = [];
-    // keys2.push({frame: 0, value: new BABYLON.Color3(0, 0, 0)});
-    // keys2.push({frame: 0.5 * numSteps, value: new BABYLON.Color3(0.8, 0.8, 0.8)});
-    // keys2.push({frame: numSteps, value: new BABYLON.Color3(0, 0, 0)});
+    // keys2.push({frame: 0, value: new Color3(0, 0, 0)});
+    // keys2.push({frame: 0.5 * numSteps, value: new Color3(0.8, 0.8, 0.8)});
+    // keys2.push({frame: numSteps, value: new Color3(0, 0, 0)});
     // navMeshAnim4.setKeys(keys2);
     // navMeshAnim5.setKeys(keys2);
 
@@ -203,12 +204,12 @@ function runLoadBabylonScene(): void {
 function loadScene(resolveFunc: Function, onSuccess?: Function, onError?: Function): void {
     LoadingScreens.babylonJSLoadingMsg("Loading the main scene...");
     // Start loading the main scene.
-    BABYLON.SceneLoader.LoadAssetContainer(Vars.sceneName, "scene.babylon", Vars.scene, (container: any) => {
+    SceneLoader.LoadAssetContainer(Vars.sceneName, "scene.babylon", Vars.scene, (container: any) => {
         onSceneLoaded(container, resolveFunc, onSuccess);
-    }, (progress: any) => {
-        if (progress["lengthComputable"]) {
+    }, (progress: ISceneLoaderProgressEvent) => {
+        if (progress.lengthComputable) {
             // Only to 90 to not give the impression that it's done loading.
-            const percent = Math.round(90 * progress["loaded"] / progress["total"]);
+            const percent = Math.round(90 * progress.loaded / progress.total);
             LoadingScreens.babylonJSLoadingMsg("Loading the main scene... " + percent.toString() + "%");
         }
     }, (scene: any, msg: any) => {
@@ -265,7 +266,8 @@ function onSceneLoaded(container: any, resolveFunc: Function, onSuccess?: Functi
             // lit appropriately.
             let lightsSerialized: any[] = Vars.scene.lights.map(l => l.serialize());
             for (let i = 0; i < lightsSerialized.length; i++) {
-                BABYLON.Light.Parse(lightsSerialized[i], Vars.scene.utilityLayerScene);
+                // @ts-ignore
+                Light.Parse(lightsSerialized[i], Vars.scene.utilityLayerScene);
             }
 
             resolveFunc();
@@ -313,7 +315,11 @@ export function runFinalizeScene(): void {
     )
 }
 
-function runRenderLoopFun() {
+/**
+ * Runs the render loop.
+ * @returns void
+ */
+function runRenderLoopFun(): void {
     Vars.engine.stopRenderLoop();
 
     // Register a render loop to repeatedly render the scene
@@ -322,12 +328,25 @@ function runRenderLoopFun() {
     });
 }
 
+/**
+ * Sets up the render loop. Includes detecting onBlur and onFocus.
+ * @returns void
+ */
 function setupRenderLoop(): void {
+
+    /**
+     * Pauses the render loop.
+     * @returns void
+     */
     function deactivate(): void {
         console.log("Pausing...");
         Vars.engine.stopRenderLoop();
     }
 
+    /**
+     * Starts the render loop.
+     * @returns void
+     */
     function activate(): void {
         console.log("Restarting...");
         runRenderLoopFun();

@@ -4,25 +4,24 @@
 
 import * as Vars from "../Vars/Vars";
 import * as Points from "../Navigation/Points";
-
-declare var BABYLON;
+import { Color3, SceneLoader, StandardMaterial, Vector3 } from "@babylonjs/core";
 
 /**
  * Load the 3D arrow that points towards the protein.
  * @returns void
  */
 export function loadArrow(): void {
-    BABYLON.SceneLoader.ImportMeshAsync(null, "environs/arrow/", "arrow.babylon", Vars.scene).then(function (data) {
+    SceneLoader.ImportMeshAsync(null, "environs/arrow/", "arrow.babylon", Vars.scene).then(function (data) {
         // Do something with the meshes and skeletons
         // particleSystems are always null for glTF assets
         let arrowMesh = data.meshes[0];
-        arrowMesh.scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
-        var arrowMat = new BABYLON.StandardMaterial("arrowMat", Vars.scene);
+        arrowMesh.scaling = new Vector3(0.2, 0.2, 0.2);
+        var arrowMat = new StandardMaterial("arrowMat", Vars.scene);
 
-        arrowMat.diffuseColor = new BABYLON.Color3(0.3, 0.35, 0.4);
-        arrowMat.specularColor = new BABYLON.Color3(0, 0, 0);
-        arrowMat.emissiveColor = new BABYLON.Color3(0.3, 0.35, 0.4);
-        // arrowMat.ambientColor = new BABYLON.Color3(0.23, 0.98, 0.53);
+        arrowMat.diffuseColor = new Color3(0.3, 0.35, 0.4);
+        arrowMat.specularColor = new Color3(0, 0, 0);
+        arrowMat.emissiveColor = new Color3(0.3, 0.35, 0.4);
+        // arrowMat.ambientColor = new Color3(0.23, 0.98, 0.53);
 
         arrowMesh.material = arrowMat;
         // arrowMesh.visibility = 0.75;

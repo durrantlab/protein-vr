@@ -7,6 +7,11 @@
 
 let alreadyLoaded = new Set([]);
 
+/**
+ * Lazy loads an external javascript file.
+ * @param  {string} path  The path to the file.
+ * @returns *  A promise that is fulfilled when the file is loaded.
+ */
 export function lazyLoadJS(path: string): Promise<any> {
     if (alreadyLoaded.has(path)) {
         return Promise.resolve();

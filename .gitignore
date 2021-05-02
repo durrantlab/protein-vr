@@ -44,4 +44,5 @@ dist
 dist/*
 dist/**/*
 **/*.template.htm.ts
+*babylon_extern*
 

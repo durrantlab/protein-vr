@@ -73,15 +73,29 @@ export function enableDebugging(): Promise<any> {
     return Promise.resolve();
 }
 
-/**
- * A function to activate debug mode (babylonjs)
- * @returns void
- */
-function debugMode(): void {
-    Vars.scene.debugLayer.show().then(() => {
-        document.getElementById("inspector-host").style.zIndex = "15";
-        document.getElementById("scene-explorer-host").style.zIndex = "15";
-    });
-}
+// TODO: Comment this out for build time! Slows things down a lot.
 
-window["debugMode"] = debugMode;
+// /**
+//  * A function to activate debug mode (babylonjs)
+//  * @returns void
+//  */
+// function debugMode(): void {
+//     import(
+//         /* webpackChunkName: "debugLayer" */
+//         /* webpackMode: "lazy" */
+//         "@babylonjs/core/Debug/debugLayer"
+//     ).then(() => {
+//         return import(
+//             /* webpackChunkName: "inspector" */
+//             /* webpackMode: "lazy" */
+//             "@babylonjs/inspector"
+//         )
+//     }).then(() => {
+//         Vars.scene.debugLayer.show().then(() => {
+//             document.getElementById("inspector-host").style.zIndex = "15";
+//             document.getElementById("scene-explorer-host").style.zIndex = "15";
+//         });
+//     })
+// }
+
+// window["debugMode"] = debugMode;

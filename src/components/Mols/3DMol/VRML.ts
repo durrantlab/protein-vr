@@ -11,12 +11,11 @@ import * as Load from "../Load";
 import * as PositionInScene from "./PositionInScene";
 import * as SimpleModalComponent from "../../UI/Vue/Components/OpenPopup/SimpleModalComponent"
 import * as MonitorLoadFinish from "../../System/MonitorLoadFinish";
-import { runHooks, HookTypes } from "../../Plugins/Hooks/Hooks";
 import { getFilenameExtension, makeUrl } from "../../Plugins/LoadSave/LoadSaveUtils";
+import { Color3, Mesh, Quaternion, StandardMaterial, Vector3, VertexData } from "@babylonjs/core";
 
 declare var $3Dmol;
 
-declare var BABYLON: any;
 declare var jQuery: any;
 
 // Uncomment this to debug Worker.
@@ -38,8 +37,8 @@ let modelData: IVRMLModel[] = [];
 
 export let geoCenter: any;  // Vector3
 
-// export let molRotation: any = new BABYLON.Vector3(0, 0, 0);
-export let molRotationQuat: any = new BABYLON.Quaternion(0, 0, 0, 0);
+// export let molRotation: any = new Vector3(0, 0, 0);
+export let molRotationQuat: any = new Quaternion(0, 0, 0, 0);
 
 export let viewer: any;
 let element: any;
@@ -122,7 +121,7 @@ export function resetAll(): void {
  *                              object is the parameter.
  * @returns void
  */
-export function loadMolURL(url: string, callBack: any): void {
+export function loadMolFromURL(url: string, callBack: any): void {
     jQuery.ajax( url, {
 
         /**
@@ -187,12 +186,13 @@ export function loadMolDataInto3DMol(data: string, type: string, callBack: any, 
     const mdl = viewer.addModel(data, type, {"keepH": true});
     callBack(mdl);
 }
-
+/**
+ * If the existing url parameters match the ones in the pvr file, proceed to
+ * load. Otherwise, you need to reload the app with the right parameters.
+ * @param  {*} jsonData  The json data containing the pvr scene and url data.
+ * @returns void
+ */
 function reloadPVRIfNeeded(jsonData: any): void {
-    // If the existing url parameters match the ones in the pvr file, proceed
-    // to load. Otherwise, you need to reload the app with the right
-    // parameters.
-
     let currentUrlParams = UrlVars.getAllUrlParams(window.location.href);
 
     const jsonDataKeys = Object.keys(jsonData);
@@ -332,7 +332,7 @@ export function addSurface(colorScheme: any, sels: any, callBack: any): void {
  *                                  as a parameter.
  * @returns void
  */
-export function render(updateData: boolean, repName: string, callBack: any = () => { return; }): void {
+export function getMeshFrom3DMol(updateData: boolean, repName: string, callBack: any = () => { return; }): void {
     // Make sure there are no waiting menus up and running. Happens some
     // times.
     Vars.engine.hideLoadingUI();
@@ -341,7 +341,7 @@ export function render(updateData: boolean, repName: string, callBack: any = () 
         // Load the data.
         loadVRMLFrom3DMol(
             () => {
-                loadValsFromVRML(
+                loadValsFromVRMLWebworker(
                     repName,
                     () => {
                         // Could modify coordinates before importing into
@@ -357,8 +357,6 @@ export function render(updateData: boolean, repName: string, callBack: any = () 
                             }
 
                             callBack(newMesh);  // Cloned so it won't change with new rep in future.
-
-                            // console.log("HERE")
 
                             // Clean up.
                             modelData = [];
@@ -406,10 +404,9 @@ function loadVRMLFrom3DMol(callBack: any, callBackErr: any): void {
  * @param  {Function}  callBack  A callback function.
  * @returns void
  */
-function loadValsFromVRML(repName: string, callBack: any): void {
+function loadValsFromVRMLWebworker(repName: string, callBack: any): void {
     // Clear previous model data.
     modelData = [];
-
     if (typeof(Worker) !== "undefined") {
         vrmlParserWebWorker.onmessage = (event: any) => {
             // Msg back from web worker
@@ -421,7 +418,7 @@ function loadValsFromVRML(repName: string, callBack: any): void {
             /** @type {string} */
             const status = resp["status"];
 
-            geoCenter = new BABYLON.Vector3(resp["geoCenter"][0], resp["geoCenter"][1], resp["geoCenter"][2]);
+            geoCenter = new Vector3(resp["geoCenter"][0], resp["geoCenter"][1], resp["geoCenter"][2]);
 
             if (chunk !== undefined) {
                 /** @type {number} */
@@ -527,10 +524,10 @@ function typedArrayConcat(resultConstructor: any, listOfArrays: any[]): any {
  */
 export function importIntoBabylonScene(): Promise<any> {
     // The material to add to all meshes.
-    const mat = new BABYLON.StandardMaterial("Material", Vars.scene);
-    mat.diffuseColor = new BABYLON.Color3(1, 1, 1);
-    mat.emissiveColor = new BABYLON.Color3(0, 0, 0);
-    mat.specularColor = new BABYLON.Color3(0, 0, 0);
+    const mat = new StandardMaterial("Material", Vars.scene);
+    mat.diffuseColor = new Color3(1, 1, 1);
+    mat.emissiveColor = new Color3(0, 0, 0);
+    mat.specularColor = new Color3(0, 0, 0);
 
     const meshes = [];
 
@@ -543,24 +540,25 @@ export function importIntoBabylonScene(): Promise<any> {
         // Calculate normals instead? It's not necessary. Doesn't chang over
         // 3dmoljs calculated normals.
         const norms: any[] = [];
-        BABYLON.VertexData.ComputeNormals(
+        VertexData.ComputeNormals(
             modelDatum["coors"], modelDatum["trisIdxs"], norms,
         );
 
         // Compile all that into vertex data.
-        const vertexData = new BABYLON.VertexData();
-        vertexData["positions"] = modelDatum["coors"];  // In quotes because from webworker (external)
-        vertexData["indices"] = modelDatum["trisIdxs"];
-        vertexData["normals"] = norms;
-        vertexData["colors"] = modelDatum["colors"];
+        const vertexData = new VertexData();
+        vertexData.positions = modelDatum["coors"];  // In quotes because from webworker (external)
+        vertexData.indices = modelDatum["trisIdxs"];
+        vertexData.normals = norms;
+        vertexData.colors = modelDatum["colors"];
 
         // Make the new mesh
-        const babylonMeshTmp = new BABYLON.Mesh("mesh_3dmol_tmp" + modelIdx, Vars.scene);
+        const babylonMeshTmp = new Mesh("mesh_3dmol_tmp" + modelIdx, Vars.scene);
         vertexData.applyToMesh(babylonMeshTmp);
 
         // Add a material.
         babylonMeshTmp.material = mat;
         // babylonMeshTmp.showBoundingBox = true;
+
 
         meshes.push(babylonMeshTmp);
     }
@@ -570,7 +568,7 @@ export function importIntoBabylonScene(): Promise<any> {
     if (meshes.length > 0) {
         // Merge all these meshes.
         // https://doc.babylonjs.com/how_to/how_to_merge_meshes
-        babylonMesh = BABYLON.Mesh.MergeMeshes(meshes, true, true);  // dispose of source and allow 32 bit integers.
+        babylonMesh = Mesh.MergeMeshes(meshes, true, true);  // dispose of source and allow 32 bit integers.
         babylonMesh.name = "MeshFrom3DMol" + Math.random().toString();
         babylonMesh.id = babylonMesh.name;
 
@@ -582,6 +580,7 @@ export function importIntoBabylonScene(): Promise<any> {
 
     return meshReadyPromise.then(() => {
         MonitorLoadFinish.loadSuccessful();
+
         return Promise.resolve(babylonMesh);
     });
 
@@ -595,14 +594,14 @@ export function importIntoBabylonScene(): Promise<any> {
  * @returns void
  */
 export function updateMolRotation(axis: string, amount: number): void {
-    let rotAxis = new BABYLON.Vector3(
+    let rotAxis = new Vector3(
         axis == "x" ? 1 : 0,
         axis == "y" ? 1 : 0,
         axis == "z" ? 1 : 0
     );
 
-    let rotationMatrix = new BABYLON.Quaternion();
-    BABYLON.Quaternion.RotationAxisToRef(rotAxis, amount, rotationMatrix);
+    let rotationMatrix = new Quaternion();
+    Quaternion.RotationAxisToRef(rotAxis, amount, rotationMatrix);
     // molRotationQuat.multiplyToRef(rotationMatrix, molRotationQuat);  // rotate about local axes
     rotationMatrix.multiplyToRef(molRotationQuat, molRotationQuat);  // rotate about global axes
 
@@ -618,8 +617,8 @@ export function updateMolRotation(axis: string, amount: number): void {
  * @returns void
  */
 export function setMolRotationQuatFromURLEuler(x: number, y: number, z: number): void {
-    // molRotation = new BABYLON.Vector3(x, y, z);
-    molRotationQuat = BABYLON.Quaternion.RotationYawPitchRoll(
+    // molRotation = new Vector3(x, y, z);
+    molRotationQuat = Quaternion.RotationYawPitchRoll(
         y, x, z
     );
 }

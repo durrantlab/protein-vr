@@ -9,13 +9,12 @@ import * as CommonCamera from "../Cameras/CommonCamera";
 import * as Vars from "../Vars/Vars";
 import * as Pickables from "./Pickables";
 import * as Menu3D from "../UI/Menus/Menu3D/Menu3D";
+import { Ray, Vector3 } from "@babylonjs/core";
 
-declare var BABYLON: any;
-
-export let pointWayOffScreen = new BABYLON.Vector3(-1000, 1000, 1000);
-export let groundPointBelowCamera = new BABYLON.Vector3(0, 0, 0);
-export let groundPointBelowStarePt = new BABYLON.Vector3(0, 0, 0);
-export let curStarePt = new BABYLON.Vector3(0, 0, 0);
+export let pointWayOffScreen = new Vector3(-1000, 1000, 1000);
+export let groundPointBelowCamera = new Vector3(0, 0, 0);
+export let groundPointBelowStarePt = new Vector3(0, 0, 0);
+export let curStarePt = new Vector3(0, 0, 0);
 
 /**
  * Sets the curStarePt variable externally.
@@ -110,7 +109,7 @@ function cancelStareIfFarAway(): void {
         Pickables.setCurPickedMesh(undefined);
     } else {
         /** @type {number} */
-        const dist = BABYLON.Vector3.Distance(
+        const dist = Vector3.Distance(
             CommonCamera.getCameraPosition(), curStarePt,
         );
         if (dist > 10) {
@@ -157,8 +156,8 @@ export function setPickPointAndObjInScene(updatePos = true): void {
  */
 export function groundPointPickingInfo(pt: any): any {
     /** @const {*} */
-    const ray = new BABYLON.Ray(
-        pt, new BABYLON.Vector3(0, -1, 0), 50,
+    const ray = new Ray(
+        pt, new Vector3(0, -1, 0), 50,
     );
 
     /** @const {*} */

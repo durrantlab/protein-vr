@@ -135,6 +135,7 @@ html:fullscreen {
   font-size: 18px;
   font-weight: bold;
   display: none;
+  text-align: center;
 }
 
 /* To get the 2D menu working. */

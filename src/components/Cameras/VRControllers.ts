@@ -2,13 +2,12 @@
 // See LICENSE.md or go to https://opensource.org/licenses/BSD-3-Clause for
 // full details. Copyright 2021 Jacob D. Durrant.
 
+import { AbstractMesh, PBRMaterial, Quaternion, Ray, StandardMaterial, UniversalCamera, Vector3, WebXRAbstractMotionController, WebXRControllerComponent } from "@babylonjs/core";
 import * as Navigation from "../Navigation/Navigation";
 import * as Pickables from "../Navigation/Pickables";
 import * as Points from "../Navigation/Points";
 import * as Vars from "../Vars/Vars";
 import * as CommonCamera from "./CommonCamera";
-
-declare var BABYLON: any;
 
 let lastTriggerTime = 0;
 let lastPadRotationTime = 0;
@@ -34,7 +33,7 @@ export function setup(): void {
     Vars.vrHelper.input.onControllerAddedObservable.add((inputSource) => {
         // https://doc.babylonjs.com/how_to/webxr_controllers_support#how-to-get-a-model
 
-        inputSource.onMeshLoadedObservable.add((controllerMesh: any) => {
+        inputSource.onMeshLoadedObservable.add((controllerMesh: AbstractMesh) => {
             // Unfortunately, controllers are PBR materials by default, which
             // require more advanced lighting:
             // https://doc.babylonjs.com/how_to/physically_based_rendering#light-setup.
@@ -44,24 +43,26 @@ export function setup(): void {
             let meshIdx = 0;
             while (meshIdx < meshes.length) {
                 let mesh = meshes[meshIdx];
-                if (mesh.material && mesh.material.albedoTexture) {
-                    const newMat = new BABYLON.StandardMaterial(
+                let material = mesh.material as PBRMaterial;
+                if (material && material.albedoTexture) {
+                    const newMat = new StandardMaterial(
                         mesh.name + "Material",
                         Vars.scene
                     );
 
-                    newMat.diffuseTexture = mesh.material.albedoTexture;
+                    newMat.diffuseTexture = material.albedoTexture;
 
                     mesh.material = newMat;
                 }
 
+                // @ts-ignore
                 meshes = meshes.concat(mesh.getChildren());
                 meshIdx++;
             }
         });
 
         // Set gaze point using motion controller.
-        inputSource.onMotionControllerInitObservable.add((motionController) => {
+        inputSource.onMotionControllerInitObservable.add((motionController: WebXRAbstractMotionController) => {
             // Save input sources so they can be access elsewhere.
             inputSources[getSourceType(motionController.handness)] = inputSource;
 
@@ -124,7 +125,7 @@ function getSourceType(handness: string): string {
  * @param  {*} webXRController    The XR controller object to examine.
  * @returns any[]  The matching components, in an array.
  */
-function getComponents(keywords: string[], webXRController: any): any[] {
+function getComponents(keywords: string[], webXRController: WebXRAbstractMotionController): any[] {
     keywords = keywords.map(k => k.toUpperCase());
     let idsToKeep: string[] = webXRController.getComponentIds().filter((componentName: string) => {
         const keywordsLen = keywords.length;
@@ -143,7 +144,7 @@ function getComponents(keywords: string[], webXRController: any): any[] {
         return (index === 0) || (value !== array[index-1]);
     });
 
-    let components: any[] = idsToKeep.map(n => webXRController.getComponent(n));
+    let components: WebXRControllerComponent[] = idsToKeep.map(n => webXRController.getComponent(n));
 
     if (components.length === 0) {
         console.log("WARNING: No controller components matched keyword(s). Keywords: " + keywords.join(" ") +  ". Components detected: " + webXRController.getComponentIds().join(" "));
@@ -157,7 +158,7 @@ function getComponents(keywords: string[], webXRController: any): any[] {
  * @param  {*} webVRController The web controller object.
  * @returns void
  */
-function setupMotionControllerTrigger(webXRController: any): void {
+function setupMotionControllerTrigger(webXRController: WebXRAbstractMotionController): void {
     let triggerComponents = getComponents(["TRIGGER", "BUTTON", "SQUEEZE"], webXRController);
     const triggerComponentsLen = triggerComponents.length;
     for (let i = 0; i < triggerComponentsLen; i++) {
@@ -197,7 +198,7 @@ function resetPadState(): void {
  * @param  {*} webXRController
  * @returns void
  */
-function setupMotionPad(webXRController: any): void {
+function setupMotionPad(webXRController: WebXRAbstractMotionController): void {
     let padComponents = getComponents(["PAD", "STICK"], webXRController);
     const padComponentsLen = padComponents.length;
     for (let i = 0; i < padComponentsLen; i++) {
@@ -229,7 +230,7 @@ function setupMotionPad(webXRController: any): void {
             }
         })
 
-        padComponent.onButtonStateChangedObservable.add((component /* WebXRControllerComponent */ ) => {
+        padComponent.onButtonStateChangedObservable.add((component: WebXRControllerComponent ) => {
             // will trigger when the touchpad is touched or pressed.
             if (!switchNavigationControl(webXRController)) {
                 // You haven't switched control, so use to navigate.
@@ -268,7 +269,7 @@ function setupMotionPad(webXRController: any): void {
  * @returns boolean             True if a switch to a new controller happened.
  *                              False otherwise.
  */
-function switchNavigationControl(webXRController: any): boolean {
+function switchNavigationControl(webXRController: WebXRAbstractMotionController): boolean {
     if (currentInputSourceType === webXRController.handness) {
         // It hasn't changed, so no need to update anything.
         return false;
@@ -278,7 +279,7 @@ function switchNavigationControl(webXRController: any): boolean {
     let inputSource = inputSources[getSourceType(webXRController.handness)];
 
     Points.setRayFuncToCalcNavMeshPos(() => {
-        var ray = new BABYLON.Ray(new BABYLON.Vector3(), new BABYLON.Vector3())
+        var ray = new Ray(new Vector3(), new Vector3())
         inputSource.getWorldPointerRayToRef(ray)
         return ray;
     });
@@ -331,5 +332,5 @@ function rotateCamera(): void {
     lastPadRotationTime = nowTime;
 
     // Update camera rotation.
-    Vars.scene.activeCamera.rotationQuaternion.multiplyInPlace(BABYLON.Quaternion.FromEulerAngles(0, Math.sign(padRotateSpeedFactor) * 0.25 * Math.PI, 0));
+    (Vars.scene.activeCamera as UniversalCamera).rotationQuaternion.multiplyInPlace(Quaternion.FromEulerAngles(0, Math.sign(padRotateSpeedFactor) * 0.25 * Math.PI, 0));
 }
