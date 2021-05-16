@@ -1,0 +1,7 @@
+<div id="msgsContainer">
+    <!-- <transition-group name="slide" id="msgsContainer" tag="div"> -->
+        <div class="msg" :id="'msg-' + idx.toString()" v-for="(msg, idx) in messages">
+            {{msg}}
+        </div>
+    <!-- </transition-group> -->
+</div>

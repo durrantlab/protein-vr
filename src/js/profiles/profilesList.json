@@ -2,6 +2,9 @@
   "generic-button": {
     "path": "generic-button/profile.json"
   },
+  "generic-hand": {
+    "path": "generic-hand/profile.json"
+  },
   "generic-touchpad": {
     "path": "generic-touchpad/profile.json"
   },
@@ -32,6 +35,9 @@
   "google-daydream": {
     "path": "google-daydream/profile.json"
   },
+  "hp-mixed-reality": {
+    "path": "hp-mixed-reality/profile.json"
+  },
   "htc-vive-cosmos": {
     "path": "htc-vive-cosmos/profile.json"
   },
@@ -59,6 +65,9 @@
   },
   "oculus-touch-v2": {
     "path": "oculus-touch-v2/profile.json"
+  },
+  "oculus-touch-v3": {
+    "path": "oculus-touch-v3/profile.json"
   },
   "oculus-touch": {
     "path": "oculus-touch/profile.json"

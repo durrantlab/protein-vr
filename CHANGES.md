@@ -18,19 +18,24 @@ CHANGES
   specified by each individual user when appropriate.
 * Fixed a bug with leader/follow mode that previously prevented some
   connections from completing.
+* In follower mode, cursor indicates grabbing is not possible ("not-allowed").
+* Added message to indicate when no VR headset detected.
 * Numeric menu items are now sorted numerically.
 * Added three new protein representations: trace, ribbon, and tubes.
 * Added three new color schemes: B factor, atom index, and secondary structure.
 * Added three new colors: pink, iceblue, and lime.
 * Now possible to have more than one light in an environment, though only one
   light can cast a shadow.
-* Added "Simple" environment.
+* Added "Simple" environment. It is now the default.
+* Added support for additional VR controllers (e.g., Oculus Quest 2).
 * Updated the copyright notice to 2021.
 * Fixed bug that prevented the skybox from tracking with the camera at
   "infinite distance" in some cases.
 * Improved PVR support. Now possible to include PVR file in URL.
 * ProteinVR now pauses itself when it does not have the focus, to prevent
   excess consumption of resources when running in the background.
+* Now using the WebGL multiview extension, where it is supported, to
+  accelerate VR rendering.
 
 1.0.6
 -----

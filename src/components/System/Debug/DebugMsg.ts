@@ -20,7 +20,7 @@ let plane;
  * @param  {string} m  The new value.
  * @returns void
  */
-export function setMsg(m: string): void {
+export function setDebugMsg(m: string): void {
     msg = m;
 }
 

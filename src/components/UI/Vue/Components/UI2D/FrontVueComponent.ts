@@ -13,6 +13,7 @@ import * as IsIOS from "../../../../System/IsIOS";
 
 // @ts-ignore
 import {templateHtml} from "./FrontVueComponent.template.htm.ts";
+import { addMessage } from "../MessagesComponent";
 
 interface I2DButton {
     svg: string;
@@ -239,6 +240,11 @@ export class FrontVueComponent extends VueComponentParent {
             if (UrlVars.checkIfWebRTCInUrl()) {
                 // So you're in follower mode.
                 btns = btns.filter(b => b.showInFollowerMode);
+
+                // Also fix cursor (no grab).
+                let canvas = document.getElementById("renderCanvas") as HTMLCanvasElement
+                canvas.classList.remove("grab-icon");
+                canvas.classList.add("no-grab");
             }
 
             // btns = [];  // For debugging
@@ -368,6 +374,9 @@ export class FrontVueComponent extends VueComponentParent {
                 }
             }).catch(() => {
                 console.log("Warning: Could not activate VR!");
+                if (!UrlVars.checkIfWebRTCInUrl()) {
+                    addMessage("VR headset not detected! Navigate using click/tap, drag, and/or keyboard (e.g., arrow keys) instead.");
+                }
             });
         });
     };

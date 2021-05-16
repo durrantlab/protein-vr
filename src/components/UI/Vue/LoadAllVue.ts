@@ -28,6 +28,7 @@ export function load(): void {
                 // "store": Store.store,
                 "template": `
                 <div style="height:0;">
+                    <messages></messages>
                     <front></front>
                     <load-save-modal></load-save-modal>
                     <menu-2d-modal></menu-2d-modal>

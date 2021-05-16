@@ -11,6 +11,7 @@ import * as CommonCamera from "../Cameras/CommonCamera";
 import * as MonitorLoadFinish from "../System/MonitorLoadFinish";
 import { runURLPlugins } from "../Plugins/URLParams/LoadAll";
 import { Quaternion, Vector3 } from "@babylonjs/core";
+import { addMessage } from "../UI/Vue/Components/MessagesComponent";
 
 declare var jQuery: any;
 
@@ -233,12 +234,7 @@ export function readUrlParams(): void {
         jQuery("#capture-clicks").remove();
 
         // Show a warning message.
-        let followerModeWarning = jQuery("#followerModeWarning");
-        followerModeWarning.fadeIn(500);
-
-        setTimeout(() => {
-            followerModeWarning.fadeOut(500);
-        }, 8000);
+        addMessage("Follower (view only) mode. Movement controlled by a remote user.");
     }
 
     // Update the mesh rotations
@@ -346,8 +342,11 @@ export function startLoadingStyles(): void {
         const style = stylesQueue.shift();
         VisStyles.toggleRep(style[0], style[1], style[2], () => {
             // Try to get the next style.
+            console.warn("not yet")
             startLoadingStyles();
         });
+    } else {
+        console.warn("done")
     }
 }
 

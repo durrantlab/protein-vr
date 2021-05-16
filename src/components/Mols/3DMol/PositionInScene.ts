@@ -9,7 +9,7 @@ import * as VRML from "./VRML";
 import * as StatusComponent from "../../UI/Vue/Components/StatusComponent";
 // import * as Axes from "../../Scene/Axes";
 import { HookTypes, runHooks } from '../../Plugins/Hooks/Hooks';
-import { AbstractMesh, Animation, Quaternion, TransformNode, Vector3, VertexBuffer } from "@babylonjs/core";
+import { AbstractMesh, Animation, BoundingBox, Quaternion, TransformNode, Vector3, VertexBuffer } from "@babylonjs/core";
 
 export let lastRotationQuatBeforeAnimation = new Quaternion(0, 0, 0, 0);
 let lastRotationQuat: Quaternion = undefined;
@@ -54,10 +54,10 @@ export function positionAll3DMolMeshInsideAnother(babylonMeshJustAdded: any, oth
     const allVisInitialInfo = getVisibleMolMeshesAndInfo(babylonMeshJustAdded);
     const allVisMeshes = allVisInitialInfo.meshes;
 
-    if (allVisMeshes.length === 0) {
-        // No meshes to show, so abort effort.
-        return;
-    }
+    // if (allVisMeshes.length === 0) {
+    //     // No meshes to show, so abort effort.
+    //     return;
+    // }
 
     // Reset scaling (1,1,1) and position (0,0,0). Rotation is set to
     // VRML.molRotation.
@@ -208,12 +208,31 @@ function getMaxVolMeshInfo(allVisMeshes: AbstractMesh[]): any {
     // Get the molecular model with the biggest volume.
     const allVisMolMeshesLen = allVisMeshes.length;
     let maxVol = 0.0;
-    let maxVolBox;
+    let maxVolBox: BoundingBox;
     let maxVolBoxDimens: number[];
     let maxVolMesh;  // To store biggest mesh.
     for (let i = 0; i < allVisMolMeshesLen; i++) {
-        const allVisMolMesh = allVisMeshes[i];
-        const maxVolBoxTmp = allVisMolMesh.getBoundingInfo().boundingBox;
+        const visMolMesh = allVisMeshes[i];
+
+        console.log("\n\nDDDT: visMolMesh: name", JSON.stringify(visMolMesh.name));
+        console.log("DDDT: visMolMesh: position", JSON.stringify(visMolMesh.position));
+        console.log("DDDT: visMolMesh: scaling", JSON.stringify(visMolMesh.scaling));
+        console.log("DDDT: visMolMesh: rotation", JSON.stringify(visMolMesh.rotationQuaternion));
+        console.log("DDDT: visMolMesh: parent", JSON.stringify(visMolMesh.getChildMeshes().length));
+        console.log("DDDT: visMolMesh: VertexBuffer", JSON.stringify(visMolMesh.getVerticesData(VertexBuffer.PositionKind).slice(0,6)));
+        console.log(VertexBuffer.PositionKind, "FFF")
+
+        console.warn("Discovery here!")
+        // Problem identified: The actual vertices are different. I have
+        // confirmed that changing position, rotation, scaling does not
+        // afffect this raw data. It must be diffferent coming off the
+        // webworker somehow. Maybe when calculates center?
+
+        visMolMesh.computeWorldMatrix(true);  // Doesn't seem to really matter.
+        visMolMesh.refreshBoundingInfo();  // Doesn't seem to matter, but here just in case.
+        const maxVolBoxTmp = visMolMesh.getBoundingInfo().boundingBox;
+        console.log("DDDT: box centerWorld", JSON.stringify(maxVolBoxTmp.centerWorld));
+
         // const maxVolBoxDimensTmp = Object.keys(maxVolBoxTmp.maximumWorld).map(
         //     (k) => maxVolBoxTmp.maximumWorld[k] - maxVolBoxTmp.minimumWorld[k],
         // );
@@ -228,9 +247,15 @@ function getMaxVolMeshInfo(allVisMeshes: AbstractMesh[]): any {
             maxVol = volume;
             maxVolBox = maxVolBoxTmp;
             maxVolBoxDimens = maxVolBoxDimensTmp;
-            maxVolMesh = allVisMolMesh;  // biggest mesh
+            maxVolMesh = visMolMesh;  // biggest mesh
         }
     }
+
+
+    // maxVolBox = maxVolMesh.getBoundingInfo().boundingBox;
+
+    console.log(maxVolMesh.name, maxVol, JSON.stringify(maxVolBox.centerWorld), "DDDT2", "Why maxVolBox different?")
+    console.log("DDDT =============")
 
     return {
         box: maxVolBox,

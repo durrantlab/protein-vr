@@ -10,7 +10,7 @@
         "touchpad": {
           "type": "touchpad",
           "gamepadIndices": {
-            "button": 2,
+            "button": 0,
             "xAxis": 0,
             "yAxis": 1
           },
@@ -99,7 +99,7 @@
         "touchpad": {
           "type": "touchpad",
           "gamepadIndices": {
-            "button": 2,
+            "button": 0,
             "xAxis": 0,
             "yAxis": 1
           },
@@ -188,7 +188,7 @@
         "touchpad": {
           "type": "touchpad",
           "gamepadIndices": {
-            "button": 2,
+            "button": 0,
             "xAxis": 0,
             "yAxis": 1
           },

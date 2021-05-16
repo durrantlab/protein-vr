@@ -16,6 +16,7 @@ import * as Points from "../Navigation/Points";
 import * as NonVRCamera from "./NonVRCamera";
 import * as FrontVueComponent from "../UI/Vue/Components/UI2D/FrontVueComponent";
 import { LightGizmo, WebXRState } from "@babylonjs/core";
+import "@babylonjs/loaders/glTF";  // Requited because controllers are GLB files. TODO: Could do dynamic import somehow?
 
 let lastTimeJSRunningChecked: number;
 
