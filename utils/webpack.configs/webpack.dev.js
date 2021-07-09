@@ -17,6 +17,7 @@ let forDev = {
     ]
 };
 
+// Webworker first!
 let webworkerFinal = merge(webworker, forDev);
 let nonWebworkerFinal = merge(notWebworker, forDev);
 

@@ -49,7 +49,7 @@ let config: any;
 /** @type {string} */
 export let vrmlStr: string;
 
-const vrmlParserWebWorker = new Worker("vrmlWebWorker.js");
+const vrmlParserWebWorker = new Worker("VRMLWEBWORKER_FILENAME");  // vrmlWebWorker.js
 
 let molTxt = "";
 let molTxtType = "pdb";

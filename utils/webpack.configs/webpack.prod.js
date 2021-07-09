@@ -88,6 +88,7 @@ let forProd = {
     }
 }
 
+// Webworker first!
 let webworkerFinal = merge(webworker, forProd);
 let nonWebworkerFinal = merge(notWebworker, forProd);
 

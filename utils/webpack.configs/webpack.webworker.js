@@ -7,6 +7,6 @@ module.exports = merge(common, {
         vrmlWebWorker: path.join(__dirname, '../../src/components/Mols/3DMol/VRMLParser.worker.ts'),
     },
     output: {
-        filename: "[name].js"
+        filename: "[name].[hash].js"
     },
 });

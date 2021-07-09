@@ -28,7 +28,8 @@ module.exports = merge(common, {
             template: path.join(__dirname, "../../src/index.html"),
             // favicon: ???
             minify: true,
-            excludeAssets: [/vrmlWebWorker.*.js/]
+            // excludeAssets: [/vrmlWebWorker.*.js/]
+            excludeAssets: [/vrmlWebWorker*.js/]
         }),
         new HtmlWebpackExcludeAssetsPlugin(),
         new webpack.ProvidePlugin({
@@ -93,7 +94,8 @@ module.exports = merge(common, {
                     }
                 },
                 {
-                    urlPattern: './vrmlWebWorker.js',
+                    // urlPattern: './vrmlWebWorker.js',
+                    urlPattern: /vrmlWebWorker*.js/,
                     handler: "NetworkFirst", // First check the network. If that fails, use cache...
                     options: {
                         cacheableResponse: {statuses: [200]}
