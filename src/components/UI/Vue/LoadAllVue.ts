@@ -27,7 +27,7 @@ export function load(): void {
                 "el": '#vue-app',
                 // "store": Store.store,
                 "template": `
-                <div style="height:0;">
+                <div style="height:0;" id="main-app">
                     <messages></messages>
                     <front></front>
                     <load-save-modal></load-save-modal>

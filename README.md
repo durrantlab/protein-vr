@@ -2,13 +2,24 @@
 
 ## Introduction ##
 
-ProteinVR is a web-based application that allows users to view protein/ligand
-structures in virtual reality (VR) from their mobile, desktop, or
-VR-headset-based web browsers. The molecular structures are displayed within
-3D environments that give useful biological context and allow users to situate
-themselves in 3D space.
+ProteinVR is an [open-source](http://durrantlab.com/protein-vr/) web-based
+application that allows users to view protein/ligand structures in virtual
+reality (VR) from their mobile, desktop, or VR-headset-based web browsers. The
+molecular structures are displayed within 3D environments that give useful
+biological context and allow users to situate themselves in 3D space. 
 
-ProteinVR is released under the terms of the open-source BSD-3-Clause license.
+ProteinVR is made possible thanks to support from the University of Pittsburgh
+([Center for Research Computing](https://crc.pitt.edu/); [Innovation in
+Education Award](https://www.provost.pitt.edu/acie/awards)) and the National
+Institutes of Health
+([R01GM132353](https://reporter.nih.gov/project-details/9833043)). It is
+released under the terms of the [BSD-3-Clause
+license](https://git.durrantlab.pitt.edu/jdurrant/protein-vr/-/blob/1.0.7/LICENSE.md).
+If you use ProteinVR in your research, [please
+cite](https://dx.plos.org/10.1371/journal.pcbi.1007747): "Cassidy, K. C.,
+Šefčík, J., Raghav, Y., Chang, A., & Durrant, J. D. (2020). ProteinVR: Web-based
+molecular visualization in virtual reality. _PLoS computational biology_,
+_16_(3), e1007747."
 
 Most users will wish to simply access the already compiled, publicly available
 ProteinVR web app at [http://durrantlab.com/pvr/](http://durrantlab.com/pvr/).

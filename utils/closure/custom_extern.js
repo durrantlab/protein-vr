@@ -393,6 +393,7 @@ BABYLON.Mesh.ActionManager = function() {};
 BABYLON.Mesh.material = function() {};
 BABYLON.Mesh.freezeWorldMatrix = function() {};
 BABYLON.Mesh.getChildren = function() {};
+BABYLON.Mesh.computeWorldMatrix = function(a) {};
 BABYLON.Mesh.receiveShadows;
 BABYLON.Mesh.billboardMode;
 BABYLON.Mesh.BILLBOARDMODE_ALL;

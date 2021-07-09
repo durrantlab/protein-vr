@@ -12,6 +12,7 @@ import * as MonitorLoadFinish from "../System/MonitorLoadFinish";
 import { runURLPlugins } from "../Plugins/URLParams/LoadAll";
 import { Quaternion, Vector3 } from "@babylonjs/core";
 import { addMessage } from "../UI/Vue/Components/MessagesComponent";
+import { setNonVRCameraCollisionElipsoid } from '../Cameras/NonVRCamera';
 
 declare var jQuery: any;
 
@@ -286,6 +287,7 @@ export function readUrlParams(): void {
     const cz = urlParams.get("cz");
     if ((cx !== undefined) && (cy !== undefined) && (cz !== undefined)) {
         CommonCamera.setCameraPosition(new Vector3(+cx, +cy, +cz));
+        setNonVRCameraCollisionElipsoid();
     }
 
     const crx = urlParams.get("crx");
@@ -342,11 +344,8 @@ export function startLoadingStyles(): void {
         const style = stylesQueue.shift();
         VisStyles.toggleRep(style[0], style[1], style[2], () => {
             // Try to get the next style.
-            console.warn("not yet")
             startLoadingStyles();
         });
-    } else {
-        console.warn("done")
     }
 }
 

@@ -3,11 +3,11 @@
 // full details. Copyright 2021 Jacob D. Durrant.
 
 import {VueComponentParent} from "../VueComponentParent";
-
 import 'bootstrap';  // Note that this is important.
 
 // @ts-ignore
 import {templateHtml} from "./ModalComponent.template.htm.ts";
+import { canvas, engine } from "../../../../Vars/Vars";
 
 export var modalCurrentlyOpen = false;
 
@@ -158,6 +158,11 @@ export class ModalComponent extends VueComponentParent {
         // Keep track of opens and closes.
         this.modalObj.on('hidden.bs.modal', (e) => {
             modalCurrentlyOpen = false;
+    
+            // Use ref to engine to get canvas' Tab Index and set it
+            canvas.tabIndex = engine.canvasTabIndex;  
+            canvas.focus();
+            
             this["$emit"]("onClose");
         });
     }

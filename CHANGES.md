@@ -1,8 +1,8 @@
 CHANGES
 =======
 
-1.0.7 WIP
----------
+1.0.7
+-----
 
 * ProteinVR now merges duplicate vertices before loading 3Dmol.js-generated
   molecular meshes. This should improve performance, especially on low-memory
@@ -11,13 +11,13 @@ CHANGES
 * Added QRCodes to the "Load and Save" and "Leader" popups to make sharing
   scenes easier.
 * Now possible to export ProteinVR scene as 3D models for use in third-party
-  programs such as [Blender](https://www.blender.org/) (gltf, glb, obj, stl,
-  and vrml formats supported).
-* Information about scene shadows and hardware scaling is no longer saved to
-  PVR files. These values are device specific and should be explicitly
-  specified by each individual user when appropriate.
-* Fixed a bug with leader/follow mode that previously prevented some
-  connections from completing.
+  programs such as [Blender](https://www.blender.org/) (gltf, glb, obj, stl, and
+  vrml formats supported).
+* Information about scene shadows and hardware scaling is no longer saved to PVR
+  files. These values are device specific and should be explicitly specified by
+  each individual user when appropriate.
+* Fixed a bug with leader/follow mode that previously prevented some connections
+  from completing.
 * In follower mode, cursor indicates grabbing is not possible ("not-allowed").
 * Added message to indicate when no VR headset detected.
 * Numeric menu items are now sorted numerically.
@@ -29,13 +29,17 @@ CHANGES
 * Added "Simple" environment. It is now the default.
 * Added support for additional VR controllers (e.g., Oculus Quest 2).
 * Updated the copyright notice to 2021.
-* Fixed bug that prevented the skybox from tracking with the camera at
-  "infinite distance" in some cases.
+* Fixed bug that prevented the skybox from tracking with the camera at "infinite
+  distance" in some cases.
 * Improved PVR support. Now possible to include PVR file in URL.
 * ProteinVR now pauses itself when it does not have the focus, to prevent
   excess consumption of resources when running in the background.
-* Now using the WebGL multiview extension, where it is supported, to
-  accelerate VR rendering.
+* Fixed a bug that caused the structure to appear off center when a smaller part
+  (e.g., a ligand) is rendered before a larger part (e.g., the protein).
+* Now possible to rotate both clockwise and counterclockwise.
+* Upgraded BabylonJS game engine to v4.2.0.
+* Added funding and citation information to the `README.md` file and in-app help
+  system.
 
 1.0.6
 -----

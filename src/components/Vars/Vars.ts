@@ -100,7 +100,7 @@ export let vrVars: IVRSetup = {};
  */
 export function setup(): void {
     canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
-
+    
     // window["canvas"] = canvas;  // debugging
 
     // Generate the BABYLON 3D engine
@@ -120,12 +120,15 @@ export function setup(): void {
 
 /**
  * Determines the camera height from the active camera.
+ * @param  {boolean} [ignoreExistingCameraHeight=false]  If true, ignroe any
+ *                                                       previous camera height
+ *                                                       calculations.
  * @returns void
  */
-export function determineCameraHeightFromActiveCamera(): void {
+export function determineCameraHeightFromActiveCamera(ignoreExistingCameraHeight: boolean = false): void {
     // Get the camera height. But I don't think this variable is every
     // actually used anywhere...
-    if (cameraHeight === undefined) {
+    if ((cameraHeight === undefined) || (ignoreExistingCameraHeight === true)) {
         // Calculate the camera height from it's position.
         /** @const {*} */
         const ray = new Ray(

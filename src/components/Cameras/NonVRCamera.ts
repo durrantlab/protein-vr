@@ -5,6 +5,7 @@
 // This sets up the non vr camera. Not everyone has a vr headset.
 
 import { UniversalCamera, Vector3 } from "@babylonjs/core";
+import { setPromise } from "../PromiseStore";
 import * as Vars from "../Vars/Vars";
 
 /** @type {*} */
@@ -25,7 +26,7 @@ export function setup(): void {
 function setupNonVRCameraObj(): void {
     // The VRHelper already created a camera. Need to set it up.
     nonVRCamera = Vars.scene.activeCamera as UniversalCamera;
-
+    
     // Enable navigation via both WASD and the arrows keys.
     nonVRCamera.keysUp = [87, 38];
     nonVRCamera.keysDown = [83, 40];
@@ -39,15 +40,10 @@ function setupNonVRCameraObj(): void {
     Vars.scene.gravity = new Vector3(0, -0.1, 0);
     nonVRCamera.applyGravity = true;
 
-    // Enable collision detection. Note that the second paramerter is a
-    // radius.
-    setCameraElipsoid();
-
     // Turn on collisions as appropriate. Note that groundMesh collisions are
     // enabled in Navigation.
     // scene.workerCollisions = true;
-    Vars.scene.collisionsEnabled = true;
-    nonVRCamera.checkCollisions = true;
+    setNonVRCameraCollisionElipsoid();
 
     // Slow the camera.
     nonVRCamera.speed = 0.1;
@@ -57,6 +53,25 @@ function setupNonVRCameraObj(): void {
     // Position the camera on the floor. See
     // http://www.html5gamedevs.com/topic/30837-gravity-camera-stops-falling/
     nonVRCamera._updatePosition();
+
+    // Use ref to engine to get canvas' Tab Index and set it
+    Vars.canvas.tabIndex = Vars.engine.canvasTabIndex;
+    Vars.canvas.focus();
+}
+
+/**
+ * Sets up the elipsoid/collisions on the camera (for non-VR camera).
+ * @returns void
+ */
+export function setNonVRCameraCollisionElipsoid(): void {
+    Vars.determineCameraHeightFromActiveCamera(true);
+
+    // Enable collision detection. Note that the second paramerter is a
+    // radius.
+    setCameraElipsoid();
+
+    Vars.scene.collisionsEnabled = true;
+    nonVRCamera.checkCollisions = true;
 }
 
 /**

@@ -6,7 +6,8 @@ function deviceOrientationSplashScreen() {
     test("TITLETITLE", async (t) => {
         await t
             .navigateTo("./?testdosplash")
-            .click("#modal-close-button-simple-modal")
+            // .click("#modal-close-button-simple-modal")
+            .click("#close-btn-simple-modal")
             .expect(Selector("#status").innerText)
             .eql("splash screen loaded", {timeout: 15000});
     });

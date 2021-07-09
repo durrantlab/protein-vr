@@ -107,11 +107,13 @@ export function loadValsFromVRML(vrmlStr: string, removeExtraPts = false): any[]
 
     // Now that you've collected all the data, go back and translate all the
     // vertixes, so center the coordinates at the origin. Makes it easier to
-    // pivot at geometric center.
-    if (geoCenter === undefined) {
-        geoCenter = getGeometricCenter(modelData);
-    }
-    modelData = translateBeforeBabylonImport(geoCenter, modelData);
+    // pivot at geometric center. Note that below doesn't seem to be
+    // necessary, and no doubt adds to the calculation time.
+    // if (geoCenter === undefined) {
+    //     geoCenter = getGeometricCenter(modelData);
+    // }
+    // modelData = translateBeforeBabylonImport(geoCenter, modelData);
+    geoCenter = new Float32Array([0, 0, 0]);
 
     if (!inWebWorker) {
         // TODO: You should never get here. Webworkers required.
@@ -134,6 +136,10 @@ export function loadValsFromVRML(vrmlStr: string, removeExtraPts = false): any[]
                 for (let i2 = 0; i2 < chunksLen; i2++) {
                     const chunk = chunks[i2];
                     dataToSendBack.push([modelIdx, dataType, chunk]);
+
+                    // if (dataType === "coors") {
+                    //     console.log("moo1d", chunk.slice(0, 3))
+                    // }
                 }
             }
         }
@@ -312,20 +318,21 @@ function betweenbookends(bookend1: string, bookend2: string, str: string): strin
  * @returns Array<Object<string, Array<number>>>   Like model Data, but with
  *                                                 the coordinates translated.
  */
-function translateBeforeBabylonImport(delta: number[], modelData: any[]): any[] {
-    const numModels = modelData.length;
-    for (let modelIdx = 0; modelIdx < numModels; modelIdx++) {
-        /** @type {number} */
-        const coorsLen = modelData[modelIdx]["coors"].length;
-        for (let coorIdx = 0; coorIdx < coorsLen; coorIdx = coorIdx + 3) {
-            modelData[modelIdx]["coors"][coorIdx] = modelData[modelIdx]["coors"][coorIdx] - delta[0];
-            modelData[modelIdx]["coors"][coorIdx + 1] = modelData[modelIdx]["coors"][coorIdx + 1] - delta[1];
-            modelData[modelIdx]["coors"][coorIdx + 2] = modelData[modelIdx]["coors"][coorIdx + 2] - delta[2];
-        }
-    }
+// function translateBeforeBabylonImport(delta: number[], modelData: any[]): any[] {
+//     // Below prevents translation
+//     const numModels = modelData.length;
+//     for (let modelIdx = 0; modelIdx < numModels; modelIdx++) {
+//         /** @type {number} */
+//         const coorsLen = modelData[modelIdx]["coors"].length;
+//         for (let coorIdx = 0; coorIdx < coorsLen; coorIdx = coorIdx + 3) {
+//             modelData[modelIdx]["coors"][coorIdx] = modelData[modelIdx]["coors"][coorIdx] - delta[0];
+//             modelData[modelIdx]["coors"][coorIdx + 1] = modelData[modelIdx]["coors"][coorIdx + 1] - delta[1];
+//             modelData[modelIdx]["coors"][coorIdx + 2] = modelData[modelIdx]["coors"][coorIdx + 2] - delta[2];
+//         }
+//     }
 
-    return modelData;
-}
+//     return modelData;
+// }
 
 /**
  * Calculate the geometric center of the coordinates.
@@ -335,43 +342,45 @@ function translateBeforeBabylonImport(delta: number[], modelData: any[]): any[] 
  *                                                            colors, etc.
  * @returns * The x, y, z of the geometric center. Float32Array.
  */
-function getGeometricCenter(modelData: any[]): Float32Array {
-    // No coordinates... it's an empty mesh.
-    if (modelData.length === 0) {
-        return new Float32Array([0.0, 0.0, 0.0]);
-    }
+// function getGeometricCenter(modelData: any[]): Float32Array {
+//     // No coordinates... it's an empty mesh.
+//     // TODO: In this case, you should keep geoCenter as undefined!
+//     if (modelData.length === 0) {
+//         return new Float32Array([0.0, 0.0, 0.0]);
+//     }
 
-    /** @type {number} */
-    const coorCountAllModels = modelData.map((m) => m["coors"].length).reduce((a: number, b: number) => a + b);
-    if (coorCountAllModels === 0) {
-        // No coordinates... it's an empty mesh.
-        return new Float32Array([0.0, 0.0, 0.0]);
-    }
+//     /** @type {number} */
+//     const coorCountAllModels = modelData.map((m) => m["coors"].length).reduce((a: number, b: number) => a + b);
+//     if (coorCountAllModels === 0) {
+//         // No coordinates... it's an empty mesh.
+//         // TODO: In this case, you should keep geoCenter as undefined!
+//         return new Float32Array([0.0, 0.0, 0.0]);
+//     }
 
-    let xTotal = 0;
-    let yTotal = 0;
-    let zTotal = 0;
-    const numModels = modelData.length;
+//     let xTotal = 0;
+//     let yTotal = 0;
+//     let zTotal = 0;
+//     const numModels = modelData.length;
 
-    for (let modelIdx = 0; modelIdx < numModels; modelIdx++) {
-        const modelDatum = modelData[modelIdx];
-        const coors = modelDatum["coors"];
-        /** @type {number} */
-        const coorsLen = coors.length;
-        for (let coorIdx = 0; coorIdx < coorsLen; coorIdx = coorIdx + 3) {
-            xTotal = xTotal + coors[coorIdx];
-            yTotal = yTotal + coors[coorIdx + 1];
-            zTotal = zTotal + coors[coorIdx + 2];
-        }
-    }
+//     for (let modelIdx = 0; modelIdx < numModels; modelIdx++) {
+//         const modelDatum = modelData[modelIdx];
+//         const coors = modelDatum["coors"];
+//         /** @type {number} */
+//         const coorsLen = coors.length;
+//         for (let coorIdx = 0; coorIdx < coorsLen; coorIdx = coorIdx + 3) {
+//             xTotal = xTotal + coors[coorIdx];
+//             yTotal = yTotal + coors[coorIdx + 1];
+//             zTotal = zTotal + coors[coorIdx + 2];
+//         }
+//     }
 
-    const numCoors = coorCountAllModels / 3.0;
-    xTotal = xTotal / numCoors;
-    yTotal = yTotal / numCoors;
-    zTotal = zTotal / numCoors;
+//     const numCoors = coorCountAllModels / 3.0;
+//     xTotal = xTotal / numCoors;
+//     yTotal = yTotal / numCoors;
+//     zTotal = zTotal / numCoors;
 
-    return new Float32Array([xTotal, yTotal, zTotal]);
-}
+//     return new Float32Array([xTotal, yTotal, zTotal]);
+// }
 
 /**
  * Simplifies meshes by merging vertexes by distance.

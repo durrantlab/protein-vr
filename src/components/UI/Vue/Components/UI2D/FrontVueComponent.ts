@@ -229,7 +229,11 @@ export class FrontVueComponent extends VueComponentParent {
                     "showInFollowerMode": true,
                     "clickFunc": () => {
                         Vars.engine.switchFullscreen(true);
-                        jQuery("#renderCanvas").focus();  // So keypress will work.
+
+                        // So keypress will work.
+                        // Use ref to engine to get canvas' Tab Index and set it
+                        Vars.canvas.tabIndex = Vars.engine.canvasTabIndex;  
+                        Vars.canvas.focus();  
                     },
                     "curBottom": undefined
                 });

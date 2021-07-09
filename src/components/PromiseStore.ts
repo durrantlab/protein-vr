@@ -21,7 +21,8 @@ let promises = {
     "LoadMolecule": null,
     "SetupMenus": null,
     "FinalizeScene": null,
-    "SetupVue": null
+    "SetupVue": null,
+    "CameraCollisions": null
 };
 
 let promiseStates = {};
@@ -46,13 +47,13 @@ const enum PromiseState {
  */
 export function setPromise(name: string, dependencies: string[], promiseFunc: Function): void {
     if (promises[name] === undefined) {
-        throw new Error("Promise not registered: " + name);
+        throw new Error("Promise not registered in PromiseStore.ts: " + name);
     }
     const dependenciesLen = dependencies.length;
     for (let i = 0; i < dependenciesLen; i++) {
         const dependencyName = dependencies[i];
         if (promises[dependencyName] === undefined) {
-            throw new Error("Promise not registered: " + dependencyName);
+            throw new Error("Promise not registered in PromiseStore.ts: " + dependencyName);
         }
     }
 

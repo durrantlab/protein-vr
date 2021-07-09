@@ -64,11 +64,13 @@ export function runSetupCamera(): void {
                 Vars.scene.activeCamera = cameraFromBabylonFile;
             }
 
-            // Get the camera height.
-            Vars.determineCameraHeightFromActiveCamera();
+            // Get the camera height (now handled elsewhere).
+            // Vars.determineCameraHeightFromActiveCamera();
 
             // Setup the default (nonVR) camera.
             NonVRCamera.setup();
+
+            resolve();
         }
     )
 }

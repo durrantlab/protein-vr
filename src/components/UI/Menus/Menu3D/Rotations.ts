@@ -17,39 +17,36 @@ export function buildRotationsSubMenu(): any {
         "Undo Rotate": () => {
             undoRotate();
         },
-        "X Axis": () => {
+        "+X Axis": () => {
             axisRotation("x");
         },
-        "Y Axis": () => {
+        "-X Axis": () => {
+            axisRotation("x", -1);
+        },
+        "+Y Axis": () => {
             axisRotation("y");
         },
-        "Z Axis": () => {
+        "-Y Axis": () => {
+            axisRotation("y", -1);
+        },
+        "+Z Axis": () => {
             axisRotation("z");
         },
-
-        // Below judged unnecessary with new "undo" button.
-        // "-X Axis": () => {
-        //     VRML.updateMolRotation("x", -amt);
-        //     PositionInScene.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"));
-        // },
-        // "-Y Axis": () => {
-        //     VRML.updateMolRotation("y", -amt);
-        //     PositionInScene.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"));
-        // },
-        // "-Z Axis": () => {
-        //     VRML.updateMolRotation("z", -amt);
-        //     PositionInScene.positionAll3DMolMeshInsideAnother(undefined, Vars.scene.getMeshByName("protein_box"));
-        // },
+        "-Z Axis": () => {
+            axisRotation("z", -1);
+        },
     };
 }
 
 /**
  * Rotates the molecule about a given axis.
- * @param  {string} axis The axis to rotate about.
+ * @param  {string} axis           The axis to rotate about.
+ * @param  {number} [direction=1]  Direction to rotate (1 or -1). Defaults to
+ *                                 1.
  * @returns void
  */
-export function axisRotation(axis: string): void {
-    let amt = 15.0 * Math.PI / 180.0;
+export function axisRotation(axis: string, direction: number = 1): void {
+    let amt = direction * 15.0 * Math.PI / 180.0;
 
     if (axis === "REDRAW") {
         // Just to trigger redraw (helps position labels, for example).

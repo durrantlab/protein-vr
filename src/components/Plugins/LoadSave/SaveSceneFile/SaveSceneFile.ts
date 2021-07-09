@@ -72,11 +72,7 @@ export class SaveSceneFile extends Parent.LoadSaveParent {
                 // No remote url to load. So look at data in memory.
 
                 // First, make sure you can proceed.
-                if (
-                    (store.state["loadLocalFilePanel"]["fileContent"] === undefined) ||
-                    (store.state["loadLocalFilePanel"]["fileType"] === undefined)
-                ) {
-
+                if ((store.state["loadLocalFilePanel"]["fileContent"] === undefined) ||(store.state["loadLocalFilePanel"]["fileType"] === undefined)) {
                     store.commit("setVar", {
                         moduleName: "loadSaveModal",
                         varName: "showLoadSaveModal",

@@ -91,7 +91,7 @@ export function addMessage(msg: string): void {
                         startTimerToRemoveMsg();
                     });
                 }
-            }, 8000)
+            }, 9000)
         }
         startTimerToRemoveMsg();
 

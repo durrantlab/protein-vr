@@ -42,8 +42,14 @@ export function runSetupMenus(): void {
 export function smartSort(lst: string[]): void {
     let t = lst[0].match(/\[([0-9]+?)\-([0-9]+?)\]/);
     if (t === null) {
-        // Just sort alphabetically
-        lst.sort();
+        // Just sort alphabetically, but ignore + and -.
+        lst.sort(function(a, b): number {
+            let a2 = a.replace("+", "").replace("-", "");
+            let b2 = b.replace("+", "").replace("-", "");
+            if (a2 < b2) { return -1; }
+            if (a2 > b2) { return 1; }
+            return 0;
+        });
     } else {
         // It's numbers like [213-123].
         lst.sort(function(a, b): number {

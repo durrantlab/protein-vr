@@ -12,7 +12,7 @@ import * as PositionInScene from "./PositionInScene";
 import * as SimpleModalComponent from "../../UI/Vue/Components/OpenPopup/SimpleModalComponent"
 import * as MonitorLoadFinish from "../../System/MonitorLoadFinish";
 import { getFilenameExtension, makeUrl } from "../../Plugins/LoadSave/LoadSaveUtils";
-import { Color3, Mesh, Quaternion, StandardMaterial, Vector3, VertexData } from "@babylonjs/core";
+import { Color3, Mesh, Quaternion, StandardMaterial, Vector3, VertexBuffer, VertexData } from "@babylonjs/core";
 
 declare var $3Dmol;
 
@@ -252,7 +252,7 @@ export function showLoadMoleculeError(hdr: any, status: any, err: any, url: stri
                       url.split(":")[0] + "://\".";
             } else {
                 // Some other unspecified error that can't be caught.
-                err ='Unidentifiable network error. It might be a <a rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank">CORS issue</a> or a dropped internet connection. If you\'re a developer, check the console.';
+                err ='Unidentifiable network error. Perhaps the URL is wrong? Or it might be a <a rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank">CORS issue</a>, or even a dropped internet connection. If you\'re a developer, check the console.';
             }
         }
     }
@@ -557,8 +557,7 @@ export function importIntoBabylonScene(): Promise<any> {
 
         // Add a material.
         babylonMeshTmp.material = mat;
-        // babylonMeshTmp.showBoundingBox = true;
-
+        babylonMeshTmp.showBoundingBox = true;
 
         meshes.push(babylonMeshTmp);
     }
@@ -580,6 +579,8 @@ export function importIntoBabylonScene(): Promise<any> {
 
     return meshReadyPromise.then(() => {
         MonitorLoadFinish.loadSuccessful();
+
+        // console.log("moo22", babylonMesh.getVerticesData(VertexBuffer.PositionKind).slice(0,3));
 
         return Promise.resolve(babylonMesh);
     });

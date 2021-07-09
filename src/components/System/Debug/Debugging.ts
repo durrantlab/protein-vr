@@ -79,23 +79,23 @@ export function enableDebugging(): Promise<any> {
  * A function to activate debug mode (babylonjs)
  * @returns void
  */
-function debugMode(): void {
-    import(
-        /* webpackChunkName: "debugLayer" */
-        /* webpackMode: "lazy" */
-        "@babylonjs/core/Debug/debugLayer"
-    ).then(() => {
-        return import(
-            /* webpackChunkName: "inspector" */
-            /* webpackMode: "lazy" */
-            "@babylonjs/inspector"
-        )
-    }).then(() => {
-        Vars.scene.debugLayer.show().then(() => {
-            document.getElementById("inspector-host").style.zIndex = "15";
-            document.getElementById("scene-explorer-host").style.zIndex = "15";
-        });
-    })
-}
+// function debugMode(): void {
+//     import(
+//         /* webpackChunkName: "debugLayer" */
+//         /* webpackMode: "lazy" */
+//         "@babylonjs/core/Debug/debugLayer"
+//     ).then(() => {
+//         return import(
+//             /* webpackChunkName: "inspector" */
+//             /* webpackMode: "lazy" */
+//             "@babylonjs/inspector"
+//         )
+//     }).then(() => {
+//         Vars.scene.debugLayer.show().then(() => {
+//             document.getElementById("inspector-host").style.zIndex = "15";
+//             document.getElementById("scene-explorer-host").style.zIndex = "15";
+//         });
+//     })
+// }
 
-window["debugMode"] = debugMode;
+// window["debugMode"] = debugMode;

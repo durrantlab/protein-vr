@@ -11,6 +11,11 @@ import { ShadowOnlyMaterial } from "@babylonjs/materials";
 
 export let shadowGenerator: ShadowGenerator;
 
+/**
+ * Gets the light that has been designated for shadow casting (named shadowlight
+ * or shadow_light).
+ * @returns Light
+ */
 export function getShadowCastingLight(): Light | undefined {
     const VarsSceneLightsLen = Vars.scene.lights.length;
     for (let i = 0; i < VarsSceneLightsLen; i++) {

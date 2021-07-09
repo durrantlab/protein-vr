@@ -268,7 +268,7 @@ function onSceneLoaded(container: any, resolveFunc: Function, onSuccess?: Functi
             for (let i = 0; i < lightsSerialized.length; i++) {
                 // @ts-ignore
                 Light.Parse(lightsSerialized[i], Vars.scene.utilityLayerScene);
-            }
+            }   
 
             resolveFunc();
 

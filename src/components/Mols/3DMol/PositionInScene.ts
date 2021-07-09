@@ -66,10 +66,6 @@ export function positionAll3DMolMeshInsideAnother(babylonMeshJustAdded: any, oth
     // Get the bounding box of the other (containing) mesh and it's dimensions
     // (protein_box).
     const containingBox = otherContainerBabylonMesh.getBoundingInfo().boundingBox;
-    // const containingBoxDimens = Object.keys(containingBox.maximumWorld).map(
-    //     (k) => containingBox.maximumWorld[k] - containingBox.minimumWorld[k],
-    // );
-
     const containingBoxDimens = [
         containingBox.maximumWorld.x - containingBox.minimumWorld.x,
         containingBox.maximumWorld.y - containingBox.minimumWorld.y,
@@ -77,10 +73,15 @@ export function positionAll3DMolMeshInsideAnother(babylonMeshJustAdded: any, oth
     ]
 
     // Get information about the mesh with the maximum volume.
-    const maxVolInfo = getMaxVolMeshInfo(allVisMeshes);
+    let maxVolInfo = getMaxVolMeshInfo(allVisMeshes);
 
     // Scale all the meshes to fit in the containing box.
-    scaleAllMeshesToFixInBox(containingBoxDimens, maxVolInfo.boxDimens, allVisMeshes);
+    scaleAllMeshesToFitInBox(containingBoxDimens, maxVolInfo.boxDimens, allVisMeshes);
+
+    // Note the need to recalculate now that scaled. Otherwise, you get an
+    // error when you rend the smaller representation first (e.g., ligand
+    // before protein). Much work went into discovering this solution...
+    maxVolInfo = getMaxVolMeshInfo(allVisMeshes);
 
     // Position all the meshes appropriate within countaining box.
     translateAllMeshes(containingBox, allVisMeshes, maxVolInfo);
@@ -214,24 +215,9 @@ function getMaxVolMeshInfo(allVisMeshes: AbstractMesh[]): any {
     for (let i = 0; i < allVisMolMeshesLen; i++) {
         const visMolMesh = allVisMeshes[i];
 
-        console.log("\n\nDDDT: visMolMesh: name", JSON.stringify(visMolMesh.name));
-        console.log("DDDT: visMolMesh: position", JSON.stringify(visMolMesh.position));
-        console.log("DDDT: visMolMesh: scaling", JSON.stringify(visMolMesh.scaling));
-        console.log("DDDT: visMolMesh: rotation", JSON.stringify(visMolMesh.rotationQuaternion));
-        console.log("DDDT: visMolMesh: parent", JSON.stringify(visMolMesh.getChildMeshes().length));
-        console.log("DDDT: visMolMesh: VertexBuffer", JSON.stringify(visMolMesh.getVerticesData(VertexBuffer.PositionKind).slice(0,6)));
-        console.log(VertexBuffer.PositionKind, "FFF")
-
-        console.warn("Discovery here!")
-        // Problem identified: The actual vertices are different. I have
-        // confirmed that changing position, rotation, scaling does not
-        // afffect this raw data. It must be diffferent coming off the
-        // webworker somehow. Maybe when calculates center?
-
-        visMolMesh.computeWorldMatrix(true);  // Doesn't seem to really matter.
-        visMolMesh.refreshBoundingInfo();  // Doesn't seem to matter, but here just in case.
+        visMolMesh.computeWorldMatrix(true);
+        // visMolMesh.refreshBoundingInfo();  // Doesn't seem to be necessary.
         const maxVolBoxTmp = visMolMesh.getBoundingInfo().boundingBox;
-        console.log("DDDT: box centerWorld", JSON.stringify(maxVolBoxTmp.centerWorld));
 
         // const maxVolBoxDimensTmp = Object.keys(maxVolBoxTmp.maximumWorld).map(
         //     (k) => maxVolBoxTmp.maximumWorld[k] - maxVolBoxTmp.minimumWorld[k],
@@ -251,12 +237,6 @@ function getMaxVolMeshInfo(allVisMeshes: AbstractMesh[]): any {
         }
     }
 
-
-    // maxVolBox = maxVolMesh.getBoundingInfo().boundingBox;
-
-    console.log(maxVolMesh.name, maxVol, JSON.stringify(maxVolBox.centerWorld), "DDDT2", "Why maxVolBox different?")
-    console.log("DDDT =============")
-
     return {
         box: maxVolBox,
         boxDimens: maxVolBoxDimens,  // ? maxVolBoxDimens : [0, 0, 0],
@@ -272,10 +252,7 @@ function getMaxVolMeshInfo(allVisMeshes: AbstractMesh[]): any {
  * @param  {*[]} visMeshes            A list of all the visible meshes.
  * @returns void
  */
-function scaleAllMeshesToFixInBox(
-    containingBoxDimens: any[], maxVolBoxDimens: any[],
-    visMeshes: AbstractMesh[]
-): void {
+function scaleAllMeshesToFitInBox(containingBoxDimens: any[], maxVolBoxDimens: any[], visMeshes: AbstractMesh[]): void {
     const allVisMolMeshesLen = visMeshes.length;
 
     // Get the scales
@@ -317,6 +294,7 @@ function translateAllMeshes(containingBox: any, allVisMeshes: AbstractMesh[], ma
         const allVisMolMesh = allVisMeshes[i];
         allVisMolMesh.position = allVisMolMesh.position.subtract(meshTranslation);
     }
+
 
     // Also nonMolMeshesTransformNode
     nonMolMeshesTransformNode.position = nonMolMeshesTransformNode.position.subtract(meshTranslation);
@@ -456,11 +434,7 @@ function animateRotation(allVisInitialInfo: any, allVisMeshes: AbstractMesh[]): 
  * @param  {*}  endSca    The ending scale of the mesh.
  * @param  {*}  endRot    The ending rotation of the mesh.
  */
-function animateRotationOnSingleMesh(
-    mesh: TransformNode,
-    startPos: Vector3, startSca: Vector3, startRot: Quaternion,
-    endPos: Vector3, endSca: Vector3, endRot: Quaternion
-): void {
+function animateRotationOnSingleMesh(mesh: TransformNode, startPos: Vector3, startSca: Vector3, startRot: Quaternion, endPos: Vector3, endSca: Vector3, endRot: Quaternion): void {
     //                           name,   prop,         start_val,  end_val
     const posX = makeBabylonAnim("posX", "position.x", startPos.x, endPos.x);
     const posY = makeBabylonAnim("posY", "position.y", startPos.y, endPos.y);
@@ -483,7 +457,7 @@ function animateRotationOnSingleMesh(
     const anim = Vars.scene.beginAnimation(mesh, 0, 15, false, 1, () => {
         // You need to recalculate the shadows.
         Optimizations.updateEnvironmentShadows();
-        StatusComponent.setStatus("Rotate done: " + startRot.toString());
+        StatusComponent.setStatus("Rotate done: " + startRot.toString().replace(/: /g, ":"));
     });
 }
 
